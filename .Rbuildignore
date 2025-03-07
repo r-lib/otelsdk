@@ -1,5 +1,6 @@
 ^src/.*[.]o$
 ^src/.*[.]so$
 ^src/cpp$
+^src/install$
 ^src/cpp/build$
 ^LICENSE\.md$
