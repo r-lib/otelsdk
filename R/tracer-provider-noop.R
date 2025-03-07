@@ -1,3 +1,4 @@
+#' Tracer provider to ignore all tracing commands
 #' @export
 
 tracer_provider_noop <- list(

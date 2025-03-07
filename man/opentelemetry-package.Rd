@@ -4,12 +4,12 @@
 \name{opentelemetry-package}
 \alias{opentelemetry}
 \alias{opentelemetry-package}
-\title{opentelemetry: What the Package Does (One Line, Title Case)}
+\title{opentelemetry: R Implementation of 'OpenTelemetry'}
 \description{
-What the package does (one paragraph).
+'OpenTelemetry' is a collection of tools, 'APIs', and 'SDKs' used to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior. Use this package as a dependency if you want to instrument your R package for 'OpenTelemetry'.
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com}
+\strong{Maintainer}: Gébor Csárdi \email{csardi.gabor@gmail.com}
 
 }
 \keyword{internal}

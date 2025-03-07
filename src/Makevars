@@ -1,23 +1,28 @@
 
-PKG_LIBS = cpp/build/sdk/src/trace/libopentelemetry_trace.a \
+OTEL_CPP_LIBS = cpp/build/sdk/src/trace/libopentelemetry_trace.a \
 	  cpp/build/sdk/src/resource/libopentelemetry_resources.a \
 	  cpp/build/sdk/src/common/libopentelemetry_common.a \
 	  cpp/build/exporters/ostream/libopentelemetry_exporter_ostream_span.a
 
-OBJECTS = $(PKG_LIBS) init.o tracer-sdk.o tracer-api.o
+OBJECTS = init.o tracer-sdk.o tracer-api.o
 
 PKG_CPPFLAGS = -Icpp/api/include -Icpp/sdk/include \
     -Icpp/exporters/ostream/include
 
-all: $(SHLIB)
+PKG_LIBS = $(OTEL_CPP_LIBS)
 
-cpp/build/Makefile:
-	tar xzf opentelemetry-cpp.tgz
-	(cd cpp; cmake -S . -B build -DBUILD_SHARED_LIBS=OFF \
-   -DCMAKE_CXX_STANDARD=11 -DWITH_ELASTICSEARCH=OFF -DWITH_EXAMPLES=OFF \
-   -DWITH_OTLP_GRPC=OFF -DWITH_OTLP_HTTP=ON -DWITH_ABSEIL=OFF \
-   -DWITH_PROMETHEUS=OFF -DBUILD_TESTING=OFF -DWITH_BENCHMARK=OFF \
-   -DWITH_FUNC_TESTS=OFF)
+all: $(OTEL_CPP_LIBS) $(SHLIB)
 
-cpp/build/sdk/src/trace/libopentelemetry_trace.a: cpp/build/Makefile
-	(cd cpp; cmake --build build)
+cpp/build/configured: vendor/opentelemetry-cpp.tgz
+	tar xzf vendor/opentelemetry-cpp.tgz
+	mkdir -p cpp/.git
+	(cd cpp; MAKEFLAGS= cmake -S . -B build -DBUILD_SHARED_LIBS=OFF \
+	-DCMAKE_CXX_STANDARD=14 -DWITH_ELASTICSEARCH=OFF -DWITH_EXAMPLES=OFF \
+	-DWITH_OTLP_GRPC=OFF -DWITH_OTLP_HTTP=ON -DWITH_ABSEIL=OFF \
+	-DWITH_PROMETHEUS=OFF -DBUILD_TESTING=OFF -DWITH_BENCHMARK=OFF \
+	-DWITH_FUNC_TESTS=OFF)
+	rm -rf cpp/.git
+	touch cpp/build/configured
+
+cpp/build/sdk/src/trace/libopentelemetry_trace.a: cpp/build/configured
+	(cd cpp; MAKEFLAGS= cmake --build build)

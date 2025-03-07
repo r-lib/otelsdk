@@ -14,4 +14,5 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib
+SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
+    GNU make

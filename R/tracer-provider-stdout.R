@@ -1,3 +1,4 @@
+#' Tracer provider to write to the standard output
 #' @export
 
 tracer_provider_stdout <- list(

@@ -1,6 +1,12 @@
 default_tracer_provider_option <- "opentelemetry.default_tracer_provider"
 default_tracer_provider_envvar <- "R_OPENTELEMETRY_DEFAULT_TRACER_PROVIDER"
 
+#' Set the default tracer provider
+#' @param tracer_provider An OpenTelemetry tracer provider
+#'   (`opentelemetry_tracer_provider` object) to set as default.
+#' @return The previously set default tracer provider, or `NULL`, if no
+#'   default was set before.
+#'
 #' @export
 
 set_default_tracer_provider <- function(tracer_provider) {
@@ -18,6 +24,25 @@ set_default_tracer_provider <- function(tracer_provider) {
   invisible(old)
 }
 
+#' Get the default tracer provider
+#'
+#' If there is no default set currently, then it creates and sets a
+#' default.
+#'
+#' The default tracer provider is created based on the
+#' `r default_tracer_provider_envvar` environment variable.
+#' The following values are allowed:
+#' - `stdout`: uses [tracer_provider_stdout], to write traces to the
+#'   standard output.
+#' - `http`: uses [tracer_provider_http], to send traces over HTTP.
+#' - `<package>::<provider>`: will select the `<provider>` object from
+#'   the `<package>` package to use as a tracer provider. It calls
+#'   `<package>::<provider>$new()` to create the new traver provider.
+#'   If this fails for some reason, e.g. the package is not installed,
+#'   then it throws an error.
+#'
+#' @return The default tracer provider, an `opentelemetry_tracer_provider`
+#'   object.
 #' @export
 
 get_default_tracer_provider <- function() {
@@ -85,6 +110,14 @@ setup_default_tracer_provider <- function() {
 # -------------------------------------------------------------------------
 # Simplified API
 
+#' Get a tracer from the default tracer provider
+#'
+#' Calls [get_default_tracer_provider()] to get the default tracer
+#' provider. Then calls its `$get_tracer()` method to create a new tracer.
+#'
+#' @param name Name of the new tracer. This is typically the R package
+#'   name.
+#' @return An OpenTelemetry tracer, an `opentelemetry_tracer` object.
 #' @export
 
 setup_default_tracer <- function(name) {
