@@ -1,12 +1,23 @@
 
-OBJECTS = init.o tracer-sdk.o tracer-api.o
+PKG_LIBS = cpp/build/sdk/src/trace/libopentelemetry_trace.a \
+	  cpp/build/sdk/src/resource/libopentelemetry_resources.a \
+	  cpp/build/sdk/src/common/libopentelemetry_common.a \
+	  cpp/build/exporters/ostream/libopentelemetry_exporter_ostream_span.a
 
-PKG_CPPFLAGS = -I/Users/gaborcsardi/works/opentelemetry-cpp/api/include \
-               -I/Users/gaborcsardi/works/opentelemetry-cpp/sdk/include \
-               -I/Users/gaborcsardi/works/opentelemetry-cpp/exporters/ostream/include
+OBJECTS = $(PKG_LIBS) init.o tracer-sdk.o tracer-api.o
 
-PKG_LIBS = -L/Users/gaborcsardi/works/opentelemetry-cpp/lib \
-           -lopentelemetry_trace \
-           -lopentelemetry_resources \
-           -lopentelemetry_common \
-           -lopentelemetry_exporter_ostream_span
+PKG_CPPFLAGS = -Icpp/api/include -Icpp/sdk/include \
+    -Icpp/exporters/ostream/include
+
+all: $(SHLIB)
+
+cpp/build/Makefile:
+	tar xzf opentelemetry-cpp.tgz
+	(cd cpp; cmake -S . -B build -DBUILD_SHARED_LIBS=OFF \
+   -DCMAKE_CXX_STANDARD=11 -DWITH_ELASTICSEARCH=OFF -DWITH_EXAMPLES=OFF \
+   -DWITH_OTLP_GRPC=OFF -DWITH_OTLP_HTTP=ON -DWITH_ABSEIL=OFF \
+   -DWITH_PROMETHEUS=OFF -DBUILD_TESTING=OFF -DWITH_BENCHMARK=OFF \
+   -DWITH_FUNC_TESTS=OFF)
+
+cpp/build/sdk/src/trace/libopentelemetry_trace.a: cpp/build/Makefile
+	(cd cpp; cmake --build build)
