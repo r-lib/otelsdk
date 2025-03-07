@@ -4,3 +4,5 @@
 ^src/install$
 ^src/cpp/build$
 ^LICENSE\.md$
+^\.github$
+^codecov\.yml$
