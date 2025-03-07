@@ -1,0 +1,12 @@
+
+OBJECTS = init.o tracer-sdk.o tracer-api.o
+
+PKG_CPPFLAGS = -I/Users/gaborcsardi/works/opentelemetry-cpp/api/include \
+               -I/Users/gaborcsardi/works/opentelemetry-cpp/sdk/include \
+               -I/Users/gaborcsardi/works/opentelemetry-cpp/exporters/ostream/include
+
+PKG_LIBS = -L/Users/gaborcsardi/works/opentelemetry-cpp/lib \
+           -lopentelemetry_trace \
+           -lopentelemetry_resources \
+           -lopentelemetry_common \
+           -lopentelemetry_exporter_ostream_span
