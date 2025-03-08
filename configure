@@ -1,0 +1,56 @@
+#! /usr/bin/env sh
+
+if [ -z "$R_HOME" ]; then
+    echo >&2 R_HOME is not set, are you running R CMD INSTALL?
+    exit 1
+fi
+
+if [ "$R_OSTYPE" = "unix" ]; then
+    UNAME=`uname`
+else
+    UNAME=Windows
+fi
+
+# CentOS 7 seems to work with C++-14
+if [ "$UNAME" = "Linux" ]; then
+    CXX_STANDARD=14
+else
+    CXX_STANDARD=14
+fi
+
+if echo ${R_LIBRARY_DIR} | grep -q opentelemetry.Rcheck ||
+   echo ${R_LIBS} | grep -q opentelemetry.Rcheck; then
+  OTEL_CLEANUP=true
+else
+  OTEL_CLEANUP=false
+fi
+
+CMAKE_BUILD_PARALLEL_LEVEL=""
+if ! echo ${R_LIBRARY_DIR} | grep -q opentelemetry.Rcheck &&
+   ! echo ${R_LIBS} | grep -q opentelemetry.Rcheck; then
+  if [ -n "$NCPU" ]; then
+    # already set
+    true
+  elif [ "$R_OSTYPE" = "windows" ]; then
+    NCPU=$NUMBER_OF_PROCESSORS
+  elif [ "$UNAME" = "Linux" ]; then
+    NCPU=`cat /proc/cpuinfo  | grep '^processor\s*:' | wc -l || true`
+  elif [ "$UNAME" = "Darwin" ]; then
+    NCPU=`sysctl -n hw.ncpu || true`
+  else
+    NCPU=""
+  fi
+  if expr "$NCPU" : '[1-9][0-9]*$' >/dev/null; then
+    echo '**'" using $NCPU processors (unless configured differently in Makeconf)."
+    CMAKE_BUILD_PARALLEL_LEVEL="CMAKE_BUILD_PARALLEL_LEVEL=$NCPU"
+  else
+    echo '**'" parallel compilation is disabled."
+    NCPU=""
+  fi
+fi
+
+cat src/Makevars.in |
+  sed "s|@CXX_STANDARD@|${CXX_STANDARD}|" |
+  sed "s|@OTEL_CLEANUP@|${OTEL_CLEANUP}|" |
+  sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |
+  cat > src/Makevars

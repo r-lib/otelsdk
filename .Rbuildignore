@@ -2,6 +2,7 @@
 ^src/.*[.]so$
 ^src/cpp$
 ^src/install$
+^src/Makevars$
 ^src/cpp/build$
 ^LICENSE\.md$
 ^\.github$

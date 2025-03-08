@@ -13,7 +13,7 @@ PKG_LIBS = \
     -lopentelemetry_trace -lopentelemetry_resources \
     -lopentelemetry_common
 
-all: $(SHLIB)
+all: $(SHLIB) strip cleanup
 
 # need static libs before linking
 $(SHLIB): $(OTEL_CPP_LIBS)
@@ -33,11 +33,23 @@ cpp/CMakeLists.txt: vendor/opentelemetry-cpp.tgz
     -DCMAKE_INSTALL_PREFIX=../install \
     -DCMAKE_PREFIX_PATH=$$CMAKE_PREFIX_PATH \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-	-DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_STANDARD=14 \
+	-DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_STANDARD=@CXX_STANDARD@ \
 	-DWITH_ELASTICSEARCH=OFF -DWITH_EXAMPLES=OFF \
 	-DWITH_OTLP_GRPC=OFF -DWITH_OTLP_HTTP=ON -DWITH_ABSEIL=OFF \
 	-DWITH_PROMETHEUS=OFF -DBUILD_TESTING=OFF -DWITH_BENCHMARK=OFF \
 	-DWITH_FUNC_TESTS=OFF)
 	rm -rf cpp/.git
-	(cd cpp; MAKEFLAGS= cmake --build build)
-	(cd cpp; MAKEFLAFS= cmake --install build)
+	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ cmake --build build)
+	(cd cpp; cmake --install build)
+
+strip: $(SHLIB)
+	@if which strip >/dev/null && which uname >/dev/null && test "`uname`" = "Linux" && test "$$_R_SHLIB_STRIP_" = "true" && test -n "$$R_STRIP_SHARED_LIB"; then \
+		echo stripping $(SHLIB); \
+		echo $$R_STRIP_SHARED_LIB $(SHLIB); \
+		$$R_STRIP_SHARED_LIB $(SHLIB); \
+	fi
+
+cleanup: $(SHLIB)
+	@if test "$$OTEL_CLEANUP" = "true"; then \
+		rm -rf cpp install ._cpp; \
+	fi
