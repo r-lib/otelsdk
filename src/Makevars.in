@@ -41,18 +41,10 @@ cpp/CMakeLists.txt: vendor/opentelemetry-cpp.tgz
 	rm -rf cpp/.git
 	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ cmake --build build)
 	(cd cpp; cmake --install build)
-	@for f in `find cpp -name "*.hpp" -or -name "*.h"`; do \
-		sed -i 's/#pragma/# pragma/'; \
-	done
 
 strip: $(SHLIB)
 	@if which strip >/dev/null && which uname >/dev/null && test "`uname`" = "Linux" && test "$$_R_SHLIB_STRIP_" = "true" && test -n "$$R_STRIP_SHARED_LIB"; then \
 		echo stripping $(SHLIB); \
 		echo $$R_STRIP_SHARED_LIB $(SHLIB); \
 		$$R_STRIP_SHARED_LIB $(SHLIB); \
-	fi
-
-cleanup: $(SHLIB)
-	@if test "$$OTEL_CLEANUP" = "true"; then \
-		rm -rf cpp install ._cpp; \
 	fi

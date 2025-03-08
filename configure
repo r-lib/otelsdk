@@ -18,13 +18,6 @@ else
     CXX_STANDARD=14
 fi
 
-if echo ${R_LIBRARY_DIR} | grep -q opentelemetry.Rcheck ||
-   echo ${R_LIBS} | grep -q opentelemetry.Rcheck; then
-  OTEL_CLEANUP=true
-else
-  OTEL_CLEANUP=false
-fi
-
 CMAKE_BUILD_PARALLEL_LEVEL=""
 if ! echo ${R_LIBRARY_DIR} | grep -q opentelemetry.Rcheck &&
    ! echo ${R_LIBS} | grep -q opentelemetry.Rcheck; then
