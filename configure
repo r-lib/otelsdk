@@ -19,7 +19,7 @@ else
 fi
 
 if [ "$UNAME" = "Windows" ]; then
-    CMAKE_PREFIX_PATH="../cmake"
+    CMAKE_PREFIX_PATH="../extra/cmake"
 elif [ "$UNAME" = "Darwin" ]; then
     CMAKE_PREFIX_PATH="/opt/R/`arch`"
 else
@@ -51,6 +51,7 @@ if ! echo ${R_LIBRARY_DIR} | grep -q opentelemetry.Rcheck &&
 fi
 
 cat src/Makevars.in |
+  sed "s|@UNAME@|${UNAME}|" |
   sed "s|@CXX_STANDARD@|${CXX_STANDARD}|" |
   sed "s|@OTEL_CLEANUP@|${OTEL_CLEANUP}|" |
   sed "s|@CMAKE_PREFIX_PATH@|${CMAKE_PREFIX_PATH}|" |
