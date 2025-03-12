@@ -18,6 +18,14 @@ else
     CXX_STANDARD=14
 fi
 
+if [ "$UNAME" = "Windows" ]; then
+    CMAKE_PREFIX_PATH="../cmake"
+elif [ "$UNAME" = "Darwin" ]; then
+    CMAKE_PREFIX_PATH="/opt/R/`arch`"
+else
+    CMAKE_PREFIX_PATH=""
+fi
+
 CMAKE_BUILD_PARALLEL_LEVEL=""
 if ! echo ${R_LIBRARY_DIR} | grep -q opentelemetry.Rcheck &&
    ! echo ${R_LIBS} | grep -q opentelemetry.Rcheck; then
@@ -45,5 +53,6 @@ fi
 cat src/Makevars.in |
   sed "s|@CXX_STANDARD@|${CXX_STANDARD}|" |
   sed "s|@OTEL_CLEANUP@|${OTEL_CLEANUP}|" |
+  sed "s|@CMAKE_PREFIX_PATH@|${CMAKE_PREFIX_PATH}|" |
   sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |
   cat > src/Makevars
