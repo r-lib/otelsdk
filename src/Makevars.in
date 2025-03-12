@@ -38,9 +38,11 @@ cpp/CMakeLists.txt: vendor/opentelemetry-cpp.tgz
 	-DWITH_PROMETHEUS=OFF -DBUILD_TESTING=OFF -DWITH_BENCHMARK=OFF \
 	-DWITH_FUNC_TESTS=OFF -DWITH_ETW=OFF)
 	@rm -rf cpp/.git
+	sed -i.bak -e 's/^M$$//' cpp/build/CMakeFiles/3.30.4/CompilerIdC/CMakeCCompilerId.c
+	sed -i.bak -e 's/^M$$//' cpp/build/CMakeFiles/3.30.4/CompilerIdCXX/CMakeCXXCompilerId.cpp
 	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ cmake --build build)
 	(cd cpp; cmake --install build)
-	@find . -type f  -name '*.pb.h' -exec sed -i.bak 's/#pragma/# pragma/g' {} \;
+	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 
 strip: $(SHLIB)
 	@if which strip >/dev/null && which uname >/dev/null && test "`uname`" = "Linux" && test "$$_R_SHLIB_STRIP_" = "true" && test -n "$$R_STRIP_SHARED_LIB"; then \
