@@ -5,7 +5,7 @@
 \alias{tracer_provider_http}
 \title{Tracer provider to export over HTTP}
 \format{
-An object of class \code{list} of length 1.
+An object of class \code{list} of length 2.
 }
 \usage{
 tracer_provider_http

@@ -58,7 +58,7 @@ void otel_tracer_finally_(void *tracer);
 void otel_span_finally_(void *span);
 void otel_scope_finally_(void *scope);
 
-void *otel_create_tracer_provider_stdout_(void);
+void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
 void *otel_get_tracer_(void *tracer_provider, const char *name);
 struct otel_scoped_span otel_start_span_(void *tracer, const char *name, void *parent);

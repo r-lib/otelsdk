@@ -6,7 +6,7 @@
 \alias{opentelemetry-package}
 \title{opentelemetry: R Implementation of 'OpenTelemetry'}
 \description{
-'OpenTelemetry' is a collection of tools, 'APIs', and 'SDKs' used to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior. Use this package as a dependency if you want to instrument your R package for 'OpenTelemetry'.
+High-quality, ubiquitous, and portable telemetry to enable effective observability. 'OpenTelemetry' is a collection of tools, 'APIs', and 'SDKs' used to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior. Use this package as a dependency if you want to instrument your R package for 'OpenTelemetry'.
 }
 \author{
 \strong{Maintainer}: Gébor Csárdi \email{csardi.gabor@gmail.com}

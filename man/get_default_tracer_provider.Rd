@@ -19,8 +19,10 @@ The default tracer provider is created based on the
 R_OPENTELEMETRY_DEFAULT_TRACER_PROVIDER environment variable.
 The following values are allowed:
 \itemize{
-\item \code{stdout}: uses \link{tracer_provider_stdout}, to write traces to the
+\item \code{stdout}: uses \link{tracer_provider_stdstream}, to write traces to the
 standard output.
+\item \code{stderr}: uses \link{tracer_provider_stdstream}, to write traces to the
+standard error.
 \item \code{http}: uses \link{tracer_provider_http}, to send traces over HTTP.
 \item \verb{<package>::<provider>}: will select the \verb{<provider>} object from
 the \verb{<package>} package to use as a tracer provider. It calls

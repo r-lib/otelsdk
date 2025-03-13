@@ -6,7 +6,7 @@
 
 #include "otel_common.h"
 
-SEXP otel_create_tracer_provider_stdout(void);
+SEXP otel_create_tracer_provider_stdstream(SEXP stream);
 SEXP otel_create_tracer_provider_http(void);
 SEXP otel_get_tracer(SEXP provider, SEXP name);
 
@@ -19,7 +19,7 @@ SEXP otel_tracer_provider_http_options(void);
   { #name, (DL_FUNC)&name, n }
 
 static const R_CallMethodDef callMethods[]  = {
-  CALLDEF(otel_create_tracer_provider_stdout, 0),
+  CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_get_tracer, 2),
   CALLDEF(otel_start_span, 3),
@@ -66,8 +66,9 @@ void otel_scope_finally(SEXP x) {
   }
 }
 
-SEXP otel_create_tracer_provider_stdout(void) {
-  void *tracer_provider_ = otel_create_tracer_provider_stdout_();
+SEXP otel_create_tracer_provider_stdstream(SEXP stream) {
+  const char *cstream = CHAR(STRING_ELT(stream, 0));
+  void *tracer_provider_ = otel_create_tracer_provider_stdstream_(cstream);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
   return xptr;

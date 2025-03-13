@@ -32,8 +32,10 @@ set_default_tracer_provider <- function(tracer_provider) {
 #' The default tracer provider is created based on the
 #' `r default_tracer_provider_envvar` environment variable.
 #' The following values are allowed:
-#' - `stdout`: uses [tracer_provider_stdout], to write traces to the
+#' - `stdout`: uses [tracer_provider_stdstream], to write traces to the
 #'   standard output.
+#' - `stderr`: uses [tracer_provider_stdstream], to write traces to the
+#'   standard error.
 #' - `http`: uses [tracer_provider_http], to send traces over HTTP.
 #' - `<package>::<provider>`: will select the `<provider>` object from
 #'   the `<package>` package to use as a tracer provider. It calls
@@ -91,7 +93,10 @@ setup_default_tracer_provider <- function() {
     switch(
       ev,
       "stdout" = {
-        tracer_provider_stdout$new()
+        tracer_provider_stdstream$new("stdout")
+      },
+      "stderr" = {
+        tracer_provider_stdstream$new("stderr")
       },
       "http" = {
         tracer_provider_http$new()

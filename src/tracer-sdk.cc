@@ -94,8 +94,10 @@ void otel_scope_finally_(void *scope_) {
   delete scope;
 }
 
-void *otel_create_tracer_provider_stdout_(void) {
-  auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create();
+void *otel_create_tracer_provider_stdstream_(const char *stream) {
+  auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(
+    !strcmp(stream, "stdout") ? std::cout : std::cerr
+  );
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
   struct otel_tracer_provider *tps = new otel_tracer_provider;
