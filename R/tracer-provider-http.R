@@ -13,9 +13,8 @@ tracer_provider_http <- list(
 
     self$xptr <- .Call(otel_create_tracer_provider_http)
     self
+  },
+  options = function() {
+    .Call(otel_tracer_provider_http_options)
   }
 )
-
-tracer_provider_http_options <- function() {
-  .Call(otel_tracer_provider_http_options)
-}

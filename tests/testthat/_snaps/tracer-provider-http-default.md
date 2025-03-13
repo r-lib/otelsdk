@@ -1,7 +1,7 @@
 # HTTP tracer provider defaults
 
     Code
-      tracer_provider_http_options()
+      tracer_provider_http$options()
     Output
       $url
       [1] "http://localhost:4318/v1/traces"
