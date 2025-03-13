@@ -34,12 +34,12 @@ all: $(SHLIB) strip
 $(SHLIB): $(OTEL_CPP_LIBS)
 
 # need to extract headers before compiling R package
-$(OBJECTS): cpp/CMakeLists.txt
+$(OBJECTS): $(OTEL_CPP_LIBS)
 
 # need to build our proto lib with -DNDEBUG in CXXFLAGS, because of a bug:
 # https://github.com/protocolbuffers/protobuf/issues/9947
 # https://stackoverflow.com/a/73074255/604364
-cpp/CMakeLists.txt: vendor/opentelemetry-cpp.tgz
+$(OTEL_CPP_LIBS): vendor/opentelemetry-cpp.tgz
 	tar xzf vendor/opentelemetry-cpp.tgz --no-same-owner || \
 	    tar xzf vendor/opentelemetry-cpp.tgz
 	@mkdir -p cpp/.git
