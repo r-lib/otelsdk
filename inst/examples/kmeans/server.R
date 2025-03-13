@@ -1,9 +1,7 @@
 function(input, output, session) {
 
-  session$userData$tracer <-
-    opentelemetry::setup_default_tracer("kmeans-shiny-app")
   session$userData$session_span <-
-    session$userData$tracer$start_span("session", scope = NULL)
+    tracer$start_span("session", parent = app_span, scope = NULL)
   session$onSessionEnded(function() session$userData$session_span$end())
 
   # Combine the selected variables into a new data frame
@@ -12,12 +10,12 @@ function(input, output, session) {
   })
 
   clusters <- reactive({
-    session$userData$tracer$start_span("kmeans")
+    tracer$start_span("kmeans", parent = session$userData$session_span)
     kmeans(selectedData(), input$clusters)
   })
 
   output$plot1 <- renderPlot({
-    session$userData$tracer$start_span("plot")
+    tracer$start_span("plot", parent = session$userData$session_span)
     palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
       "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
 
