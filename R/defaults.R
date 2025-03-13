@@ -10,7 +10,7 @@ default_tracer_provider_envvar <- "R_OPENTELEMETRY_DEFAULT_TRACER_PROVIDER"
 #' @export
 
 set_default_tracer_provider <- function(tracer_provider) {
-  if (!inherits(tracer, "opentelemetry_tracer_provider")) {
+  if (!inherits(tracer_provider, "opentelemetry_tracer_provider")) {
     stop(
       "Cannot set default opentelemetry tracer provider, not an ",
       "opentelemetry_tracer_provider object"
