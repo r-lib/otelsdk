@@ -27,6 +27,7 @@ PKG_LIBS = \
 	-lopentelemetry_common \
 	-lopentelemetry_proto \
 	-lprotobuf \
+	-lcurl
 
 all: $(SHLIB) strip
 
