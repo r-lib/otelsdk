@@ -20,10 +20,18 @@ fi
 
 if [ "$UNAME" = "Windows" ]; then
     CMAKE_PREFIX_PATH="../extra/cmake"
+    PROTOBUF_LIBS="`pkg-config --libs protobuf`"
+    LIBCURL_LIBS="`pkg-config --libs libcurl`"
+    XCFLAGS="-DCURL_STATICLIB"
+    XCXXFLAGS="-DCURL_STATICLIB"
 elif [ "$UNAME" = "Darwin" ]; then
     CMAKE_PREFIX_PATH="/opt/R/`arch`"
+    PROTOBUF_LIBS="-lprotobuf"
+    LIBCURL_LIBS="-lcurl"
 else
     CMAKE_PREFIX_PATH=""
+    PROTOBUF_LIBS="-lprotobuf"
+    LIBCURL_LIBS="-lcurl"
 fi
 
 CMAKE_BUILD_PARALLEL_LEVEL=""
@@ -53,6 +61,10 @@ fi
 cat src/Makevars.in |
   sed "s|@UNAME@|${UNAME}|" |
   sed "s|@CXX_STANDARD@|${CXX_STANDARD}|" |
+  sed "s|@XCFLAGS@|${XCFLAGS}|" |
+  sed "s|@XCXXFLAGS@|${XCXXFLAGS}|" |
+  sed "s|@PROTOBUF_LIBS@|${PROTOBUF_LIBS}|" |
+  sed "s|@LIBCURL_LIBS@|${LIBCURL_LIBS}|" |
   sed "s|@OTEL_CLEANUP@|${OTEL_CLEANUP}|" |
   sed "s|@CMAKE_PREFIX_PATH@|${CMAKE_PREFIX_PATH}|" |
   sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |

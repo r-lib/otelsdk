@@ -26,8 +26,8 @@ PKG_LIBS = \
 	-lopentelemetry_resources \
 	-lopentelemetry_common \
 	-lopentelemetry_proto \
-	-lprotobuf \
-	-lcurl
+	@PROTOBUF_LIBS@ \
+	@LIBCURL_LIBS@
 
 all: $(SHLIB) strip
 
@@ -45,9 +45,10 @@ $(OTEL_CPP_LIBS): vendor/opentelemetry-cpp.tgz
 	    tar xzf vendor/opentelemetry-cpp.tgz
 	@mkdir -p cpp/.git
 	(cd cpp; MAKEFLAGS= CC="$(CC)" CXX="$(CXX)" AR="$(AR)" \
-     RANLIB="$(RANLIB)" CPPFLAGS="$(CPPFLAGS)" \
-     CXXFLAGS="$(CXXFLAGS) $(CXXPICFLAGS) -DNDEBUG" \
-	 CFLAGS="$(CFLAGS) $(CPICFLAGS) -DNDEBUG" cmake -S . -B build \
+	RANLIB="$(RANLIB)" CPPFLAGS="$(CPPFLAGS)" \
+	CXXFLAGS="$(CXXFLAGS) $(CXXPICFLAGS) -DNDEBUG @XCXXFLAGS@" \
+	CFLAGS="$(CFLAGS) $(CPICFLAGS) -DNDEBUG @XCFLAGS@" \
+	cmake -S . -B build \
 	-DCMAKE_INSTALL_PREFIX=../install \
 	-DCMAKE_PREFIX_PATH="@CMAKE_PREFIX_PATH@" \
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
