@@ -1,6 +1,12 @@
 #include <memory>
+#include <stdexcept>
 #include <utility>
+#include <iostream>
 
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -14,6 +20,7 @@
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
 namespace trace_exporter = opentelemetry::exporter::trace;
+namespace otlp           = opentelemetry::exporter::otlp;
 namespace nostd          = opentelemetry::nostd;
 
 #include "otel_common.h"
@@ -52,6 +59,16 @@ void *otel_create_tracer_provider_stdout_(void) {
   return (void*) tps;
 }
 
+void *otel_create_tracer_provider_http_(void) {
+  auto exporter  = otlp::OtlpHttpExporterFactory::Create();
+  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+
+  struct otel_tracer_provider *tps = new otel_tracer_provider;
+  tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+
+  return (void*) tps;
+}
+
 void *otel_get_tracer_(void *tracer_provider_, const char *name) {
   struct otel_tracer_provider *tps =
     (struct otel_tracer_provider *) tracer_provider_;
@@ -60,6 +77,20 @@ void *otel_get_tracer_(void *tracer_provider_, const char *name) {
   ts->ptr = tracer_provider.GetTracer(name);
 
   return (void*) ts;
+}
+
+void otel_tracer_provider_http_default_url_(char *buffer, size_t *buf_len) {
+  std::string url = otlp::GetOtlpDefaultHttpTracesEndpoint();
+  size_t len = url.length();
+  if (buffer) {
+    if (*buf_len <= len) {
+      throw std::runtime_error("Internal error, buffer too short");
+    }
+    memcpy(buffer, url.c_str(), len);
+    buffer[len] = '\0';
+  } else {
+    *buf_len = len;
+  }
 }
 
 }

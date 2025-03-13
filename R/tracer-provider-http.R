@@ -11,8 +11,7 @@ tracer_provider_http <- list(
       }
     )
 
-    # TODO
-#    self$xptr <- .Call(otel_create_tracer_provider_http)
+    self$xptr <- .Call(otel_create_tracer_provider_http)
     self
   }
 )

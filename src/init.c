@@ -5,19 +5,24 @@
 #include "otel_common.h"
 
 SEXP otel_create_tracer_provider_stdout(void);
+SEXP otel_create_tracer_provider_http(void);
 SEXP otel_get_tracer(SEXP provider, SEXP name);
 
 SEXP otel_start_span(SEXP tracer, SEXP name, SEXP parent);
 SEXP otel_span_end(SEXP scoped_span);
+
+SEXP otel_tracer_provider_http_default_url(void);
 
 #define CALLDEF(name, n) \
   { #name, (DL_FUNC)&name, n }
 
 static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_stdout, 0),
+  CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_get_tracer, 2),
   CALLDEF(otel_start_span, 3),
   CALLDEF(otel_span_end, 1),
+  CALLDEF(otel_tracer_provider_http_default_url, 0),
   { NULL, NULL, 0 }
 };
 
@@ -61,6 +66,13 @@ void otel_scope_finally(SEXP x) {
 
 SEXP otel_create_tracer_provider_stdout(void) {
   void *tracer_provider_ = otel_create_tracer_provider_stdout_();
+  SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_create_tracer_provider_http(void) {
+  void *tracer_provider_ = otel_create_tracer_provider_http_();
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
   return xptr;
@@ -110,4 +122,13 @@ SEXP otel_span_end(SEXP scoped_span) {
     R_ClearExternalPtr(scope);
   }
   return R_NilValue;
+}
+
+SEXP otel_tracer_provider_http_default_url(void) {
+  size_t len;
+  otel_tracer_provider_http_default_url_(NULL, &len);
+  SEXP res = PROTECT(Rf_allocVector(RAWSXP, ++len));
+  otel_tracer_provider_http_default_url_((char*)RAW(res), &len);
+  UNPROTECT(1);
+  return res;
 }
