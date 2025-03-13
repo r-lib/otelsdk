@@ -26,6 +26,51 @@ namespace nostd          = opentelemetry::nostd;
 #include "otel_common.h"
 #include "otel_common_cpp.h"
 
+static void
+otel_string_to_char(const std::string &inp, struct otel_string &outp) {
+  size_t len = inp.length();
+  if (outp.s) {
+    if (outp.size <= len) {
+      throw std::runtime_error("Intarnal error, buffer too short.");
+    }
+    memcpy(outp.s, inp.c_str(), len);
+    outp.s[len] = '\0';
+  } else {
+    outp.size = len + 1;
+  }
+}
+
+template<class Compare>
+static void otel_multimap_to_char(
+  const std::multimap<std::string, std::string, Compare> &map,
+  struct otel_strings &outp) {
+
+  if (outp.s) {
+    char *s = outp.s;
+    size_t chk_size = 0;
+    for (auto it = map.begin(); it != map.end(); it++) {
+      size_t flen = it->first.length();
+      size_t slen = it->second.length();
+      chk_size += flen + slen + 2;
+      if (outp.size < chk_size) {
+        throw std::runtime_error("Internal error, buffer too short");
+      }
+      memcpy(s, it->first.c_str(), flen);
+      s[flen] = '\0';
+      s += flen + 1;
+      memcpy(s, it->second.c_str(), slen);
+      s[slen] = '\0';
+      s += slen + 1;
+    }
+  } else {
+    outp.count = map.size() * 2;
+    outp.size = map.size() * 2;
+    for (auto it = map.begin(); it != map.end(); it++) {
+      outp.size += it->first.length() + it->second.length();
+    }
+  }
+}
+
 extern "C" {
 
 void otel_tracer_provider_finally_(void *tracer_provider_) {
@@ -79,18 +124,50 @@ void *otel_get_tracer_(void *tracer_provider_, const char *name) {
   return (void*) ts;
 }
 
-void otel_tracer_provider_http_default_url_(char *buffer, size_t *buf_len) {
-  std::string url = otlp::GetOtlpDefaultHttpTracesEndpoint();
-  size_t len = url.length();
-  if (buffer) {
-    if (*buf_len <= len) {
-      throw std::runtime_error("Internal error, buffer too short");
-    }
-    memcpy(buffer, url.c_str(), len);
-    buffer[len] = '\0';
-  } else {
-    *buf_len = len;
+void otel_tracer_provider_http_default_options_(
+  struct otel_tracer_provider_http_options_t *copts) {
+
+  otlp::OtlpHttpExporterOptions *opts =
+    new otlp::OtlpHttpExporterOptions();
+
+  otel_string_to_char(opts->url, copts->url);
+  switch(opts->content_type) {
+    case otlp::HttpRequestContentType::kJson:
+      copts->content_type = k_json;
+      break;
+    case otlp::HttpRequestContentType::kBinary:
+      copts->content_type = k_binary;
+      break;
+    default:
+      throw std::runtime_error("Internal error, unknown HTTP request content type");
+      break;
   }
+  copts->use_json_name = opts->use_json_name;
+  copts->console_debug = opts->console_debug;
+  copts->timeout = std::chrono::duration<double>(opts->timeout).count();
+  otel_multimap_to_char(opts->http_headers, copts->http_headers);
+  copts->ssl_insecure_skip_verify = opts->ssl_insecure_skip_verify;
+  otel_string_to_char(opts->ssl_ca_cert_path, copts->ssl_ca_cert_path);
+  otel_string_to_char(opts->ssl_ca_cert_string, copts->ssl_ca_cert_string);
+  otel_string_to_char(opts->ssl_client_key_path, copts->ssl_client_key_path);
+  otel_string_to_char(opts->ssl_client_key_string, copts->ssl_client_key_string);
+  otel_string_to_char(opts->ssl_client_cert_path, copts->ssl_client_cert_path);
+  otel_string_to_char(opts->ssl_client_cert_string, copts->ssl_client_cert_string);
+  otel_string_to_char(opts->ssl_min_tls, copts->ssl_min_tls);
+  otel_string_to_char(opts->ssl_max_tls, copts->ssl_max_tls);
+  otel_string_to_char(opts->ssl_cipher, copts->ssl_cipher);
+  otel_string_to_char(opts->ssl_cipher_suite, copts->ssl_cipher_suite);
+  otel_string_to_char(opts->compression, copts->compression);
+  copts->retry_policy_max_attempts = opts->retry_policy_max_attempts;
+  copts->retry_policy_initial_backoff = opts->retry_policy_initial_backoff.count();
+  copts->retry_policy_max_backoff = opts->retry_policy_max_backoff.count();
+  copts->retry_policy_backoff_multiplier = opts->retry_policy_backoff_multiplier;
+}
+
+void otel_tracer_provider_http_default_options_del_(void *opts_) {
+  otlp::OtlpHttpExporterOptions *opts =
+    (otlp::OtlpHttpExporterOptions*) opts_;
+  delete opts;
 }
 
 }

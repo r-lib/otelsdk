@@ -1,5 +1,5 @@
-test_that("multiplication works", {
+test_that("HTTP tracer provider defaults", {
   expect_snapshot({
-    rawToChar(.Call(otel_tracer_provider_http_default_url))
+    tracer_provider_http_options()
   })
 })
