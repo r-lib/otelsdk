@@ -28,10 +28,13 @@ static const R_CallMethodDef callMethods[]  = {
   { NULL, NULL, 0 }
 };
 
+extern void otel_init_context_storage(void);
+
 void R_init_opentelemetry(DllInfo *dll) {
   R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);
+  otel_init_context_storage();
 }
 
 void otel_tracer_provider_finally(SEXP x) {
