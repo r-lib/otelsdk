@@ -13,6 +13,11 @@ SEXP otel_get_tracer(SEXP provider, SEXP name);
 SEXP otel_start_span(SEXP tracer, SEXP name, SEXP parent);
 SEXP otel_span_end(SEXP scoped_span);
 
+SEXP otel_start_session(void);
+SEXP otel_activate_session(SEXP sess);
+SEXP otel_deactivate_session(SEXP sess);
+SEXP otel_finish_session(SEXP sess);
+
 SEXP otel_tracer_provider_http_options(void);
 
 #define CALLDEF(name, n) \
@@ -24,6 +29,10 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_get_tracer, 2),
   CALLDEF(otel_start_span, 3),
   CALLDEF(otel_span_end, 1),
+  CALLDEF(otel_start_session, 0),
+  CALLDEF(otel_activate_session, 1),
+  CALLDEF(otel_deactivate_session, 1),
+  CALLDEF(otel_finish_session, 1),
   CALLDEF(otel_tracer_provider_http_options, 0),
   { NULL, NULL, 0 }
 };
@@ -65,6 +74,14 @@ void otel_scope_finally(SEXP x) {
   void *scope_ = R_ExternalPtrAddr(x);
   if (scope_) {
     otel_span_finally_(scope_);
+    R_ClearExternalPtr(x);
+  }
+}
+
+void otel_session_finally(SEXP x) {
+  void *sess_ = R_ExternalPtrAddr(x);
+  if (sess_) {
+    otel_session_finally_(sess_);
     R_ClearExternalPtr(x);
   }
 }
@@ -127,6 +144,32 @@ SEXP otel_span_end(SEXP scoped_span) {
     otel_span_end_(span_, scope_);
     R_ClearExternalPtr(scope);
   }
+  return R_NilValue;
+}
+
+SEXP otel_start_session(void) {
+  void *sess_ = otel_start_session_();
+  SEXP res = PROTECT(R_MakeExternalPtr(sess_, R_NilValue, R_NilValue));
+  R_RegisterCFinalizerEx(res, otel_session_finally, (Rboolean) 1);
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP otel_activate_session(SEXP sess) {
+  void *sess_ = R_ExternalPtrAddr(sess);
+  otel_activate_session_(sess_);
+  return R_NilValue;
+}
+
+SEXP otel_deactivate_session(SEXP sess) {
+  void *sess_ = R_ExternalPtrAddr(sess);
+  otel_deactivate_session_(sess_);
+  return R_NilValue;
+}
+
+SEXP otel_finish_session(SEXP sess) {
+  void *sess_ = R_ExternalPtrAddr(sess);
+  otel_finish_session_(sess_);
   return R_NilValue;
 }
 

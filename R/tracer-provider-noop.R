@@ -27,7 +27,11 @@ tracer_noop <- list(
         start_span = function(name, ...) {
           span_noop$new(name, ...)
         },
-        is_enabled = function(...) FALSE
+        is_enabled = function(...) FALSE,
+        start_session = function() { },
+        activate_session = function(session) { },
+        deactivate_session = function(Session) { },
+        finish_session = function(session) { }
       ),
       class = c("opentelemetry_tracer_noop", "opentelemetry_tracer")
     )

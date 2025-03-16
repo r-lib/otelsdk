@@ -1,10 +1,31 @@
+#include <map>
+
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/trace/span.h"
 
 namespace ctx   = opentelemetry::context;
 namespace nostd = opentelemetry::nostd;
+namespace trace = opentelemetry::trace;
+
+nostd::shared_ptr<ctx::RuntimeContextStorage> &GetRContextStorage();
 
 namespace r_otel {
+
+class SessionId {
+public:
+  SessionId() : id(std::to_string(nxt())) {}
+  friend bool operator<(const SessionId& l, const SessionId r) {
+    return l.id < r.id;
+  }
+
+private:
+  std::string id;
+  int64_t nxt() {
+    static int64_t counter = 1;
+    return counter++;
+  }
+};
 
 class RContextStorage : public ctx::RuntimeContextStorage {
 public:
@@ -43,12 +64,27 @@ public:
     return CreateToken(context);
   }
 
+  SessionId StartSession() {
+    return GetStackSet().NewStack();
+  }
+
+  void ActivateSession(SessionId &id) {
+    GetStackSet().SelectStack(id);
+  }
+
+  void DeactivateSession(SessionId &id) {
+    GetStackSet().UnselectStack(id);
+  }
+
+  void FinishSession(SessionId &id) {
+    GetStackSet().RemoveStack(id);
+  }
+
 private:
   // A nested class to store the attached contexts in a stack.
   class Stack
   {
-    friend class RContextStorage;
-
+  public:
     Stack() noexcept : size_(0), capacity_(0), base_(nullptr) {}
 
     // Pops the top Context off the stack.
@@ -133,18 +169,96 @@ private:
     ctx::Context *base_;
   };
 
-  OPENTELEMETRY_API_SINGLETON Stack &GetStack()
-  {
-    static thread_local Stack stack_ = Stack();
-    return stack_;
+  class StackSet {
+  public:
+    StackSet() : is_default_(true) { }
+
+    Stack &GetCurrent() {
+      if (is_default_) {
+        return default_;
+      } else {
+        return sessions_[current_];
+      }
+    }
+
+    SessionId NewStack() {
+      is_default_ = false;
+      current_ = SessionId();
+      sessions_[current_] = Stack();
+      return current_;
+    }
+
+    void SelectStack(SessionId &id) {
+      is_default_ = false;
+      current_ = id;
+    }
+
+    void UnselectStack(SessionId &id) {
+      is_default_ = true;
+    }
+
+    void RemoveStack(SessionId &id) {
+      sessions_.erase(id);
+      is_default_ = true;
+    }
+
+    ~StackSet() noexcept { }
+
+    bool is_default_;
+    Stack default_;
+    std::map<SessionId, Stack> sessions_;
+    SessionId current_;
+  };
+
+  StackSet &GetStackSet() {
+    static StackSet stackset_ = StackSet();
+    return stackset_;
+  }
+
+  Stack &GetStack() {
+    return GetStackSet().GetCurrent();
   }
 };
 
+SessionId StartSession() {
+  nostd::shared_ptr<ctx::RuntimeContextStorage> &str = GetRContextStorage();
+  r_otel::RContextStorage *rstr =
+    static_cast<r_otel::RContextStorage*>(str.get());
+  return rstr->StartSession();
+}
+
+void ActivateSession(SessionId &id) {
+  nostd::shared_ptr<ctx::RuntimeContextStorage> &str = GetRContextStorage();
+  r_otel::RContextStorage *rstr =
+    static_cast<r_otel::RContextStorage*>(str.get());
+  rstr->ActivateSession(id);
+}
+
+void DeactivateSession(SessionId &id) {
+  nostd::shared_ptr<ctx::RuntimeContextStorage> &str = GetRContextStorage();
+  r_otel::RContextStorage *rstr =
+    static_cast<r_otel::RContextStorage*>(str.get());
+  rstr->DeactivateSession(id);
+}
+
+void FinishSession(SessionId &id) {
+  nostd::shared_ptr<ctx::RuntimeContextStorage> &str = GetRContextStorage();
+  r_otel::RContextStorage *rstr =
+    static_cast<r_otel::RContextStorage*>(str.get());
+  rstr->FinishSession(id);
+}
+
 } // namespace r_otel
 
-void otel_init_context_storage_(void) {
-  const nostd::shared_ptr<ctx::RuntimeContextStorage>
+nostd::shared_ptr<ctx::RuntimeContextStorage> &GetRContextStorage() {
+  static nostd::shared_ptr<ctx::RuntimeContextStorage>
     storage(new r_otel::RContextStorage);
+  return storage;
+}
+
+void otel_init_context_storage_(void) {
+  nostd::shared_ptr<ctx::RuntimeContextStorage> storage =
+    GetRContextStorage();
   ctx::RuntimeContext::SetRuntimeContextStorage(storage);
 }
 
@@ -152,6 +266,30 @@ extern "C" {
 
 extern void otel_init_context_storage(void) {
   otel_init_context_storage_();
+}
+
+void otel_session_finally_(void *id_) {
+  r_otel::SessionId *id = (r_otel::SessionId*) id_;
+  r_otel::FinishSession(*id);
+}
+
+void *otel_start_session_(void) {
+  r_otel::SessionId *id = new r_otel::SessionId{r_otel::StartSession()};
+  return (void*) id;
+}
+
+void otel_activate_session_(void *id_) {
+  r_otel::SessionId *id = (r_otel::SessionId*) id_;
+  r_otel::ActivateSession(*id);
+}
+
+void otel_deactivate_session_(void *id_) {
+  r_otel::SessionId *id = (r_otel::SessionId*) id_;
+  r_otel::DeactivateSession(*id);
+}
+
+void otel_finish_session_(void *id_) {
+  otel_session_finally_(id_);
 }
 
 }
