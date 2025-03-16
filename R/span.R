@@ -9,7 +9,8 @@ span <- list(
       start_timestamp = NULL,
       scope) {
 
-    if (!is.null(parent) && !inherits(parent, "opentelemetry_span")) {
+    if (!is.null(parent) && is_na(parent) &&
+        !inherits(parent, "opentelemetry_span")) {
       stop(
         "`parent` must be an `opentelemetry_span` object when ",
         "creating an Opentelemetry span"

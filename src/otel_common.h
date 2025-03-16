@@ -57,12 +57,18 @@ void otel_tracer_provider_finally_(void *tracer_provider);
 void otel_tracer_finally_(void *tracer);
 void otel_span_finally_(void *span);
 void otel_scope_finally_(void *scope);
+void otel_session_finally_(void *sess);
 
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
 void *otel_get_tracer_(void *tracer_provider, const char *name);
 struct otel_scoped_span otel_start_span_(void *tracer, const char *name, void *parent);
 void otel_span_end_(void *span, void *scope);
+
+void *otel_start_session_(void);
+void otel_activate_session_(void *id_);
+void otel_deactivate_session_(void *id_);
+void otel_finish_session_(void *id_);
 
 void otel_tracer_provider_http_default_options_(
   struct otel_tracer_provider_http_options_t *opts);
