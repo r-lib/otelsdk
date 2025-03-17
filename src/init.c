@@ -10,7 +10,10 @@ SEXP otel_create_tracer_provider_stdstream(SEXP stream);
 SEXP otel_create_tracer_provider_http(void);
 SEXP otel_get_tracer(SEXP provider, SEXP name);
 
-SEXP otel_start_span(SEXP tracer, SEXP name, SEXP parent);
+SEXP otel_start_span(
+  SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
+  SEXP parent
+);
 SEXP otel_span_end(SEXP scoped_span);
 
 SEXP otel_start_session(void);
@@ -20,6 +23,8 @@ SEXP otel_finish_session(SEXP sess);
 
 SEXP otel_tracer_provider_http_options(void);
 
+SEXP rf_get_list_element(SEXP list, const char *str);
+
 #define CALLDEF(name, n) \
   { #name, (DL_FUNC)&name, n }
 
@@ -27,7 +32,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_get_tracer, 2),
-  CALLDEF(otel_start_span, 3),
+  CALLDEF(otel_start_span, 6),
   CALLDEF(otel_span_end, 1),
   CALLDEF(otel_start_session, 0),
   CALLDEF(otel_activate_session, 1),
@@ -115,7 +120,10 @@ SEXP otel_get_tracer(SEXP provider, SEXP name) {
   return xptr;
 }
 
-SEXP otel_start_span(SEXP tracer, SEXP name, SEXP parent) {
+SEXP otel_start_span(
+  SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
+  SEXP parent) {
+
   void *tracer_ = R_ExternalPtrAddr(tracer);
   if (!tracer_) {
     Rf_error("Opentelemetry tracer cleaned up already, internal error.");
@@ -124,6 +132,11 @@ SEXP otel_start_span(SEXP tracer, SEXP name, SEXP parent) {
   if (!Rf_isNull(parent)) {
     parent_ = R_ExternalPtrAddr(parent);
   }
+
+  // TODO: attributes
+  // TODO: links
+  // TODO: rest of options
+
   const char *name_ = CHAR(STRING_ELT(name, 0));
   struct otel_scoped_span sspan = otel_start_span_(tracer_, name_, parent_);
   SEXP res = PROTECT(Rf_allocVector(VECSXP, 2));

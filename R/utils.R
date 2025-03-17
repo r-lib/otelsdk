@@ -1,10 +1,4 @@
-is_na <- function(x) {
-  is.vector(x) && length(x) == 1 && is.na(x)
-}
-
-is_string <- function(x) {
-  is.character(x) && length(x) == 1 && !is.na(x)
-}
+`%||%` <- function(l, r) if (is.null(l)) r else l
 
 defer <- function(expr, envir = parent.frame()) {
   finalizer <- as.call(list(function() expr))

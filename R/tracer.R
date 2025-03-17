@@ -2,8 +2,12 @@ tracer <- list(
   new = function(provider, name, ...) {
     self <- new_object(
       "opentelemetry_tracer",
-      start_span = function(name, ..., scope = parent.frame()) {
-        span$new(self, name, ..., scope = scope)
+      start_span = function(name, attributes = NULL, links = NULL,
+                            options = NULL, scope = parent.frame()) {
+        span$new(
+          self, name = name, attributes = attributes, links = links,
+          options = options, scope = scope
+        )
       },
       is_enabled = function(...) TRUE,
       start_session = function() {

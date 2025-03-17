@@ -2,9 +2,11 @@ function(input, output, session) {
 
   session$userData$otel_session <- tracer$start_session()
   session$userData$session_span <-
-    tracer$start_span("session", parent = app_span, scope = NULL)
-  session$onSessionEnded(function() {
+    tracer$start_span("session", options = list(parent = app_span), scope = NULL)
+  session$onSessionEnded(function(...) {
+    browser()
     session$userData$session_span$end()
+    print(tracer)
     tracer$finish_session(session$userData$otel_session)
   })
 

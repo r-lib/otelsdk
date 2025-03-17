@@ -2,20 +2,18 @@ span <- list(
   new = function(
       tracer,
       name,
-      parent = NULL,
-      span_kind = "internal",
       attributes = NULL,
       links = NULL,
-      start_timestamp = NULL,
+      options = NULL,
       scope) {
 
-    if (!is.null(parent) && is_na(parent) &&
-        !inherits(parent, "opentelemetry_span")) {
-      stop(
-        "`parent` must be an `opentelemetry_span` object when ",
-        "creating an Opentelemetry span"
-      )
-    }
+    options[["start_system_time"]] <-
+      as_timestamp(options[["start_system_time"]])
+    options[["start_steady_time"]] <-
+      as_timestamp(options[["start_steady_time"]])
+    options[["parent"]] <- as_span(options[["parent"]], na = TRUE)
+    options[["kind"]] <- as_choice(options[["kind"]], span_kinds)
+    scope <- as_env(scope)
 
     self <- new_object(
       "opentelemetry_span",
@@ -63,12 +61,15 @@ span <- list(
 
     self$tracer <- tracer
     self$name <- name
-    self$parent <- parent
-    self$span_kind <- span_kind
     self$attributes <- attributes
     self$links <- links
-    self$start_timestamp <- start_timestamp
-    self$xptr <- .Call(otel_start_span, self$tracer$xptr, self$name, self$parent$xptr[[1]])
+    self$options <- options
+
+    parent <- options[["parent"]][["xptr"]][[1]]
+    self$xptr <- .Call(
+      otel_start_span,
+      self$tracer$xptr, self$name, attributes, links, options, parent
+    )
     self$scoped <- FALSE
     if (!is.null(scope) && !is_na(scope)) {
       if (!is.environment(scope)) {
@@ -80,4 +81,8 @@ span <- list(
 
     self
   }
+)
+
+span_kinds <- c(
+  default = "internal", "server", "client", "producer", "consumer"
 )
