@@ -22,6 +22,9 @@ tracer <- list(
       finish_session = function(session) {
         .Call(otel_finish_session, session)
       },
+      finish_all_sessions = function() {
+        .Call(otel_finish_all_sessions)
+      },
       name = NULL
     )
     self$provider <- provider

@@ -80,6 +80,10 @@ public:
     GetStackSet().RemoveStack(id);
   }
 
+  void FinishAllSessions() {
+    GetStackSet().RemoveAllStacks();
+  }
+
 private:
   // A nested class to store the attached contexts in a stack.
   class Stack
@@ -202,6 +206,11 @@ private:
       is_default_ = true;
     }
 
+    void RemoveAllStacks(void) {
+      sessions_.clear();
+      is_default_ = true;
+    }
+
     ~StackSet() noexcept { }
 
     bool is_default_;
@@ -248,6 +257,13 @@ void FinishSession(SessionId &id) {
   rstr->FinishSession(id);
 }
 
+void FinishAllSessions(void) {
+  nostd::shared_ptr<ctx::RuntimeContextStorage> &str = GetRContextStorage();
+  r_otel::RContextStorage *rstr =
+    static_cast<r_otel::RContextStorage*>(str.get());
+  rstr->FinishAllSessions();
+}
+
 } // namespace r_otel
 
 nostd::shared_ptr<ctx::RuntimeContextStorage> &GetRContextStorage() {
@@ -290,6 +306,10 @@ void otel_deactivate_session_(void *id_) {
 
 void otel_finish_session_(void *id_) {
   otel_session_finally_(id_);
+}
+
+void otel_finish_all_sessions_(void) {
+  r_otel::FinishAllSessions();
 }
 
 }

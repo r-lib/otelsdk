@@ -69,6 +69,7 @@ void *otel_start_session_(void);
 void otel_activate_session_(void *id_);
 void otel_deactivate_session_(void *id_);
 void otel_finish_session_(void *id_);
+void otel_finish_all_sessions_(void);
 
 void otel_tracer_provider_http_default_options_(
   struct otel_tracer_provider_http_options_t *opts);

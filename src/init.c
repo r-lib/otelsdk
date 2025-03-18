@@ -20,6 +20,7 @@ SEXP otel_start_session(void);
 SEXP otel_activate_session(SEXP sess);
 SEXP otel_deactivate_session(SEXP sess);
 SEXP otel_finish_session(SEXP sess);
+SEXP otel_finish_all_sessions(void);
 
 SEXP otel_tracer_provider_http_options(void);
 
@@ -38,6 +39,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_activate_session, 1),
   CALLDEF(otel_deactivate_session, 1),
   CALLDEF(otel_finish_session, 1),
+  CALLDEF(otel_finish_all_sessions, 0),
   CALLDEF(otel_tracer_provider_http_options, 0),
   { NULL, NULL, 0 }
 };
@@ -183,6 +185,11 @@ SEXP otel_deactivate_session(SEXP sess) {
 SEXP otel_finish_session(SEXP sess) {
   void *sess_ = R_ExternalPtrAddr(sess);
   otel_finish_session_(sess_);
+  return R_NilValue;
+}
+
+SEXP otel_finish_all_sessions(void) {
+  otel_finish_all_sessions_();
   return R_NilValue;
 }
 

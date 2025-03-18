@@ -31,7 +31,8 @@ tracer_noop <- list(
         start_session = function() { },
         activate_session = function(session) { },
         deactivate_session = function(Session) { },
-        finish_session = function(session) { }
+        finish_session = function(session) { },
+        finish_all_sessions = function() { }
       ),
       class = c("opentelemetry_tracer_noop", "opentelemetry_tracer")
     )
