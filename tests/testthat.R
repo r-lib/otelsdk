@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(opentelemetry)
+library(otelsdk)
 
-test_check("opentelemetry")
+test_check("otelsdk")

@@ -46,7 +46,7 @@ static const R_CallMethodDef callMethods[]  = {
 
 extern void otel_init_context_storage(void);
 
-void R_init_opentelemetry(DllInfo *dll) {
+void R_init_otelsdk(DllInfo *dll) {
   R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);

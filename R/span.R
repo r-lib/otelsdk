@@ -16,7 +16,7 @@ span <- list(
     scope <- as_env(scope)
 
     self <- new_object(
-      "opentelemetry_span",
+      "otel_span",
       get_context = function() {
         # TODO?
       },

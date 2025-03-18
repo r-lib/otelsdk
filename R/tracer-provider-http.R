@@ -4,8 +4,8 @@
 tracer_provider_http <- list(
   new = function() {
     self <- new_object(
-      c("opentelemetry_tracer_provider_http",
-        "opentelemetry_tracer_provider"),
+      c("otel_tracer_provider_http",
+        "otel_tracer_provider"),
       get_tracer = function(name, ...) {
         tracer$new(self, name, ...)
       }

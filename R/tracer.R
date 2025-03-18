@@ -1,7 +1,7 @@
 tracer <- list(
   new = function(provider, name, ...) {
     self <- new_object(
-      "opentelemetry_tracer",
+      "otel_tracer",
       start_span = function(name, attributes = NULL, links = NULL,
                             options = NULL, scope = parent.frame()) {
         span$new(

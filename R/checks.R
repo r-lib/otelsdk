@@ -42,14 +42,14 @@ as_timestamp <- function(x, null = TRUE, call = NULL) {
 as_span <- function(x, null = TRUE, na = TRUE, call = NULL) {
   if (null && is.null(x)) return(x)
   if (na && is_na(x)) return(NA)
-  if (inherits(x, "opentelemetry_span")) {
+  if (inherits(x, "otel_span")) {
     return(x)
   }
 
   call <- call %||% match.call()
   stop(
     "Invalid argument: ", call[[2]], " must be a span object ",
-    "(`opentelemetry_span`), but it is ", typename(x), "."
+    "(`otel_span`), but it is ", typename(x), "."
   )
 }
 

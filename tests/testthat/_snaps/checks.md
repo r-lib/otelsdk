@@ -69,7 +69,7 @@
     Output
       list()
       attr(,"class")
-      [1] "opentelemetry_span"
+      [1] "otel_span"
 
 ---
 
@@ -77,7 +77,7 @@
       as_span(b1)
     Condition
       Error in `as_span()`:
-      ! Invalid argument: b1 must be a span object (`opentelemetry_span`), but it is a data frame.
+      ! Invalid argument: b1 must be a span object (`otel_span`), but it is a data frame.
 
 # as_choice
 

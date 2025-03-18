@@ -46,7 +46,7 @@ test_that("as_timestamp", {
 })
 
 test_that("as_span", {
-  sp <- structure(list(), class = "opentelemetry_span")
+  sp <- structure(list(), class = "otel_span")
   expect_snapshot({
     as_span(NULL)
     as_span(NA)

@@ -35,8 +35,8 @@ else
 fi
 
 CMAKE_BUILD_PARALLEL_LEVEL=""
-if ! echo ${R_LIBRARY_DIR} | grep -q opentelemetry.Rcheck &&
-   ! echo ${R_LIBS} | grep -q opentelemetry.Rcheck; then
+if ! echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck &&
+   ! echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
   if [ -n "$NCPU" ]; then
     # already set
     true
