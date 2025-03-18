@@ -18,5 +18,6 @@ RoxygenNote: 7.3.2
 SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
     GNU make
 Suggests:
+    shiny,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

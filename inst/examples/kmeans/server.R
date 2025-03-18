@@ -1,30 +1,21 @@
 function(input, output, session) {
 
-  session$userData$otel_session <- tracer$start_session()
-  session$userData$session_span <-
-    tracer$start_span("session", options = list(parent = app_span), scope = NULL)
-  session$onSessionEnded(function(...) {
-    session$userData$session_span$end()
-    tracer$finish_session(session$userData$otel_session)
-  })
+  opentelemetry::start_shiny_session(session)
 
   # Combine the selected variables into a new data frame
   selectedData <- reactive({
-    tracer$activate_session(session$userData$otel_session)
-    tracer$start_span("data")
+    opentelemetry::start_span("data", session)
     iris[, c(input$xcol, input$ycol)]
   })
 
   clusters <- reactive({
-    tracer$activate_session(session$userData$otel_session)
-    tracer$start_span("kmeans")
+    opentelemetry::start_span("kmeans", session)
     Sys.sleep(1)
     kmeans(selectedData(), input$clusters)
   })
 
   output$plot1 <- renderPlot({
-    tracer$activate_session(session$userData$otel_session)
-    tracer$start_span("plot")
+    opentelemetry::start_span("plot", session)
     palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3",
       "#FF7F00", "#FFFF33", "#A65628", "#F781BF", "#999999"))
 
