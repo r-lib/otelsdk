@@ -16,16 +16,25 @@ default.
 }
 \details{
 The default tracer provider is created based on the
-R_OPENTELEMETRY_DEFAULT_TRACER_PROVIDER environment variable.
+R_OTEL_TRACES_EXPORTER environment variable. This
+environment variable is specifically for R applications with
+OpenTelemetry support.
+
+If this is not set, then the generic OTEL_TRACES_EXPORTER
+environment variable is used. This applies to all applications that
+support OpenTelemetry and use the OpenTelemetry SDK.
+
 The following values are allowed:
 \itemize{
-\item \code{stdout}: uses \link{tracer_provider_stdstream}, to write traces to the
-standard output.
+\item \code{none}: no traces are exported.
+\item \code{stdout} or \code{console}: uses \link{tracer_provider_stdstream}, to write
+traces to the standard output.
 \item \code{stderr}: uses \link{tracer_provider_stdstream}, to write traces to the
 standard error.
-\item \code{http}: uses \link{tracer_provider_http}, to send traces over HTTP.
+\item \code{http} or \code{otlp}: uses \link{tracer_provider_http}, to send traces through
+HTTP, using the OpenTelemetry Protocol (OTLP).
 \item \verb{<package>::<provider>}: will select the \verb{<provider>} object from
-the \verb{<package>} package to use as a tracer provider. It calls
+the \verb{<package>} package to use as a trace exporter. It calls
 \verb{<package>::<provider>$new()} to create the new traver provider.
 If this fails for some reason, e.g. the package is not installed,
 then it throws an error.

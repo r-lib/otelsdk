@@ -1,5 +1,7 @@
 default_tracer_provider_option <- "opentelemetry.default_tracer_provider"
-default_tracer_provider_envvar <- "R_OPENTELEMETRY_DEFAULT_TRACER_PROVIDER"
+default_tracer_exporter_envvar <- "OTEL_TRACES_EXPORTER"
+default_tracer_exporter_envvar_r <-
+  paste0("R_", default_tracer_exporter_envvar)
 
 #' Set the default tracer provider
 #' @param tracer_provider An OpenTelemetry tracer provider
@@ -12,7 +14,7 @@ default_tracer_provider_envvar <- "R_OPENTELEMETRY_DEFAULT_TRACER_PROVIDER"
 set_default_tracer_provider <- function(tracer_provider) {
   if (!inherits(tracer_provider, "opentelemetry_tracer_provider")) {
     stop(
-      "Cannot set default opentelemetry tracer provider, not an ",
+      "Cannot set default OpenTelemetry tracer provider, not an ",
       "opentelemetry_tracer_provider object"
     )
   }
@@ -30,15 +32,24 @@ set_default_tracer_provider <- function(tracer_provider) {
 #' default.
 #'
 #' The default tracer provider is created based on the
-#' `r default_tracer_provider_envvar` environment variable.
+#' `r default_tracer_exporter_envvar_r` environment variable. This
+#' environment variable is specifically for R applications with
+#' OpenTelemetry support.
+#'
+#' If this is not set, then the generic `r default_tracer_exporter_envvar`
+#' environment variable is used. This applies to all applications that
+#' support OpenTelemetry and use the OpenTelemetry SDK.
+#'
 #' The following values are allowed:
-#' - `stdout`: uses [tracer_provider_stdstream], to write traces to the
-#'   standard output.
+#' - `none`: no traces are exported.
+#' - `stdout` or `console`: uses [tracer_provider_stdstream], to write
+#'   traces to the standard output.
 #' - `stderr`: uses [tracer_provider_stdstream], to write traces to the
 #'   standard error.
-#' - `http`: uses [tracer_provider_http], to send traces over HTTP.
+#' - `http` or `otlp`: uses [tracer_provider_http], to send traces through
+#'   HTTP, using the OpenTelemetry Protocol (OTLP).
 #' - `<package>::<provider>`: will select the `<provider>` object from
-#'   the `<package>` package to use as a tracer provider. It calls
+#'   the `<package>` package to use as a trace exporter. It calls
 #'   `<package>::<provider>$new()` to create the new traver provider.
 #'   If this fails for some reason, e.g. the package is not installed,
 #'   then it throws an error.
@@ -56,7 +67,10 @@ get_default_tracer_provider <- function() {
 }
 
 setup_default_tracer_provider <- function() {
-  ev <- Sys.getenv(default_tracer_provider_envvar, NA_character_)
+  ev <- Sys.getenv(
+    default_tracer_exporter_envvar_r,
+    Sys.getenv(default_tracer_exporter_envvar, NA_character_)
+  )
   tp <-  if (is.na(ev)) {
     tracer_provider_noop$new()
   } else if (grepl("::", ev)) {
@@ -65,15 +79,15 @@ setup_default_tracer_provider <- function() {
     prv <- evx[2]
     if (!requireNamespace(pkg, quietly = TRUE)) {
       stop(
-        "Cannot set tracer provider ", ev,
-        " from ", default_tracer_provider_envvar,
+        "Cannot set trace exporter ", ev,
+        " from ", default_tracer_exporter_envvar_r,
         " environment variable, cannot load package ", pkg, "."
       )
     }
     if (!prv %in% names(asNamespace(pkg))) {
       stop(
-        "Cannot set tracer provider ", ev,
-        " from ", default_tracer_provider_envvar,
+        "Cannot set trace exporter ", ev,
+        " from ", default_tracer_exporter_envvar_r,
         " environment variable, cannot find provider ", prv,
         " in package ", pkg, "."
       )
@@ -81,8 +95,8 @@ setup_default_tracer_provider <- function() {
     tp <- asNamespace(pkg)[[prv]]
     if ((!is.list(tp) && !is.environment(tp)) || !"new" %in% names(tp)) {
       stop(
-        "Cannot set tracer provider ", ev,
-        " from ", default_tracer_provider_envvar,
+        "Cannot set trace exporter ", ev,
+        " from ", default_tracer_exporter_envvar_r,
         " environment variable, it is not a list or environment with ",
         "a 'new' member."
       )
@@ -92,18 +106,31 @@ setup_default_tracer_provider <- function() {
   } else {
     switch(
       ev,
+      "none" = {
+        tracer_provider_noop$new()
+      },
+      "console" = ,
       "stdout" = {
         tracer_provider_stdstream$new("stdout")
       },
       "stderr" = {
         tracer_provider_stdstream$new("stderr")
       },
+      "otlp" = ,
       "http" = {
         tracer_provider_http$new()
       },
+      "jaeger" = {
+        warning("OpenTelemetry: Jaeger trace exporter is not supported yet")
+        tracer_provider_noop$new()
+      },
+      "zipkin" = {
+        warning("OpenTelemetry: Zipkin trace exporter is not supported yet")
+        tracer_provider_noop$new()
+      },
       stop(
-        "Unknown opentelemetry tracer provider from ",
-        default_tracer_provider_envvar, " environment variable: ", ev
+        "Unknown OpenTelemetry exporter from ",
+        default_tracer_exporter_envvar_r, " environment variable: ", ev
       )
     )
   }
