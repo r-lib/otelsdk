@@ -113,7 +113,7 @@ as_span_attributes <- function(attributes, call = NULL) {
   if (!is.list(attributes)) {
     stop(
       "Invalid argument: ", call[[2]], " must be a named list, but it is ",
-      typename(x), "."
+      typename(attributes), "."
     )
   }
 
