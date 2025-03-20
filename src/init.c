@@ -14,7 +14,17 @@ SEXP otel_start_span(
   SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
   SEXP parent
 );
-SEXP otel_span_end(SEXP scoped_span);
+SEXP otel_span_get_context(SEXP span);
+SEXP otel_span_is_recording(SEXP span);
+SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value);
+SEXP otel_span_add_event(
+  SEXP span, SEXP name, SEXP attributes, SEXP timestamp
+);
+// ABI v2
+// SEXP otel_span_add_link(SEXP span, SEXP link);
+SEXP otel_span_set_status(SEXP span, SEXP status_code, SEXP description);
+SEXP otel_span_update_name(SEXP span, SEXP name);
+SEXP otel_span_end(SEXP span, SEXP options);
 
 SEXP otel_start_session(void);
 SEXP otel_activate_session(SEXP sess);
@@ -34,7 +44,15 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_get_tracer, 2),
   CALLDEF(otel_start_span, 6),
-  CALLDEF(otel_span_end, 1),
+  CALLDEF(otel_span_get_context, 1),
+  CALLDEF(otel_span_is_recording, 1),
+  CALLDEF(otel_span_set_attribute, 3),
+  CALLDEF(otel_span_add_event, 4),
+  // ABI v2
+  // CALLDEF(otel_span_add_link, 2),
+  CALLDEF(otel_span_set_status, 3),
+  CALLDEF(otel_span_update_name, 2),
+  CALLDEF(otel_span_end, 2),
   CALLDEF(otel_start_session, 0),
   CALLDEF(otel_activate_session, 1),
   CALLDEF(otel_deactivate_session, 1),
@@ -65,22 +83,6 @@ void otel_tracer_finally(SEXP x) {
   void *tracer_ = R_ExternalPtrAddr(x);
   if (tracer_) {
     otel_tracer_finally_(tracer_);
-    R_ClearExternalPtr(x);
-  }
-}
-
-void otel_span_finally(SEXP x) {
-  void *span_ = R_ExternalPtrAddr(x);
-  if (span_) {
-    otel_span_finally_(span_);
-    R_ClearExternalPtr(x);
-  }
-}
-
-void otel_scope_finally(SEXP x) {
-  void *scope_ = R_ExternalPtrAddr(x);
-  if (scope_) {
-    otel_span_finally_(scope_);
     R_ClearExternalPtr(x);
   }
 }
@@ -120,46 +122,6 @@ SEXP otel_get_tracer(SEXP provider, SEXP name) {
   SEXP xptr = R_MakeExternalPtr(tracer_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_finally, (Rboolean) 1);
   return xptr;
-}
-
-SEXP otel_start_span(
-  SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
-  SEXP parent) {
-
-  void *tracer_ = R_ExternalPtrAddr(tracer);
-  if (!tracer_) {
-    Rf_error("Opentelemetry tracer cleaned up already, internal error.");
-  }
-  void *parent_ = NULL;
-  if (!Rf_isNull(parent)) {
-    parent_ = R_ExternalPtrAddr(parent);
-  }
-
-  // TODO: attributes
-  // TODO: links
-  // TODO: rest of options
-
-  const char *name_ = CHAR(STRING_ELT(name, 0));
-  struct otel_scoped_span sspan = otel_start_span_(tracer_, name_, parent_);
-  SEXP res = PROTECT(Rf_allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(res, 0, R_MakeExternalPtr(sspan.span, R_NilValue, R_NilValue));
-  R_RegisterCFinalizerEx(VECTOR_ELT(res, 0), otel_span_finally, (Rboolean) 1);
-  SET_VECTOR_ELT(res, 1, R_MakeExternalPtr(sspan.scope, R_NilValue, R_NilValue));
-  R_RegisterCFinalizerEx(VECTOR_ELT(res, 1), otel_scope_finally, (Rboolean) 1);
-  UNPROTECT(1);
-  return res;
-}
-
-SEXP otel_span_end(SEXP scoped_span) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
-  SEXP scope = VECTOR_ELT(scoped_span, 1);
-  void *span_ = R_ExternalPtrAddr(span);
-  void *scope_ = R_ExternalPtrAddr(scope);
-  if (span_ && scope_) {
-    otel_span_end_(span_, scope_);
-    R_ClearExternalPtr(scope);
-  }
-  return R_NilValue;
 }
 
 SEXP otel_start_session(void) {

@@ -2,7 +2,10 @@
 #define OTEL_COMMON_H
 
 #ifdef __cplusplus
+#include <cstdint>
 extern "C" {
+#else
+#include "stdint.h"
 #endif
 
 struct otel_scoped_span {
@@ -24,6 +27,57 @@ struct otel_strings {
   char *s;
   size_t count;
   size_t size;
+};
+
+enum otel_attribute_type {
+  k_string,
+  k_boolean,
+  k_double,
+  k_int64,
+  k_string_array,
+  k_boolean_array,
+  k_double_array,
+  k_int64_array
+};
+
+struct otel_string_array {
+  char **a;
+  size_t count;
+};
+
+struct otel_boolean_array {
+  int *a;
+  size_t count;
+};
+
+struct otel_double_array {
+  double *a;
+  size_t count;
+};
+
+struct otel_int64_array {
+  int64_t *a;
+  size_t count;
+};
+
+struct otel_attribute {
+  enum otel_attribute_type type;
+  const char *name;
+  union {
+    struct otel_string string;
+    int boolean;
+    double dbl;
+    int64_t int64;
+    struct otel_string_array string_array;
+    struct otel_boolean_array boolean_array;
+    struct otel_double_array dbl_array;
+    struct otel_int64_array int64_array;
+  } val;
+};
+
+struct otel_attributes {
+  struct otel_attribute *a;
+  size_t count;
 };
 
 struct otel_tracer_provider_http_options_t {
@@ -62,7 +116,12 @@ void otel_session_finally_(void *sess);
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
 void *otel_get_tracer_(void *tracer_provider, const char *name);
-struct otel_scoped_span otel_start_span_(void *tracer, const char *name, void *parent);
+struct otel_scoped_span otel_start_span_(
+  void *tracer,
+  const char *name,
+  struct otel_attributes *attr,
+  void *parent
+);
 void otel_span_end_(void *span, void *scope);
 
 void *otel_start_session_(void);

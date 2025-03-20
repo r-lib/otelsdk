@@ -6,6 +6,11 @@ is_string <- function(x) {
   is.character(x) && length(x) == 1 && !is.na(x)
 }
 
+is_named <- function(x) {
+  nms <- names(x)
+  length(x) == length(nms) && ! anyNA(nms) && all(nms != "")
+}
+
 as_timestamp <- function(x, null = TRUE, call = NULL) {
   if (null && is.null(x)) return(x)
   if (inherits(x, "POSIXt") && length(x) == 1 && !is.na(x)) {
@@ -92,4 +97,59 @@ as_string <- function(x, null = TRUE, call = NULL) {
     "Invalid argument: ", call[[2]], " must be a string scalar, but it is ",
     typename(x), "."
   )
+}
+
+span_attr_types <- c(typeof(""), typeof(TRUE), typeof(1), typeof(1L))
+
+as_span_attributes <- function(attributes, call = NULL) {
+  if ((is.list(attributes) || is.null(attributes)) &&
+      is_named(attributes) &&
+      all((tps <- map_chr(attributes, typeof)) %in% span_attr_types) &&
+      all(!(hna <- map_lgl(attributes, anyNA)))) {
+    return(attributes)
+  }
+
+  call <- call %||% match.call()
+  if (!is.list(attributes)) {
+    stop(
+      "Invalid argument: ", call[[2]], " must be a named list, but it is ",
+      typename(x), "."
+    )
+  }
+
+  if (!is_named(attributes)) {
+    stop(
+      "Invalid argument: ", call[[2]], " must be a named list, but not ",
+      "all of its entries are named."
+    )
+  }
+
+  badtypes <- ! (tps %in% span_attr_types)
+  if (any(badtypes)) {
+    stop(
+      "Invalid argument: ", call[[2]], " can only contain types ",
+      paste(span_attr_types, collapse = ", "), ", but it contains ",
+      paste(unique(tps[badtypes]), collapse = ", "), " types."
+    )
+  }
+
+  stop(
+    "Invalid argument: ", call[[2]], " its entries must not contain ",
+    "missing (`NA`) values."
+  )
+}
+
+as_span_links <- function(links) {
+  # TODO
+  links
+}
+
+as_span_options <- function(options) {
+  options[["start_system_time"]] <-
+    as_timestamp(options[["start_system_time"]])
+  options[["start_steady_time"]] <-
+    as_timestamp(options[["start_steady_time"]])
+  options[["parent"]] <- as_span(options[["parent"]], na = TRUE)
+  options[["kind"]] <- as_choice(options[["kind"]], span_kinds)
+  options
 }

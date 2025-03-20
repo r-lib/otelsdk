@@ -7,48 +7,53 @@ span <- list(
       options = NULL,
       scope) {
 
-    options[["start_system_time"]] <-
-      as_timestamp(options[["start_system_time"]])
-    options[["start_steady_time"]] <-
-      as_timestamp(options[["start_steady_time"]])
-    options[["parent"]] <- as_span(options[["parent"]], na = TRUE)
-    options[["kind"]] <- as_choice(options[["kind"]], span_kinds)
+    attributes <- as_span_attributes(attributes)
+    links <- as_span_links(links)
+    options <- as_span_options(options)
     scope <- as_env(scope)
 
     self <- new_object(
       "otel_span",
       get_context = function() {
-        # TODO?
+        .Call(otel_span_get_context, self$xptr)
       },
 
       is_recording = function() {
-        TRUE
+        .Call(otel_span_is_recording, self$xptr)
       },
 
       set_attribute = function(name, value = NULL) {
+        .Call(otel_span_set_attribute, self$xptr, name, value)
         invisible(self)
       },
 
       add_event = function(name, attributes = NULL, timestamp = NULL) {
+        .Call(otel_span_add_event, self$xptr, name, attributes, timestamp)
         invisible(self)
       },
 
-      add_link = function(link) {
-        invisible(self)
-      },
+      # This needs ABI v2
+      # add_link = function(link) {
+      #   .Call(otel_span_add_link, self$xptr, link)
+      #   invisible(self)
+      # },
 
       set_status = function(
-        status_code = c("unset", "ok", "error"),
-        description = NULL) {
-          invisible(self)
-        },
-
-      update_name = function(name) {
+          status_code = c("unset", "ok", "error"),
+          description = NULL) {
+        .Call(otel_span_set_status, self$xptr, status_code, description)
         invisible(self)
       },
 
-      end = function() {
-        .Call(otel_span_end, self$xptr)
+      update_name = function(name) {
+        .Call(otel_span_update_name, self$xptr, name)
+        invisible(self)
+      },
+
+      end = function(options = NULL) {
+        options[["end_steady_time"]] <-
+          as_timestamp(options[["end_steady_time"]])
+        .Call(otel_span_end, self$xptr, options)
         invisible(self)
       },
 
