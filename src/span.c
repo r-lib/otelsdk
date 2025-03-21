@@ -5,6 +5,8 @@
 
 #include "otel_common.h"
 
+SEXP rf_get_list_element(SEXP list, const char *str);
+
 void otel_span_finally(SEXP x) {
   void *span_ = R_ExternalPtrAddr(x);
   if (span_) {
@@ -96,30 +98,60 @@ void r2c_attributes(SEXP r, struct otel_attributes *c) {
 }
 
 SEXP otel_start_span(
-  SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
-  SEXP parent) {
+    SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options) {
 
   void *tracer_ = R_ExternalPtrAddr(tracer);
   if (!tracer_) {
     Rf_error("Opentelemetry tracer cleaned up already, internal error.");
   }
-  void *parent_ = NULL;
-  if (!Rf_isNull(parent)) {
-    parent_ = R_ExternalPtrAddr(parent);
-  }
 
   struct otel_attributes attributes_;
   r2c_attributes(attributes, &attributes_);
 
-  // TODO: links
-  // TODO: rest of options
+  struct otel_links links_ = { NULL, 0 };
+  links_.count = Rf_length(links);
+  if (links_.count > 0) {
+    links_.a = (struct otel_link*)
+      R_alloc(links_.count, sizeof(struct otel_link));
+    for (R_len_t i = 0; i < links_.count; i++) {
+      SEXP scoped_span = VECTOR_ELT(VECTOR_ELT(links, i), 0);
+      SEXP linked_span = VECTOR_ELT(scoped_span, 0);
+      links_.a[i].span = R_ExternalPtrAddr(linked_span);
+      SEXP attr = VECTOR_ELT(VECTOR_ELT(links, i), 1);
+      r2c_attributes(attr, &links_.a[i].attr);
+    }
+  }
+
+  void *parent_ = NULL;
+  SEXP parent = rf_get_list_element(options, "parent");
+  if (!Rf_isNull(parent)) {
+    parent_ = R_ExternalPtrAddr(parent);
+  }
+  double *start_system_time_ = NULL;
+  SEXP start_system_time =
+    rf_get_list_element(options, "start_system_time");
+  if (!Rf_isNull(start_system_time)) {
+    start_system_time_ = REAL(start_system_time);
+  }
+  double *start_steady_time_ = NULL;
+  SEXP start_steady_time =
+    rf_get_list_element(options, "start_steady_time");
+  if (!Rf_isNull(start_steady_time)) {
+    start_steady_time_ = REAL(start_steady_time);
+  }
+  SEXP span_kind = rf_get_list_element(options, "span_kind");
+  int span_kind_ = INTEGER(span_kind)[0];
 
   const char *name_ = CHAR(STRING_ELT(name, 0));
   struct otel_scoped_span sspan = otel_start_span_(
     tracer_,
     name_,
     &attributes_,
-    parent_
+    &links_,
+    start_system_time_,
+    start_steady_time_,
+    parent_,
+    span_kind_
   );
   SEXP res = PROTECT(Rf_allocVector(VECSXP, 2));
   SET_VECTOR_ELT(res, 0, R_MakeExternalPtr(sspan.span, R_NilValue, R_NilValue));
@@ -130,25 +162,47 @@ SEXP otel_start_span(
   return res;
 }
 
-SEXP otel_span_get_context(SEXP span) {
-  // TODO
-  return R_NilValue;
+// TODO: maybe we don't need to get the context explicitly
+// SEXP otel_span_get_context(SEXP span) {
+//   // TODO
+//   return R_NilValue;
+// }
+
+SEXP otel_span_is_recording(SEXP scoped_span) {
+  SEXP span = VECTOR_ELT(scoped_span, 0);
+  void *span_ = R_ExternalPtrAddr(span);
+  int res = 0;
+  if (span_) {
+    res = otel_span_is_recording_(span_);
+  }
+  return Rf_ScalarLogical(res);
 }
 
-SEXP otel_span_is_recording(SEXP span) {
-  // TODO
-  return R_NilValue;
-}
-
-SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value) {
-  // TODO
+SEXP otel_span_set_attribute(SEXP scoped_span, SEXP name, SEXP value) {
+  SEXP span = VECTOR_ELT(scoped_span, 0);
+  void *span_ = R_ExternalPtrAddr(span);
+  if (span_) {
+    struct otel_attribute attr;
+    r2c_attribute(CHAR(STRING_ELT(name, 0)),value, &attr);
+    otel_span_set_attribute_(span_, &attr);
+  }
   return R_NilValue;
 }
 
 SEXP otel_span_add_event(
-  SEXP span, SEXP name, SEXP attributes, SEXP timestamp
-) {
-  // TODO
+    SEXP scoped_span, SEXP name, SEXP attributes, SEXP timestamp) {
+  SEXP span = VECTOR_ELT(scoped_span, 0);
+  void *span_ = R_ExternalPtrAddr(span);
+  if (span_) {
+    const char *name_ = CHAR(STRING_ELT(name, 0));
+    struct otel_attributes attributes_;
+    r2c_attributes(attributes, &attributes_);
+    void *timestamp_ = NULL;
+    if (!Rf_isNull(timestamp)) {
+      timestamp_ = REAL(timestamp);
+    }
+    otel_span_add_event_(span_, name_, &attributes_, timestamp_);
+  }
   return R_NilValue;
 }
 
@@ -158,13 +212,28 @@ SEXP otel_span_add_event(
 //   return R_NilValue;
 // }
 
-SEXP otel_span_set_status(SEXP span, SEXP status_code, SEXP description) {
-  // TODO
+SEXP otel_span_set_status(
+    SEXP scoped_span, SEXP status_code, SEXP description) {
+  SEXP span = VECTOR_ELT(scoped_span, 0);
+  void *span_ = R_ExternalPtrAddr(span);
+  if (span_) {
+    int status_code_ = INTEGER(status_code)[0];
+    char *description_ = NULL;
+    if (!Rf_isNull(description)) {
+      description_ = (char*) CHAR(STRING_ELT(description, 0));
+    }
+    otel_span_set_status_(span_, status_code_, description_);
+  }
   return R_NilValue;
 }
 
-SEXP otel_span_update_name(SEXP span, SEXP name) {
-  // TODO
+SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
+  SEXP span = VECTOR_ELT(scoped_span, 0);
+  void *span_ = R_ExternalPtrAddr(span);
+  if (span_) {
+    const char *name_ = CHAR(STRING_ELT(name, 0));
+    otel_span_update_name_(span_, name_);
+  }
   return R_NilValue;
 }
 

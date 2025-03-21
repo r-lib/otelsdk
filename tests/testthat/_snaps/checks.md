@@ -84,15 +84,15 @@
     Code
       as_choice(NULL, c(default = "foo", "bar"))
     Output
-      [1] "foo"
+      [1] 0
     Code
       as_choice("foo", c(default = "foo", "bar"))
     Output
-      [1] "foo"
+      [1] 0
     Code
       as_choice("bar", c(default = "foo", "bar"))
     Output
-      [1] "bar"
+      [1] 1
 
 ---
 

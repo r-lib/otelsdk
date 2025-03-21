@@ -80,6 +80,16 @@ struct otel_attributes {
   size_t count;
 };
 
+struct otel_link {
+  void *span;
+  struct otel_attributes attr;
+};
+
+struct otel_links {
+  struct otel_link *a;
+  size_t count;
+};
+
 struct otel_tracer_provider_http_options_t {
   struct otel_string url;
   enum otel_http_request_content_type content_type;
@@ -120,8 +130,26 @@ struct otel_scoped_span otel_start_span_(
   void *tracer,
   const char *name,
   struct otel_attributes *attr,
-  void *parent
+  struct otel_links *links,
+  double *start_system_time,
+  double *start_steady_time,
+  void *parent,
+  int span_kind
 );
+int otel_span_is_recording_(void *span);
+void otel_span_set_attribute_(void *span, struct otel_attribute *attr);
+void otel_span_add_event_(
+  void *span,
+  const char *name,
+  struct otel_attributes *attr,
+  void *timestamp
+);
+void otel_span_set_status_(
+  void *span_,
+  int status_code_,
+  char *description_
+);
+void otel_span_update_name_(void *span_, const char *name_);
 void otel_span_end_(void *span, void *scope);
 
 void *otel_start_session_(void);

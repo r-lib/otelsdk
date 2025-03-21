@@ -59,8 +59,12 @@ as_span <- function(x, null = TRUE, na = TRUE, call = NULL) {
 }
 
 as_choice <- function(x, choices, null = TRUE, call = NULL) {
-  if (null && is.null(x)) return(choices[["default"]])
-  if (is_string(x) && x %in% choices) return(x)
+  if (null && is.null(x)) {
+    return(match("default", names(choices)) - 1L)
+  }
+  if (is_string(x) && !is.na(mch <- match(x, choices))) {
+    return(mch - 1L)
+  }
 
   call <- call %||% match.call()
   cchoices <- paste(choices, collapse = ", ")
@@ -101,6 +105,28 @@ as_string <- function(x, null = TRUE, call = NULL) {
 
 span_attr_types <- c(typeof(""), typeof(TRUE), typeof(1), typeof(1L))
 
+as_span_attribute_value <- function(x, call = NULL) {
+  if (typeof(x) %in% span_attr_types &&
+      !(hna <- anyNA(x))) {
+    return(x)
+  }
+
+  call <- call %||% match.call()
+  if (!typeof(x) %in% span_attr_types) {
+    stop(
+      "Invalid argument: ", call[[2]], " must of type ",
+      collapse(span_attr_types, last = ", or "), ", but it is",
+      typename(x), "."
+    )
+  }
+  if (hna) {
+    stop(
+      "Invalid argument: ", call[[2]], " must not contain missing (`NA`) ",
+      "values."
+    )
+  }
+}
+
 as_span_attributes <- function(attributes, call = NULL) {
   if ((is.list(attributes) || is.null(attributes)) &&
       is_named(attributes) &&
@@ -139,9 +165,46 @@ as_span_attributes <- function(attributes, call = NULL) {
   )
 }
 
-as_span_links <- function(links) {
-  # TODO
-  links
+as_span_link <- function(link, call = NULL) {
+  if (inherits(link, "otel_span")) {
+    return(list(link$xptr, NULL))
+  }
+  if (is.list(link) && inherits(link[[1]], "otel_span")) {
+    link[-1] <- as_span_attributes(link[-1], call = call)
+    return(list(link[[1]]$xptr, link[-1]))
+  }
+
+  call <- call %||% match.call()
+  stop(
+    "Invalid argument: ", call[[2]], " must be either an OpenTelemetry ",
+    "span (`otel_span`) object or a list with a span object as ",
+    "the first element and named span attributes as the rest."
+  )
+}
+
+as_span_links <- function(links, call = NULL) {
+  if (is.list(links) || is.null(links)) {
+    for (i in seq_along(links)) {
+      links[[i]] <- as_span_link(
+        links[[i]],
+        call = as.call(substitute(links[[i]], list(i = i)))
+      )
+    }
+    return(links)
+  }
+
+  call = call %||% match.call()
+  if (!is.list(links)) {
+    stop(
+      "Invalid argument: ", call[[2]], " must be a named list, but it is ",
+      typename(links), "."
+    )
+  }
+
+  stop(
+    "Invalid argument: ", call[[2]], " must be a named list, but not ",
+    "all of its entries are named."
+  )
 }
 
 as_span_options <- function(options) {

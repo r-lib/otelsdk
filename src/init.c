@@ -14,7 +14,8 @@ SEXP otel_start_span(
   SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
   SEXP parent
 );
-SEXP otel_span_get_context(SEXP span);
+// TODO: maybe we don't need to get the context explicitly
+// SEXP otel_span_get_context(SEXP span);
 SEXP otel_span_is_recording(SEXP span);
 SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value);
 SEXP otel_span_add_event(
@@ -35,6 +36,7 @@ SEXP otel_finish_all_sessions(void);
 SEXP otel_tracer_provider_http_options(void);
 
 SEXP rf_get_list_element(SEXP list, const char *str);
+SEXP trim_(SEXP x);
 
 #define CALLDEF(name, n) \
   { #name, (DL_FUNC)&name, n }
@@ -43,8 +45,9 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_get_tracer, 2),
-  CALLDEF(otel_start_span, 6),
-  CALLDEF(otel_span_get_context, 1),
+  CALLDEF(otel_start_span, 5),
+  // TODO: maybe we don't need to get the context explicitly
+  // CALLDEF(otel_span_get_context, 1),
   CALLDEF(otel_span_is_recording, 1),
   CALLDEF(otel_span_set_attribute, 3),
   CALLDEF(otel_span_add_event, 4),
@@ -59,6 +62,8 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_finish_session, 1),
   CALLDEF(otel_finish_all_sessions, 0),
   CALLDEF(otel_tracer_provider_http_options, 0),
+
+  CALLDEF(trim_, 1),
   { NULL, NULL, 0 }
 };
 
