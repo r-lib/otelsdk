@@ -238,13 +238,18 @@ SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
 }
 
 SEXP otel_span_end(SEXP scoped_span, SEXP options) {
-  // TODO: options
   SEXP span = VECTOR_ELT(scoped_span, 0);
   SEXP scope = VECTOR_ELT(scoped_span, 1);
   void *span_ = R_ExternalPtrAddr(span);
   void *scope_ = R_ExternalPtrAddr(scope);
   if (span_ && scope_) {
-    otel_span_end_(span_, scope_);
+    double *end_steady_time_ = NULL;
+    SEXP end_steady_time =
+      rf_get_list_element(options, "end_steady_time");
+    if (!Rf_isNull(end_steady_time)) {
+      end_steady_time_ = REAL(end_steady_time);
+    }
+    otel_span_end_(span_, scope_, end_steady_time_);
     R_ClearExternalPtr(scope);
   }
   return R_NilValue;

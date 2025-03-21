@@ -154,10 +154,14 @@ struct otel_scoped_span otel_start_span_(
     opts.parent = parent.GetContext();
   }
   if (start_system_time_) {
-    double *start_system_time = (double*) start_system_time_;
-    std::chrono::duration<double, std::ratio<1, 1>> ts(*start_system_time);
+    std::chrono::duration<double, std::ratio<1, 1>> ts(*start_system_time_);
     common::SystemTimestamp ts2(ts);
     opts.start_system_time = ts2;
+  }
+  if (start_steady_time_) {
+    std::chrono::duration<double, std::ratio<1, 1>> ts(*start_steady_time_);
+    common::SteadyTimestamp ts2(ts);
+    opts.start_steady_time = ts2;
   }
   switch (span_kind_) {
     case 0: opts.kind = trace::SpanKind::kInternal; break;
@@ -267,9 +271,15 @@ void otel_span_add_event_(
   }
 }
 
-void otel_span_end_(void *span_, void *scope_) {
+void otel_span_end_(void *span_, void *scope_, double *end_steady_time_) {
   struct otel_span *ss = (struct otel_span *) span_;
   trace::Span &span = *(ss->ptr);
+  trace::EndSpanOptions opts;
+  if (end_steady_time_) {
+    std::chrono::duration<double, std::ratio<1, 1>> ts(*end_steady_time_);
+    common::SteadyTimestamp ts2(ts);
+    opts.end_steady_time = ts2;
+  }
   span.End();
   trace::Scope *scope = (trace::Scope*) scope_;
   delete scope;

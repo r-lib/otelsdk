@@ -59,8 +59,7 @@ span <- list(
       },
 
       end = function(options = NULL) {
-        options[["end_steady_time"]] <-
-          as_timestamp(options[["end_steady_time"]])
+        options <- as_end_span_options(options)
         .Call(otel_span_end, self$xptr, options)
         invisible(self)
       },

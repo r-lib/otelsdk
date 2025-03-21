@@ -216,3 +216,9 @@ as_span_options <- function(options) {
   options[["kind"]] <- as_choice(options[["kind"]], span_kinds)
   options
 }
+
+as_end_span_options <- function(options) {
+  options[["end_steady_time"]] <-
+    as_timestamp(options[["end_steady_time"]])
+  options
+}

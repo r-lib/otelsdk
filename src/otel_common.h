@@ -150,7 +150,7 @@ void otel_span_set_status_(
   char *description_
 );
 void otel_span_update_name_(void *span_, const char *name_);
-void otel_span_end_(void *span, void *scope);
+void otel_span_end_(void *span, void *scope, double *end_steady_time);
 
 void *otel_start_session_(void);
 void otel_activate_session_(void *id_);
