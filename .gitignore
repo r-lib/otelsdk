@@ -1,5 +1,7 @@
 /src/*.o
 /src/*.so
+/src/*.gcda
+/src/*.gcno
 /src/Makevars
 /src/cpp
 /src/install
