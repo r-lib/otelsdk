@@ -139,7 +139,7 @@ SEXP otel_start_span(
   if (!Rf_isNull(start_steady_time)) {
     start_steady_time_ = REAL(start_steady_time);
   }
-  SEXP span_kind = rf_get_list_element(options, "span_kind");
+  SEXP span_kind = rf_get_list_element(options, "kind");
   int span_kind_ = INTEGER(span_kind)[0];
 
   const char *name_ = CHAR(STRING_ELT(name, 0));
