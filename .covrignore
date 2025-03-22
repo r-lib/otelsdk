@@ -1,1 +1,4 @@
 src/install
+R/collapse.R
+R/friendly-type.R
+R/otelsdk-package.R
