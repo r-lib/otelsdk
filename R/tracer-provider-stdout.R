@@ -1,5 +1,9 @@
-tracer_provider_stdstream_new <- function(stream = c("stdout", "stderr")) {
-  stream <- match.arg(stream)
+tracer_provider_stdstream_new <- function(stream = NULL) {
+  stream <- as_string(stream) %||%
+    Sys.getenv(tracer_provider_stdstream_output, "stdout")
+  if (stream != "stdout" && stream != "stderr") {
+    stream <- as_output_file(stream, null = FALSE)
+  }
   self <- new_object(
     c("otel_tracer_provider_stdstream",
       "otel_tracer_provider"),

@@ -245,3 +245,27 @@ test_that("as_end_span_options", {
     as_end_span_options(options)
   })
 })
+
+test_that("as_output_file", {
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+
+  expect_equal(as_output_file(NULL) , NULL)
+  expect_false(file.exists(tmp))
+  expect_equal(as_output_file(tmp), tmp)
+  expect_true(file.exists(tmp))
+
+  tmp2 <- tempfile()
+  on.exit(unlink(tmp2, recursive = TRUE), add = TRUE)
+  tmp3 <- file.path(tmp2, "output")
+  expect_snapshot(error = TRUE, transform = transform_tempdir, {
+    as_output_file(tmp3)
+  })
+
+  dir.create(tmp2)
+  file.create(tmp3)
+  Sys.chmod(tmp3, "0100")
+  expect_snapshot(error = TRUE, transform = transform_tempdir, {
+    as_output_file(tmp3)
+  })
+})

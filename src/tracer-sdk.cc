@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <utility>
 #include <iostream>
+#include <fstream>
 
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
@@ -71,6 +72,13 @@ static void otel_multimap_to_char(
   }
 }
 
+static inline std::ostream &open_ostream(std::fstream &fs, const char *path) {
+  fs.open (path, std::fstream::out | std::fstream::app);
+  // no buffering, because we use this for testing
+  fs.rdbuf()->pubsetbuf(0,0);
+  return fs;
+}
+
 extern "C" {
 
 void otel_tracer_provider_finally_(void *tracer_provider_) {
@@ -95,9 +103,10 @@ void otel_scope_finally_(void *scope_) {
 }
 
 void *otel_create_tracer_provider_stdstream_(const char *stream) {
-  auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(
-    !strcmp(stream, "stdout") ? std::cout : std::cerr
-  );
+  std::fstream fs;
+  std::ostream &out = !strcmp(stream, "stdout") ? std::cout :
+    (!strcmp(stream, "stderr") ? std::cerr : open_ostream(fs, stream));
+  auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(out);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
   struct otel_tracer_provider *tps = new otel_tracer_provider;

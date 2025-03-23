@@ -279,3 +279,32 @@ as_end_span_options <- function(options, call = NULL) {
     "span options are: ", collapse(nms), "."
   )
 }
+
+as_output_file <- function(x, null = TRUE, call = NULL) {
+  if (null && is.null(x)) return(x)
+
+  call <- call %||% match.call()
+  x <- as_string(x, call = substitute(as_string(x), list(x = call[[2]])))
+
+  dn <- dirname(x)
+  if (!file.exists(dn)) {
+    stop(
+      "Directory of OpenTelemetry output file '", x,
+      "' does not exist or it is not writeable."
+    )
+  }
+
+  # This is the closest thing to Unix `touch` that I could find.
+  suppressWarnings(
+    tryCatch(
+      cat("", sep = "", file = x, append = TRUE),
+      error = function(e) NULL
+    )
+  )
+
+  if (!file.exists(x) || file.access(x, 2) != 0) {
+    stop("Cannot write to OpenTelemetry output file '", x, "'.")
+  }
+
+  x
+}

@@ -9,8 +9,8 @@ test_that("tracer_new", {
 })
 
 test_that("start_span", {
-  skip("not ready for this yet")
-  tracer_provider <- tracer_provider_stdstream_new()
+  tmp <- tempfile(fileext = "otel")
+  tracer_provider <- tracer_provider_stdstream_new(tmp)
   tracer <- tracer_provider$get_tracer("mytracer")
   span <- tracer$start_span("span1")
   expect_equal(class(span), "otel_span")
