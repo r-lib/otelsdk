@@ -6,7 +6,7 @@ span_new <- function(
   options = NULL,
   scope) {
 
-  name <- name %||% "empty"
+  name <- name %||% default_span_name
   name <- as_string(name)
   attributes <- as_span_attributes(attributes)
   links <- as_span_links(links)
@@ -85,15 +85,14 @@ span_new <- function(
   )
   self$scoped <- FALSE
   if (!is.null(scope) && !is_na(scope)) {
-    if (!is.environment(scope)) {
-      stop("Opentelemetry span scope must be an environment.")
-    }
     self$scoped <- TRUE
     defer(self$end(), envir = scope)
   }
 
   self
 }
+
+default_span_name <- "<NA>"
 
 span_kinds <- c(
   default = "internal", "server", "client", "producer", "consumer"
