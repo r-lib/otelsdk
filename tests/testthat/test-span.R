@@ -30,6 +30,29 @@ test_that("close span automatically", {
   # they are not stacked
   expect_equal(spns[[1]]$parent_span_id, "0000000000000000")
   expect_equal(spns[[2]]$parent_span_id, "0000000000000000")
+  expect_equal(spns[[1]]$status, "Ok")
+  expect_equal(spns[[2]]$status, "Ok")
+})
+
+test_that("close span automatically, on error", {
+  tmp <- tempfile(fileext = "otel")
+  on.exit(unlink(tmp), add = TRUE)
+  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc <- trc_prv$get_tracer("mytracer")
+  do <- function(name = NULL) {
+    spn1 <- trc$start_span(name)
+    stop("oops")
+  }
+  try(do("1"), silent = TRUE)
+  try(do("2"), silent = TRUE)
+  trc$flush()
+
+  spns <- parse_spans(tmp)
+  # they are not stacked
+  expect_equal(spns[[1]]$parent_span_id, "0000000000000000")
+  expect_equal(spns[[2]]$parent_span_id, "0000000000000000")
+  expect_equal(spns[[1]]$status, "Error")
+  expect_equal(spns[[2]]$status, "Error")
 })
 
 test_that("is_recording", {
@@ -50,7 +73,21 @@ test_that("add_event", {
 })
 
 test_that("set_status", {
+  tmp <- tempfile(fileext = "otel")
+  on.exit(unlink(tmp), add = TRUE)
+  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc <- trc_prv$get_tracer("mytracer")
+  do <- function() {
+    spn1 <- trc$start_span()
+    spn1$set_status("Unset", description = "Testing preset Unset")
+  }
+  do()
+  trc$flush()
 
+  spns <- parse_spans(tmp)
+  expect_equal(spns[[1]]$parent_span_id, "0000000000000000")
+  expect_equal(spns[[1]]$status, "Unset")
+  expect_equal(spns[[1]]$description, "Testing preset Unset")
 })
 
 test_that("update_data", {

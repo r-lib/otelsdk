@@ -237,12 +237,16 @@ SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
   return R_NilValue;
 }
 
-SEXP otel_span_end(SEXP scoped_span, SEXP options) {
+SEXP otel_span_end(SEXP scoped_span, SEXP options, SEXP status_code) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
   SEXP scope = VECTOR_ELT(scoped_span, 1);
   void *span_ = R_ExternalPtrAddr(span);
   void *scope_ = R_ExternalPtrAddr(scope);
   if (span_ && scope_) {
+    if (!Rf_isNull(status_code)) {
+      int status_code_ = INTEGER(status_code)[0];
+      otel_span_set_status_(span_, status_code_, NULL);
+    }
     double *end_steady_time_ = NULL;
     SEXP end_steady_time =
       rf_get_list_element(options, "end_steady_time");

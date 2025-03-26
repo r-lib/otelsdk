@@ -50,6 +50,7 @@ span_new <- function(
       status_code <- as_choice(status_code, span_status_codes)
       description <- as_string(description)
       .Call(otel_span_set_status, self$xptr, status_code, description)
+      self$status_set <- TRUE
       invisible(self)
     },
 
@@ -59,9 +60,24 @@ span_new <- function(
       invisible(self)
     },
 
-    end = function(options = NULL) {
+    end = function(options = NULL, status_code = NULL) {
       options <- as_end_span_options(options)
-      .Call(otel_span_end, self$xptr, options)
+      # if NULL, then we leave it as is, maybe it was explicitly set
+      if (!is.null(status_code)) {
+        status_code <- as_choice(status_code, c(span_status_codes, "auto"))
+        # if 'auto' then we are in 'on.exit()', check if this is an error
+        # hopefully returnValue() works for this
+        if (status_code == 3L) {
+          if (self$status_set) {
+            status_code <- NULL
+          } else if (identical(returnValue(random_token), random_token)) {
+            status_code <- 2L
+          } else {
+            status_code <- 1L
+          }
+        }
+      }
+      .Call(otel_span_end, self$xptr, options, status_code)
       invisible(self)
     },
 
@@ -77,6 +93,7 @@ span_new <- function(
   self$attributes <- attributes
   self$links <- links
   self$options <- options
+  self$status_set <- FALSE
 
   parent <- options[["parent"]][["xptr"]][[1]]
   self$xptr <- .Call(
@@ -86,13 +103,15 @@ span_new <- function(
   self$scoped <- FALSE
   if (!is.null(scope) && !is_na(scope)) {
     self$scoped <- TRUE
-    defer(self$end(), envir = scope)
+    defer(self$end(status_code = "auto"), envir = scope)
   }
 
   self
 }
 
 default_span_name <- "<NA>"
+
+random_token <- "DxMi8lklYBT6z835eeMF1AjL90ioUMIP"
 
 span_kinds <- c(
   default = "internal", "server", "client", "producer", "consumer"
