@@ -3,7 +3,10 @@ tracer_provider_http_new <- function() {
     c("otel_tracer_provider_http",
       "otel_tracer_provider"),
     get_tracer = function(name, ...) {
-      tracer$new(self, name, ...)
+      tracer_new(self, name, ...)
+    },
+    flush = function() {
+      # noop currently
     }
   )
 

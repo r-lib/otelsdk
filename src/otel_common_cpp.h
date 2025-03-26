@@ -1,6 +1,8 @@
 #ifndef OTEL_COMMON_CPP_H
 #define OTEL_COMMON_CPP_H
 
+#include <fstream>
+
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 
@@ -14,6 +16,7 @@ struct otel_span {
 
 struct otel_tracer_provider {
   std::unique_ptr<trace_sdk::TracerProvider> ptr;
+  std::fstream stream;
 };
 
 struct otel_tracer {

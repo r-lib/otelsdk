@@ -1,11 +1,13 @@
 span_new <- function(
   tracer,
-  name,
+  name = NULL,
   attributes = NULL,
   links = NULL,
   options = NULL,
   scope) {
 
+  name <- name %||% "empty"
+  name <- as_string(name)
   attributes <- as_span_attributes(attributes)
   links <- as_span_links(links)
   options <- as_span_options(options)
@@ -92,10 +94,6 @@ span_new <- function(
 
   self
 }
-
-span <- list(
-  new = span_new
-)
 
 span_kinds <- c(
   default = "internal", "server", "client", "producer", "consumer"

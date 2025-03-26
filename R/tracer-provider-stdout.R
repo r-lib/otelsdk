@@ -8,7 +8,10 @@ tracer_provider_stdstream_new <- function(stream = NULL) {
     c("otel_tracer_provider_stdstream",
       "otel_tracer_provider"),
     get_tracer = function(name, ...) {
-      tracer$new(self, name, ...)
+      tracer_new(self, name, ...)
+    },
+    flush = function() {
+      .Call(otel_tracer_provider_flush, self$xptr)
     }
   )
 

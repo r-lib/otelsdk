@@ -125,6 +125,7 @@ void otel_session_finally_(void *sess);
 
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
+void otel_tracer_provider_flush_(void *tracer_provider);
 void *otel_get_tracer_(void *tracer_provider, const char *name);
 struct otel_scoped_span otel_start_span_(
   void *tracer,

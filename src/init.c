@@ -8,6 +8,7 @@
 
 SEXP otel_create_tracer_provider_stdstream(SEXP stream);
 SEXP otel_create_tracer_provider_http(void);
+SEXP otel_tracer_provider_flush(SEXP provider);
 SEXP otel_get_tracer(SEXP provider, SEXP name);
 
 SEXP otel_start_span(
@@ -44,6 +45,7 @@ SEXP trim_(SEXP x);
 static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
+  CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 2),
   CALLDEF(otel_start_span, 5),
   // TODO: maybe we don't need to get the context explicitly
@@ -115,6 +117,17 @@ SEXP otel_create_tracer_provider_http(void) {
   return xptr;
 }
 
+SEXP otel_tracer_provider_flush(SEXP provider) {
+  void *tracer_provider_ = R_ExternalPtrAddr(provider);
+  if (!tracer_provider_) {
+    Rf_error(
+      "Opentelemetry tracer provider cleaned up already, internal error."
+    );
+  }
+  otel_tracer_provider_flush_(tracer_provider_);
+  return R_NilValue;
+}
+
 SEXP otel_get_tracer(SEXP provider, SEXP name) {
   void *tracer_provider_ = R_ExternalPtrAddr(provider);
   if (!tracer_provider_) {
@@ -165,7 +178,7 @@ const char *otel_http_request_content_type_str[] = {
   "binary"
 };
 
-static SEXP raw_to_string(SEXP r, size_t count) {
+SEXP raw_to_string(SEXP r, size_t count) {
   SEXP res = PROTECT(Rf_allocVector(STRSXP, count));
   char *s = (char*) RAW(r);
   for (int i = 0; i < count; i++) {

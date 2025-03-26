@@ -1,9 +1,9 @@
 tracer_new <- function(provider, name, ...) {
   self <- new_object(
     "otel_tracer",
-    start_span = function(name, attributes = NULL, links = NULL,
+    start_span = function(name = NULL, attributes = NULL, links = NULL,
                           options = NULL, scope = parent.frame()) {
-      span$new(
+      span_new(
         self, name = name, attributes = attributes, links = links,
         options = options, scope = scope
       )
@@ -24,6 +24,9 @@ tracer_new <- function(provider, name, ...) {
     finish_all_sessions = function() {
       .Call(otel_finish_all_sessions)
     },
+    flush = function() {
+      self$provider$flush()
+    },
     name = NULL
   )
   self$provider <- provider
@@ -31,7 +34,3 @@ tracer_new <- function(provider, name, ...) {
   self$xptr <- .Call(otel_get_tracer, self$provider$xptr, self$name)
   self
 }
-
-tracer <- list(
-  new = tracer_new
-)

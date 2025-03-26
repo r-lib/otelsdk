@@ -72,13 +72,6 @@ static void otel_multimap_to_char(
   }
 }
 
-static inline std::ostream &open_ostream(std::fstream &fs, const char *path) {
-  fs.open (path, std::fstream::out | std::fstream::app);
-  // no buffering, because we use this for testing
-  fs.rdbuf()->pubsetbuf(0,0);
-  return fs;
-}
-
 extern "C" {
 
 void otel_tracer_provider_finally_(void *tracer_provider_) {
@@ -103,16 +96,26 @@ void otel_scope_finally_(void *scope_) {
 }
 
 void *otel_create_tracer_provider_stdstream_(const char *stream) {
-  std::fstream fs;
-  std::ostream &out = !strcmp(stream, "stdout") ? std::cout :
-    (!strcmp(stream, "stderr") ? std::cerr : open_ostream(fs, stream));
-  auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(out);
-  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-
+  bool stdout = !strcmp(stream, "stdout");
+  bool stderr = !strcmp(stream, "stderr");
   struct otel_tracer_provider *tps = new otel_tracer_provider;
-  tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
-  return (void*) tps;
+  if (stdout || stderr) {
+    std::ostream &out = stdout ? std::cout : std::cerr;
+    auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(out);
+    auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+    tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+    return (void*) tps;
+
+  } else {
+    tps->stream.open(stream, std::fstream::out | std::fstream::app);
+    // no buffering, because we use this for testing
+    tps->stream.rdbuf()->pubsetbuf(0,0);
+    auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(tps->stream);
+    auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+    tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+    return tps;
+  }
 }
 
 void *otel_create_tracer_provider_http_(void) {
@@ -123,6 +126,14 @@ void *otel_create_tracer_provider_http_(void) {
   tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
   return (void*) tps;
+}
+
+void otel_tracer_provider_flush_(void *tracer_provider_) {
+  struct otel_tracer_provider *tps =
+    (struct otel_tracer_provider *) tracer_provider_;
+  if (tps->stream.is_open()) {
+    tps->stream.flush();
+  }
 }
 
 void *otel_get_tracer_(void *tracer_provider_, const char *name) {
