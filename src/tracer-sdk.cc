@@ -96,12 +96,12 @@ void otel_scope_finally_(void *scope_) {
 }
 
 void *otel_create_tracer_provider_stdstream_(const char *stream) {
-  int stdout = !strcmp(stream, "stdout");
-  int stderr = !strcmp(stream, "stderr");
+  int sout = !strcmp(stream, "stdout");
+  int serr = !strcmp(stream, "stderr");
   struct otel_tracer_provider *tps = new otel_tracer_provider;
 
-  if (stdout || stderr) {
-    std::ostream &out = stdout ? std::cout : std::cerr;
+  if (sout || serr) {
+    std::ostream &out = sout ? std::cout : std::cerr;
     auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(out);
     auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
     tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
