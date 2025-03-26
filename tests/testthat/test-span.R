@@ -90,8 +90,17 @@ test_that("set_status", {
   expect_equal(spns[[1]]$description, "Testing preset Unset")
 })
 
-test_that("update_data", {
-
+test_that("update_name", {
+  tmp <- tempfile(fileext = "otel")
+  on.exit(unlink(tmp), add = TRUE)
+  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc <- trc_prv$get_tracer("mytracer")
+  spn1 <- trc$start_span()
+  spn1$update_name("good")
+  spn1$end()
+  trc$flush()
+  spns <- parse_spans(tmp)
+  expect_equal(spns[[1]]$name, "good")
 })
 
 test_that("record_exception", {
