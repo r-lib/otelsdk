@@ -96,8 +96,8 @@ void otel_scope_finally_(void *scope_) {
 }
 
 void *otel_create_tracer_provider_stdstream_(const char *stream) {
-  bool stdout = !strcmp(stream, "stdout");
-  bool stderr = !strcmp(stream, "stderr");
+  int stdout = !strcmp(stream, "stdout");
+  int stderr = !strcmp(stream, "stderr");
   struct otel_tracer_provider *tps = new otel_tracer_provider;
 
   if (stdout || stderr) {
