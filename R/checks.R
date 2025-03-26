@@ -62,7 +62,7 @@ as_choice <- function(x, choices, null = TRUE, call = NULL) {
   if (null && is.null(x)) {
     return(match("default", names(choices)) - 1L)
   }
-  if (is_string(x) && !is.na(mch <- match(x, choices))) {
+  if (is_string(x) && !is.na(mch <- match(tolower(x), choices))) {
     return(mch - 1L)
   }
 
