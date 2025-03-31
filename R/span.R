@@ -95,7 +95,6 @@ span_new <- function(
   self$options <- options
   self$status_set <- FALSE
 
-  parent <- options[["parent"]][["xptr"]][[1]]
   self$xptr <- .Call(
     otel_start_span,
     self$tracer$xptr, self$name, attributes, links, options
