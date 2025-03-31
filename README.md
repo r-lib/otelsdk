@@ -26,7 +26,8 @@ package or project that was instrumented with the otel package.
 
 ## Installation
 
-> \[!WARNING\] This package is experimental and may introduce breaking
+> [!WARNING]
+> This package is experimental and may introduce breaking
 > changes any time. It probably works best with the latest commit of the
 > [otel](https://github.com/r-lib/otel) package.
 
@@ -50,7 +51,8 @@ pak::pak("r-lib/otelsdk")
 - Start R and your app. Telemetry data will be exported to the chosen
   exporter.
 
-> \[!TIP\] If you have Docker, you can start a
+> [!TIP]
+> If you have Docker, you can start a
 > [Jaeger](https://www.jaegertracing.io/) container on the default port:
 >
 >     docker run --rm --name jaeger \
