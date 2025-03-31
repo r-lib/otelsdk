@@ -29,6 +29,7 @@ tracer_new <- function(provider, name, ...) {
     },
     name = NULL
   )
+  name <- name %||% get_env("OTEL_SERVICE_NAME") %||% "R"
   self$provider <- provider
   self$name <- name
   self$xptr <- .Call(otel_get_tracer, self$provider$xptr, self$name)
