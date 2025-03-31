@@ -24,7 +24,7 @@ void otel_scope_finally(SEXP x) {
   }
   void *scope_ = R_ExternalPtrAddr(x);
   if (scope_) {
-    otel_span_finally_(scope_);
+    otel_scope_finally_(scope_);
     R_ClearExternalPtr(x);
   }
 }
