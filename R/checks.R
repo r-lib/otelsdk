@@ -218,6 +218,7 @@ as_span_options <- function(options, call = NULL) {
     options[["start_steady_time"]] <-
       as_timestamp(options[["start_steady_time"]])
     options[["parent"]] <- as_span(options[["parent"]], na = TRUE)
+    options[["parent"]] <- options[["parent"]]$xptr[[1]]
     options[["kind"]] <- as_choice(options[["kind"]], span_kinds)
     return(options)
   }

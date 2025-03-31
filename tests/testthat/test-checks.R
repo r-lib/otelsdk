@@ -207,7 +207,7 @@ test_that("as_span_options", {
   p <- structure(list(xptr = "ptr"), class = "otel_span")
   expect_equal(
     as_span_options(list(parent = p)),
-    list(parent = p, kind = 0L)
+    list(parent = "ptr", kind = 0L)
   )
   expect_equal(
     as_span_options(list(kind = "client")),
