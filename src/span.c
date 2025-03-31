@@ -8,6 +8,9 @@
 SEXP rf_get_list_element(SEXP list, const char *str);
 
 void otel_span_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid span pointer.");
+  }
   void *span_ = R_ExternalPtrAddr(x);
   if (span_) {
     otel_span_finally_(span_);
@@ -16,6 +19,9 @@ void otel_span_finally(SEXP x) {
 }
 
 void otel_scope_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid scope pointer.");
+  }
   void *scope_ = R_ExternalPtrAddr(x);
   if (scope_) {
     otel_span_finally_(scope_);
@@ -100,6 +106,9 @@ void r2c_attributes(SEXP r, struct otel_attributes *c) {
 SEXP otel_start_span(
     SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options) {
 
+  if (TYPEOF(tracer) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid tracer pointer.");
+  }
   void *tracer_ = R_ExternalPtrAddr(tracer);
   if (!tracer_) {
     Rf_error("Opentelemetry tracer cleaned up already, internal error.");
@@ -116,6 +125,9 @@ SEXP otel_start_span(
     for (R_len_t i = 0; i < links_.count; i++) {
       SEXP scoped_span = VECTOR_ELT(VECTOR_ELT(links, i), 0);
       SEXP linked_span = VECTOR_ELT(scoped_span, 0);
+      if (TYPEOF(linked_span) != EXTPTRSXP) {
+        Rf_error("OpenTelemetry: invalid span pointer to linked span.");
+      }
       links_.a[i].span = R_ExternalPtrAddr(linked_span);
       SEXP attr = VECTOR_ELT(VECTOR_ELT(links, i), 1);
       r2c_attributes(attr, &links_.a[i].attr);
@@ -125,6 +137,9 @@ SEXP otel_start_span(
   void *parent_ = NULL;
   SEXP parent = rf_get_list_element(options, "parent");
   if (!Rf_isNull(parent)) {
+    if (TYPEOF(parent) != EXTPTRSXP) {
+      Rf_error("OpenTelemetry: invalid span pointer to parent span.");
+    }
     parent_ = R_ExternalPtrAddr(parent);
   }
   double *start_system_time_ = NULL;
@@ -170,6 +185,9 @@ SEXP otel_start_span(
 
 SEXP otel_span_is_recording(SEXP scoped_span) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
   void *span_ = R_ExternalPtrAddr(span);
   int res = 0;
   if (span_) {
@@ -180,6 +198,9 @@ SEXP otel_span_is_recording(SEXP scoped_span) {
 
 SEXP otel_span_set_attribute(SEXP scoped_span, SEXP name, SEXP value) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
   void *span_ = R_ExternalPtrAddr(span);
   if (span_) {
     struct otel_attribute attr;
@@ -192,6 +213,9 @@ SEXP otel_span_set_attribute(SEXP scoped_span, SEXP name, SEXP value) {
 SEXP otel_span_add_event(
     SEXP scoped_span, SEXP name, SEXP attributes, SEXP timestamp) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
   void *span_ = R_ExternalPtrAddr(span);
   if (span_) {
     const char *name_ = CHAR(STRING_ELT(name, 0));
@@ -215,6 +239,9 @@ SEXP otel_span_add_event(
 SEXP otel_span_set_status(
     SEXP scoped_span, SEXP status_code, SEXP description) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
   void *span_ = R_ExternalPtrAddr(span);
   if (span_) {
     int status_code_ = INTEGER(status_code)[0];
@@ -229,6 +256,9 @@ SEXP otel_span_set_status(
 
 SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
   void *span_ = R_ExternalPtrAddr(span);
   if (span_) {
     const char *name_ = CHAR(STRING_ELT(name, 0));
@@ -240,7 +270,13 @@ SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
 SEXP otel_span_end(SEXP scoped_span, SEXP options, SEXP status_code) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
   SEXP scope = VECTOR_ELT(scoped_span, 1);
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
   void *span_ = R_ExternalPtrAddr(span);
+  if (TYPEOF(scope) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid scope pointer.");
+  }
   void *scope_ = R_ExternalPtrAddr(scope);
   if (span_ && scope_) {
     if (!Rf_isNull(status_code)) {

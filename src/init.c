@@ -79,6 +79,13 @@ void R_init_otelsdk(DllInfo *dll) {
 }
 
 void otel_tracer_provider_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(
+      R_NilValue,
+      "OpenTelemetry: invalid tracer provider pointer."
+    );
+    return;
+  }
   void *tracer_provider_ = R_ExternalPtrAddr(x);
   if (tracer_provider_) {
     otel_tracer_provider_finally_(tracer_provider_);
@@ -87,6 +94,10 @@ void otel_tracer_provider_finally(SEXP x) {
 }
 
 void otel_tracer_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid tracer pointer.");
+    return;
+  }
   void *tracer_ = R_ExternalPtrAddr(x);
   if (tracer_) {
     otel_tracer_finally_(tracer_);
@@ -95,6 +106,10 @@ void otel_tracer_finally(SEXP x) {
 }
 
 void otel_session_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid session pointer.");
+    return;
+  }
   void *sess_ = R_ExternalPtrAddr(x);
   if (sess_) {
     otel_session_finally_(sess_);
@@ -118,6 +133,13 @@ SEXP otel_create_tracer_provider_http(void) {
 }
 
 SEXP otel_tracer_provider_flush(SEXP provider) {
+  if (TYPEOF(provider) != EXTPTRSXP) {
+    Rf_warningcall(
+      R_NilValue,
+      "OpenTelemetry: invalid tracer provider pointer."
+    );
+    return R_NilValue;
+  }
   void *tracer_provider_ = R_ExternalPtrAddr(provider);
   if (!tracer_provider_) {
     Rf_error(
@@ -129,6 +151,9 @@ SEXP otel_tracer_provider_flush(SEXP provider) {
 }
 
 SEXP otel_get_tracer(SEXP provider, SEXP name) {
+  if (TYPEOF(provider) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid tracer provider pointer.");
+  }
   void *tracer_provider_ = R_ExternalPtrAddr(provider);
   if (!tracer_provider_) {
     Rf_error(
@@ -151,20 +176,38 @@ SEXP otel_start_session(void) {
 }
 
 SEXP otel_activate_session(SEXP sess) {
+  if (TYPEOF(sess) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid session pointer.");
+  }
   void *sess_ = R_ExternalPtrAddr(sess);
+  if (!sess_) {
+    Rf_error(
+      "OpenTelemetry error: invalid session id, session already ended?"
+    );
+  }
   otel_activate_session_(sess_);
   return R_NilValue;
 }
 
 SEXP otel_deactivate_session(SEXP sess) {
+  if (TYPEOF(sess) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid session pointer.");
+  }
   void *sess_ = R_ExternalPtrAddr(sess);
-  otel_deactivate_session_(sess_);
+  if (sess_) {
+    otel_deactivate_session_(sess_);
+  }
   return R_NilValue;
 }
 
 SEXP otel_finish_session(SEXP sess) {
+  if (TYPEOF(sess) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid session pointer.");
+  }
   void *sess_ = R_ExternalPtrAddr(sess);
-  otel_finish_session_(sess_);
+  if (sess_) {
+    otel_finish_session_(sess_);
+  }
   return R_NilValue;
 }
 
