@@ -6,6 +6,10 @@
 
 #include "otel_common.h"
 
+SEXP current_expr(void);
+SEXP returned_value(void);
+SEXP handler_stack(void);
+
 SEXP otel_create_tracer_provider_stdstream(SEXP stream);
 SEXP otel_create_tracer_provider_http(void);
 SEXP otel_tracer_provider_flush(SEXP provider);
@@ -43,6 +47,10 @@ SEXP trim_(SEXP x);
   { #name, (DL_FUNC)&name, n }
 
 static const R_CallMethodDef callMethods[]  = {
+  CALLDEF(current_expr, 0),
+  CALLDEF(returned_value, 0),
+  CALLDEF(handler_stack, 0),
+
   CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_tracer_provider_flush, 1),
@@ -68,6 +76,21 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(trim_, 1),
   { NULL, NULL, 0 }
 };
+
+extern SEXP R_CurrentExpr;
+SEXP current_expr(void) {
+  return R_CurrentExpr;
+}
+
+extern SEXP R_ReturnedValue;
+SEXP returned_value(void) {
+  return R_ReturnedValue;
+}
+
+extern SEXP R_HandlerStack;
+SEXP handler_stack(void) {
+  return R_HandlerStack;
+}
 
 extern void otel_init_context_storage(void);
 
