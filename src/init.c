@@ -6,6 +6,9 @@
 
 #include "otel_common.h"
 
+SEXP otel_fail(void);
+SEXP otel_error_object(void);
+
 SEXP otel_create_tracer_provider_stdstream(SEXP stream);
 SEXP otel_create_tracer_provider_http(void);
 SEXP otel_tracer_provider_flush(SEXP provider);
@@ -43,6 +46,9 @@ SEXP trim_(SEXP x);
   { #name, (DL_FUNC)&name, n }
 
 static const R_CallMethodDef callMethods[]  = {
+  CALLDEF(otel_fail, 0),
+  CALLDEF(otel_error_object, 0),
+
   CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_tracer_provider_flush, 1),
@@ -70,6 +76,11 @@ static const R_CallMethodDef callMethods[]  = {
 };
 
 extern void otel_init_context_storage(void);
+
+SEXP otel_fail(void) {
+  Rf_error("from C");
+  return R_NilValue;
+}
 
 void R_init_otelsdk(DllInfo *dll) {
   R_registerRoutines(dll, NULL, callMethods, NULL, NULL);

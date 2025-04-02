@@ -12,7 +12,9 @@ OTEL_CPP_LIBS =  \
 	install/lib/libopentelemetry_proto.a
 
 
-OBJECTS = init.o span.o utils.o context-storage.o tracer-sdk.o tracer-api.o
+OBJECTS = \
+	init.o span.o utils.o context.o context-storage.o \
+	tracer-sdk.o tracer-api.o
 
 PKG_CPPFLAGS = -Iinstall/include
 PKG_LIBS = \

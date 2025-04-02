@@ -71,6 +71,7 @@ span_new <- function(
           if (self$status_set) {
             status_code <- NULL
           } else if (identical(returnValue(random_token), random_token)) {
+            # TODO: record an exception event
             status_code <- 2L
           } else {
             status_code <- 1L
