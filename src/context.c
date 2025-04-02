@@ -15,7 +15,7 @@ SEXP otel_error_object() {
 
 #else
 
-#ifdef Win32
+#ifdef WIN32
 #include <setjmp.h>
 typedef int sigset_t;
 typedef struct {
