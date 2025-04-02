@@ -41,3 +41,63 @@ test_that("map_lgl", {
     c(a = FALSE, b = TRUE)
   )
 })
+
+test_that("get_current_error", {
+  skip_on_cran()
+
+  # plain error string
+  err <- NULL
+  f <- function() {
+    on.exit(err <<- get_current_error(), add = TRUE)
+    stop("boo!")
+  }
+  tryCatch(f(), error = function(e) NULL)
+  expect_equal(
+    err,
+    list(tried = TRUE, success = TRUE, object = "boo!", error = NULL)
+  )
+
+  # error object
+  err <- NULL
+  errobj <- structure(
+    list(message = "booo!"),
+    class = c("custom_error", "error", "condition")
+  )
+  f <- function() {
+    on.exit(err <<- get_current_error(), add = TRUE)
+    stop(errobj)
+  }
+  tryCatch(f(), error = function(e) NULL)
+  expect_equal(
+    err,
+    list(tried = TRUE, success = TRUE, object = errobj, error = NULL)
+  )
+
+  # error from C code
+  err <- NULL
+  f <- function() {
+    on.exit(err <<- get_current_error(), add = TRUE)
+    .Call(otel_fail)
+  }
+  tryCatch(f(), error = function(e) NULL)
+  expect_equal(
+    err,
+    list(tried = TRUE, success = TRUE, object = "from C", error = NULL)
+  )
+
+  # no error
+  expect_snapshot({
+    get_current_error()
+  })
+
+  # no error, from on.exit()
+  err <- NULL
+  f <- function() {
+    on.exit(err <<- get_current_error(), add = TRUE)
+    "success!"
+  }
+  tryCatch(f(), error = function(e) NULL)
+  expect_snapshot({
+    err
+  })
+})
