@@ -53,6 +53,10 @@ transform_tempdir <- function(x) {
   x
 }
 
+transform_srcref <- function(x) {
+  sub("[ ]*at [-a-zA-Z0-9]+[.]R:[0-9]+:[0-9]+?", "", x)
+}
+
 sort_named_list <- function(x) {
   if (!is_named(x) || length(x) <= 1) {
     x
