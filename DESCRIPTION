@@ -20,7 +20,6 @@ SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
 Imports:
     otel
 Suggests:
-    asciicast,
     callr,
     cli,
     processx,

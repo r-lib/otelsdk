@@ -61,17 +61,25 @@ sort_named_list <- function(x) {
   }
 }
 
+record_object <- function(expr, envir = parent.frame()) {
+  rds <- tempfile(fileext = ".rds")
+  rs <- tempfile(fileext = ".R")
+  defer(unlink(c(rds, rs)), envir = envir)
+  writeLines(
+    c(deparse(expr), sprintf("saveRDS(.Last.value, '%s')", rds)),
+    con = rs
+  )
+  callr::rscript(rs, show = FALSE)
+  readRDS(rds)
+}
+
 base_error <- local({
   err <- NULL
   function() {
     if (!is.null(err)) return(err)
-    tmp <- tempfile(fileext = ".rds")
-    on.exit(unlink(tmp), add = TRUE)
-    asciicast::record(substitute({
-      err <- tryCatch(stop("boo!"), error = function(e) e)
-      saveRDS(err, path)
-    }, list(path = tmp)))
-    err <<- readRDS(tmp)
+    err <<- record_object(quote(
+      tryCatch(stop("boo!"), error = function(e) e)
+    ))
     err
   }
 })
@@ -80,21 +88,16 @@ cli_error <- local({
   err <- NULL
   function() {
     if (!is.null(err)) return(err)
-    tmp <- tempfile(fileext = ".rds")
-    on.exit(unlink(tmp), add = TRUE)
-    asciicast::record(substitute({
-      err <- tryCatch(
+    err <<- record_object(quote(
+      tryCatch(
         cli::cli_abort(c(
           "Something went wrong.",
           "x" = "You did not do the {.emph right} thing.",
           "i" = "You did {.emph another} thing instead."
-          )
-        ),
+        )),
         error = function(e) e
       )
-      saveRDS(err, path)
-    }, list(path = tmp)))
-    err <<- readRDS(tmp)
+    ))
     err
   }
 })
@@ -103,16 +106,12 @@ processx_error <- local({
   err <- NULL
   function() {
     if (!is.null(err)) return(err)
-    tmp <- tempfile(fileext = ".rds")
-    on.exit(unlink(tmp), add = TRUE)
-    asciicast::record(substitute({
-      err <<- tryCatch(
+    err <<- record_object(quote(
+      tryCatch(
         processx::run("false"),
         error = function(e) e
       )
-      saveRDS(err, path)
-    }, list(path = tmp)))
-    err <<- readRDS(tmp)
+    ))
     err
   }
 })
@@ -121,16 +120,12 @@ callr_error <- local({
   err <- NULL
   function() {
     if (!is.null(err)) return(err)
-    tmp <- tempfile(fileext = ".rds")
-    on.exit(unlink(tmp), add = TRUE)
-    asciicast::record(substitute({
-      err <<- tryCatch(
+    err <<- record_object(quote(
+      tryCatch(
         callr::r(function() 1 + ""),
         error = function(e) e
       )
-      saveRDS(err, path)
-    }, list(path = tmp)))
-    err <<- readRDS(tmp)
+    ))
     err
   }
 })
