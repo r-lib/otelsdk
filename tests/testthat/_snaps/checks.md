@@ -292,3 +292,11 @@
       Error in `as_output_file()`:
       ! Directory of OpenTelemetry output file '<tempdir>/<tempfile>/output' does not exist or it is not writeable.
 
+---
+
+    Code
+      as_output_file(tmp3)
+    Condition
+      Error in `as_output_file()`:
+      ! Cannot write to OpenTelemetry output file '<tempdir>/<tempfile>/output'.
+

@@ -1,16 +1,40 @@
+parse_span_attributes <- function(attr) {
+  on.exit(close(tc), add = TRUE)
+  tc <- textConnection(attr)
+  as.list(as.data.frame(read.dcf(tc)))
+}
+
+parse_span_events <- function(events) {
+  events <- strsplit(events, "\n")[[1]]
+  events <- sub("^\t", "", events)
+  parse_spans(events)
+}
+
+# TODO: should parse this in the data frame, really....
 parse_spans <- function(path) {
-  lns <- readLines(path)
-  # split by }
-  lns[1] <- "}"
-  lns <- lns[-length(lns)]
-  lns <- lns[lns != "{"]
-  spans <- split(lns, cumsum(lns == "}"))
-  spans <- lapply(spans, function(x) x[-1])
-  spans <- lapply(spans, function(x) {
-    key <- trimws(sub(":.*$", "", x))
-    val <- trimws(sub("^[^:]*:", "", x))
-    structure(as.list(val), names = key)
-  })
+  if (length(path) == 1 && file.exists(path)) {
+    lns <- readLines(path)
+  } else {
+    lns <- path
+  }
+  # remove whitespace from key
+  lns <- sub("^  ([a-z0-9A-Z]+)\\s*", "\\1", lns)
+  # record separators
+  lns[lns %in% c("{", "}")] <- ""
+  on.exit(close(tc), add = TRUE)
+  tc <- textConnection(lns)
+  d <- as.data.frame(read.dcf(tc, keep.white = "events"))
+  names(d) <- trimws(names(d))
+  if ("resources" %in% names(d)) {
+    d[["resources"]] <- I(lapply(d$resources, parse_span_attributes))
+  }
+  if ("attributes" %in% names(d)) {
+    d[["attributes"]] <- I(lapply(d$attributes, parse_span_attributes))
+  }
+  if ("events" %in% names(d)) {
+    d[["events"]] <- I(lapply(d$events, parse_span_events))
+  }
+  spans <- lapply(apply(d, 1, c, simplify = FALSE), as.list)
   names(spans) <- map_chr(spans, function(x) x$name %||% "")
   spans
 }

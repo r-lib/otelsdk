@@ -33,9 +33,9 @@ test_that("start_span", {
   expect_equal(spns[[1]]$parent_span_id, spns[[2]]$span_id)
   expect_match(spns[[1]]$start, "^[0-9]+$")
   expect_match(spns[[1]]$duration, "^[0-9]+$")
-  expect_equal(spns[[1]]$`span kind`, "Internal")
+  expect_equal(spns[[1]]$`spankind`, "Internal")
   expect_equal(spns[[1]]$status, "Unset")
-  expect_equal(spns[[1]]$service.name, "unknown_service")
+  expect_equal(spns[[1]]$resources$service.name, "unknown_service")
   expect_equal(spns[[1]]$`instr-lib`, "mytracer")
 })
 
