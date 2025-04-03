@@ -83,7 +83,9 @@ span_new <- function(
     },
 
     record_exception = function(attributes = NULL) {
+      # nocov start
       invisible(self)
+      # nocov end
     },
 
     name = NULL

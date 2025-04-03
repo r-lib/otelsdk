@@ -42,6 +42,13 @@ test_that("map_lgl", {
   )
 })
 
+test_that("get_env", {
+  withr::local_envvar(TESTENVVAR = "testenvvar")
+  expect_equal(get_env("TESTENVVAR"), "testenvvar")
+  withr::local_envvar(TESTENVVAR = NA_character_)
+  expect_null(get_env("TESTENVVAR"))
+})
+
 test_that("get_current_error", {
   skip_on_cran()
 
@@ -99,5 +106,16 @@ test_that("get_current_error", {
   tryCatch(f(), error = function(e) NULL)
   expect_snapshot({
     err
+  })
+})
+
+test_that("get_current_error, failure", {
+  fake(get_current_error, ".Call", function(...) stop("Shucks."))
+  expect_snapshot({
+    get_current_error()
+  })
+  fake(get_current_error, ".Call", list(FALSE))
+  expect_snapshot({
+    get_current_error()
   })
 })
