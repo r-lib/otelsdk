@@ -82,10 +82,12 @@ span_new <- function(
       invisible(self)
     },
 
-    record_exception = function(attributes = NULL) {
-      # nocov start
+    record_exception = function(error_condition, attributes = NULL, ...) {
+      exception <- format_exception(error_condition)
+      attributes <- as_span_attributes(attributes)
+      attr <- modifyList(exception, as.list(attributes))
+      self$add_event("exception", attributes = attr, ...)
       invisible(self)
-      # nocov end
     },
 
     name = NULL
@@ -120,3 +122,39 @@ span_kinds <- c(
 )
 
 span_status_codes <- c(default = "unset", "ok", "error")
+
+format_exception <- function(error_condition) {
+  message <- tryCatch(
+    capture.output(error_condition),
+    error = function(err) NULL
+  ) %||% tryCatch(
+    conditionMessage(error_condition),
+    error = function(err) NULL
+  ) %||% tryCatch(
+    error_condition$message,
+    error = function(err) NULL
+  ) %||% "<error message missing>"
+
+  stacktrace <- if (!is.null(error_condition$trace)) {
+    tryCatch(
+      capture.output(error_condition$trace),
+      error = function(err) NULL
+    )
+  }
+  stacktrace <- stacktrace %||% tryCatch({
+    cl <- conditionCall(error_condition)
+    if (!is.null(cl)) format(cl)
+  }, error = function(err) NULL) %||% "<stacktrace missing>"
+
+  type <- if (is_string(error_condition)) {
+    c("simpleError", "error", "condition")
+  } else {
+    class(error_condition)
+  }
+
+  list(
+    exception.message = message,
+    exception.stacktrace = stacktrace,
+    exception.type = type
+  )
+}

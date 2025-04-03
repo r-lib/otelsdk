@@ -54,9 +54,83 @@ transform_tempdir <- function(x) {
 }
 
 sort_named_list <- function(x) {
-  if (!is_named(x)) {
+  if (!is_named(x) || length(x) == 1) {
     x
   } else {
     x[order(names(x))]
   }
 }
+
+base_error <- local({
+  err <- NULL
+  function() {
+    if (!is.null(err)) return(err)
+    tmp <- tempfile(fileext = ".rds")
+    on.exit(unlink(tmp), add = TRUE)
+    asciicast::record(substitute({
+      err <- tryCatch(stop("boo!"), error = function(e) e)
+      saveRDS(err, path)
+    }, list(path = tmp)))
+    err <<- readRDS(tmp)
+    err
+  }
+})
+
+cli_error <- local({
+  err <- NULL
+  function() {
+    if (!is.null(err)) return(err)
+    tmp <- tempfile(fileext = ".rds")
+    on.exit(unlink(tmp), add = TRUE)
+    asciicast::record(substitute({
+      err <- tryCatch(
+        cli::cli_abort(c(
+          "Something went wrong.",
+          "x" = "You did not do the {.emph right} thing.",
+          "i" = "You did {.emph another} thing instead."
+          )
+        ),
+        error = function(e) e
+      )
+      saveRDS(err, path)
+    }, list(path = tmp)))
+    err <<- readRDS(tmp)
+    err
+  }
+})
+
+processx_error <- local({
+  err <- NULL
+  function() {
+    if (!is.null(err)) return(err)
+    tmp <- tempfile(fileext = ".rds")
+    on.exit(unlink(tmp), add = TRUE)
+    asciicast::record(substitute({
+      err <<- tryCatch(
+        processx::run("false"),
+        error = function(e) e
+      )
+      saveRDS(err, path)
+    }, list(path = tmp)))
+    err <<- readRDS(tmp)
+    err
+  }
+})
+
+callr_error <- local({
+  err <- NULL
+  function() {
+    if (!is.null(err)) return(err)
+    tmp <- tempfile(fileext = ".rds")
+    on.exit(unlink(tmp), add = TRUE)
+    asciicast::record(substitute({
+      err <<- tryCatch(
+        callr::r(function() 1 + ""),
+        error = function(e) e
+      )
+      saveRDS(err, path)
+    }, list(path = tmp)))
+    err <<- readRDS(tmp)
+    err
+  }
+})

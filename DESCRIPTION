@@ -20,6 +20,11 @@ SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
 Imports:
     otel
 Suggests:
+    asciicast,
+    callr,
+    cli,
+    processx,
+    rlang,
     testthat (>= 3.0.0),
     withr
 Remotes:
