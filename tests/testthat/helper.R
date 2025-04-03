@@ -1,7 +1,7 @@
 parse_span_attributes <- function(attr) {
   on.exit(close(tc), add = TRUE)
   tc <- textConnection(attr)
-  as.list(as.data.frame(read.dcf(tc)))
+  sort_named_list(as.list(as.data.frame(read.dcf(tc))))
 }
 
 parse_span_events <- function(events) {
@@ -51,4 +51,12 @@ transform_tempdir <- function(x) {
   x <- sub("[\\\\/]file[a-zA-Z0-9]+", "/<tempfile>", x)
   x <- sub("[A-Z]:.*Rtmp[a-zA-Z0-9]+[\\\\/]", "<tempdir>/", x)
   x
+}
+
+sort_named_list <- function(x) {
+  if (!is_named(x)) {
+    x
+  } else {
+    x[order(names(x))]
+  }
 }
