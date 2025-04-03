@@ -85,7 +85,7 @@ span_new <- function(
     record_exception = function(error_condition, attributes = NULL, ...) {
       exception <- format_exception(error_condition)
       attributes <- as_span_attributes(attributes)
-      attr <- modifyList(exception, as.list(attributes))
+      attr <- utils::modifyList(exception, as.list(attributes))
       self$add_event("exception", attributes = attr, ...)
       invisible(self)
     },
@@ -125,7 +125,7 @@ span_status_codes <- c(default = "unset", "ok", "error")
 
 format_exception <- function(error_condition) {
   message <- tryCatch(
-    capture.output(error_condition),
+    utils::capture.output(error_condition),
     error = function(err) NULL
   ) %||% tryCatch(
     conditionMessage(error_condition),
@@ -137,7 +137,7 @@ format_exception <- function(error_condition) {
 
   stacktrace <- if (!is.null(error_condition$trace)) {
     tryCatch(
-      capture.output(error_condition$trace),
+      utils::capture.output(error_condition$trace),
       error = function(err) NULL
     )
   }
