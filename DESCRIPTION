@@ -20,7 +20,8 @@ SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
 Imports:
     otel
 Suggests:
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    withr
 Remotes:
     r-lib/otel
 Config/testthat/edition: 3
