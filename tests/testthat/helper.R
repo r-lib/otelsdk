@@ -54,7 +54,7 @@ transform_tempdir <- function(x) {
 }
 
 sort_named_list <- function(x) {
-  if (!is_named(x) || length(x) == 1) {
+  if (!is_named(x) || length(x) <= 1) {
     x
   } else {
     x[order(names(x))]
