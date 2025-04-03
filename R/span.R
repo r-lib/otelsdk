@@ -71,7 +71,26 @@ span_new <- function(
           if (self$status_set) {
             status_code <- NULL
           } else if (identical(returnValue(random_token), random_token)) {
-            # TODO: record an exception event
+            err <- get_current_error()
+            if (!err$tried || !isTRUE(err$success)) {
+              # no error object because exiting or could not get it
+              # create a stacktrace nevertheless
+              cnd <- structure(
+                list(message = "Unknown error"),
+                class = c("error", "condition")
+              )
+            } else {
+              cnd <- err$object
+            }
+            exception <- format_exception(cnd)
+            if (identical(exception$exception.stacktrace, "<stacktrace missing>")) {
+              exception$exception.stacktrace <-
+                utils::capture.output(traceback(sys.calls()))
+            }
+            tryCatch(
+              self$add_event("exception", exception),
+              error = function(err) NULL
+            )
             status_code <- 2L
           } else {
             status_code <- 1L
@@ -131,13 +150,13 @@ format_exception <- function(error_condition) {
     conditionMessage(error_condition),
     error = function(err) NULL
   ) %||% tryCatch(
-    error_condition$message,
+    error_condition[["message"]],
     error = function(err) NULL
   ) %||% "<error message missing>"
 
-  stacktrace <- if (!is.null(error_condition$trace)) {
+  stacktrace <- if ("trace" %in% names(error_condition)) {
     tryCatch(
-      utils::capture.output(error_condition$trace),
+      utils::capture.output(error_condition[["trace"]]),
       error = function(err) NULL
     )
   }
@@ -146,11 +165,7 @@ format_exception <- function(error_condition) {
     if (!is.null(cl)) format(cl)
   }, error = function(err) NULL) %||% "<stacktrace missing>"
 
-  type <- if (is_string(error_condition)) {
-    c("simpleError", "error", "condition")
-  } else {
-    class(error_condition)
-  }
+  type <- class(error_condition)
 
   list(
     exception.message = message,
