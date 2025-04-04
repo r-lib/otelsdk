@@ -3,6 +3,7 @@ OTEL_CPP_LIBS =  \
 	install/lib/libopentelemetry_exporter_ostream_span.a \
 	install/lib/libopentelemetry_exporter_otlp_http.a \
 	install/lib/libopentelemetry_exporter_otlp_http_client.a \
+	install/lib/libopentelemetry_exporter_ostream_logs.a \
 	install/lib/libopentelemetry_http_client_curl.a \
 	install/lib/libopentelemetry_otlp_recordable.a \
 	install/lib/libopentelemetry_trace.a \
@@ -14,13 +15,14 @@ OTEL_CPP_LIBS =  \
 
 OBJECTS = \
 	init.o span.o utils.o context.o context-storage.o \
-	tracer-sdk.o tracer-api.o
+	tracer-sdk.o tracer-api.o logger.o logger-sdk.o
 
 PKG_CPPFLAGS = -Iinstall/include
 PKG_LIBS = \
 	-Linstall/lib -lopentelemetry_exporter_ostream_span \
 	-lopentelemetry_exporter_otlp_http \
 	-lopentelemetry_exporter_otlp_http_client \
+	-lopentelemetry_exporter_ostream_logs \
 	-lopentelemetry_http_client_curl \
 	-lopentelemetry_otlp_recordable \
 	-lopentelemetry_trace \

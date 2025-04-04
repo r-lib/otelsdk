@@ -27,14 +27,26 @@ namespace nostd          = opentelemetry::nostd;
 #include "otel_common.h"
 #include "otel_common_cpp.h"
 
-static void
-otel_string_to_char(const std::string &inp, struct otel_string &outp) {
+void otel_string_to_char(const std::string &inp, struct otel_string &outp) {
   size_t len = inp.length();
   if (outp.s) {
     if (outp.size <= len) {
       throw std::runtime_error("Intarnal error, buffer too short.");
     }
     memcpy(outp.s, inp.c_str(), len);
+    outp.s[len] = '\0';
+  } else {
+    outp.size = len + 1;
+  }
+}
+
+void otel_string_to_char(const nostd::string_view &inp, struct otel_string &outp) {
+  size_t len = inp.length();
+  if (outp.s) {
+    if (outp.size <= len) {
+      throw std::runtime_error("Intarnal error, buffer too short.");
+    }
+    memcpy(outp.s, inp.data(), len);
     outp.s[len] = '\0';
   } else {
     outp.size = len + 1;

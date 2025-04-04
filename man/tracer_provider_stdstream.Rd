@@ -3,7 +3,8 @@
 \docType{data}
 \name{tracer_provider_stdstream}
 \alias{tracer_provider_stdstream}
-\title{Tracer provider to write to the standard output or standard error}
+\title{Tracer provider to write to the standard output or standard error or
+to a file}
 \format{
 An object of class \code{list} of length 1.
 }
@@ -11,6 +12,7 @@ An object of class \code{list} of length 1.
 tracer_provider_stdstream
 }
 \description{
-Tracer provider to write to the standard output or standard error
+Tracer provider to write to the standard output or standard error or
+to a file
 }
 \keyword{datasets}

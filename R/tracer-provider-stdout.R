@@ -19,7 +19,8 @@ tracer_provider_stdstream_new <- function(stream = NULL) {
   self
 }
 
-#' Tracer provider to write to the standard output or standard error
+#' Tracer provider to write to the standard output or standard error or
+#' to a file
 #' @export
 
 tracer_provider_stdstream <- list(

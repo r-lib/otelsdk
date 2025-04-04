@@ -309,3 +309,17 @@ as_output_file <- function(x, null = TRUE, call = NULL) {
 
   x
 }
+
+# TODO
+as_log_severity <- function(x) {
+  if (is_string(x)) {
+    log_severity_levels[x]
+  } else {
+    x
+  }
+}
+
+# TODO
+as_event_id <- function(x, null = TRUE, call = NULL) {
+  x
+}

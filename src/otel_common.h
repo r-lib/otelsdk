@@ -122,6 +122,7 @@ void otel_tracer_finally_(void *tracer);
 void otel_span_finally_(void *span);
 void otel_scope_finally_(void *scope);
 void otel_session_finally_(void *sess);
+void otel_logger_finally_(void *logger);
 
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
@@ -161,6 +162,15 @@ void otel_finish_all_sessions_(void);
 
 void otel_tracer_provider_http_default_options_(
   struct otel_tracer_provider_http_options_t *opts);
+
+void otel_logger_provider_finally_(void *logger_provider);
+void *otel_create_logger_provider_stdstream_(const char *stream);
+void otel_logger_provider_flush_(void *tracer_provider);
+void *otel_get_logger_(void *logger_provider, const char *name);
+void *otel_logger_get_name_(void *logger, struct otel_string *name);
+void otel_log_(
+  void *logger_, int severity_, const char *format_,
+  struct otel_attributes *attr);
 
 #ifdef __cplusplus
 }
