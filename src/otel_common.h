@@ -165,6 +165,7 @@ void otel_tracer_provider_http_default_options_(
 
 void otel_logger_provider_finally_(void *logger_provider);
 void *otel_create_logger_provider_stdstream_(const char *stream);
+void *otel_create_logger_provider_http_(void);
 void otel_logger_provider_flush_(void *tracer_provider);
 void *otel_get_logger_(void *logger_provider, const char *name);
 void *otel_logger_get_name_(void *logger, struct otel_string *name);

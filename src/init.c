@@ -40,6 +40,7 @@ SEXP otel_finish_all_sessions(void);
 SEXP otel_tracer_provider_http_options(void);
 
 SEXP otel_create_logger_provider_stdstream(SEXP stream);
+SEXP otel_create_logger_provider_http(void);
 SEXP otel_get_logger(SEXP provider, SEXP name);
 SEXP otel_logger_provider_flush(SEXP provider);
 
@@ -88,6 +89,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_tracer_provider_http_options, 0),
 
   CALLDEF(otel_create_logger_provider_stdstream, 1),
+  CALLDEF(otel_create_logger_provider_http, 0),
   CALLDEF(otel_logger_provider_flush, 1),
   CALLDEF(otel_get_logger, 2),
   CALLDEF(otel_logger_get_name, 1),
@@ -411,6 +413,13 @@ void otel_logger_finally(SEXP x) {
 SEXP otel_create_logger_provider_stdstream(SEXP stream) {
   const char *cstream = CHAR(STRING_ELT(stream, 0));
   void *logger_provider_ = otel_create_logger_provider_stdstream_(cstream);
+  SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_create_logger_provider_http(void) {
+  void *logger_provider_ = otel_create_logger_provider_http_();
   SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
   return xptr;

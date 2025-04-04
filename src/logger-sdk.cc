@@ -1,3 +1,5 @@
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -10,6 +12,7 @@
 namespace logs_api       = opentelemetry::logs;
 namespace logs_sdk       = opentelemetry::sdk::logs;
 namespace logs_exporter  = opentelemetry::exporter::logs;
+namespace otlp           = opentelemetry::exporter::otlp;
 namespace common         = opentelemetry::common;
 
 #include "otel_common.h"
@@ -50,6 +53,16 @@ void *otel_create_logger_provider_stdstream_(const char *stream) {
     tps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
     return tps;
   }
+}
+
+void *otel_create_logger_provider_http_(void) {
+  auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create();
+  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
+
+  struct otel_logger_provider *lps = new otel_logger_provider;
+  lps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
+
+  return (void*) lps;
 }
 
 void otel_logger_provider_flush_(void *logger_provider_) {
