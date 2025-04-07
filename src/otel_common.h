@@ -123,6 +123,8 @@ void otel_span_finally_(void *span);
 void otel_scope_finally_(void *scope);
 void otel_session_finally_(void *sess);
 void otel_logger_finally_(void *logger);
+void otel_meter_finally_(void *meter);
+void otel_counter_finally_(void *counter);
 
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
@@ -172,6 +174,19 @@ void *otel_logger_get_name_(void *logger, struct otel_string *name);
 void otel_log_(
   void *logger_, int severity_, const char *format_,
   struct otel_attributes *attr);
+
+void otel_meter_provider_finally_(void *logger_provider);
+void *otel_create_meter_provider_stdstream_(
+  const char *stream, int export_interval, int export_timeout);
+void otel_meter_provider_flush_(void *tracer_provider, int timeout);
+void otel_meter_provider_shutdown_(void *tracer_provider, int timeout);
+void *otel_get_meter_(void *meter_provider, const char *name);
+
+void *otel_create_counter_(
+  void *meter_, const char *name, const char *description,
+  const char *unit);
+void otel_counter_add_(
+  void *counter_, double cvalue, struct otel_attributes *attributes_);
 
 #ifdef __cplusplus
 }

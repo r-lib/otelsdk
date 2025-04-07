@@ -56,6 +56,17 @@ SEXP otel_logger_is_enabled(SEXP logger, SEXP severiry, SEXP event_id);
 SEXP otel_log(
   SEXP logger, SEXP severity, SEXP format, SEXP event_id, SEXP attributes);
 
+SEXP otel_create_meter_provider_stdstream(
+  SEXP stream, SEXP export_interval, SEXP export_timeout);
+SEXP otel_get_meter(SEXP provider, SEXP name);
+SEXP otel_meter_provider_flush(SEXP provider, SEXP timeout);
+SEXP otel_meter_provider_shutdown(SEXP provider, SEXP timeout);
+
+SEXP otel_create_counter(
+  SEXP meter, SEXP name, SEXP description, SEXP unit);
+SEXP otel_counter_add(
+  SEXP counter, SEXP value, SEXP attributes, SEXP context);
+
 SEXP rf_get_list_element(SEXP list, const char *str);
 SEXP trim_(SEXP x);
 
@@ -102,6 +113,13 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_log_fatal, 2),
   CALLDEF(otel_logger_is_enabled, 3),
   CALLDEF(otel_log ,5),
+
+  CALLDEF(otel_create_meter_provider_stdstream, 3),
+  CALLDEF(otel_get_meter, 2),
+  CALLDEF(otel_meter_provider_flush, 2),
+  CALLDEF(otel_meter_provider_shutdown, 2),
+  CALLDEF(otel_create_counter, 4),
+  CALLDEF(otel_counter_add, 4),
 
   CALLDEF(trim_, 1),
   { NULL, NULL, 0 }
@@ -381,81 +399,4 @@ SEXP otel_tracer_provider_http_options(void) {
 
   UNPROTECT(14);
   return res;
-}
-
-void otel_logger_provider_finally(SEXP x) {
-  if (TYPEOF(x) != EXTPTRSXP) {
-    Rf_warningcall(
-      R_NilValue,
-      "OpenTelemetry: invalid logger provider pointer."
-    );
-    return;
-  }
-  void *logger_provider_ = R_ExternalPtrAddr(x);
-  if (logger_provider_) {
-    otel_logger_provider_finally_(logger_provider_);
-    R_ClearExternalPtr(x);
-  }
-}
-
-void otel_logger_finally(SEXP x) {
-  if (TYPEOF(x) != EXTPTRSXP) {
-    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid logger pointer.");
-    return;
-  }
-  void *logger_ = R_ExternalPtrAddr(x);
-  if (logger_) {
-    otel_logger_finally_(logger_);
-    R_ClearExternalPtr(x);
-  }
-}
-
-SEXP otel_create_logger_provider_stdstream(SEXP stream) {
-  const char *cstream = CHAR(STRING_ELT(stream, 0));
-  void *logger_provider_ = otel_create_logger_provider_stdstream_(cstream);
-  SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
-  R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
-  return xptr;
-}
-
-SEXP otel_create_logger_provider_http(void) {
-  void *logger_provider_ = otel_create_logger_provider_http_();
-  SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
-  R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
-  return xptr;
-}
-
-SEXP otel_logger_provider_flush(SEXP provider) {
-  if (TYPEOF(provider) != EXTPTRSXP) {
-    Rf_warningcall(
-      R_NilValue,
-      "OpenTelemetry: invalid logger provider pointer."
-    );
-    return R_NilValue;
-  }
-  void *logger_provider_ = R_ExternalPtrAddr(provider);
-  if (!logger_provider_) {
-    Rf_error(
-      "Opentelemetry logger provider cleaned up already, internal error."
-    );
-  }
-  otel_logger_provider_flush_(logger_provider_);
-  return R_NilValue;
-}
-
-SEXP otel_get_logger(SEXP provider, SEXP name) {
-  if (TYPEOF(provider) != EXTPTRSXP) {
-    Rf_error("OpenTelemetry: invalid logger provider pointer.");
-  }
-  void *logger_provider_ = R_ExternalPtrAddr(provider);
-  if (!logger_provider_) {
-    Rf_error(
-      "Opentelemetry logger provider cleaned up already, internal error."
-    );
-  }
-  const char *name_ = CHAR(STRING_ELT(name, 0));
-  void *logger_ = otel_get_logger_(logger_provider_, name_);
-  SEXP xptr = R_MakeExternalPtr(logger_, R_NilValue, R_NilValue);
-  R_RegisterCFinalizerEx(xptr, otel_logger_finally, (Rboolean) 1);
-  return xptr;
 }
