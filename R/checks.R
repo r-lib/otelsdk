@@ -323,3 +323,33 @@ as_log_severity <- function(x) {
 as_event_id <- function(x, null = TRUE, call = NULL) {
   x
 }
+
+as_count <- function(x, positive = FALSE, call = NULL) {
+  limit <- if (positive) 1L else 0L
+  if (is.numeric(x) && length(x) == 1 && !is.na(x) && x >= limit) {
+    return(as.integer(x))
+  }
+
+  call <- call %||% match.call()
+  if (is.numeric(x) && length(x) != 1) {
+    stop(
+      "Invalid argument: ", format(call[[2]]), " must be an integer ",
+      "scalar, not a vector."
+    )
+  } else if (is.numeric(x) && length(x) == 1 && is.na(x)) {
+    stop(
+      "Invalid argument: ", format(call[[2]]), " must not be `NA`."
+    )
+  } else if (is.numeric(x) && length(x) == 1 && !is.na(x) && x < limit) {
+    stop(
+      "Invalid argument: ", format(call[[2]]), " must be ",
+      if (positive) "positive." else "non-negative."
+    )
+  } else {
+    stop(
+      "Invalid argument: ", format(call[[2]]), " must be a ",
+      if (positive) "positive " else "non-negative ",
+      "integer scalar, but it is ", typename(x), "."
+    )
+  }
+}

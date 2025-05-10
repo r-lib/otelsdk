@@ -1,2 +1,3 @@
 tracer_provider_stdstream_output <- "OTEL_EXPORTER_STDSTREAM_TRACES_OUTPUT"
 logger_provider_stdstream_output <- "OTEL_EXPORTER_STDSTREAM_LOGS_OUTPUT"
+meter_provider_stdstream_output <- "OTEL_EXPORTER_STDSTREAM_METRICS_OUTPUT"

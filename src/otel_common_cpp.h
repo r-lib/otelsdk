@@ -6,12 +6,16 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
 
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
 namespace logs_api       = opentelemetry::logs;
 namespace logs_sdk       = opentelemetry::sdk::logs;
+namespace metrics_api    = opentelemetry::metrics;
+namespace metrics_sdk    = opentelemetry::sdk::metrics;
 namespace nostd          = opentelemetry::nostd;
 
 struct otel_span {
@@ -34,6 +38,19 @@ struct otel_logger_provider {
 
 struct otel_logger {
   nostd::shared_ptr<logs_api::Logger> ptr;
+};
+
+struct otel_meter_provider {
+  std::unique_ptr<metrics_sdk::MeterProvider> ptr;
+  std::fstream stream;
+};
+
+struct otel_meter {
+  nostd::shared_ptr<metrics_api::Meter> ptr;
+};
+
+struct otel_counter {
+  nostd::unique_ptr<metrics_api::Counter<double>> ptr;
 };
 
 void otel_string_to_char(const std::string &inp, struct otel_string &outp);

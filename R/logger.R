@@ -1,4 +1,4 @@
-logger_new <- function(provider, name, ...) {
+logger_new <- function(provider, name = NULL, ...) {
   self <- new_object(
     "otel_logger",
     get_name = function() {
