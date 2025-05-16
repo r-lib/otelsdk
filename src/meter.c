@@ -44,6 +44,17 @@ SEXP otel_create_meter_provider_stdstream(
   return xptr;
 }
 
+SEXP otel_create_meter_provider_http(
+    SEXP export_interval, SEXP export_timeout) {
+  int cexport_interval = INTEGER(export_interval)[0];
+  int cexport_timeout = INTEGER(export_timeout)[0];
+  void *meter_provider_ = otel_create_meter_provider_http_(
+    cexport_interval, cexport_timeout);
+  SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_meter_provider_finally, (Rboolean) 1);
+  return xptr;
+}
+
 SEXP otel_get_meter(SEXP provider, SEXP name) {
   if (TYPEOF(provider) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid meter provider pointer.");

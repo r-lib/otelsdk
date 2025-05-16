@@ -2,6 +2,7 @@
 
 export(logger_provider_http)
 export(logger_provider_stdstream)
+export(meter_provider_http)
 export(meter_provider_stdstream)
 export(tracer_provider_http)
 export(tracer_provider_stdstream)

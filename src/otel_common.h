@@ -178,6 +178,8 @@ void otel_log_(
 void otel_meter_provider_finally_(void *logger_provider);
 void *otel_create_meter_provider_stdstream_(
   const char *stream, int export_interval, int export_timeout);
+void *otel_create_meter_provider_http_(
+  int export_interval, int export_timeout);
 void otel_meter_provider_flush_(void *tracer_provider, int timeout);
 void otel_meter_provider_shutdown_(void *tracer_provider, int timeout);
 void *otel_get_meter_(void *meter_provider, const char *name);

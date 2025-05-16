@@ -14,11 +14,16 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 
 namespace metrics_sdk      = opentelemetry::sdk::metrics;
 namespace common           = opentelemetry::common;
 namespace metrics_exporter = opentelemetry::exporter::metrics;
 namespace metrics_api      = opentelemetry::metrics;
+namespace otlp             = opentelemetry::exporter::otlp;
+
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
@@ -86,6 +91,32 @@ void *otel_create_meter_provider_stdstream_(
     mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
     return (void*) mps;
   }
+}
+
+void *otel_create_meter_provider_http_(
+    int export_interval, int export_timeout) {
+  struct otel_meter_provider *mps = new otel_meter_provider;
+
+  std::string version{"1.2.0"};
+  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
+
+  // Initialize and set the global MeterProvider
+  metrics_sdk::PeriodicExportingMetricReaderOptions reader_options;
+  reader_options.export_interval_millis =
+    std::chrono::milliseconds(export_interval);
+  reader_options.export_timeout_millis  =
+    std::chrono::milliseconds(export_timeout);
+
+  auto exporter = otlp::OtlpHttpMetricExporterFactory::Create();
+  auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
+    std::move(exporter),
+    reader_options
+  );
+  auto context = metrics_sdk::MeterContextFactory::Create();
+  context->AddMetricReader(std::move(reader));
+
+  mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
+  return (void*) mps;
 }
 
 void otel_meter_provider_flush_(void *meter_provider_, int timeout) {
