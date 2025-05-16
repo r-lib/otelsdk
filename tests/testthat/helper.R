@@ -60,7 +60,7 @@ transform_srcref <- function(x) {
     x
   )
   # remove trailing spaces
-  x <- sub("\\s$", "", x)
+  x <- sub("\\s+$", "", x)
   x
 }
 
