@@ -5,16 +5,18 @@ OTEL_CPP_LIBS =  \
 	install/lib/libopentelemetry_exporter_otlp_http_client.a \
 	install/lib/libopentelemetry_exporter_ostream_logs.a \
 	install/lib/libopentelemetry_exporter_otlp_http_log.a \
+	install/lib/libopentelemetry_exporter_otlp_http_metric.a \
+	install/lib/libopentelemetry_exporter_ostream_metrics.a \
 	install/lib/libopentelemetry_http_client_curl.a \
 	install/lib/libopentelemetry_otlp_recordable.a \
 	install/lib/libopentelemetry_trace.a \
 	install/lib/libopentelemetry_logs.a \
+	install/lib/libopentelemetry_metrics.a \
 	install/lib/libopentelemetry_resources.a \
 	install/lib/libopentelemetry_common.a \
 	install/lib/libopentelemetry_proto.a
 
-
-OBJECTS = \
+OBJECTS = meter.o meter-sdk.o \
 	init.o span.o utils.o context.o context-storage.o \
 	tracer-sdk.o tracer-api.o logger.o logger-sdk.o
 
@@ -25,10 +27,13 @@ PKG_LIBS = \
 	-lopentelemetry_exporter_otlp_http_client \
 	-lopentelemetry_exporter_ostream_logs \
 	-lopentelemetry_exporter_otlp_http_log \
+	-lopentelemetry_exporter_otlp_http_metric \
+	-lopentelemetry_exporter_ostream_metrics \
 	-lopentelemetry_http_client_curl \
 	-lopentelemetry_otlp_recordable \
 	-lopentelemetry_trace \
 	-lopentelemetry_logs \
+	-lopentelemetry_metrics \
 	-lopentelemetry_resources \
 	-lopentelemetry_common \
 	-lopentelemetry_proto \

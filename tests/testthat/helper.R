@@ -54,7 +54,14 @@ transform_tempdir <- function(x) {
 }
 
 transform_srcref <- function(x) {
-  sub("[ ]*at ([a-zA-Z0-9.]+/R/)?[-a-zA-Z0-9]+[.]R:[0-9]+:[0-9]+?", "", x)
+  x <- sub(
+    "[ ]*at ([a-zA-Z0-9.]+/R/)?[-a-zA-Z0-9]+[.]R:[0-9]+:[0-9]+?",
+    "",
+    x
+  )
+  # remove trailing spaces
+  x <- sub("\\s$", "", x)
+  x
 }
 
 sort_named_list <- function(x) {
