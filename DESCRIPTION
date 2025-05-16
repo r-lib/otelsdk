@@ -27,5 +27,5 @@ Suggests:
     testthat (>= 3.0.0),
     withr
 Remotes:
-    r-lib/otel@feature/metrics
+    r-lib/otel
 Config/testthat/edition: 3
