@@ -19,32 +19,32 @@
       format_exception(cli_error())
     Output
       $exception.message
-       [1] "<error/rlang_error>"                                                         
-       [2] "Error:"                                                                      
-       [3] "! Something went wrong."                                                     
-       [4] "x You did not do the right thing."                                           
-       [5] "i You did another thing instead."                                            
-       [6] "---"                                                                         
-       [7] "Backtrace:"                                                                  
-       [8] "    x"                                                                       
-       [9] " 1. +-base::tryCatch(...)"                                                   
-      [10] " 2. | \\-base (local) tryCatchList(expr, classes, parentenv, handlers)"      
-      [11] " 3. |   \\-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])" 
+       [1] "<error/rlang_error>"                                                        
+       [2] "Error:"                                                                     
+       [3] "! Something went wrong."                                                    
+       [4] "x You did not do the right thing."                                          
+       [5] "i You did another thing instead."                                           
+       [6] "---"                                                                        
+       [7] "Backtrace:"                                                                 
+       [8] "    x"                                                                      
+       [9] " 1. +-base::tryCatch(...)"                                                  
+      [10] " 2. | \\-base (local) tryCatchList(expr, classes, parentenv, handlers)"     
+      [11] " 3. |   \\-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])"
       [12] " 4. |     \\-base (local) doTryCatch(return(expr), name, parentenv, handler)"
-      [13] " 5. \\-cli::cli_abort(...)"                                                  
-      [14] " 6.   \\-rlang::abort(...)"                                                  
+      [13] " 5. \\-cli::cli_abort(...)"                                                 
+      [14] " 6.   \\-rlang::abort(...)"                                                 
       
       $exception.stacktrace
-      [1] "    x"                                                                       
-      [2] " 1. +-base::tryCatch(...)"                                                   
-      [3] " 2. | \\-base (local) tryCatchList(expr, classes, parentenv, handlers)"      
-      [4] " 3. |   \\-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])" 
+      [1] "    x"                                                                      
+      [2] " 1. +-base::tryCatch(...)"                                                  
+      [3] " 2. | \\-base (local) tryCatchList(expr, classes, parentenv, handlers)"     
+      [4] " 3. |   \\-base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])"
       [5] " 4. |     \\-base (local) doTryCatch(return(expr), name, parentenv, handler)"
-      [6] " 5. \\-cli::cli_abort(...)"                                                  
-      [7] " 6.   \\-rlang::abort(...)"                                                  
+      [6] " 5. \\-cli::cli_abort(...)"                                                 
+      [7] " 6.   \\-rlang::abort(...)"                                                 
       
       $exception.type
-      [1] "rlang_error" "error"       "condition"  
+      [1] "rlang_error" "error"       "condition" 
       
 
 ---
