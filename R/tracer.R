@@ -1,11 +1,20 @@
 tracer_new <- function(provider, name, ...) {
   self <- new_object(
     "otel_tracer",
-    start_span = function(name = NULL, attributes = NULL, links = NULL,
-                          options = NULL, scope = parent.frame()) {
+    start_span = function(
+      name = NULL,
+      attributes = NULL,
+      links = NULL,
+      options = NULL,
+      scope = parent.frame()
+    ) {
       span_new(
-        self, name = name, attributes = attributes, links = links,
-        options = options, scope = scope
+        self,
+        name = name,
+        attributes = attributes,
+        links = links,
+        options = options,
+        scope = scope
       )
     },
     is_enabled = function(...) TRUE,

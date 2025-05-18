@@ -1,19 +1,30 @@
-collapse <- function(x, sep = ", ", sep2 = sub("^,", "", last), last = ", and ",
-                     trunc = Inf, width = Inf, ellipsis = "...",
-                     style = c("both-ends", "head")) {
-
+collapse <- function(
+  x,
+  sep = ", ",
+  sep2 = sub("^,", "", last),
+  last = ", and ",
+  trunc = Inf,
+  width = Inf,
+  ellipsis = "...",
+  style = c("both-ends", "head")
+) {
   style <- match.arg(style)
   switch(
     style,
     "both-ends" = collapse_both_ends(
-      x, sep, sep2, last, trunc, width, ellipsis
+      x,
+      sep,
+      sep2,
+      last,
+      trunc,
+      width,
+      ellipsis
     ),
     "head" = collapse_head(x, sep, sep2, last, trunc, width, ellipsis)
   )
 }
 
 collapse_head_notrim <- function(x, trunc, sep, sep2, last, ellipsis) {
-
   lnx <- length(x)
 
   if (lnx == 1L) return(x)
@@ -36,7 +47,6 @@ collapse_head_notrim <- function(x, trunc, sep, sep2, last, ellipsis) {
 }
 
 collapse_head <- function(x, sep, sep2, last, trunc, width, ellipsis) {
-
   trunc <- max(trunc, 1L)
   x <- as.character(x)
   lnx <- length(x)
@@ -59,19 +69,19 @@ collapse_head <- function(x, sep, sep2, last, trunc, width, ellipsis) {
   if (tcd) x <- x[1:trunc]
 
   # then we calculate the width w/o trimming
-  wx    <- nchar(x)
-  wsep  <- nchar(sep, "width")
+  wx <- nchar(x)
+  wsep <- nchar(sep, "width")
   wsep2 <- nchar(sep2, "width")
   wlast <- nchar(last, "width")
-  well  <- nchar(ellipsis, "width")
+  well <- nchar(ellipsis, "width")
   if (!tcd) {
     # x[1]
     # x[1] and x[2]
     # x[1], x[2], and x[3]
-    nsep  <- if (lnx > 2L) lnx - 2L else 0L
+    nsep <- if (lnx > 2L) lnx - 2L else 0L
     nsep2 <- if (lnx == 2L) 1L else 0L
     nlast <- if (lnx > 2L) 1L else 0L
-    wtot  <- sum(wx) + nsep * wsep + nsep2 * wsep2 + nlast * wlast
+    wtot <- sum(wx) + nsep * wsep + nsep2 * wsep2 + nlast * wlast
     if (wtot <= width) {
       if (lnx == 1L) {
         return(x)
@@ -85,7 +95,6 @@ collapse_head <- function(x, sep, sep2, last, trunc, width, ellipsis) {
         ))
       }
     }
-
   } else {
     # x[1], x[2], x[trunc], ...
     wtot <- sum(wx) + trunc * wsep + well
@@ -129,7 +138,6 @@ collapse_head <- function(x, sep, sep2, last, trunc, width, ellipsis) {
 }
 
 collapse_both_ends <- function(x, sep, sep2, last, trunc, width, ellipsis) {
-
   # we always list at least 5 elements
   trunc <- max(trunc, 5L)
   trunc <- min(trunc, length(x))

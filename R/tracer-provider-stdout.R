@@ -5,8 +5,7 @@ tracer_provider_stdstream_new <- function(stream = NULL) {
     stream <- as_output_file(stream, null = FALSE)
   }
   self <- new_object(
-    c("otel_tracer_provider_stdstream",
-      "otel_tracer_provider"),
+    c("otel_tracer_provider_stdstream", "otel_tracer_provider"),
     get_tracer = function(name, ...) {
       tracer_new(self, name, ...)
     },

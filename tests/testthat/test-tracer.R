@@ -51,27 +51,27 @@ test_that("sessions", {
   trc_prv <- tracer_provider_stdstream_new(tmp)
   trc <- trc_prv$get_tracer("mytracer")
 
-  spn0 <- trc$start_span("0")        # 0
+  spn0 <- trc$start_span("0") # 0
 
-  sess1 <- trc$start_session()       # 1
-  spn1 <- trc$start_span("1")        # 1
+  sess1 <- trc$start_session() # 1
+  spn1 <- trc$start_span("1") # 1
 
-  sess2 <- trc$start_session()       # 2
-  spn2 <- trc$start_span("2")        # 2
+  sess2 <- trc$start_session() # 2
+  spn2 <- trc$start_span("2") # 2
 
-  trc$activate_session(sess1)        # 1
-  spn11 <- trc$start_span("11")      # 1
-  trc$deactivate_session(sess1)      # 1
-  trc$finish_session(sess1)          # 1
-  spn11$end()                        # 1
-  spn1$end()                         # 1
+  trc$activate_session(sess1) # 1
+  spn11 <- trc$start_span("11") # 1
+  trc$deactivate_session(sess1) # 1
+  trc$finish_session(sess1) # 1
+  spn11$end() # 1
+  spn1$end() # 1
 
-  spn2$end()                         # 2
-  trc$finish_all_sessions()          # 2
+  spn2$end() # 2
+  trc$finish_all_sessions() # 2
 
-  spn01 <- trc$start_span("01")      # 0
-  spn01$end()                        # 0
-  spn0$end()                         # 0
+  spn01 <- trc$start_span("01") # 0
+  spn01$end() # 0
+  spn0$end() # 0
 
   trc$flush()
   spns <- parse_spans(tmp)

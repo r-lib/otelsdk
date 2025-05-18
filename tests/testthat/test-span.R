@@ -173,9 +173,12 @@ test_that("format_exception", {
   expect_snapshot({
     format_exception(base_error())
   })
-  expect_snapshot({
-    format_exception(cli_error())
-  }, transform = transform_srcref)
+  expect_snapshot(
+    {
+      format_exception(cli_error())
+    },
+    transform = transform_srcref
+  )
   expect_snapshot({
     format_exception(processx_error())
   })

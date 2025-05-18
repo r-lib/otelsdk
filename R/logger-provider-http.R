@@ -1,7 +1,6 @@
 logger_provider_http_new <- function() {
   self <- new_object(
-    c("otel_logger_provider_http",
-      "otel_logger_provider"),
+    c("otel_logger_provider_http", "otel_logger_provider"),
     get_logger = function(name = NULL, ...) {
       logger_new(self, name, ...)
     },

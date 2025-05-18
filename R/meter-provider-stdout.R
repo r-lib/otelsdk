@@ -1,5 +1,8 @@
 meter_provider_stdstream_new <- function(
-    stream = NULL, export_interval = 1000L, export_timeout = 500L) {
+  stream = NULL,
+  export_interval = 1000L,
+  export_timeout = 500L
+) {
   stream <- as_string(stream) %||%
     Sys.getenv(meter_provider_stdstream_output, "stdout")
   if (stream != "stdout" && stream != "stderr") {
@@ -8,8 +11,7 @@ meter_provider_stdstream_new <- function(
   export_interval <- as_count(export_interval, positive = TRUE)
   export_timeout <- as_count(export_timeout, positive = TRUE)
   self <- new_object(
-    c("otel_meter_provider_stdstream",
-      "otel_meter_provider"),
+    c("otel_meter_provider_stdstream", "otel_meter_provider"),
     get_meter = function(name = NULL, ...) {
       meter_new(self, name, ...)
     },
@@ -25,8 +27,11 @@ meter_provider_stdstream_new <- function(
   )
 
   self$xptr <- .Call(
-    otel_create_meter_provider_stdstream, stream, export_interval,
-    export_timeout)
+    otel_create_meter_provider_stdstream,
+    stream,
+    export_interval,
+    export_timeout
+  )
   self
 }
 

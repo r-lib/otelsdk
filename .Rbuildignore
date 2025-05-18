@@ -11,3 +11,5 @@
 ^codecov\.yml$
 ^\.covrignore$
 ^README\.Rmd$
+^[\.]?air\.toml$
+^\.vscode$

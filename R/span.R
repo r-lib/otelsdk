@@ -4,8 +4,8 @@ span_new <- function(
   attributes = NULL,
   links = NULL,
   options = NULL,
-  scope) {
-
+  scope
+) {
   name <- name %||% default_span_name
   name <- as_string(name)
   attributes <- as_span_attributes(attributes)
@@ -83,7 +83,9 @@ span_new <- function(
               cnd <- err$object
             }
             exception <- format_exception(cnd)
-            if (identical(exception$exception.stacktrace, "<stacktrace missing>")) {
+            if (
+              identical(exception$exception.stacktrace, "<stacktrace missing>")
+            ) {
               exception$exception.stacktrace <-
                 utils::capture.output(traceback(sys.calls()))
             }
@@ -121,7 +123,11 @@ span_new <- function(
 
   self$xptr <- .Call(
     otel_start_span,
-    self$tracer$xptr, self$name, attributes, links, options
+    self$tracer$xptr,
+    self$name,
+    attributes,
+    links,
+    options
   )
   self$scoped <- FALSE
   if (!is.null(scope) && !is_na(scope)) {
@@ -137,7 +143,11 @@ default_span_name <- "<NA>"
 random_token <- "DxMi8lklYBT6z835eeMF1AjL90ioUMIP"
 
 span_kinds <- c(
-  default = "internal", "server", "client", "producer", "consumer"
+  default = "internal",
+  "server",
+  "client",
+  "producer",
+  "consumer"
 )
 
 span_status_codes <- c(default = "unset", "ok", "error")
@@ -146,13 +156,16 @@ format_exception <- function(error_condition) {
   message <- tryCatch(
     utils::capture.output(error_condition),
     error = function(err) NULL
-  ) %||% tryCatch(
-    conditionMessage(error_condition),
-    error = function(err) NULL
-  ) %||% tryCatch(
-    error_condition[["message"]],
-    error = function(err) NULL
-  ) %||% "<error message missing>"
+  ) %||%
+    tryCatch(
+      conditionMessage(error_condition),
+      error = function(err) NULL
+    ) %||%
+    tryCatch(
+      error_condition[["message"]],
+      error = function(err) NULL
+    ) %||%
+    "<error message missing>"
 
   stacktrace <- if ("trace" %in% names(error_condition)) {
     tryCatch(
@@ -160,10 +173,15 @@ format_exception <- function(error_condition) {
       error = function(err) NULL
     )
   }
-  stacktrace <- stacktrace %||% tryCatch({
-    cl <- conditionCall(error_condition)
-    if (!is.null(cl)) format(cl)
-  }, error = function(err) NULL) %||% "<stacktrace missing>"
+  stacktrace <- stacktrace %||%
+    tryCatch(
+      {
+        cl <- conditionCall(error_condition)
+        if (!is.null(cl)) format(cl)
+      },
+      error = function(err) NULL
+    ) %||%
+    "<stacktrace missing>"
 
   type <- class(error_condition)
 

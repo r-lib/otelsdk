@@ -23,8 +23,8 @@ test_that("is_string", {
 test_that("is_named", {
   expect_true(is_named(NULL))
   expect_true(is_named(character()))
-  expect_true(is_named(c(a= "1")))
-  expect_true(is_named(c(a= 1)))
+  expect_true(is_named(c(a = "1")))
+  expect_true(is_named(c(a = 1)))
 
   expect_false(is_named(1))
   expect_false(is_named(letters))
@@ -250,7 +250,7 @@ test_that("as_output_file", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
 
-  expect_equal(as_output_file(NULL) , NULL)
+  expect_equal(as_output_file(NULL), NULL)
   expect_false(file.exists(tmp))
   expect_equal(as_output_file(tmp), tmp)
   expect_true(file.exists(tmp))

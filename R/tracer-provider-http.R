@@ -1,7 +1,6 @@
 tracer_provider_http_new <- function() {
   self <- new_object(
-    c("otel_tracer_provider_http",
-      "otel_tracer_provider"),
+    c("otel_tracer_provider_http", "otel_tracer_provider"),
     get_tracer = function(name, ...) {
       tracer_new(self, name, ...)
     },

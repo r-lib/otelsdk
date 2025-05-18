@@ -1,5 +1,4 @@
 test_that("new_object", {
-
   obj <- new_object(
     "myclass",
     method = function() "mymethod",

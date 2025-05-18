@@ -4,7 +4,7 @@ new_object <- function(cls, ...) {
   encl_env[["self"]] <- bind_env
   mbs <- list(...)
   # TODO: check named
-  for (i in seq_along(mbs)){
+  for (i in seq_along(mbs)) {
     if (is.function(mbs[[i]])) {
       environment(mbs[[i]]) <- encl_env
     }
