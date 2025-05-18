@@ -9,7 +9,7 @@
 High-quality, ubiquitous, and portable telemetry to enable effective observability. 'OpenTelemetry' is a collection of tools, 'APIs', and 'SDKs' used to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior. Use this package to export traces, metrics, logs through the 'OpenTelemetry Protocol' ('OTLP').
 }
 \author{
-\strong{Maintainer}: Gébor Csárdi \email{csardi.gabor@gmail.com}
+\strong{Maintainer}: Gábor Csárdi \email{csardi.gabor@gmail.com}
 
 }
 \keyword{internal}

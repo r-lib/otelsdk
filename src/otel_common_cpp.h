@@ -53,6 +53,18 @@ struct otel_counter {
   nostd::unique_ptr<metrics_api::Counter<double>> ptr;
 };
 
+struct otel_up_down_counter {
+  nostd::unique_ptr<metrics_api::UpDownCounter<double>> ptr;
+};
+
+struct otel_histogram {
+  nostd::unique_ptr<metrics_api::Histogram<double>> ptr;
+};
+
+struct otel_gauge {
+  nostd::unique_ptr<metrics_api::Gauge<double>> ptr;
+};
+
 void otel_string_to_char(const std::string &inp, struct otel_string &outp);
 void otel_string_to_char(const nostd::string_view &inp, struct otel_string &outp);
 

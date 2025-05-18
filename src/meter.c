@@ -122,6 +122,45 @@ void otel_counter_finally(SEXP x) {
   }
 }
 
+void otel_up_down_counter_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(
+      R_NilValue,
+      "OpenTelemetry: invalid up-down counter pointer."
+    );
+    return;
+  }
+  void *up_down_counter_ = R_ExternalPtrAddr(x);
+  if (up_down_counter_) {
+    otel_up_down_counter_finally_(up_down_counter_);
+    R_ClearExternalPtr(x);
+  }
+}
+
+void otel_histogram_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid histogram pointer.");
+    return;
+  }
+  void *histogram_ = R_ExternalPtrAddr(x);
+  if (histogram_) {
+    otel_histogram_finally_(histogram_);
+    R_ClearExternalPtr(x);
+  }
+}
+
+void otel_gauge_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid gauge pointer.");
+    return;
+  }
+  void *gauge_ = R_ExternalPtrAddr(x);
+  if (gauge_) {
+    otel_gauge_finally_(gauge_);
+    R_ClearExternalPtr(x);
+  }
+}
+
 SEXP otel_create_counter(
     SEXP meter, SEXP name, SEXP description, SEXP unit) {
   if (TYPEOF(meter) != EXTPTRSXP) {
@@ -157,5 +196,125 @@ SEXP otel_counter_add(
   r2c_attributes(attributes, &attributes_);
   // TODO: context
   otel_counter_add_(counter_, cvalue, &attributes_);
+  return R_NilValue;
+}
+
+SEXP otel_create_up_down_counter(
+    SEXP meter, SEXP name, SEXP description, SEXP unit) {
+  if (TYPEOF(meter) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid meter pointer");
+  }
+  void *meter_ = R_ExternalPtrAddr(meter);
+  if (!meter_) {
+    Rf_error("Opentelemetry meter cleaned up already, internal error.");
+  }
+
+  const char *cname = CHAR(STRING_ELT(name, 0));
+  const char *cdescription =
+    Rf_isNull(description) ? NULL : CHAR(STRING_ELT(description, 0));
+  const char *cunit = Rf_isNull(unit) ? NULL : CHAR(STRING_ELT(unit, 0));
+  void *up_down_counter_ =
+    otel_create_up_down_counter_(meter_, cname, cdescription, cunit);
+  SEXP xptr = R_MakeExternalPtr(up_down_counter_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_up_down_counter_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_up_down_counter_add(
+    SEXP up_down_counter, SEXP value, SEXP attributes, SEXP context) {
+  if (TYPEOF(up_down_counter) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid counter pointer");
+  }
+  void *up_down_counter_ = R_ExternalPtrAddr(up_down_counter);
+  if (!up_down_counter_) {
+    Rf_error(
+      "Opentelemetry up-down counter cleaned up already, internal error."
+    );
+  }
+  double cvalue = REAL(value)[0];
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  // TODO: context
+  otel_up_down_counter_add_(up_down_counter_, cvalue, &attributes_);
+  return R_NilValue;
+}
+
+SEXP otel_create_histogram(
+    SEXP meter, SEXP name, SEXP description, SEXP unit) {
+  if (TYPEOF(meter) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid meter pointer");
+  }
+  void *meter_ = R_ExternalPtrAddr(meter);
+  if (!meter_) {
+    Rf_error("Opentelemetry meter cleaned up already, internal error.");
+  }
+
+  const char *cname = CHAR(STRING_ELT(name, 0));
+  const char *cdescription =
+    Rf_isNull(description) ? NULL : CHAR(STRING_ELT(description, 0));
+  const char *cunit = Rf_isNull(unit) ? NULL : CHAR(STRING_ELT(unit, 0));
+  void *histogram_ =
+    otel_create_histogram_(meter_, cname, cdescription, cunit);
+  SEXP xptr = R_MakeExternalPtr(histogram_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_histogram_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_histogram_record(
+    SEXP histogram, SEXP value, SEXP attributes, SEXP context) {
+  if (TYPEOF(histogram) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid counter pointer");
+  }
+  void *histogram_ = R_ExternalPtrAddr(histogram);
+  if (!histogram_) {
+    Rf_error(
+      "Opentelemetry histogram cleaned up already, internal error."
+    );
+  }
+  double cvalue = REAL(value)[0];
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  // TODO: context
+  otel_histogram_record_(histogram_, cvalue, &attributes_);
+  return R_NilValue;
+}
+
+SEXP otel_create_gauge(
+    SEXP meter, SEXP name, SEXP description, SEXP unit) {
+  if (TYPEOF(meter) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid meter pointer");
+  }
+  void *meter_ = R_ExternalPtrAddr(meter);
+  if (!meter_) {
+    Rf_error("Opentelemetry meter cleaned up already, internal error.");
+  }
+
+  const char *cname = CHAR(STRING_ELT(name, 0));
+  const char *cdescription =
+    Rf_isNull(description) ? NULL : CHAR(STRING_ELT(description, 0));
+  const char *cunit = Rf_isNull(unit) ? NULL : CHAR(STRING_ELT(unit, 0));
+  void *gauge_ =
+    otel_create_gauge_(meter_, cname, cdescription, cunit);
+  SEXP xptr = R_MakeExternalPtr(gauge_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_gauge_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_gauge_record(
+    SEXP gauge, SEXP value, SEXP attributes, SEXP context) {
+  if (TYPEOF(gauge) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid counter pointer");
+  }
+  void *gauge_ = R_ExternalPtrAddr(gauge);
+  if (!gauge_) {
+    Rf_error(
+      "Opentelemetry gauge cleaned up already, internal error."
+    );
+  }
+  double cvalue = REAL(value)[0];
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  // TODO: context
+  otel_gauge_record_(gauge_, cvalue, &attributes_);
   return R_NilValue;
 }

@@ -125,6 +125,9 @@ void otel_session_finally_(void *sess);
 void otel_logger_finally_(void *logger);
 void otel_meter_finally_(void *meter);
 void otel_counter_finally_(void *counter);
+void otel_up_down_counter_finally_(void *up_down_counter);
+void otel_histogram_finally_(void *histogram);
+void otel_gauge_finally_(void *gauge);
 
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
@@ -189,6 +192,23 @@ void *otel_create_counter_(
   const char *unit);
 void otel_counter_add_(
   void *counter_, double cvalue, struct otel_attributes *attributes_);
+
+void *otel_create_up_down_counter_(
+  void *meter_, const char *name, const char *description,
+  const char *unit);
+void otel_up_down_counter_add_(
+  void *up_down_counter_, double cvalue, struct
+  otel_attributes *attributes_);
+
+void *otel_create_histogram_(
+  void *meter_, const char *name, const char *description, const char *unit);
+void otel_histogram_record_(
+  void *histogram_, double cvalue, struct otel_attributes *attributes_);
+
+void *otel_create_gauge_(
+  void *meter_, const char *name, const char *description, const char *unit);
+void otel_gauge_record_(
+  void *gauge_, double cvalue, struct otel_attributes *attributes_);
 
 #ifdef __cplusplus
 }

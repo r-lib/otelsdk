@@ -47,6 +47,22 @@ void otel_counter_finally_(void *counter_) {
   delete cs;
 }
 
+void otel_up_down_counter_finally_(void *up_down_counter_) {
+  struct otel_up_down_counter *cs =
+    (struct otel_up_down_counter *) up_down_counter_;
+  delete cs;
+}
+
+void otel_histogram_finally_(void *histogram_) {
+  struct otel_histogram *cs = (struct otel_histogram *) histogram_;
+  delete cs;
+}
+
+void otel_gauge_finally_(void *gauge_) {
+  struct otel_gauge *cs = (struct otel_gauge *) gauge_;
+  delete cs;
+}
+
 void *otel_create_meter_provider_stdstream_(
     const char *stream, int export_interval, int export_timeout) {
   int sout = !strcmp(stream, "stdout");
@@ -175,6 +191,68 @@ void otel_counter_add_(
   metrics_api::Counter<double> &counter = *(cs->ptr);
   RKeyValueIterable attributes(*attributes_);
   counter.Add(cvalue, attributes);
+}
+
+void *otel_create_up_down_counter_(
+    void *meter_, const char *name, const char *description,
+    const char *unit) {
+  struct otel_meter *ms = (struct otel_meter*) meter_;
+  metrics_api::Meter &meter = *(ms->ptr);
+  struct otel_up_down_counter *cs = new otel_up_down_counter;
+  cs->ptr = meter.CreateDoubleUpDownCounter(
+    name, description ? description : "", unit ? unit : "");
+
+  return (void*) cs;
+}
+
+void otel_up_down_counter_add_(
+    void *up_down_counter_, double cvalue,
+    struct otel_attributes *attributes_) {
+  struct otel_up_down_counter *cs =
+    (struct otel_up_down_counter*) up_down_counter_;
+  metrics_api::UpDownCounter<double> &up_down_counter = *(cs->ptr);
+  RKeyValueIterable attributes(*attributes_);
+  up_down_counter.Add(cvalue, attributes);
+}
+
+void *otel_create_histogram_(
+    void *meter_, const char *name, const char *description,
+    const char *unit) {
+  struct otel_meter *ms = (struct otel_meter*) meter_;
+  metrics_api::Meter &meter = *(ms->ptr);
+  struct otel_histogram *cs = new otel_histogram;
+  cs->ptr = meter.CreateDoubleHistogram(
+    name, description ? description : "", unit ? unit : "");
+
+  return (void*) cs;
+}
+
+void otel_histogram_record_(
+    void *histogram_, double cvalue, struct otel_attributes *attributes_) {
+  struct otel_histogram *cs = (struct otel_histogram*) histogram_;
+  metrics_api::Histogram<double> &histogram = *(cs->ptr);
+  RKeyValueIterable attributes(*attributes_);
+  histogram.Record(cvalue, attributes);
+}
+
+void *otel_create_gauge_(
+    void *meter_, const char *name, const char *description,
+    const char *unit) {
+  struct otel_meter *ms = (struct otel_meter*) meter_;
+  metrics_api::Meter &meter = *(ms->ptr);
+  struct otel_gauge *cs = new otel_gauge;
+  cs->ptr = meter.CreateDoubleGauge(
+    name, description ? description : "", unit ? unit : "");
+
+  return (void*) cs;
+}
+
+void otel_gauge_record_(
+    void *gauge_, double cvalue, struct otel_attributes *attributes_) {
+  struct otel_gauge *cs = (struct otel_gauge*) gauge_;
+  metrics_api::Gauge<double> &gauge = *(cs->ptr);
+  RKeyValueIterable attributes(*attributes_);
+  gauge.Record(cvalue, attributes);
 }
 
 } // extern "C"

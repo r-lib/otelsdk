@@ -69,6 +69,21 @@ SEXP otel_create_counter(
 SEXP otel_counter_add(
   SEXP counter, SEXP value, SEXP attributes, SEXP context);
 
+SEXP otel_create_up_down_counter(
+  SEXP meter, SEXP name, SEXP description, SEXP unit);
+SEXP otel_up_down_counter_add(
+  SEXP up_down_counter, SEXP value, SEXP attributes, SEXP context);
+
+SEXP otel_create_histogram(
+  SEXP meter, SEXP name, SEXP description, SEXP unit);
+SEXP otel_histogram_record(
+  SEXP histogram, SEXP value, SEXP attributes, SEXP unit);
+
+SEXP otel_create_gauge(
+  SEXP meter, SEXP name, SEXP description, SEXP unit);
+SEXP otel_gauge_record(
+  SEXP gauge, SEXP value, SEXP attributes, SEXP unit);
+
 SEXP rf_get_list_element(SEXP list, const char *str);
 SEXP trim_(SEXP x);
 
@@ -123,6 +138,12 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_meter_provider_shutdown, 2),
   CALLDEF(otel_create_counter, 4),
   CALLDEF(otel_counter_add, 4),
+  CALLDEF(otel_create_up_down_counter, 4),
+  CALLDEF(otel_up_down_counter_add, 4),
+  CALLDEF(otel_create_histogram, 4),
+  CALLDEF(otel_histogram_record, 4),
+  CALLDEF(otel_create_gauge, 4),
+  CALLDEF(otel_gauge_record, 4),
 
   CALLDEF(trim_, 1),
   { NULL, NULL, 0 }
