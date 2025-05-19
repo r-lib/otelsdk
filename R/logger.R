@@ -1,4 +1,11 @@
-logger_new <- function(provider, name = NULL, ...) {
+logger_new <- function(
+  provider,
+  name = NULL,
+  version = NULL,
+  schema_url = NULL,
+  attributes = NULL,
+  ...
+) {
   self <- new_object(
     "otel_logger",
     get_name = function() {
@@ -50,7 +57,7 @@ logger_new <- function(provider, name = NULL, ...) {
       severity <- as_log_severity(severity)
       format <- as_string(format, null = FALSE)
       event_id <- as_event_id(event_id)
-      attributes <- as_span_attributes(attributes)
+      attributes <- as_otel_attributes(attributes)
       .Call(otel_log, self$xptr, severity, format, event_id, attributes)
       invisible(self)
     },
@@ -61,8 +68,18 @@ logger_new <- function(provider, name = NULL, ...) {
   )
   name <- name %||% get_env("OTEL_SERVICE_NAME") %||% "R"
   self$provider <- provider
-  self$name <- name
-  self$xptr <- .Call(otel_get_logger, self$provider$xptr, self$name)
+  self$name <- as_string(name)
+  self$version <- as_string(version)
+  self$schema_url <- as_string(schema_url)
+  self$attributes <- as_otel_attributes(attributes)
+  self$xptr <- .Call(
+    otel_get_logger,
+    self$provider$xptr,
+    self$name,
+    self$version,
+    self$schema_url,
+    self$attributes
+  )
   self
 }
 

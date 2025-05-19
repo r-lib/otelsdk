@@ -117,11 +117,11 @@ test_that("as_string", {
   })
 })
 
-test_that("as_span_attribute_value", {
-  expect_equal(as_span_attribute_value("a"), "a")
-  expect_equal(as_span_attribute_value(TRUE), TRUE)
-  expect_equal(as_span_attribute_value(1), 1)
-  expect_equal(as_span_attribute_value(1L), 1L)
+test_that("as_otel_attribute_value", {
+  expect_equal(as_otel_attribute_value("a"), "a")
+  expect_equal(as_otel_attribute_value(TRUE), TRUE)
+  expect_equal(as_otel_attribute_value(1), 1)
+  expect_equal(as_otel_attribute_value(1L), 1L)
 
   v1 <- list()
   v2 <- c("a", NA)
@@ -129,28 +129,28 @@ test_that("as_span_attribute_value", {
   v4 <- c(1, NA)
   v5 <- c(1L, NA)
   expect_snapshot(error = TRUE, {
-    as_span_attribute_value(v1)
-    as_span_attribute_value(v2)
-    as_span_attribute_value(v3)
-    as_span_attribute_value(v4)
-    as_span_attribute_value(v5)
+    as_otel_attribute_value(v1)
+    as_otel_attribute_value(v2)
+    as_otel_attribute_value(v3)
+    as_otel_attribute_value(v4)
+    as_otel_attribute_value(v5)
   })
 })
 
-test_that("as_span_attributes", {
-  expect_null(as_span_attributes(NULL))
+test_that("as_otel_attributes", {
+  expect_null(as_otel_attributes(NULL))
   v <- list(a = "a", b = TRUE, c = 1, d = 1L)
-  expect_equal(as_span_attributes(v), v)
+  expect_equal(as_otel_attributes(v), v)
 
   v1 <- 1:10
   v2 <- list(1:10)
   v3 <- list(a = list())
   v4 <- list(a = c(1, NA, 2))
   expect_snapshot(error = TRUE, {
-    as_span_attributes(v1)
-    as_span_attributes(v2)
-    as_span_attributes(v3)
-    as_span_attributes(v4)
+    as_otel_attributes(v1)
+    as_otel_attributes(v2)
+    as_otel_attributes(v3)
+    as_otel_attributes(v4)
   })
 })
 

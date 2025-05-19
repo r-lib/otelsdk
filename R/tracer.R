@@ -1,4 +1,11 @@
-tracer_new <- function(provider, name, ...) {
+tracer_new <- function(
+  provider,
+  name = NULL,
+  version = NULL,
+  schema_url = NULL,
+  attributes = NULL,
+  ...
+) {
   self <- new_object(
     "otel_tracer",
     start_span = function(
@@ -40,7 +47,17 @@ tracer_new <- function(provider, name, ...) {
   )
   name <- name %||% get_env("OTEL_SERVICE_NAME") %||% "R"
   self$provider <- provider
-  self$name <- name
-  self$xptr <- .Call(otel_get_tracer, self$provider$xptr, self$name)
+  self$name <- as_string(name)
+  self$version <- as_string(version)
+  self$schema_url <- as_string(schema_url)
+  self$attributes <- as_otel_attributes(attributes)
+  self$xptr <- .Call(
+    otel_get_tracer,
+    self$provider$xptr,
+    self$name,
+    self$version,
+    self$schema_url,
+    self$attributes
+  )
   self
 }

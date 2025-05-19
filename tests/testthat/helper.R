@@ -1,4 +1,4 @@
-parse_span_attributes <- function(attr) {
+parse_otel_attributes <- function(attr) {
   on.exit(close(tc), add = TRUE)
   tc <- textConnection(attr)
   sort_named_list(as.list(as.data.frame(read.dcf(tc))))
@@ -26,10 +26,10 @@ parse_spans <- function(path) {
   d <- as.data.frame(read.dcf(tc, keep.white = "events"))
   names(d) <- trimws(names(d))
   if ("resources" %in% names(d)) {
-    d[["resources"]] <- I(lapply(d$resources, parse_span_attributes))
+    d[["resources"]] <- I(lapply(d$resources, parse_otel_attributes))
   }
   if ("attributes" %in% names(d)) {
-    d[["attributes"]] <- I(lapply(d$attributes, parse_span_attributes))
+    d[["attributes"]] <- I(lapply(d$attributes, parse_otel_attributes))
   }
   if ("events" %in% names(d)) {
     d[["events"]] <- I(lapply(d$events, parse_span_events))

@@ -2,5 +2,10 @@
     "[r]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "Posit.air-vscode"
+    },
+    "files.associations": {
+        "new": "cpp",
+        "otel_attributes.h": "c",
+        "otel_common.h": "c"
     }
 }

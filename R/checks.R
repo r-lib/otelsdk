@@ -138,7 +138,7 @@ as_string <- function(x, null = TRUE, call = NULL) {
 
 span_attr_types <- c(typeof(""), typeof(TRUE), typeof(1), typeof(1L))
 
-as_span_attribute_value <- function(x, call = NULL) {
+as_otel_attribute_value <- function(x, call = NULL) {
   if (typeof(x) %in% span_attr_types && !(hna <- anyNA(x))) {
     return(x)
   }
@@ -165,7 +165,7 @@ as_span_attribute_value <- function(x, call = NULL) {
   }
 }
 
-as_span_attributes <- function(attributes, call = NULL) {
+as_otel_attributes <- function(attributes, call = NULL) {
   if (
     (is.list(attributes) || is.null(attributes)) &&
       is_named(attributes) &&
@@ -223,9 +223,9 @@ as_span_link <- function(link, call = NULL) {
   }
   call <- call %||% match.call()
   if (is.list(link) && inherits(link[[1]], "otel_span")) {
-    link[-1] <- as_span_attributes(
+    link[-1] <- as_otel_attributes(
       link[-1],
-      call = substitute(as_span_attributes(link[-1]), list(link = call[[2]]))
+      call = substitute(as_otel_attributes(link[-1]), list(link = call[[2]]))
     )
     return(list(link[[1]]$xptr, link[-1]))
   }

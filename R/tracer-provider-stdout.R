@@ -6,8 +6,14 @@ tracer_provider_stdstream_new <- function(stream = NULL) {
   }
   self <- new_object(
     c("otel_tracer_provider_stdstream", "otel_tracer_provider"),
-    get_tracer = function(name, ...) {
-      tracer_new(self, name, ...)
+    get_tracer = function(
+      name = NULL,
+      version = NULL,
+      schema_url = NULL,
+      attributes = NULL,
+      ...
+    ) {
+      tracer_new(self, name, version, schema_url, attributes, ...)
     },
     flush = function() {
       .Call(otel_tracer_provider_flush, self$xptr)

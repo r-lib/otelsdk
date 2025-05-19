@@ -65,7 +65,9 @@ SEXP otel_logger_provider_flush(SEXP provider) {
   return R_NilValue;
 }
 
-SEXP otel_get_logger(SEXP provider, SEXP name) {
+SEXP otel_get_logger(
+    SEXP provider, SEXP name, SEXP version, SEXP schema_url,
+    SEXP attributes) {
   if (TYPEOF(provider) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid logger provider pointer.");
   }
@@ -76,7 +78,14 @@ SEXP otel_get_logger(SEXP provider, SEXP name) {
     );
   }
   const char *name_ = CHAR(STRING_ELT(name, 0));
-  void *logger_ = otel_get_logger_(logger_provider_, name_);
+  const char *version_ =
+    Rf_isNull(version) ? NULL : CHAR(STRING_ELT(version, 0));
+  const char *schema_url_ =
+    Rf_isNull(schema_url) ? NULL : CHAR(STRING_ELT(schema_url, 0));
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  void *logger_ = otel_get_logger_(
+    logger_provider_, name_, version_, schema_url_, &attributes_);
   SEXP xptr = R_MakeExternalPtr(logger_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_logger_finally, (Rboolean) 1);
   return xptr;

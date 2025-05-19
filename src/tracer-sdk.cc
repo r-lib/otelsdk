@@ -26,6 +26,7 @@ namespace nostd          = opentelemetry::nostd;
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
+#include "otel_attributes.h"
 
 void otel_string_to_char(const std::string &inp, struct otel_string &outp) {
   size_t len = inp.length();
@@ -148,12 +149,18 @@ void otel_tracer_provider_flush_(void *tracer_provider_) {
   }
 }
 
-void *otel_get_tracer_(void *tracer_provider_, const char *name) {
+void *otel_get_tracer_(
+    void *tracer_provider_, const char *name, const char *version,
+    const char *schema_url, struct otel_attributes *attributes) {
   struct otel_tracer_provider *tps =
     (struct otel_tracer_provider *) tracer_provider_;
   trace_sdk::TracerProvider &tracer_provider = *(tps->ptr);
+  RKeyValueIterable attributes_(*attributes);
   struct otel_tracer *ts = new otel_tracer;
-  ts->ptr = tracer_provider.GetTracer(name);
+  ts->ptr = tracer_provider.GetTracer(
+    name, version ? version : "", schema_url ? schema_url : "",
+    &attributes_
+  );
 
   return (void*) ts;
 }

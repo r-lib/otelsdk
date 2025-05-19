@@ -6,13 +6,17 @@
 
 #include "otel_common.h"
 
+void r2c_attributes(SEXP r, struct otel_attributes *c);
+
 SEXP otel_fail(void);
 SEXP otel_error_object(void);
 
 SEXP otel_create_tracer_provider_stdstream(SEXP stream);
 SEXP otel_create_tracer_provider_http(void);
 SEXP otel_tracer_provider_flush(SEXP provider);
-SEXP otel_get_tracer(SEXP provider, SEXP name);
+SEXP otel_get_tracer(
+  SEXP provider, SEXP name, SEXP version, SEXP schema_url,
+  SEXP attributes);
 
 SEXP otel_start_span(
   SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
@@ -41,7 +45,9 @@ SEXP otel_tracer_provider_http_options(void);
 
 SEXP otel_create_logger_provider_stdstream(SEXP stream);
 SEXP otel_create_logger_provider_http(void);
-SEXP otel_get_logger(SEXP provider, SEXP name);
+SEXP otel_get_logger(
+  SEXP provider, SEXP name, SEXP version, SEXP schema_url,
+  SEXP attributes);
 SEXP otel_logger_provider_flush(SEXP provider);
 
 SEXP otel_logger_get_name(SEXP logger);
@@ -60,7 +66,8 @@ SEXP otel_create_meter_provider_stdstream(
   SEXP stream, SEXP export_interval, SEXP export_timeout);
 SEXP otel_create_meter_provider_http(
   SEXP export_interval, SEXP export_timeout);
-SEXP otel_get_meter(SEXP provider, SEXP name);
+SEXP otel_get_meter(SEXP provider, SEXP name, SEXP version,
+  SEXP schema_url, SEXP attributes);
 SEXP otel_meter_provider_flush(SEXP provider, SEXP timeout);
 SEXP otel_meter_provider_shutdown(SEXP provider, SEXP timeout);
 
@@ -97,7 +104,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_tracer_provider_flush, 1),
-  CALLDEF(otel_get_tracer, 2),
+  CALLDEF(otel_get_tracer, 5),
   CALLDEF(otel_start_span, 5),
   // TODO: maybe we don't need to get the context explicitly
   // CALLDEF(otel_span_get_context, 1),
@@ -119,7 +126,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_logger_provider_stdstream, 1),
   CALLDEF(otel_create_logger_provider_http, 0),
   CALLDEF(otel_logger_provider_flush, 1),
-  CALLDEF(otel_get_logger, 2),
+  CALLDEF(otel_get_logger, 5),
   CALLDEF(otel_logger_get_name, 1),
   CALLDEF(otel_emit_log_record, 2),
   CALLDEF(otel_log_trace, 2),
@@ -133,7 +140,7 @@ static const R_CallMethodDef callMethods[]  = {
 
   CALLDEF(otel_create_meter_provider_stdstream, 3),
   CALLDEF(otel_create_meter_provider_http, 2),
-  CALLDEF(otel_get_meter, 2),
+  CALLDEF(otel_get_meter, 5),
   CALLDEF(otel_meter_provider_flush, 2),
   CALLDEF(otel_meter_provider_shutdown, 2),
   CALLDEF(otel_create_counter, 4),
@@ -235,7 +242,9 @@ SEXP otel_tracer_provider_flush(SEXP provider) {
   return R_NilValue;
 }
 
-SEXP otel_get_tracer(SEXP provider, SEXP name) {
+SEXP otel_get_tracer(
+    SEXP provider, SEXP name, SEXP version, SEXP schema_url,
+    SEXP attributes) {
   if (TYPEOF(provider) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid tracer provider pointer.");
   }
@@ -246,7 +255,14 @@ SEXP otel_get_tracer(SEXP provider, SEXP name) {
     );
   }
   const char *name_ = CHAR(STRING_ELT(name, 0));
-  void *tracer_ = otel_get_tracer_(tracer_provider_, name_);
+  const char *version_ =
+    Rf_isNull(version) ? NULL : CHAR(STRING_ELT(version, 0));
+  const char *schema_url_ =
+    Rf_isNull(schema_url) ? NULL : CHAR(STRING_ELT(schema_url, 0));
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  void *tracer_ = otel_get_tracer_(
+    tracer_provider_, name_, version_, schema_url_, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_finally, (Rboolean) 1);
   return xptr;

@@ -24,7 +24,6 @@ namespace metrics_exporter = opentelemetry::exporter::metrics;
 namespace metrics_api      = opentelemetry::metrics;
 namespace otlp             = opentelemetry::exporter::otlp;
 
-
 #include "otel_common.h"
 #include "otel_common_cpp.h"
 #include "otel_attributes.h"
@@ -163,12 +162,17 @@ void otel_meter_provider_shutdown_(void *meter_provider_, int timeout) {
   }
 }
 
-void *otel_get_meter_(void *meter_provider_, const char *name) {
+void *otel_get_meter_(
+    void *meter_provider_, const char *name, const char *version,
+    const char *schema_url, struct otel_attributes *attributes) {
   struct otel_meter_provider *mps =
     (struct otel_meter_provider *) meter_provider_;
   metrics_sdk::MeterProvider &meter_provider = *(mps->ptr);
+  RKeyValueIterable attributes_(*attributes);
   struct otel_meter *ms = new otel_meter;
-  ms->ptr = meter_provider.GetMeter(name);
+  ms->ptr = meter_provider.GetMeter(
+    name, version ? version : "", schema_url ? schema_url : "",
+    &attributes_);
 
   return (void*) ms;
 }

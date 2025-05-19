@@ -73,13 +73,17 @@ void otel_logger_provider_flush_(void *logger_provider_) {
   }
 }
 
-void *otel_get_logger_(void *logger_provider_, const char *name) {
+void *otel_get_logger_(
+    void *logger_provider_, const char *name, const char *version,
+    const char *schema_url, struct otel_attributes *attributes) {
   struct otel_logger_provider *lps =
     (struct otel_logger_provider *) logger_provider_;
   logs_sdk::LoggerProvider &logger_provider = *(lps->ptr);
+  RKeyValueIterable attributes_(*attributes);
   struct otel_logger *ls = new otel_logger;
   ls->ptr = logger_provider.GetLogger(
-    name, "", "", "", common::NoopKeyValueIterable());
+    name, name, version ? version : "", schema_url ? schema_url : "",
+    attributes_);
 
   return (void*) ls;
 }

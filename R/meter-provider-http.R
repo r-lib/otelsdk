@@ -7,8 +7,14 @@ meter_provider_http_new <- function(
 
   self <- new_object(
     c("otel_meter_provider_http", "otel_meter_provider"),
-    get_meter = function(name = NULL, ...) {
-      meter_new(self, name, ...)
+    get_meter = function(
+      name = NULL,
+      version = NULL,
+      schema_url = NULL,
+      attributes = NULL,
+      ...
+    ) {
+      meter_new(self, name, version, schema_url, attributes, ...)
     },
     flush = function(timeout = NULL) {
       # noop

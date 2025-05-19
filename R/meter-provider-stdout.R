@@ -12,8 +12,14 @@ meter_provider_stdstream_new <- function(
   export_timeout <- as_count(export_timeout, positive = TRUE)
   self <- new_object(
     c("otel_meter_provider_stdstream", "otel_meter_provider"),
-    get_meter = function(name = NULL, ...) {
-      meter_new(self, name, ...)
+    get_meter = function(
+      name = NULL,
+      version = NULL,
+      schema_url = NULL,
+      attributes = NULL,
+      ...
+    ) {
+      meter_new(self, name, version, schema_url, attributes, ...)
     },
     flush = function(timeout = NULL) {
       # TODO: check arg

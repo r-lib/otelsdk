@@ -6,8 +6,14 @@ logger_provider_stdstream_new <- function(stream = NULL) {
   }
   self <- new_object(
     c("otel_logger_provider_stdstream", "otel_logger_provider"),
-    get_logger = function(name = NULL, ...) {
-      logger_new(self, name, ...)
+    get_logger = function(
+      name = NULL,
+      version = NULL,
+      schema_url = NULL,
+      attributes = NULL,
+      ...
+    ) {
+      logger_new(self, name, version, schema_url, attributes, ...)
     },
     flush = function() {
       .Call(otel_logger_provider_flush, self$xptr)

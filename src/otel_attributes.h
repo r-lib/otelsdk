@@ -2,6 +2,7 @@
 #include "opentelemetry/common/key_value_iterable.h"
 
 namespace nostd  = opentelemetry::nostd;
+namespace common = opentelemetry::common;
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"

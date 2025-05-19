@@ -8,7 +8,7 @@ span_new <- function(
 ) {
   name <- name %||% default_span_name
   name <- as_string(name)
-  attributes <- as_span_attributes(attributes)
+  attributes <- as_otel_attributes(attributes)
   links <- as_span_links(links)
   options <- as_span_options(options)
   scope <- as_env(scope)
@@ -27,14 +27,14 @@ span_new <- function(
 
     set_attribute = function(name, value = NULL) {
       name <- as_string(name, null = FALSE)
-      value <- as_span_attribute_value(value)
+      value <- as_otel_attribute_value(value)
       .Call(otel_span_set_attribute, self$xptr, name, value)
       invisible(self)
     },
 
     add_event = function(name, attributes = NULL, timestamp = NULL) {
       name <- as_string(name, null = FALSE)
-      attributes <- as_span_attributes(attributes)
+      attributes <- as_otel_attributes(attributes)
       timestamp <- as_timestamp(timestamp)
       .Call(otel_span_add_event, self$xptr, name, attributes, timestamp)
       invisible(self)
@@ -105,7 +105,7 @@ span_new <- function(
 
     record_exception = function(error_condition, attributes = NULL, ...) {
       exception <- format_exception(error_condition)
-      attributes <- as_span_attributes(attributes)
+      attributes <- as_otel_attributes(attributes)
       attr <- utils::modifyList(exception, as.list(attributes))
       self$add_event("exception", attributes = attr, ...)
       invisible(self)

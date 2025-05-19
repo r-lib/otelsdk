@@ -132,7 +132,9 @@ void otel_gauge_finally_(void *gauge);
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
 void otel_tracer_provider_flush_(void *tracer_provider);
-void *otel_get_tracer_(void *tracer_provider, const char *name);
+void *otel_get_tracer_(
+    void *tracer_provider_, const char *name, const char *version,
+    const char *schema_url, struct otel_attributes *attributes);
 struct otel_scoped_span otel_start_span_(
   void *tracer,
   const char *name,
@@ -172,7 +174,9 @@ void otel_logger_provider_finally_(void *logger_provider);
 void *otel_create_logger_provider_stdstream_(const char *stream);
 void *otel_create_logger_provider_http_(void);
 void otel_logger_provider_flush_(void *tracer_provider);
-void *otel_get_logger_(void *logger_provider, const char *name);
+void *otel_get_logger_(
+  void *logger_provider, const char *name, const char *version,
+  const char *schema_url, struct otel_attributes *attributes);
 void *otel_logger_get_name_(void *logger, struct otel_string *name);
 void otel_log_(
   void *logger_, int severity_, const char *format_,
@@ -185,7 +189,9 @@ void *otel_create_meter_provider_http_(
   int export_interval, int export_timeout);
 void otel_meter_provider_flush_(void *tracer_provider, int timeout);
 void otel_meter_provider_shutdown_(void *tracer_provider, int timeout);
-void *otel_get_meter_(void *meter_provider, const char *name);
+void *otel_get_meter_(
+  void *meter_provider, const char *name, const char *version,
+  const char *schema_url, struct otel_attributes *attributes);
 
 void *otel_create_counter_(
   void *meter_, const char *name, const char *description,

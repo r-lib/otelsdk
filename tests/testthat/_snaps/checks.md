@@ -143,55 +143,55 @@
       Error in `as_string()`:
       ! Invalid argument: s4 must be a string scalar, but it is NULL.
 
-# as_span_attribute_value
+# as_otel_attribute_value
 
     Code
-      as_span_attribute_value(v1)
+      as_otel_attribute_value(v1)
     Condition
-      Error in `as_span_attribute_value()`:
+      Error in `as_otel_attribute_value()`:
       ! Invalid argument: v1 must be of type character, logical, double, or integer, but it is an empty list.
     Code
-      as_span_attribute_value(v2)
+      as_otel_attribute_value(v2)
     Condition
-      Error in `as_span_attribute_value()`:
+      Error in `as_otel_attribute_value()`:
       ! Invalid argument: v2 must not contain missing (`NA`) values.
     Code
-      as_span_attribute_value(v3)
+      as_otel_attribute_value(v3)
     Condition
-      Error in `as_span_attribute_value()`:
+      Error in `as_otel_attribute_value()`:
       ! Invalid argument: v3 must not contain missing (`NA`) values.
     Code
-      as_span_attribute_value(v4)
+      as_otel_attribute_value(v4)
     Condition
-      Error in `as_span_attribute_value()`:
+      Error in `as_otel_attribute_value()`:
       ! Invalid argument: v4 must not contain missing (`NA`) values.
     Code
-      as_span_attribute_value(v5)
+      as_otel_attribute_value(v5)
     Condition
-      Error in `as_span_attribute_value()`:
+      Error in `as_otel_attribute_value()`:
       ! Invalid argument: v5 must not contain missing (`NA`) values.
 
-# as_span_attributes
+# as_otel_attributes
 
     Code
-      as_span_attributes(v1)
+      as_otel_attributes(v1)
     Condition
-      Error in `as_span_attributes()`:
+      Error in `as_otel_attributes()`:
       ! Invalid argument: v1 must be a named list, but it is an integer vector.
     Code
-      as_span_attributes(v2)
+      as_otel_attributes(v2)
     Condition
-      Error in `as_span_attributes()`:
+      Error in `as_otel_attributes()`:
       ! Invalid argument: v2 must be a named list, but not all of its entries are named.
     Code
-      as_span_attributes(v3)
+      as_otel_attributes(v3)
     Condition
-      Error in `as_span_attributes()`:
+      Error in `as_otel_attributes()`:
       ! Invalid argument: v3 can only contain types character, logical, double, and integer, but it contains list types.
     Code
-      as_span_attributes(v4)
+      as_otel_attributes(v4)
     Condition
-      Error in `as_span_attributes()`:
+      Error in `as_otel_attributes()`:
       ! Invalid argument: the entries of v4 must not contain missing (`NA`) values.
 
 # as_span_link
@@ -206,13 +206,13 @@
       link <- list(sl, "foo", "bar")
       as_span_link(link)
     Condition
-      Error in `as_span_attributes()`:
+      Error in `as_otel_attributes()`:
       ! Invalid argument: link[-1] must be a named list, but not all of its entries are named.
     Code
       link <- list(sl, a = "1", b = c(1, NA))
       as_span_link(link)
     Condition
-      Error in `as_span_attributes()`:
+      Error in `as_otel_attributes()`:
       ! Invalid argument: the entries of link[-1] must not contain missing (`NA`) values.
 
 # as_span_links
