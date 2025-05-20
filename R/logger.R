@@ -1,6 +1,7 @@
 logger_new <- function(
   provider,
   name = NULL,
+  minimum_severity = "warn",
   version = NULL,
   schema_url = NULL,
   attributes = NULL,
@@ -48,11 +49,20 @@ logger_new <- function(
     #   .Call(otel_log_fatal, self$xptr, args)
     #   invisible(self)
     # },
-    # is_enabled = function(severity, event_id = NULL) {
-    #   severity <- as_severity(severity)
-    #   event_id <- as_event_id(event_id)
-    #   .Call(otel_logger_is_enabled, self$xptr, severity, event_id);
-    # },
+    is_enabled = function(severity = "warn", event_id = NULL) {
+      severity <- as_log_severity(severity)
+      event_id <- as_event_id(event_id)
+      .Call(otel_logger_is_enabled, self$xptr, severity, event_id)
+    },
+    get_minimum_severity = function() {
+      ms <- .Call(otel_get_minimum_log_severity, self$xptr)
+      log_severity_levels[ms + 1L]
+    },
+    set_minimum_severity = function(minimum_severity) {
+      minimum_severity <- as_log_severity(minimum_severity)
+      .Call(otel_set_minimum_log_severity, self$xptr, minimum_severity)
+      invisible(self)
+    },
     log = function(severity, format, event_id = NULL, attributes = NULL) {
       severity <- as_log_severity(severity)
       format <- as_string(format, null = FALSE)
@@ -68,6 +78,7 @@ logger_new <- function(
   )
   name <- name %||% get_env("OTEL_SERVICE_NAME") %||% "R"
   self$provider <- provider
+  minimum_severity <- as_log_severity(minimum_severity)
   self$name <- as_string(name)
   self$version <- as_string(version)
   self$schema_url <- as_string(schema_url)
@@ -76,6 +87,7 @@ logger_new <- function(
     otel_get_logger,
     self$provider$xptr,
     self$name,
+    minimum_severity,
     self$version,
     self$schema_url,
     self$attributes
@@ -113,5 +125,6 @@ log_severity_levels <- c(
   "fatal2" = 22L,
   "fatal3" = 23L,
   "fatal4" = 24L,
+  "maximumseverity" = 255L,
   NULL
 )

@@ -3,9 +3,11 @@
 #include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/logs/logger_provider.h"
 
@@ -73,14 +75,26 @@ void otel_logger_provider_flush_(void *logger_provider_) {
   }
 }
 
+int otel_get_minimum_log_severity_(void *logger_) {
+  struct otel_logger *ls = (struct otel_logger*) logger_;
+  return ls->minimum_severity;
+}
+
+void otel_set_minimum_log_severity_(void *logger_, int minimum_severity_) {
+  struct otel_logger *ls = (struct otel_logger*) logger_;
+  ls->minimum_severity = minimum_severity_;
+}
+
 void *otel_get_logger_(
-    void *logger_provider_, const char *name, const char *version,
-    const char *schema_url, struct otel_attributes *attributes) {
+    void *logger_provider_, const char *name, int minimum_severity,
+    const char *version, const char *schema_url,
+    struct otel_attributes *attributes) {
   struct otel_logger_provider *lps =
     (struct otel_logger_provider *) logger_provider_;
   logs_sdk::LoggerProvider &logger_provider = *(lps->ptr);
   RKeyValueIterable attributes_(*attributes);
   struct otel_logger *ls = new otel_logger;
+  ls->minimum_severity = minimum_severity;
   ls->ptr = logger_provider.GetLogger(
     name, name, version ? version : "", schema_url ? schema_url : "",
     attributes_);
@@ -132,10 +146,16 @@ logs_api::Severity to_severity(int x) {
   }
 }
 
+int otel_logger_is_enabled_(void *logger_, int severity_) {
+  struct otel_logger *ls = (struct otel_logger*) logger_;
+  return ls->minimum_severity <= severity_ ? 1 : 0;
+}
+
 void otel_log_(
     void *logger_, int severity_, const char *format_,
     struct otel_attributes *attributes_) {
   struct otel_logger *ls = (struct otel_logger*) logger_;
+  if (severity_ < ls->minimum_severity) return;
   logs_api::Logger &logger = *(ls->ptr);
   logs_api::Severity severity = to_severity(severity_);
   RKeyValueIterable attributes(*attributes_);

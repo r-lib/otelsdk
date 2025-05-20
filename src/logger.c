@@ -66,8 +66,8 @@ SEXP otel_logger_provider_flush(SEXP provider) {
 }
 
 SEXP otel_get_logger(
-    SEXP provider, SEXP name, SEXP version, SEXP schema_url,
-    SEXP attributes) {
+    SEXP provider, SEXP name, SEXP minimum_severity, SEXP version,
+    SEXP schema_url, SEXP attributes) {
   if (TYPEOF(provider) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid logger provider pointer.");
   }
@@ -84,11 +84,40 @@ SEXP otel_get_logger(
     Rf_isNull(schema_url) ? NULL : CHAR(STRING_ELT(schema_url, 0));
   struct otel_attributes attributes_;
   r2c_attributes(attributes, &attributes_);
+  int minimum_severity_ = INTEGER(minimum_severity)[0];
   void *logger_ = otel_get_logger_(
-    logger_provider_, name_, version_, schema_url_, &attributes_);
+    logger_provider_, name_, minimum_severity_, version_, schema_url_,
+    &attributes_);
   SEXP xptr = R_MakeExternalPtr(logger_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_logger_finally, (Rboolean) 1);
   return xptr;
+}
+
+SEXP otel_get_minimum_log_severity(SEXP logger) {
+  if (TYPEOF(logger) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid logger pointer");
+  }
+  void *logger_ = R_ExternalPtrAddr(logger);
+  if (!logger_) {
+    Rf_error("Opentelemetry logger cleaned up already, internal error.");
+  }
+
+  int minimum_severity = otel_get_minimum_log_severity_(logger_);
+  return Rf_ScalarInteger(minimum_severity);
+}
+
+SEXP otel_set_minimum_log_severity(SEXP logger, SEXP minimum_severity) {
+  if (TYPEOF(logger) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid logger pointer");
+  }
+  void *logger_ = R_ExternalPtrAddr(logger);
+  if (!logger_) {
+    Rf_error("Opentelemetry logger cleaned up already, internal error.");
+  }
+
+  int minimum_severity_ = INTEGER(minimum_severity)[0];
+  otel_set_minimum_log_severity_(logger_, minimum_severity_);
+  return R_NilValue;
 }
 
 SEXP otel_logger_get_name(SEXP logger) {
@@ -139,8 +168,17 @@ SEXP otel_log_fatal(SEXP logger, SEXP args) {
 
 }
 
-SEXP otel_logger_is_enabled(SEXP logger, SEXP severiry, SEXP event_id) {
-
+SEXP otel_logger_is_enabled(SEXP logger, SEXP severity, SEXP event_id) {
+  if (TYPEOF(logger) != EXTPTRSXP) {
+    Rf_error("Opentelemetry: invalid logger pointer");
+  }
+  void *logger_ = R_ExternalPtrAddr(logger);
+  if (!logger_) {
+    Rf_error("Opentelemetry logger cleaned up already, internal error.");
+  }
+  int severity_ = INTEGER(severity)[0];
+  int enabled = otel_logger_is_enabled_(logger_, severity_);
+  return Rf_ScalarLogical(enabled);
 }
 
 SEXP otel_log(

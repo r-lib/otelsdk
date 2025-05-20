@@ -174,10 +174,14 @@ void otel_logger_provider_finally_(void *logger_provider);
 void *otel_create_logger_provider_stdstream_(const char *stream);
 void *otel_create_logger_provider_http_(void);
 void otel_logger_provider_flush_(void *tracer_provider);
+int otel_get_minimum_log_severity_(void *logger);
+void otel_set_minimum_log_severity_(void *logger, int minimum_severity);
 void *otel_get_logger_(
-  void *logger_provider, const char *name, const char *version,
-  const char *schema_url, struct otel_attributes *attributes);
+  void *logger_provider, const char *name, int minimum_severity,
+  const char *version, const char *schema_url,
+  struct otel_attributes *attributes);
 void *otel_logger_get_name_(void *logger, struct otel_string *name);
+int otel_logger_is_enabled_(void *logger_, int severity_);
 void otel_log_(
   void *logger_, int severity_, const char *format_,
   struct otel_attributes *attr);

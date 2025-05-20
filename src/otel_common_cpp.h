@@ -38,6 +38,7 @@ struct otel_logger_provider {
 
 struct otel_logger {
   nostd::shared_ptr<logs_api::Logger> ptr;
+  int minimum_severity;
 };
 
 struct otel_meter_provider {

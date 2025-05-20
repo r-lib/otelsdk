@@ -8,12 +8,21 @@ logger_provider_stdstream_new <- function(stream = NULL) {
     c("otel_logger_provider_stdstream", "otel_logger_provider"),
     get_logger = function(
       name = NULL,
+      minimum_severity = "warn",
       version = NULL,
       schema_url = NULL,
       attributes = NULL,
       ...
     ) {
-      logger_new(self, name, version, schema_url, attributes, ...)
+      logger_new(
+        self,
+        name,
+        minimum_severity,
+        version,
+        schema_url,
+        attributes,
+        ...
+      )
     },
     flush = function() {
       .Call(otel_logger_provider_flush, self$xptr)

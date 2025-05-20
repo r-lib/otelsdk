@@ -3,12 +3,21 @@ logger_provider_http_new <- function() {
     c("otel_logger_provider_http", "otel_logger_provider"),
     get_logger = function(
       name = NULL,
+      minimum_severity = "warn",
       version = NULL,
       schema_url = NULL,
       attributes = NULL,
       ...
     ) {
-      logger_new(self, name, version, schema_url, attributes, ...)
+      logger_new(
+        self,
+        name,
+        minimum_severity,
+        version,
+        schema_url,
+        attributes,
+        ...
+      )
     },
     flush = function() {
       # noop currenrly
