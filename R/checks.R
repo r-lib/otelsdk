@@ -22,35 +22,25 @@ as_timestamp <- function(x, null = TRUE, call = NULL) {
 
   call <- call %||% match.call()
   if (inherits(x, "POSIXt") && length(x) == 0) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a time stamp ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a time stamp ",
       "(`POSIXt` scalar or numeric scalar), but it is an empty vector."
-    )
+    )))
   } else if (inherits(x, "POSIXt") && length(x) > 1) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a time stamp ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a time stamp ",
       "(`POSIXt` scalar or numeric scalar), but it is too long."
-    )
+    )))
   } else if (inherits(x, "POSIXt") && length(x) == 1 && is.na(x)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a time stamp ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a time stamp ",
       "(`POSIXt` scalar or numeric scalar), but it is `NA`."
-    )
+    )))
   } else {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a time stamp ",
-      "(`POSIXt` scalar or numeric scalar), but it is ",
-      typename(x),
-      "."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a time stamp ",
+      "(`POSIXt` scalar or numeric scalar), but it is {typename(x)}."
+    )))
   }
 }
 
@@ -62,14 +52,10 @@ as_span <- function(x, null = TRUE, na = TRUE, call = NULL) {
   }
 
   call <- call %||% match.call()
-  stop(
-    "Invalid argument: ",
-    format(call[[2]]),
-    " must be a span object ",
-    "(`otel_span`), but it is ",
-    typename(x),
-    "."
-  )
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} must be a span object ",
+    "(`otel_span`), but it is {typename(x)}."
+  )))
 }
 
 as_choice <- function(x, choices, null = TRUE, call = NULL) {
@@ -83,26 +69,15 @@ as_choice <- function(x, choices, null = TRUE, call = NULL) {
   call <- call %||% match.call()
   cchoices <- paste(choices, collapse = ", ")
   if (is_string(x)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be one of ",
-      cchoices,
-      ", but it is ",
-      x,
-      "."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be one of {cchoices}, ",
+      "but it is {x}."
+    )))
   } else {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a string ",
-      "scalar, one of ",
-      cchoices,
-      ", but it is ",
-      typename(x),
-      "."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a string scalar, one ",
+      "of {cchoices}, but it is {typename(x)}."
+    )))
   }
 }
 
@@ -111,14 +86,10 @@ as_env <- function(x, null = TRUE, call = NULL) {
   if (is.environment(x)) return(x)
 
   call <- call %||% match.call()
-  stop(
-    "Invalid argument: ",
-    format(call[[2]]),
-    " must be an environment, ",
-    "but it is ",
-    typename(x),
-    "."
-  )
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} must be an environment, ",
+    "but it is {typename(x)}."
+  )))
 }
 
 as_string <- function(x, null = TRUE, call = NULL) {
@@ -126,14 +97,10 @@ as_string <- function(x, null = TRUE, call = NULL) {
   if (is_string(x)) return(x)
 
   call <- call %||% match.call()
-  stop(
-    "Invalid argument: ",
-    format(call[[2]]),
-    " must be a string scalar, ",
-    "but it is ",
-    typename(x),
-    "."
-  )
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} must be a string scalar, ",
+    "but it is {typename(x)}."
+  )))
 }
 
 span_attr_types <- c(typeof(""), typeof(TRUE), typeof(1), typeof(1L))
@@ -145,23 +112,17 @@ as_otel_attribute_value <- function(x, call = NULL) {
 
   call <- call %||% match.call()
   if (!typeof(x) %in% span_attr_types) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be of type ",
-      collapse(span_attr_types, last = ", or "),
-      ", but it is ",
-      typename(x),
-      "."
-    )
+    ctypes <- collapse(span_attr_types, last = ", or ")
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be of type {ctypes}, ",
+      "but it is {typename(x)}."
+    )))
   }
   if (hna) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must not contain ",
-      "missing (`NA`) values."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must not contain missing ",
+      "(`NA`) values."
+    )))
   }
 }
 
@@ -177,44 +138,33 @@ as_otel_attributes <- function(attributes, call = NULL) {
 
   call <- call %||% match.call()
   if (!is.list(attributes)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a named list, ",
-      "but it is ",
-      typename(attributes),
-      "."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a named list, ",
+      "but it is {typename(attributes)}."
+    )))
   }
 
   if (!is_named(attributes)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a named list, but not ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a named list, but not ",
       "all of its entries are named."
-    )
+    )))
   }
 
   badtypes <- !(tps %in% span_attr_types)
   if (any(badtypes)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " can only contain types ",
-      collapse(span_attr_types),
-      ", but it contains ",
-      collapse(unique(tps[badtypes])),
-      " types."
-    )
+    ok <- collapse(span_attr_types)
+    bd <- collapse(unique(tps[badtypes]))
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} can only contain types ",
+      "{ok}, but it contains {bd} types."
+    )))
   }
 
-  stop(
-    "Invalid argument: the entries of ",
-    format(call[[2]]),
-    " must not ",
+  stop(glue(c(
+    "Invalid argument: the entries of {format(call[[2]])} must not ",
     "contain missing (`NA`) values."
-  )
+  )))
 }
 
 as_span_link <- function(link, call = NULL) {
@@ -230,13 +180,11 @@ as_span_link <- function(link, call = NULL) {
     return(list(link[[1]]$xptr, link[-1]))
   }
 
-  stop(
-    "Invalid argument: ",
-    format(call[[2]]),
-    " must be either an ",
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} must be either an ",
     "OpenTelemetry span (`otel_span`) object or a list with a span ",
     "object as the first element and named span attributes as the rest."
-  )
+  )))
 }
 
 as_span_links <- function(links, call = NULL) {
@@ -251,14 +199,10 @@ as_span_links <- function(links, call = NULL) {
     return(links)
   }
 
-  stop(
-    "Invalid argument: ",
-    format(call[[2]]),
-    " must be a named list, ",
-    "but it is ",
-    typename(links),
-    "."
-  )
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} must be a named list, ",
+    "but it is {typename(links)}."
+  )))
 }
 
 as_span_options <- function(options, call = NULL) {
@@ -285,39 +229,25 @@ as_span_options <- function(options, call = NULL) {
 
   call <- call %||% match.call()
   if (!is.list(options) && !is.null(options)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a named list of ",
-      "OpenTelemetry span options, but it is ",
-      typename(options),
-      "."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a named list of ",
+      "OpenTelemetry span options, but it is {typename(options)}."
+    )))
   }
 
   if (!is_named(options)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a named list of ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a named list of ",
       "OpenTelemetry span options, but not all of its entries are named."
-    )
+    )))
   }
 
   bad <- unique(setdiff(names(options), nms))
-  stop(
-    "Invalid argument: ",
-    format(call[[2]]),
-    " contains unknown ",
-    "OpenTelemetry span option",
-    if (length(bad) > 1) "s",
-    ": ",
-    collapse(bad),
-    ". Known span options ",
-    "are: ",
-    collapse(nms),
-    "."
-  )
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} contains unknown OpenTelemetry ",
+    "span option{plural(length(bad))}: {collapse(bad)}. Known span options ",
+    "are: {collapse(nms)}."
+  )))
 }
 
 as_end_span_options <- function(options, call = NULL) {
@@ -336,37 +266,25 @@ as_end_span_options <- function(options, call = NULL) {
 
   call <- call %||% match.call()
   if (!is.list(options) && !is.null(options)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a named list of ",
-      "OpenTelemetry end span options, but it is ",
-      typename(options),
-      "."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a named list of ",
+      "OpenTelemetry end span options, but it is {typename(options)}."
+    )))
   }
 
   if (!is_named(options)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a named list of ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a named list of ",
       "OpenTelemetry end span options, but not of its entries are named."
-    )
+    )))
   }
 
   bad <- unique(setdiff(names(options), nms))
-  stop(
-    "Invalid argument: ",
-    format(call[[2]]),
-    " contains unknown ",
-    "OpenTelemetry end span options: ",
-    collapse(bad),
-    ". Known end ",
-    "span options are: ",
-    collapse(nms),
-    "."
-  )
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} contains unknown ",
+    "OpenTelemetry end span options: {collapse(bad)}. Known end ",
+    "span options are: {collapse(nms)}."
+  )))
 }
 
 as_output_file <- function(x, null = TRUE, call = NULL) {
@@ -377,11 +295,10 @@ as_output_file <- function(x, null = TRUE, call = NULL) {
 
   dn <- dirname(x)
   if (!file.exists(dn)) {
-    stop(
-      "Directory of OpenTelemetry output file '",
-      x,
-      "' does not exist or it is not writeable."
-    )
+    stop(glue(c(
+      "Directory of OpenTelemetry output file '{x}' ",
+      "does not exist or it is not writeable."
+    )))
   }
 
   # This is the closest thing to Unix `touch` that I could find.
@@ -393,7 +310,7 @@ as_output_file <- function(x, null = TRUE, call = NULL) {
   )
 
   if (!file.exists(x) || file.access(x, 2) != 0) {
-    stop("Cannot write to OpenTelemetry output file '", x, "'.")
+    stop(glue(c("Cannot write to OpenTelemetry output file '{x}'.")))
   }
 
   x
@@ -410,45 +327,19 @@ as_log_severity <- function(x, spec = FALSE, call = NULL) {
   call <- call %||% match.call()
   if (is_string(x)) {
     cchoices <- paste(names(choices), collapse = ", ")
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be one of ",
-      cchoices,
-      ", but it is ",
-      x,
-      "."
-    )
-  } else if (is_count(x)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be an integer log level, between ",
-      min(choices),
-      " and ",
-      max(log_severity_levels),
-      if (spec) {
-        paste0(", or ", max(log_severity_levels_spec))
-      },
-      ", but it is ",
-      x,
-      "."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be one of {cchoices}, ",
+      "but it is {x}."
+    )))
   } else {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be an integer log level, between ",
-      min(choices),
-      " and ",
-      max(log_severity_levels),
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be an integer log level, ",
+      "between {min(choices)} and {max(log_severity_levels)}",
       if (spec) {
         paste0(", or ", max(log_severity_levels_spec))
       },
-      ", but it is ",
-      typename(x),
-      "."
-    )
+      ", but it is {if (is_count(x)) x else typename(x)}."
+    )))
   }
 }
 
@@ -483,34 +374,24 @@ as_count <- function(x, positive = FALSE, call = NULL) {
 
   call <- call %||% match.call()
   if (is.numeric(x) && length(x) != 1) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be an integer ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be an integer ",
       "scalar, not a vector."
-    )
+    )))
   } else if (is.numeric(x) && length(x) == 1 && is.na(x)) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must not be `NA`."
-    )
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must not be `NA`."
+    )))
   } else if (is.numeric(x) && length(x) == 1 && !is.na(x) && x < limit) {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be ",
       if (positive) "positive." else "non-negative."
-    )
+    )))
   } else {
-    stop(
-      "Invalid argument: ",
-      format(call[[2]]),
-      " must be a ",
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a ",
       if (positive) "positive " else "non-negative ",
-      "integer scalar, but it is ",
-      typename(x),
-      "."
-    )
+      "integer scalar, but it is {typename(x)}."
+    )))
   }
 }

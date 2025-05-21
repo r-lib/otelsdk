@@ -51,3 +51,7 @@ get_current_error <- function() {
     list(tried = TRUE, success = TRUE, object = err[[2]], error = NULL)
   }
 }
+
+plural <- function(x) {
+  if (x > 1) "s" else ""
+}
