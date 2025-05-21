@@ -269,3 +269,79 @@ test_that("as_output_file", {
     as_output_file(tmp3)
   })
 })
+
+test_that("as_log_severity", {
+  expect_equal(as_log_severity("warn"), c(warn = 13L))
+  expect_equal(as_log_severity(10L), 10L)
+  expect_equal(as_log_severity(0, spec = TRUE), 0L)
+  expect_equal(as_log_severity(255, spec = TRUE), 255L)
+
+  v1 <- "foobar"
+  v2 <- 1:10
+  v3 <- 200
+  v4 <- 200
+  v5 <- 0
+  v6 <- 255L
+  expect_snapshot(error = TRUE, {
+    as_log_severity(v1)
+    as_log_severity(v2)
+    as_log_severity(v3)
+    as_log_severity(v4, spec = TRUE)
+    as_log_severity(v5)
+    as_log_severity(v6)
+  })
+})
+
+test_that("as_event_id", {
+})
+
+test_that("as_span_id", {
+})
+
+test_that("as_trace_id", {
+})
+
+test_that("as_trace_flags", {
+})
+
+test_that("is_count", {
+  expect_true(is_count(1L))
+  expect_true(is_count(1))
+  expect_true(is_count(0L))
+  expect_true(is_count(0))
+
+  expect_false(is_count(NA_integer_))
+  expect_false(is_count(NA_real_))
+  expect_false(is_count("1"))
+  expect_false(is_count(1:10))
+  expect_false(is_count(-1L))
+  expect_false(is_count(-1))
+
+  expect_true(is_count(1, positive = TRUE))
+  expect_false(is_count(0, positive = TRUE))
+  expect_false(is_count(0L, positive = TRUE))
+})
+
+test_that("as_count", {
+  expect_equal(as_count(1L), 1L)
+  expect_equal(as_count(1), 1L)
+  expect_equal(as_count(0L), 0L)
+  expect_equal(as_count(0), 0L)
+  expect_equal(as_count(20L, positive = TRUE), 20L)
+  expect_equal(as_count(20, positive = TRUE), 20L)
+
+  v1 <- 1:10
+  v2 <- NA_integer_
+  v3 <- NA_real_
+  v4 <- -1
+  v5 <- 0
+  v6 <- mtcars
+  expect_snapshot(error = TRUE, {
+    as_count(v1)
+    as_count(v2)
+    as_count(v3)
+    as_count(v4)
+    as_count(v5, positive = TRUE)
+    as_count(v6)
+  })
+})

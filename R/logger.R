@@ -1,7 +1,7 @@
 logger_new <- function(
   provider,
   name = NULL,
-  minimum_severity = "warn",
+  minimum_severity = "info",
   version = NULL,
   schema_url = NULL,
   attributes = NULL,
@@ -19,56 +19,80 @@ logger_new <- function(
     #   .Call(otel_emit_log_record, self$xptr, log_record)
     #   invisible(self)
     # },
-    # trace = function(...) {
-    #   args <- as_log_args(list(...))
-    #   .Call(otel_log_trace, self$xptr, args)
-    #   invisible(self)
-    # },
-    # debug = function(...) {
-    #   args <- as_log_args(list(...))
-    #   .Call(otel_log_debug, self$xptr, args)
-    #   invisible(self)
-    # },
-    # info = function(...) {
-    #   args <- as_log_args(list(...))
-    #   .Call(otel_log_info, self$xptr, args)
-    #   invisible(self)
-    # },
-    # warn = function(...) {
-    #   args <- as_log_args(list(...))
-    #   .Call(otel_log_warn, self$xptr, args)
-    #   invisible(self)
-    # },
-    # error = function(...) {
-    #   args <- as_log_args(list(...))
-    #   .Call(otel_log_error, self$xptr, args)
-    #   invisible(self)
-    # },
-    # fatal = function(...) {
-    #   args <- as_log_args(list(...))
-    #   .Call(otel_log_fatal, self$xptr, args)
-    #   invisible(self)
-    # },
-    is_enabled = function(severity = "warn", event_id = NULL) {
+    trace = function(msg = "", severity = "trace", ...) {
+      self$log(msg = msg, severity = severity, ...)
+    },
+    debug = function(msg = "", severity = "debug", ...) {
+      self$log(msg = msg, severity = severity, ...)
+    },
+    info = function(msg = "", severity = "info", ...) {
+      self$log(msg = msg, severity = severity, ...)
+    },
+    warn = function(msg = "", severity = "warn", ...) {
+      self$log(msg = msg, severity = severity, ...)
+    },
+    error = function(msg = "", severity = "error", ...) {
+      self$log(msg = msg, severity = severity, ...)
+    },
+    fatal = function(msg = "", severity = "fatal", ...) {
+      self$log(msg = msg, severity = severity, ...)
+    },
+    is_enabled = function(severity = "info", event_id = NULL) {
       severity <- as_log_severity(severity)
       event_id <- as_event_id(event_id)
       .Call(otel_logger_is_enabled, self$xptr, severity, event_id)
     },
     get_minimum_severity = function() {
       ms <- .Call(otel_get_minimum_log_severity, self$xptr)
-      log_severity_levels[ms + 1L]
+      log_severity_levels[match(ms, log_severity_levels)]
     },
     set_minimum_severity = function(minimum_severity) {
       minimum_severity <- as_log_severity(minimum_severity)
       .Call(otel_set_minimum_log_severity, self$xptr, minimum_severity)
       invisible(self)
     },
-    log = function(severity, format, event_id = NULL, attributes = NULL) {
+    log = function(
+      msg = "",
+      severity = "info",
+      event_id = NULL,
+      span_id = NULL,
+      trace_id = NULL,
+      trace_flags = NULL,
+      timestamp = NULL,
+      observed_timestamp = NULL,
+      attributes = NULL,
+      .envir = parent.frame()
+    ) {
+      msg <- as_string(msg, null = FALSE)
       severity <- as_log_severity(severity)
-      format <- as_string(format, null = FALSE)
       event_id <- as_event_id(event_id)
+      span_id <- as_span_id(span_id)
+      trace_id <- as_trace_id(trace_id)
+      trace_flags <- as_trace_flags(trace_flags)
+      timestamp <- as_timestamp(timestamp)
+      observed_timestamp <- as_timestamp(observed_timestamp)
       attributes <- as_otel_attributes(attributes)
-      .Call(otel_log, self$xptr, severity, format, event_id, attributes)
+
+      # `attributes` overwrites attributes in the message
+      embedded_attributes <- extract_otel_attributes(
+        msg,
+        .envir = .envir
+      )$attributes
+      attributes <- utils::modifyList(embedded_attributes, as.list(attributes))
+
+      .Call(
+        otel_log,
+        self$xptr,
+        msg,
+        severity,
+        event_id,
+        span_id,
+        trace_id,
+        trace_flags,
+        timestamp,
+        observed_timestamp,
+        attributes
+      )
       invisible(self)
     },
     flush = function() {
@@ -100,7 +124,6 @@ logger_new <- function(
 # }
 
 log_severity_levels <- c(
-  "invalid" = 0L,
   "trace" = 1L,
   "trace2" = 2L,
   "trace3" = 3L,
@@ -125,6 +148,12 @@ log_severity_levels <- c(
   "fatal2" = 22L,
   "fatal3" = 23L,
   "fatal4" = 24L,
+  NULL
+)
+
+log_severity_levels_spec <- c(
+  "invalid" = 0L,
+  log_severity_levels,
   "maximumseverity" = 255L,
   NULL
 )

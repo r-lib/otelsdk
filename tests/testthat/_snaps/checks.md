@@ -300,3 +300,69 @@
       Error in `as_output_file()`:
       ! Cannot write to OpenTelemetry output file '<tempdir>/<tempfile>/output'.
 
+# as_log_severity
+
+    Code
+      as_log_severity(v1)
+    Condition
+      Error in `as_log_severity()`:
+      ! Invalid argument: v1 must be one of trace, trace2, trace3, trace4, debug, debug2, debug3, debug4, info, info2, info3, info4, warn, warn2, warn3, warn4, error, error2, error3, error4, fatal, fatal2, fatal3, fatal4, but it is foobar.
+    Code
+      as_log_severity(v2)
+    Condition
+      Error in `as_log_severity()`:
+      ! Invalid argument: v2 must be an integer log level, between 1 and 24, but it is an integer vector.
+    Code
+      as_log_severity(v3)
+    Condition
+      Error in `as_log_severity()`:
+      ! Invalid argument: v3 must be an integer log level, between 1 and 24, but it is 200.
+    Code
+      as_log_severity(v4, spec = TRUE)
+    Condition
+      Error in `as_log_severity()`:
+      ! Invalid argument: v4 must be an integer log level, between 0 and 24, or 255, but it is 200.
+    Code
+      as_log_severity(v5)
+    Condition
+      Error in `as_log_severity()`:
+      ! Invalid argument: v5 must be an integer log level, between 1 and 24, but it is 0.
+    Code
+      as_log_severity(v6)
+    Condition
+      Error in `as_log_severity()`:
+      ! Invalid argument: v6 must be an integer log level, between 1 and 24, but it is 255.
+
+# as_count
+
+    Code
+      as_count(v1)
+    Condition
+      Error in `as_count()`:
+      ! Invalid argument: v1 must be an integer scalar, not a vector.
+    Code
+      as_count(v2)
+    Condition
+      Error in `as_count()`:
+      ! Invalid argument: v2 must not be `NA`.
+    Code
+      as_count(v3)
+    Condition
+      Error in `as_count()`:
+      ! Invalid argument: v3 must not be `NA`.
+    Code
+      as_count(v4)
+    Condition
+      Error in `as_count()`:
+      ! Invalid argument: v4 must be non-negative.
+    Code
+      as_count(v5, positive = TRUE)
+    Condition
+      Error in `as_count()`:
+      ! Invalid argument: v5 must be positive.
+    Code
+      as_count(v6)
+    Condition
+      Error in `as_count()`:
+      ! Invalid argument: v6 must be a non-negative integer scalar, but it is a data frame.
+

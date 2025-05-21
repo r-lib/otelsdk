@@ -144,30 +144,6 @@ SEXP otel_emit_log_record(SEXP logger, SEXP log_record) {
 
 }
 
-SEXP otel_log_trace(SEXP logger, SEXP args) {
-
-}
-
-SEXP otel_log_debug(SEXP logger, SEXP args) {
-
-}
-
-SEXP otel_log_info(SEXP logger, SEXP args) {
-
-}
-
-SEXP otel_log_warn(SEXP logger, SEXP args) {
-
-}
-
-SEXP otel_log_error(SEXP logger, SEXP args) {
-
-}
-
-SEXP otel_log_fatal(SEXP logger, SEXP args) {
-
-}
-
 SEXP otel_logger_is_enabled(SEXP logger, SEXP severity, SEXP event_id) {
   if (TYPEOF(logger) != EXTPTRSXP) {
     Rf_error("Opentelemetry: invalid logger pointer");
@@ -182,7 +158,8 @@ SEXP otel_logger_is_enabled(SEXP logger, SEXP severity, SEXP event_id) {
 }
 
 SEXP otel_log(
-    SEXP logger, SEXP severity, SEXP format, SEXP event_id,
+    SEXP logger, SEXP format, SEXP severity, SEXP event_id, SEXP span_id,
+    SEXP trace_id, SEXP trace_flags, SEXP timestamp, SEXP observed_timestamp,
     SEXP attributes) {
   if (TYPEOF(logger) != EXTPTRSXP) {
     Rf_error("Opentelemetry: invalid logger pointer");
@@ -192,9 +169,14 @@ SEXP otel_log(
     Rf_error("Opentelemetry logger cleaned up already, internal error.");
   }
 
-  int severity_ = INTEGER(severity)[0];
   const char *format_ = CHAR(STRING_ELT(format, 0));
+  int severity_ = INTEGER(severity)[0];
   // TODO: event_id
+  // TODO: span_id
+  // TODO: trace_id
+  // TODO: trace_flags
+  // TODO: timestamp
+  // TODO: observed_timestamp
   struct otel_attributes attributes_;
   r2c_attributes(attributes, &attributes_);
   otel_log_(logger_, severity_, format_, &attributes_);

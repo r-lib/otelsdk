@@ -54,15 +54,11 @@ SEXP otel_get_minimum_log_severity(SEXP logger);
 SEXP otel_set_minimum_log_severity(SEXP logger, SEXP mimimum_severity);
 SEXP otel_logger_get_name(SEXP logger);
 SEXP otel_emit_log_record(SEXP logger, SEXP log_record);
-SEXP otel_log_trace(SEXP logger, SEXP args);
-SEXP otel_log_debug(SEXP logger, SEXP args);
-SEXP otel_log_info(SEXP logger, SEXP args);
-SEXP otel_log_warn(SEXP logger, SEXP args);
-SEXP otel_log_error(SEXP logger, SEXP args);
-SEXP otel_log_fatal(SEXP logger, SEXP args);
 SEXP otel_logger_is_enabled(SEXP logger, SEXP severity, SEXP event_id);
 SEXP otel_log(
-  SEXP logger, SEXP severity, SEXP format, SEXP event_id, SEXP attributes);
+  SEXP logger, SEXP format, SEXP severity, SEXP event_id, SEXP span_id,
+  SEXP trace_id, SEXP trace_flags, SEXP timestamp, SEXP observed_timestamp,
+  SEXP attributes);
 
 SEXP otel_create_meter_provider_stdstream(
   SEXP stream, SEXP export_interval, SEXP export_timeout);
@@ -94,6 +90,7 @@ SEXP otel_gauge_record(
   SEXP gauge, SEXP value, SEXP attributes, SEXP unit);
 
 SEXP rf_get_list_element(SEXP list, const char *str);
+SEXP glue_(SEXP x, SEXP f, SEXP open_arg, SEXP close_arg, SEXP cli_arg);
 SEXP trim_(SEXP x);
 
 #define CALLDEF(name, n) \
@@ -133,14 +130,8 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_get_logger, 6),
   CALLDEF(otel_logger_get_name, 1),
   CALLDEF(otel_emit_log_record, 2),
-  CALLDEF(otel_log_trace, 2),
-  CALLDEF(otel_log_debug, 2),
-  CALLDEF(otel_log_info, 2),
-  CALLDEF(otel_log_warn, 2),
-  CALLDEF(otel_log_error, 2),
-  CALLDEF(otel_log_fatal, 2),
   CALLDEF(otel_logger_is_enabled, 3),
-  CALLDEF(otel_log ,5),
+  CALLDEF(otel_log, 10),
 
   CALLDEF(otel_create_meter_provider_stdstream, 3),
   CALLDEF(otel_create_meter_provider_http, 2),
@@ -156,6 +147,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_gauge, 4),
   CALLDEF(otel_gauge_record, 4),
 
+  CALLDEF(glue_, 5),
   CALLDEF(trim_, 1),
   { NULL, NULL, 0 }
 };

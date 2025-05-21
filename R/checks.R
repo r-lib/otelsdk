@@ -399,12 +399,56 @@ as_output_file <- function(x, null = TRUE, call = NULL) {
   x
 }
 
-# TODO
-as_log_severity <- function(x) {
+as_log_severity <- function(x, spec = FALSE, call = NULL) {
+  choices <- if (spec) log_severity_levels_spec else log_severity_levels
+  if (is_string(x) && x %in% names(choices)) {
+    return(choices[x])
+  } else if (is_count(x) && x %in% choices) {
+    return(as.integer(x))
+  }
+
+  call <- call %||% match.call()
   if (is_string(x)) {
-    log_severity_levels[x]
+    cchoices <- paste(names(choices), collapse = ", ")
+    stop(
+      "Invalid argument: ",
+      format(call[[2]]),
+      " must be one of ",
+      cchoices,
+      ", but it is ",
+      x,
+      "."
+    )
+  } else if (is_count(x)) {
+    stop(
+      "Invalid argument: ",
+      format(call[[2]]),
+      " must be an integer log level, between ",
+      min(choices),
+      " and ",
+      max(log_severity_levels),
+      if (spec) {
+        paste0(", or ", max(log_severity_levels_spec))
+      },
+      ", but it is ",
+      x,
+      "."
+    )
   } else {
-    x
+    stop(
+      "Invalid argument: ",
+      format(call[[2]]),
+      " must be an integer log level, between ",
+      min(choices),
+      " and ",
+      max(log_severity_levels),
+      if (spec) {
+        paste0(", or ", max(log_severity_levels_spec))
+      },
+      ", but it is ",
+      typename(x),
+      "."
+    )
   }
 }
 
@@ -413,11 +457,29 @@ as_event_id <- function(x, null = TRUE, call = NULL) {
   x
 }
 
+# TODO
+as_span_id <- function(x, null = TRUE, call = NULL) {
+  x
+}
+
+# TODO
+as_trace_id <- function(x, null = TRUE, call = NULL) {
+  x
+}
+
+# TODO
+as_trace_flags <- function(x, null = TRUE, call = NULL) {
+  x
+}
+
+is_count <- function(x, positive = FALSE) {
+  limit <- if (positive) 1L else 0L
+  is.numeric(x) && length(x) == 1 && !is.na(x) && x >= limit
+}
+
 as_count <- function(x, positive = FALSE, call = NULL) {
   limit <- if (positive) 1L else 0L
-  if (is.numeric(x) && length(x) == 1 && !is.na(x) && x >= limit) {
-    return(as.integer(x))
-  }
+  if (is_count(x, positive = positive)) return(as.integer(x))
 
   call <- call %||% match.call()
   if (is.numeric(x) && length(x) != 1) {
