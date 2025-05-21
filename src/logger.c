@@ -141,7 +141,7 @@ SEXP otel_logger_get_name(SEXP logger) {
 }
 
 SEXP otel_emit_log_record(SEXP logger, SEXP log_record) {
-
+  // TODO
 }
 
 SEXP otel_logger_is_enabled(SEXP logger, SEXP severity, SEXP event_id) {
@@ -175,10 +175,13 @@ SEXP otel_log(
   // TODO: span_id
   // TODO: trace_id
   // TODO: trace_flags
-  // TODO: timestamp
+  void *timestamp_ = NULL;
+  if (!Rf_isNull(timestamp)) {
+    timestamp_ = REAL(timestamp);
+  }
   // TODO: observed_timestamp
   struct otel_attributes attributes_;
   r2c_attributes(attributes, &attributes_);
-  otel_log_(logger_, severity_, format_, &attributes_);
+  otel_log_(logger_, format_, severity_, timestamp_, &attributes_);
   return R_NilValue;
 }

@@ -17,10 +17,12 @@ test_that("log to file", {
   lgr$log("This is a warning", severity = "warn")
 
   type <- "structured"
+  ts <- Sys.time()
   lgr$log("This is a {type} log message.")
   lgr$log(
     "This is a {type} log message with attributes",
-    attributes = list(foo = "bar")
+    attributes = list(foo = "bar"),
+    timestamp = ts2 <- Sys.time()
   )
   lp$flush()
 
@@ -40,4 +42,19 @@ test_that("log to file", {
     spns[[3]][test_fields]
     spns[[4]][test_fields]
   })
+
+  # time stamps are set
+  expect_match(spns[[3]]$timestamp, "^[0-9]{10}[0-9]*$")
+  expect_match(spns[[3]]$observed_timestamp, "^[0-9]{10}[0-9]*$")
+  expect_true(
+    as.integer(substr(spns[[3]]$timestamp, 1, 10)) - as.integer(ts) < 10
+  )
+  expect_true(
+    as.integer(substr(spns[[3]]$observed_timestamp, 1, 10)) - as.integer(ts) <
+      10
+  )
+  expect_equal(
+    substr(spns[[4]]$timestamp, 1, 10),
+    as.character(as.integer(ts2))
+  )
 })

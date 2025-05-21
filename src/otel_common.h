@@ -183,7 +183,7 @@ void *otel_get_logger_(
 void *otel_logger_get_name_(void *logger, struct otel_string *name);
 int otel_logger_is_enabled_(void *logger_, int severity_);
 void otel_log_(
-  void *logger_, int severity_, const char *format_,
+  void *logger_, const char *format_, int severity_, void *timestamp,
   struct otel_attributes *attr);
 
 void otel_meter_provider_finally_(void *logger_provider);

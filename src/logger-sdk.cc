@@ -152,15 +152,33 @@ int otel_logger_is_enabled_(void *logger_, int severity_) {
 }
 
 void otel_log_(
-    void *logger_, int severity_, const char *format_,
-    struct otel_attributes *attributes_) {
+    void *logger_, const char *format_, int severity_,
+    void *timestamp_, struct otel_attributes *attributes_) {
   struct otel_logger *ls = (struct otel_logger*) logger_;
   if (severity_ < ls->minimum_severity) return;
   logs_api::Logger &logger = *(ls->ptr);
   logs_api::Severity severity = to_severity(severity_);
   RKeyValueIterable attributes(*attributes_);
 
-  logger.Log(severity, format_, attributes);
+  std::shared_ptr<common::SystemTimestamp> ts2(nullptr);
+  if (timestamp_) {
+    double *timestamp = (double*) timestamp_;
+    std::chrono::duration<double, std::ratio<1, 1>> ts(*timestamp);
+    ts2.reset(new common::SystemTimestamp(ts));
+  }
+
+  nostd::unique_ptr<logs_api::LogRecord> lr = logger.CreateLogRecord();
+  lr->SetSeverity(severity);
+  lr->SetBody(format_);
+  if (timestamp_) {
+    lr->SetTimestamp(*ts2);
+  }
+  attributes.ForEachKeyValue(
+    [&] (nostd::string_view key, common::AttributeValue value) -> bool {
+      lr->SetAttribute(key, value);
+      return true;
+  });
+  logger.EmitLogRecord(std::move(lr));
 }
 
 } // extern "C"

@@ -58,7 +58,7 @@ logger_new <- function(
       span_id = NULL,
       trace_id = NULL,
       trace_flags = NULL,
-      timestamp = NULL,
+      timestamp = Sys.time(),
       observed_timestamp = NULL,
       attributes = NULL,
       .envir = parent.frame()
