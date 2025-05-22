@@ -76,7 +76,7 @@ logger_new <- function(
       attributes <- as_otel_attributes(attributes)
 
       if (!is_na(span_context)) {
-        span_context <- span_context %||% otel::get_current_trace_context()
+        span_context <- span_context %||% otel::get_current_span_context()
         if (span_context$is_valid()) {
           span_id <- span_id %||% span_context$get_span_id()
           trace_id <- trace_id %||% span_context$get_trace_id()
