@@ -79,6 +79,35 @@
       Error in `as_span()`:
       ! Invalid argument: b1 must be a span object (`otel_span`), but it is a data frame.
 
+# as_span_context
+
+    Code
+      as_span_context(NULL)
+    Output
+      NULL
+    Code
+      as_span_context(NA)
+    Output
+      [1] NA
+    Code
+      as_span_context(NA_character_)
+    Output
+      [1] NA
+    Code
+      as_span_context(spc)
+    Output
+      list()
+      attr(,"class")
+      [1] "otel_span_context"
+
+---
+
+    Code
+      as_span_context(b1)
+    Condition
+      Error in `as_span_context()`:
+      ! Invalid argument: b1 must be a span context object (`otel_span_context`), but it is a data frame.
+
 # as_choice
 
     Code

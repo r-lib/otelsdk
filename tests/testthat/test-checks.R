@@ -72,6 +72,21 @@ test_that("as_span", {
   })
 })
 
+test_that("as_span_context", {
+  spc <- structure(list(), class = "otel_span_context")
+  expect_snapshot({
+    as_span_context(NULL)
+    as_span_context(NA)
+    as_span_context(NA_character_)
+    as_span_context(spc)
+  })
+
+  b1 <- mtcars
+  expect_snapshot(error = TRUE, {
+    as_span_context(b1)
+  })
+})
+
 test_that("as_choice", {
   expect_snapshot({
     as_choice(NULL, c(default = "foo", "bar"))
