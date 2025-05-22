@@ -333,6 +333,52 @@
       Error in `as_log_severity()`:
       ! Invalid argument: v6 must be an integer log level, between 1 and 24, but it is 255.
 
+# as_span_id
+
+    Code
+      as_span_id(v1)
+    Condition
+      Error in `as_span_id()`:
+      ! Invalid argument: v1 must be a span id, a string scalar containing 16 hexadecimal digits, but it is 'badcafebadcafeb'.
+    Code
+      as_span_id(v2)
+    Condition
+      Error in `as_span_id()`:
+      ! Invalid argument: v2 must be a span id, a string scalar containing 16 hexadecimal digits, but it is `NA`.
+    Code
+      as_span_id(v3)
+    Condition
+      Error in `as_span_id()`:
+      ! Invalid argument: v3 must be a span id, a string scalar containing 16 hexadecimal digits, but it is 'XXXXXXXXXXXXXXXX'.
+    Code
+      as_span_id(v4)
+    Condition
+      Error in `as_span_id()`:
+      ! Invalid argument: v4 must be a span id, a string scalar containing 16 hexadecimal digits, but it is an integer vector.
+
+# as_trace_id
+
+    Code
+      as_trace_id(v1)
+    Condition
+      Error in `as_trace_id()`:
+      ! Invalid argument: v1 must be a trace id, a string scalar containing 32 hexadecimal digits, but it is 'badcafebadcafebadcafebadcafebad'.
+    Code
+      as_trace_id(v2)
+    Condition
+      Error in `as_trace_id()`:
+      ! Invalid argument: v2 must be a trace id, a string scalar containing 32 hexadecimal digits, but it is `NA`.
+    Code
+      as_trace_id(v3)
+    Condition
+      Error in `as_trace_id()`:
+      ! Invalid argument: v3 must be a trace id, a string scalar containing 32 hexadecimal digits, but it is 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'.
+    Code
+      as_trace_id(v4)
+    Condition
+      Error in `as_trace_id()`:
+      ! Invalid argument: v4 must be a trace id, a string scalar containing 32 hexadecimal digits, but it is an integer vector.
+
 # as_count
 
     Code

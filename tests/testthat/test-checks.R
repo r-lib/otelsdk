@@ -296,9 +296,39 @@ test_that("as_event_id", {
 })
 
 test_that("as_span_id", {
+  nc <- span_id_size() * 2L
+  expect_equal(as_span_id(strrep("0", nc)), strrep("0", nc))
+  expect_equal(as_span_id(strrep("a", nc)), strrep("a", nc))
+  expect_equal(as_span_id(strrep("F", nc)), strrep("f", nc))
+
+  v1 <- substr(strrep("badcafe", nc), 1, nc - 1)
+  v2 <- NA_character_
+  v3 <- strrep("X", nc)
+  v4 <- 1:10
+  expect_snapshot(error = TRUE, {
+    as_span_id(v1)
+    as_span_id(v2)
+    as_span_id(v3)
+    as_span_id(v4)
+  })
 })
 
 test_that("as_trace_id", {
+  nc <- trace_id_size() * 2L
+  expect_equal(as_trace_id(strrep("0", nc)), strrep("0", nc))
+  expect_equal(as_trace_id(strrep("a", nc)), strrep("a", nc))
+  expect_equal(as_trace_id(strrep("F", nc)), strrep("f", nc))
+
+  v1 <- substr(strrep("badcafe", nc), 1, nc - 1)
+  v2 <- NA_character_
+  v3 <- strrep("X", nc)
+  v4 <- 1:10
+  expect_snapshot(error = TRUE, {
+    as_trace_id(v1)
+    as_trace_id(v2)
+    as_trace_id(v3)
+    as_trace_id(v4)
+  })
 })
 
 test_that("as_trace_flags", {

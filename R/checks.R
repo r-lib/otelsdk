@@ -2,8 +2,12 @@ is_na <- function(x) {
   is.vector(x) && length(x) == 1 && is.na(x)
 }
 
-is_string <- function(x) {
-  is.character(x) && length(x) == 1 && !is.na(x)
+is_string <- function(x, na = FALSE) {
+  if (na) {
+    is.character(x) && length(x) == 1
+  } else {
+    is.character(x) && length(x) == 1 && !is.na(x)
+  }
 }
 
 is_named <- function(x) {
@@ -362,14 +366,56 @@ as_event_id <- function(x, null = TRUE, call = NULL) {
   x
 }
 
-# TODO
 as_span_id <- function(x, null = TRUE, call = NULL) {
-  x
+  if (null && is.null(x)) return(x)
+  nc <- span_id_size() * 2L
+  if (is_string(x) && nchar(x) == nc && grepl("^[0-9a-fA-F]+$", x)) {
+    return(tolower(x))
+  }
+
+  call <- call %||% match.call()
+  if (is_string(x)) {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a span id, a string ",
+      "scalar containing {nc} hexadecimal digits, but it is '{x}'."
+    )))
+  } else if (is_string(x, na = TRUE)) {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a span id, a string ",
+      "scalar containing {nc} hexadecimal digits, but it is `NA`."
+    )))
+  } else {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a span id, a string ",
+      "scalar containing {nc} hexadecimal digits, but it is {typename(x)}."
+    )))
+  }
 }
 
-# TODO
 as_trace_id <- function(x, null = TRUE, call = NULL) {
-  x
+  if (null && is.null(x)) return(x)
+  nc <- trace_id_size() * 2L
+  if (is_string(x) && nchar(x) == nc && grepl("^[0-9a-fA-F]+$", x)) {
+    return(tolower(x))
+  }
+
+  call <- call %||% match.call()
+  if (is_string(x)) {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a trace id, a string ",
+      "scalar containing {nc} hexadecimal digits, but it is '{x}'."
+    )))
+  } else if (is_string(x, na = TRUE)) {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a trace id, a string ",
+      "scalar containing {nc} hexadecimal digits, but it is `NA`."
+    )))
+  } else {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a trace id, a string ",
+      "scalar containing {nc} hexadecimal digits, but it is {typename(x)}."
+    )))
+  }
 }
 
 # TODO

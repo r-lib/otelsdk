@@ -151,33 +151,81 @@ int otel_logger_is_enabled_(void *logger_, int severity_) {
   return ls->minimum_severity <= severity_ ? 1 : 0;
 }
 
+static char hexchar(char c) {
+  if(c >= '0' && c <= '9') {
+    return c - '0';
+  } else if (c >= 'A' && c <= 'F') {
+    return 10 + (c - 'A');
+  } else if (c >= 'a' && c <= 'f') {
+    return 10 + (c - 'a');
+  } else {
+    // does not happen
+    return 0;
+  }
+}
+
 void otel_log_(
     void *logger_, const char *format_, int severity_,
-    void *timestamp_, struct otel_attributes *attributes_) {
+    const char *span_id_, const char *trace_id_, void *timestamp_,
+    void *observed_timestamp_, struct otel_attributes *attributes_) {
   struct otel_logger *ls = (struct otel_logger*) logger_;
   if (severity_ < ls->minimum_severity) return;
   logs_api::Logger &logger = *(ls->ptr);
   logs_api::Severity severity = to_severity(severity_);
   RKeyValueIterable attributes(*attributes_);
 
+  nostd::unique_ptr<logs_api::LogRecord> lr = logger.CreateLogRecord();
+  lr->SetSeverity(severity);
+  lr->SetBody(format_);
+
+  if (trace_id_) {
+    // trace_id_ must have the right length
+    uint8_t buf[trace_api::TraceId::kSize];
+    for (int si = 0; si < trace_api::TraceId::kSize; si++) {
+      buf[si] = hexchar(trace_id_[si * 2]) * 16 +
+        hexchar(trace_id_[si * 2 + 1]);
+    }
+    nostd::span<const uint8_t, trace_api::TraceId::kSize>
+      buf2(buf, trace_api::TraceId::kSize);
+    trace_api::TraceId tid(buf2);
+    lr->SetTraceId(tid);
+  }
+
+  if (span_id_) {
+    // span_id_ must have the right length
+    uint8_t buf[trace_api::SpanId::kSize];
+    for (int si = 0; si < trace_api::SpanId::kSize; si++) {
+      buf[si] = hexchar(span_id_[si * 2]) * 16 +
+        hexchar(span_id_[si * 2 + 1]);
+    }
+    nostd::span<const uint8_t, trace_api::SpanId::kSize>
+      buf2(buf, trace_api::SpanId::kSize);
+    trace_api::SpanId tid(buf2);
+    lr->SetSpanId(tid);
+  }
+
   std::shared_ptr<common::SystemTimestamp> ts2(nullptr);
   if (timestamp_) {
     double *timestamp = (double*) timestamp_;
     std::chrono::duration<double, std::ratio<1, 1>> ts(*timestamp);
     ts2.reset(new common::SystemTimestamp(ts));
-  }
-
-  nostd::unique_ptr<logs_api::LogRecord> lr = logger.CreateLogRecord();
-  lr->SetSeverity(severity);
-  lr->SetBody(format_);
-  if (timestamp_) {
     lr->SetTimestamp(*ts2);
   }
+
+   std::shared_ptr<common::SystemTimestamp> ots2(nullptr);
+  if (observed_timestamp_) {
+    double *observed_timestamp = (double*) observed_timestamp_;
+    std::chrono::duration<double, std::ratio<1, 1>> ots(*observed_timestamp);
+    ots2.reset(new common::SystemTimestamp(ots));
+    lr->SetObservedTimestamp(*ots2);
+  }
+
   attributes.ForEachKeyValue(
     [&] (nostd::string_view key, common::AttributeValue value) -> bool {
       lr->SetAttribute(key, value);
       return true;
   });
+
   logger.EmitLogRecord(std::move(lr));
 }
 

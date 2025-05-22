@@ -172,16 +172,23 @@ SEXP otel_log(
   const char *format_ = CHAR(STRING_ELT(format, 0));
   int severity_ = INTEGER(severity)[0];
   // TODO: event_id
-  // TODO: span_id
-  // TODO: trace_id
+  const char *trace_id_ =
+    Rf_isNull(trace_id) ? NULL : CHAR(STRING_ELT(trace_id, 0));
+  const char *span_id_ =
+    Rf_isNull(span_id) ? NULL : CHAR(STRING_ELT(span_id, 0));
   // TODO: trace_flags
   void *timestamp_ = NULL;
   if (!Rf_isNull(timestamp)) {
     timestamp_ = REAL(timestamp);
   }
-  // TODO: observed_timestamp
+  void *observed_timestamp_ = NULL;
+  if (!Rf_isNull(observed_timestamp)) {
+    observed_timestamp_ = REAL(observed_timestamp);
+  }
   struct otel_attributes attributes_;
   r2c_attributes(attributes, &attributes_);
-  otel_log_(logger_, format_, severity_, timestamp_, &attributes_);
+  otel_log_(
+    logger_, format_, severity_, span_id_, trace_id_, timestamp_,
+    observed_timestamp_, &attributes_);
   return R_NilValue;
 }

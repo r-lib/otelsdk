@@ -38,6 +38,8 @@ SEXP otel_span_set_status(SEXP span, SEXP status_code, SEXP description);
 SEXP otel_span_update_name(SEXP span, SEXP name);
 SEXP otel_span_end(SEXP span, SEXP options, SEXP status_code);
 
+SEXP otel_span_id_size(void);
+SEXP otel_trace_id_size(void);
 SEXP otel_span_context_is_valid(SEXP span_context);
 SEXP otel_span_context_get_trace_flags(SEXP span_context);
 SEXP otel_span_context_get_trace_id(SEXP span_context);
@@ -129,6 +131,8 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_update_name, 2),
   CALLDEF(otel_span_end, 3),
 
+  CALLDEF(otel_span_id_size, 0),
+  CALLDEF(otel_trace_id_size, 0),
   CALLDEF(otel_span_context_is_valid, 1),
   CALLDEF(otel_span_context_get_trace_flags, 1),
   CALLDEF(otel_span_context_get_trace_id, 1),
@@ -310,6 +314,16 @@ SEXP otel_get_current_span_context(SEXP tracer) {
   SEXP xptr = R_MakeExternalPtr(span_context_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_span_context_finally, (Rboolean) 1);
   return xptr;
+}
+
+SEXP otel_span_id_size(void) {
+  int sz = otel_span_id_size_();
+  return Rf_ScalarInteger(sz);
+}
+
+SEXP otel_trace_id_size(void) {
+  int sz = otel_trace_id_size_();
+  return Rf_ScalarInteger(sz);
 }
 
 SEXP otel_start_session(void) {
