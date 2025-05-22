@@ -55,6 +55,7 @@ logger_new <- function(
       msg = "",
       severity = "info",
       event_id = NULL,
+      span_context = NULL,
       span_id = NULL,
       trace_id = NULL,
       trace_flags = NULL,
@@ -66,12 +67,22 @@ logger_new <- function(
       msg <- as_string(msg, null = FALSE)
       severity <- as_log_severity(severity)
       event_id <- as_event_id(event_id)
+      span_context <- as_span_context(span_context)
       span_id <- as_span_id(span_id)
       trace_id <- as_trace_id(trace_id)
       trace_flags <- as_trace_flags(trace_flags)
       timestamp <- as_timestamp(timestamp)
       observed_timestamp <- as_timestamp(observed_timestamp)
       attributes <- as_otel_attributes(attributes)
+
+      if (!is_na(span_context)) {
+        span_context <- span_context %||% otel::get_current_trace_context()
+        if (span_context$is_valid()) {
+          span_id <- span_id %||% span_context$get_span_id()
+          trace_id <- trace_id %||% span_context$get_trace_id()
+          trace_flags <- trace_flags %||% span_context$get_trace_flags()
+        }
+      }
 
       # `attributes` overwrites attributes in the message
       embedded_attributes <- extract_otel_attributes(

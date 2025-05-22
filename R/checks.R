@@ -58,6 +58,20 @@ as_span <- function(x, null = TRUE, na = TRUE, call = NULL) {
   )))
 }
 
+as_span_context <- function(x, null = TRUE, na = TRUE, call = NULL) {
+  if (null && is.null(x)) return(x)
+  if (na && is_na(x)) return(x)
+  if (inherits(x, "otel_span_context")) {
+    return(x)
+  }
+
+  call <- call %||% match.call()
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} must be a span context object ",
+    "(`otel_span_context`), but it is {typename(x)}."
+  )))
+}
+
 as_choice <- function(x, choices, null = TRUE, call = NULL) {
   if (null && is.null(x)) {
     return(match("default", names(choices)) - 1L)
