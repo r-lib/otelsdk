@@ -25,6 +25,10 @@ tracer_new <- function(
       )
     },
     is_enabled = function(...) TRUE,
+    get_current_span_context = function() {
+      xptr <- .Call(otel_get_current_span_context, self$xptr)
+      span_context_new(xptr)
+    },
     start_session = function() {
       .Call(otel_start_session)
     },

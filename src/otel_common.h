@@ -120,6 +120,7 @@ extern const char *otel_http_request_content_type_str[];
 void otel_tracer_provider_finally_(void *tracer_provider);
 void otel_tracer_finally_(void *tracer);
 void otel_span_finally_(void *span);
+void otel_span_context_finally_(void *span_context_);
 void otel_scope_finally_(void *scope);
 void otel_session_finally_(void *sess);
 void otel_logger_finally_(void *logger);
@@ -135,6 +136,8 @@ void otel_tracer_provider_flush_(void *tracer_provider);
 void *otel_get_tracer_(
     void *tracer_provider_, const char *name, const char *version,
     const char *schema_url, struct otel_attributes *attributes);
+void *otel_get_current_span_context_(void *tracer);
+
 struct otel_scoped_span otel_start_span_(
   void *tracer,
   const char *name,
@@ -145,6 +148,8 @@ struct otel_scoped_span otel_start_span_(
   void *parent,
   int span_kind
 );
+void *otel_span_get_context_(void *span);
+int otel_span_is_valid_(void *span);
 int otel_span_is_recording_(void *span);
 void otel_span_set_attribute_(void *span, struct otel_attribute *attr);
 void otel_span_add_event_(
@@ -160,6 +165,15 @@ void otel_span_set_status_(
 );
 void otel_span_update_name_(void *span_, const char *name_);
 void otel_span_end_(void *span, void *scope, double *end_steady_time);
+
+int otel_span_context_is_valid_(void* span_context);
+char otel_span_context_get_trace_flags_(void* span_context);
+int otel_trace_id_size_(void);
+void otel_span_context_get_trace_id_(void* span_context, char *buf);
+int otel_span_id_size_(void);
+void otel_span_context_get_span_id_(void* span_context, char *buf);
+int otel_span_context_is_remote_(void* span_context);
+int otel_span_context_is_sampled_(void* span_context);
 
 void *otel_start_session_(void);
 void otel_activate_session_(void *id_);

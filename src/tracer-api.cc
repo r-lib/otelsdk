@@ -60,6 +60,16 @@ private:
 
 extern "C" {
 
+void *otel_get_current_span_context_(void *tracer_) {
+  struct otel_tracer *ts = (struct otel_tracer *) tracer_;
+  trace::Tracer &tracer = *(ts->ptr);
+
+  nostd::shared_ptr<trace_api::Span> span = tracer.GetCurrentSpan();
+  trace_api::SpanContext *span_context =
+    new trace_api::SpanContext { span->GetContext() };
+  return (void*) span_context;
+}
+
 struct otel_scoped_span otel_start_span_(
   void *tracer_,
   const char *name,
@@ -106,6 +116,22 @@ struct otel_scoped_span otel_start_span_(
 
   struct otel_scoped_span sspan = { ss, scope };
   return sspan;
+}
+
+void *otel_span_get_context_(void *span_) {
+  struct otel_span *ss = (struct otel_span *) span_;
+  trace::Span &span = *(ss->ptr);
+  trace_api::SpanContext *span_context =
+    new trace_api::SpanContext { span.GetContext() };
+  return (void*) span_context;
+}
+
+int otel_span_is_valid_(void *span_) {
+  struct otel_span *ss = (struct otel_span *) span_;
+  trace::Span &span = *(ss->ptr);
+  trace_api::SpanContext span_context {span.GetContext()};
+  bool valid = span_context.IsValid();
+  return valid;
 }
 
 int otel_span_is_recording_(void *span_) {
@@ -238,4 +264,46 @@ void otel_span_update_name_(void *span_, const char *name_) {
   span.UpdateName(name_);
 }
 
+int otel_span_context_is_valid_(void* span_context_) {
+  trace::SpanContext *span_context = (trace::SpanContext*) span_context_;
+  return span_context->IsValid();
 }
+
+char otel_span_context_get_trace_flags_(void* span_context_) {
+  trace::SpanContext *span_context = (trace::SpanContext*) span_context_;
+  return span_context->trace_flags().flags();
+}
+
+int otel_trace_id_size_(void) {
+  return trace_api::TraceId::kSize;
+}
+
+void otel_span_context_get_trace_id_(void* span_context_, char* buf) {
+  trace::SpanContext *span_context = (trace::SpanContext*) span_context_;
+  nostd::span<char, 2 * trace_api::TraceId::kSize>
+    buf2(buf, 2 * trace_api::TraceId::kSize);
+  span_context->trace_id().ToLowerBase16(buf2);
+}
+
+int otel_span_id_size_(void) {
+  return trace_api::SpanId::kSize;
+}
+
+void otel_span_context_get_span_id_(void* span_context_, char* buf) {
+  trace::SpanContext *span_context = (trace::SpanContext*) span_context_;
+  nostd::span<char, 2 * trace_api::SpanId::kSize>
+    buf2(buf, 2 * trace_api::SpanId::kSize);
+  span_context->span_id().ToLowerBase16(buf2);
+}
+
+int otel_span_context_is_remote_(void* span_context_) {
+  trace::SpanContext *span_context = (trace::SpanContext*) span_context_;
+  return span_context->IsRemote();
+}
+
+int otel_span_context_is_sampled_(void* span_context_) {
+  trace::SpanContext *span_context = (trace::SpanContext*) span_context_;
+  return span_context->IsSampled();
+}
+
+} // extern "C"

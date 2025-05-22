@@ -108,6 +108,12 @@ void otel_scope_finally_(void *scope_) {
   delete scope;
 }
 
+void otel_span_context_finally_(void *span_context_) {
+  trace_api::SpanContext *span_context =
+    (trace_api::SpanContext*) span_context_;
+  delete span_context;
+}
+
 void *otel_create_tracer_provider_stdstream_(const char *stream) {
   int sout = !strcmp(stream, "stdout");
   int serr = !strcmp(stream, "stderr");

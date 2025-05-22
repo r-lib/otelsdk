@@ -16,10 +16,14 @@ span_new <- function(
   self <- new_object(
     "otel_span",
 
-    # TODO: maybe we don't need to get the context explicitly
-    # get_context = function() {
-    #   .Call(otel_span_get_context, self$xptr)
-    # },
+    get_context = function() {
+      xptr <- .Call(otel_span_get_context, self$xptr)
+      span_context_new(xptr)
+    },
+
+    is_valid = function() {
+      .Call(otel_is_valid_span, self$xptr)
+    },
 
     is_recording = function() {
       .Call(otel_span_is_recording, self$xptr)
@@ -116,9 +120,6 @@ span_new <- function(
 
   self$tracer <- tracer
   self$name <- name
-  self$attributes <- attributes
-  self$links <- links
-  self$options <- options
   self$status_set <- FALSE
 
   self$xptr <- .Call(
@@ -151,6 +152,34 @@ span_kinds <- c(
 )
 
 span_status_codes <- c(default = "unset", "ok", "error")
+
+span_context_new <- function(xptr) {
+  self <- new_object(
+    "otel_span_context",
+
+    is_valid = function() {
+      .Call(otel_span_context_is_valid, self$xptr)
+    },
+    get_trace_flags = function() {
+      .Call(otel_span_context_get_trace_flags, self$xptr)
+    },
+    get_trace_id = function() {
+      .Call(otel_span_context_get_trace_id, self$xptr)
+    },
+    get_span_id = function() {
+      .Call(otel_span_context_get_span_id, self$xptr)
+    },
+    is_remote = function() {
+      .Call(otel_span_context_is_remote, self$xptr)
+    },
+    is_sampled = function() {
+      .Call(otel_span_context_is_sampled, self$xptr)
+    }
+  )
+  self$xptr <- xptr
+
+  self
+}
 
 format_exception <- function(error_condition) {
   message <- tryCatch(

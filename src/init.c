@@ -17,6 +17,7 @@ SEXP otel_tracer_provider_flush(SEXP provider);
 SEXP otel_get_tracer(
   SEXP provider, SEXP name, SEXP version, SEXP schema_url,
   SEXP attributes);
+SEXP otel_get_current_span_context(SEXP tracer);
 
 SEXP otel_start_span(
   SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
@@ -24,6 +25,8 @@ SEXP otel_start_span(
 );
 // TODO: maybe we don't need to get the context explicitly
 // SEXP otel_span_get_context(SEXP span);
+SEXP otel_span_get_context(SEXP span);
+SEXP otel_span_is_valid(SEXP span);
 SEXP otel_span_is_recording(SEXP span);
 SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value);
 SEXP otel_span_add_event(
@@ -34,6 +37,13 @@ SEXP otel_span_add_event(
 SEXP otel_span_set_status(SEXP span, SEXP status_code, SEXP description);
 SEXP otel_span_update_name(SEXP span, SEXP name);
 SEXP otel_span_end(SEXP span, SEXP options, SEXP status_code);
+
+SEXP otel_span_context_is_valid(SEXP span_context);
+SEXP otel_span_context_get_trace_flags(SEXP span_context);
+SEXP otel_span_context_get_trace_id(SEXP span_context);
+SEXP otel_span_context_get_span_id(SEXP span_context);
+SEXP otel_span_context_is_remote(SEXP span_context);
+SEXP otel_span_context_is_sampled(SEXP span_context);
 
 SEXP otel_start_session(void);
 SEXP otel_activate_session(SEXP sess);
@@ -104,9 +114,12 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_http, 0),
   CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 5),
+  CALLDEF(otel_get_current_span_context, 1),
   CALLDEF(otel_start_span, 5),
   // TODO: maybe we don't need to get the context explicitly
   // CALLDEF(otel_span_get_context, 1),
+  CALLDEF(otel_span_get_context, 1),
+  CALLDEF(otel_span_is_valid, 1),
   CALLDEF(otel_span_is_recording, 1),
   CALLDEF(otel_span_set_attribute, 3),
   CALLDEF(otel_span_add_event, 4),
@@ -115,6 +128,14 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_set_status, 3),
   CALLDEF(otel_span_update_name, 2),
   CALLDEF(otel_span_end, 3),
+
+  CALLDEF(otel_span_context_is_valid, 1),
+  CALLDEF(otel_span_context_get_trace_flags, 1),
+  CALLDEF(otel_span_context_get_trace_id, 1),
+  CALLDEF(otel_span_context_get_span_id, 1),
+  CALLDEF(otel_span_context_is_remote, 1),
+  CALLDEF(otel_span_context_is_sampled, 1),
+
   CALLDEF(otel_start_session, 0),
   CALLDEF(otel_activate_session, 1),
   CALLDEF(otel_deactivate_session, 1),
@@ -193,6 +214,18 @@ void otel_tracer_finally(SEXP x) {
   }
 }
 
+void otel_span_context_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid span context pointer.");
+    return;
+  }
+  void *span_context_ = R_ExternalPtrAddr(x);
+  if (span_context_) {
+    otel_span_context_finally_(span_context_);
+    R_ClearExternalPtr(x);
+  }
+}
+
 void otel_session_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
     Rf_warningcall(R_NilValue, "OpenTelemetry: invalid session pointer.");
@@ -261,6 +294,21 @@ SEXP otel_get_tracer(
     tracer_provider_, name_, version_, schema_url_, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_get_current_span_context(SEXP tracer) {
+  if (TYPEOF(tracer) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid tracer pointer.");
+  }
+  void *tracer_ = R_ExternalPtrAddr(tracer);
+  if (!tracer_) {
+    Rf_error("Opentelemetry tracer cleaned up already, internal error.");
+  }
+
+  void *span_context_ = otel_get_current_span_context_(tracer_);
+  SEXP xptr = R_MakeExternalPtr(span_context_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_span_context_finally, (Rboolean) 1);
   return xptr;
 }
 

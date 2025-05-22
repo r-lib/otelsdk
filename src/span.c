@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 
 #define R_USE_C99_IN_CXX 1
 #include <Rinternals.h>
@@ -10,6 +11,9 @@ void r2c_attribute(
 void r2c_attributes(SEXP r, struct otel_attributes *c);
 
 SEXP rf_get_list_element(SEXP list, const char *str);
+
+// in init.c
+void otel_span_context_finally(SEXP x);
 
 void otel_span_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
@@ -107,11 +111,33 @@ SEXP otel_start_span(
   return res;
 }
 
-// TODO: maybe we don't need to get the context explicitly
-// SEXP otel_span_get_context(SEXP span) {
-//   // TODO
-//   return R_NilValue;
-// }
+SEXP otel_span_get_context(SEXP scoped_span) {
+  SEXP span = VECTOR_ELT(scoped_span, 0);
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
+  void *span_ = R_ExternalPtrAddr(span);
+  SEXP res = R_NilValue;
+  if (span_) {
+    void *span_context_ = otel_span_get_context_(span_);
+    res = R_MakeExternalPtr(span_context_, R_NilValue, R_NilValue);
+    R_RegisterCFinalizerEx(res, otel_span_context_finally, (Rboolean) 1);
+  }
+  return res;
+}
+
+SEXP otel_span_is_valid(SEXP scoped_span) {
+  SEXP span = VECTOR_ELT(scoped_span, 0);
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
+  void *span_ = R_ExternalPtrAddr(span);
+  int res = 0;
+  if (span_) {
+    res = otel_span_is_valid_(span_);
+  }
+  return Rf_ScalarLogical(res);
+}
 
 SEXP otel_span_is_recording(SEXP scoped_span) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
@@ -223,4 +249,77 @@ SEXP otel_span_end(SEXP scoped_span, SEXP options, SEXP status_code) {
     R_ClearExternalPtr(scope);
   }
   return R_NilValue;
+}
+
+SEXP otel_span_context_is_valid(SEXP span_context) {
+  if (TYPEOF(span_context) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span context pointer.");
+  }
+  void *span_context_ = R_ExternalPtrAddr(span_context);
+  int valid = otel_span_context_is_valid_(span_context_);
+  return Rf_ScalarLogical(valid);
+}
+
+SEXP otel_span_context_get_trace_flags(SEXP span_context) {
+  if (TYPEOF(span_context) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span context pointer.");
+  }
+  void *span_context_ = R_ExternalPtrAddr(span_context);
+  int flags = otel_span_context_get_trace_flags_(span_context_);
+  const char *trace_flags_names[] = { "is_sampled", "is_random", "" };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, trace_flags_names));
+  SET_VECTOR_ELT(res, 0, Rf_ScalarLogical(flags & 1));
+  SET_VECTOR_ELT(res, 1, Rf_ScalarLogical(flags & 2));
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP otel_span_context_get_trace_id(SEXP span_context) {
+  if (TYPEOF(span_context) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span context pointer.");
+  }
+  void *span_context_ = R_ExternalPtrAddr(span_context);
+  int idsize = otel_trace_id_size_() * 2;
+  char *buf = malloc(idsize);
+  if (!buf) {
+    Rf_error("Out of memory when querying OpenTelemetry trace id");
+  }
+  otel_span_context_get_trace_id_(span_context_, buf);
+  SEXP res = Rf_mkCharLen(buf, idsize);
+  free(buf);
+  return Rf_ScalarString(res);
+}
+
+SEXP otel_span_context_get_span_id(SEXP span_context) {
+  if (TYPEOF(span_context) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span context pointer.");
+  }
+  void *span_context_ = R_ExternalPtrAddr(span_context);
+  int idsize = otel_span_id_size_() * 2;
+  char *buf = malloc(idsize);
+  if (!buf) {
+    Rf_error("Out of memory when querying OpenTelemetry span id");
+  }
+  otel_span_context_get_span_id_(span_context_, buf);
+  SEXP res = Rf_mkCharLen(buf, idsize);
+  free(buf);
+  return Rf_ScalarString(res);
+}
+
+SEXP otel_span_context_is_remote(SEXP span_context) {
+  if (TYPEOF(span_context) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span context pointer.");
+  }
+  void *span_context_ = R_ExternalPtrAddr(span_context);
+  int remote = otel_span_context_is_remote_(span_context_);
+  return Rf_ScalarLogical(remote);
+}
+
+SEXP otel_span_context_is_sampled(SEXP span_context) {
+  if (TYPEOF(span_context) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span context pointer.");
+  }
+  void *span_context_ = R_ExternalPtrAddr(span_context);
+  int sampled = otel_span_context_is_sampled_(span_context_);
+  return Rf_ScalarLogical(sampled);
 }
