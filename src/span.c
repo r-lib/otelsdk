@@ -323,3 +323,26 @@ SEXP otel_span_context_is_sampled(SEXP span_context) {
   int sampled = otel_span_context_is_sampled_(span_context_);
   return Rf_ScalarLogical(sampled);
 }
+
+SEXP otel_span_context_to_headers(SEXP span_context) {
+  if (TYPEOF(span_context) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span context pointer.");
+  }
+  void *span_context_ = R_ExternalPtrAddr(span_context);
+  struct otel_string traceparent = { NULL, 0 };
+  struct otel_string tracestate = { NULL, 0 };
+
+  otel_span_context_to_headers_(span_context_, &traceparent, &tracestate);
+  if (!traceparent.s) {
+    Rf_error("Cannot allocate memory for OpenTelemetry trace headers");
+  }
+  // TODO: this is a leak if the R API fails, need to use cleancall
+  const char *nms[] = { "traceparent", "tracestate", "" };
+  SEXP res = PROTECT(Rf_mkNamed(STRSXP, nms));
+  SET_STRING_ELT(res, 0, Rf_mkCharLen(traceparent.s, traceparent.size));
+  SET_STRING_ELT(res, 1, Rf_mkCharLen(tracestate.s, tracestate.size));
+  free(traceparent.s);
+  free(tracestate.s);
+  UNPROTECT(1);
+  return res;
+}

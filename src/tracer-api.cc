@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cstdlib>
+#include <cstring>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/version/version.h"
@@ -7,6 +9,7 @@
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
 
 namespace trace  = opentelemetry::trace;
 namespace nostd  = opentelemetry::nostd;
@@ -304,6 +307,48 @@ int otel_span_context_is_remote_(void* span_context_) {
 int otel_span_context_is_sampled_(void* span_context_) {
   trace::SpanContext *span_context = (trace::SpanContext*) span_context_;
   return span_context->IsSampled();
+}
+
+void otel_span_context_to_headers_(
+    void *span_context_, struct otel_string *traceparent,
+    struct otel_string *tracestate) {
+  trace::SpanContext *span_context = (trace::SpanContext*) span_context_;
+
+  // traceparent
+  auto kTraceParentSize = trace::propagation::kTraceParentSize;
+  auto kTraceIdSize = trace::propagation::kTraceIdSize;
+  auto kSpanIdSize = trace::propagation::kSpanIdSize;
+  traceparent->s = (char*) malloc(kTraceParentSize);
+  if (!traceparent->s) {
+    return;
+  }
+  traceparent->size = kTraceParentSize;
+  traceparent->s[0] = '0';
+  traceparent->s[1] = '0';
+  traceparent->s[2] = '-';
+  span_context->trace_id().ToLowerBase16(
+      nostd::span<char, 2 * trace::TraceId::kSize>
+      {&traceparent->s[3], kTraceIdSize});
+  traceparent->s[kTraceIdSize + 3] = '-';
+  span_context->span_id().ToLowerBase16(
+      nostd::span<char, 2 * trace::SpanId::kSize>
+      {&traceparent->s[kTraceIdSize + 4], kSpanIdSize});
+  traceparent->s[kTraceIdSize + kSpanIdSize + 4] = '-';
+  span_context->trace_flags().ToLowerBase16(
+      nostd::span<char, 2>{&traceparent->s[kTraceIdSize + kSpanIdSize + 5], 2});
+
+  // tracestate
+  auto &trace_state = span_context->trace_state();
+  std::string hdr = trace_state->ToHeader();
+  tracestate->s = (char*) malloc(hdr.size());
+  if (!tracestate->s) {
+    free(traceparent->s);
+    traceparent->s = NULL;
+    traceparent->size = 0;
+    return;
+  }
+  tracestate->size = hdr.size();
+  memcpy(tracestate->s, hdr.c_str(), tracestate->size);
 }
 
 } // extern "C"

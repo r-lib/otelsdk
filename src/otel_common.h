@@ -174,6 +174,9 @@ int otel_span_id_size_(void);
 void otel_span_context_get_span_id_(void* span_context, char *buf);
 int otel_span_context_is_remote_(void* span_context);
 int otel_span_context_is_sampled_(void* span_context);
+void otel_span_context_to_headers_(
+  void *span_context, struct otel_string *traceparent,
+  struct otel_string *tracestate);
 
 void *otel_start_session_(void);
 void otel_activate_session_(void *id_);
