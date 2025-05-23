@@ -23,8 +23,6 @@ SEXP otel_start_span(
   SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
   SEXP parent
 );
-// TODO: maybe we don't need to get the context explicitly
-// SEXP otel_span_get_context(SEXP span);
 SEXP otel_span_get_context(SEXP span);
 SEXP otel_span_is_valid(SEXP span);
 SEXP otel_span_is_recording(SEXP span);
@@ -119,8 +117,6 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_get_tracer, 5),
   CALLDEF(otel_get_current_span_context, 1),
   CALLDEF(otel_start_span, 5),
-  // TODO: maybe we don't need to get the context explicitly
-  // CALLDEF(otel_span_get_context, 1),
   CALLDEF(otel_span_get_context, 1),
   CALLDEF(otel_span_is_valid, 1),
   CALLDEF(otel_span_is_recording, 1),

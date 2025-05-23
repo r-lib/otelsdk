@@ -22,7 +22,7 @@ span_new <- function(
     },
 
     is_valid = function() {
-      .Call(otel_is_valid_span, self$xptr)
+      .Call(otel_span_is_valid, self$xptr)
     },
 
     is_recording = function() {
