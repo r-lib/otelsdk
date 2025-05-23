@@ -47,7 +47,11 @@ tracer_new <- function(
     flush = function() {
       self$provider$flush()
     },
-    name = NULL
+    extract_http_context = function(headers) {
+      headers <- as_http_context_headers(headers)
+      xptr <- .Call(otel_extract_http_context, headers)
+      span_context_new(xptr)
+    }
   )
   name <- name %||% get_env("OTEL_SERVICE_NAME") %||% "R"
   self$provider <- provider

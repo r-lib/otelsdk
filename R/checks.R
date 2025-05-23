@@ -470,3 +470,36 @@ as_count <- function(x, positive = FALSE, call = NULL) {
     )))
   }
 }
+
+as_http_context_headers <- function(headers, call = NULL) {
+  if (is.list(headers) && is_named(headers)) {
+    traceparent <- headers[["traceparent"]]
+    tracestate <- headers[["tracestate"]]
+    if (
+      (is.null(traceparent) || is_string(traceparent)) &&
+        (is.null(tracestate) || is_string(tracestate))
+    ) {
+      return(list(traceparent = traceparent, tracestate = tracestate))
+    }
+  }
+
+  call <- call %||% match.call()
+  if (!is.list(headers) || !is_named((headers))) {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a named list, but it ",
+      "is a {typename(x)}."
+    )))
+  } else if (!is.null(traceparent) && !is_string(traceparent)) {
+    stop(glue(c(
+      "Invalid argument: the 'traceparent' entry of {format(call[[2]])} ",
+      "must be a string (character scalar), but it is a ",
+      "{typename(traceparent)}."
+    )))
+  } else {
+    stop(glue(c(
+      "Invalid argument: the 'tracestate' entry of {format(call[[2]])} ",
+      "must be a string (character scalar), but it is a ",
+      "{typename(tracestate)}."
+    )))
+  }
+}

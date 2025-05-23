@@ -45,6 +45,7 @@ SEXP otel_span_context_get_span_id(SEXP span_context);
 SEXP otel_span_context_is_remote(SEXP span_context);
 SEXP otel_span_context_is_sampled(SEXP span_context);
 SEXP otel_span_context_to_headers(SEXP span_context);
+SEXP otel_extract_http_context(SEXP headers);
 
 SEXP otel_start_session(void);
 SEXP otel_activate_session(SEXP sess);
@@ -137,6 +138,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_context_is_remote, 1),
   CALLDEF(otel_span_context_is_sampled, 1),
   CALLDEF(otel_span_context_to_headers, 1),
+  CALLDEF(otel_extract_http_context, 1),
 
   CALLDEF(otel_start_session, 0),
   CALLDEF(otel_activate_session, 1),

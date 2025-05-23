@@ -346,3 +346,17 @@ SEXP otel_span_context_to_headers(SEXP span_context) {
   UNPROTECT(1);
   return res;
 }
+
+SEXP otel_extract_http_context(SEXP headers) {
+  const char *traceparent =
+    Rf_isNull(VECTOR_ELT(headers, 0)) ? NULL :
+    CHAR(STRING_ELT(VECTOR_ELT(headers, 0), 0));
+  const char *tracestate =
+    Rf_isNull(VECTOR_ELT(headers, 1)) ? NULL :
+    CHAR(STRING_ELT(VECTOR_ELT(headers, 1), 0));
+  void *span_context_ = otel_extract_http_context_(traceparent, tracestate);
+  SEXP xptr = PROTECT(R_MakeExternalPtr(span_context_, R_NilValue, R_NilValue));
+  R_RegisterCFinalizerEx(xptr, otel_span_context_finally, (Rboolean) 1);
+  UNPROTECT(1);
+  return xptr;
+}

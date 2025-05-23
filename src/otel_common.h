@@ -177,7 +177,8 @@ int otel_span_context_is_sampled_(void* span_context);
 void otel_span_context_to_headers_(
   void *span_context, struct otel_string *traceparent,
   struct otel_string *tracestate);
-
+void *otel_extract_http_context_(
+  const char *traceparent, const char *tracestate);
 void *otel_start_session_(void);
 void otel_activate_session_(void *id_);
 void otel_deactivate_session_(void *id_);

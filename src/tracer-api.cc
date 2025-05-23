@@ -10,10 +10,12 @@
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/propagation/detail/string.h"
 
 namespace trace  = opentelemetry::trace;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
+namespace detail = opentelemetry::trace::propagation::detail;
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
@@ -307,6 +309,7 @@ int otel_span_context_is_sampled_(void* span_context_) {
   return span_context->IsSampled();
 }
 
+// TODO: use HttpTraceContext class instead of doing this manually
 void otel_span_context_to_headers_(
     void *span_context_, struct otel_string *traceparent,
     struct otel_string *tracestate) {
@@ -347,6 +350,86 @@ void otel_span_context_to_headers_(
   }
   tracestate->size = hdr.size();
   memcpy(tracestate->s, hdr.c_str(), tracestate->size);
+}
+
+// TODO: use HttpTraceContext class instead of doing this manually
+static trace::SpanContext otel_extract_http_context__(
+    nostd::string_view trace_parent, nostd::string_view trace_state) {
+  std::array<nostd::string_view, 4> fields{};
+  if (detail::SplitString(trace_parent, '-', fields.data(), 4) != 4) {
+    return trace::SpanContext::GetInvalid();
+  }
+
+  nostd::string_view version_hex     = fields[0];
+  nostd::string_view trace_id_hex    = fields[1];
+  nostd::string_view span_id_hex     = fields[2];
+  nostd::string_view trace_flags_hex = fields[3];
+
+  auto kVersionSize = trace::propagation::kVersionSize;
+  auto kTraceIdSize = trace::propagation::kTraceIdSize;
+  auto kSpanIdSize = trace::propagation::kSpanIdSize;
+  auto kTraceFlagsSize = trace::propagation::kTraceFlagsSize;
+  auto kTraceParentSize = trace::propagation::kTraceParentSize;
+
+  constexpr uint8_t kInvalidVersion        = 0xFF;
+  constexpr uint8_t kDefaultAssumedVersion = 0x00;
+
+  if (version_hex.size() != kVersionSize ||
+      trace_id_hex.size() != kTraceIdSize ||
+      span_id_hex.size() != kSpanIdSize ||
+      trace_flags_hex.size() != kTraceFlagsSize) {
+    return trace::SpanContext::GetInvalid();
+  }
+
+  if (!detail::IsValidHex(version_hex) ||
+      !detail::IsValidHex(trace_id_hex) ||
+      !detail::IsValidHex(span_id_hex) ||
+      !detail::IsValidHex(trace_flags_hex)) {
+    return trace::SpanContext::GetInvalid();
+  }
+
+  uint8_t version_binary;
+  detail::HexToBinary(version_hex, &version_binary, sizeof(version_binary));
+  if (version_binary == kInvalidVersion) {
+    // invalid version encountered
+    return trace::SpanContext::GetInvalid();
+  }
+
+  // See https://www.w3.org/TR/trace-context/#versioning-of-traceparent
+  if (version_binary > kDefaultAssumedVersion) {
+    // higher than default version detected
+    if (trace_parent.size() < kTraceParentSize) {
+      return trace::SpanContext::GetInvalid();
+    }
+  } else {
+    // version is either lower or same as the default version
+    if (trace_parent.size() != kTraceParentSize) {
+      return trace::SpanContext::GetInvalid();
+    }
+  }
+
+  trace::TraceId trace_id =
+    trace::propagation::HttpTraceContext::TraceIdFromHex(trace_id_hex);
+  trace::SpanId span_id   =
+    trace::propagation::HttpTraceContext::SpanIdFromHex(span_id_hex);
+
+  if (!trace_id.IsValid() || !span_id.IsValid()) {
+    return trace::SpanContext::GetInvalid();
+  }
+
+  return trace::SpanContext(
+    trace_id, span_id,
+    trace::propagation::HttpTraceContext::TraceFlagsFromHex(trace_flags_hex),
+    true, trace::TraceState::FromHeader(trace_state));
+}
+
+void *otel_extract_http_context_(
+    const char *traceparent_, const char *tracestate_) {
+  nostd::string_view trace_parent { traceparent_ ? traceparent_ : "" };
+  nostd::string_view trace_state { tracestate_ ? tracestate_ : "" };
+  trace::SpanContext *span_context = new trace::SpanContext {
+   otel_extract_http_context__(trace_parent, trace_state) };
+  return (void*) span_context;
 }
 
 } // extern "C"
