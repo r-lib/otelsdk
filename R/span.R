@@ -175,7 +175,7 @@ span_context_new <- function(xptr) {
     is_sampled = function() {
       .Call(otel_span_context_is_sampled, self$xptr)
     },
-    to_headers = function() {
+    to_http_headers = function() {
       hdrs <- .Call(otel_span_context_to_headers, self$xptr)
       hdrs[hdrs != ""]
     }
