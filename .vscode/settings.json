@@ -6,6 +6,7 @@
     "files.associations": {
         "new": "cpp",
         "otel_attributes.h": "c",
-        "otel_common.h": "c"
+        "otel_common.h": "c",
+        "string": "cpp"
     }
 }

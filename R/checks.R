@@ -76,6 +76,21 @@ as_span_context <- function(x, null = TRUE, na = TRUE, call = NULL) {
   )))
 }
 
+as_span_parent <- function(x, null = TRUE, na = TRUE, call = NULL) {
+  if (null && is.null(x)) return(x)
+  if (na && is_na(x)) return(x)
+  if (inherits(x, "otel_span")) {
+    return(x$get_context())
+  } else if (inherits(x, "otel_span_context")) {
+    return(x)
+  }
+
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} must be a span (`otel_span`) ",
+    "or a span context (`otel_span_context`) object but it is {typename(x)}."
+  )))
+}
+
 as_choice <- function(x, choices, null = TRUE, call = NULL) {
   if (null && is.null(x)) {
     return(match("default", names(choices)) - 1L)
@@ -239,8 +254,8 @@ as_span_options <- function(options, call = NULL) {
       as_timestamp(options[["start_system_time"]])
     options[["start_steady_time"]] <-
       as_timestamp(options[["start_steady_time"]])
-    options[["parent"]] <- as_span(options[["parent"]], na = TRUE)
-    options[["parent"]] <- options[["parent"]]$xptr[[1]]
+    options[["parent"]] <- as_span_parent(options[["parent"]], na = TRUE)
+    options[["parent"]] <- options[["parent"]]$xptr
     options[["kind"]] <- as_choice(options[["kind"]], span_kinds)
     return(options)
   }

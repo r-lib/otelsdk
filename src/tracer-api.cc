@@ -88,9 +88,7 @@ struct otel_scoped_span otel_start_span_(
 
   trace::StartSpanOptions opts;
   if (parent_) {
-    struct otel_span *sparent = (struct otel_span *) parent_;
-    trace::Span &parent = *(sparent->ptr);
-    opts.parent = parent.GetContext();
+    opts.parent = *((trace_api::SpanContext*) parent_);
   }
   if (start_system_time_) {
     std::chrono::duration<double, std::ratio<1, 1>> ts(*start_system_time_);

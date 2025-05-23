@@ -219,7 +219,7 @@ test_that("as_span_options", {
     as_span_options(list(start_steady_time = t)),
     list(start_steady_time = as.double(t), kind = 0L)
   )
-  p <- structure(list(xptr = "ptr"), class = "otel_span")
+  p <- structure(list(xptr = "ptr"), class = "otel_span_context")
   expect_equal(
     as_span_options(list(parent = p)),
     list(parent = "ptr", kind = 0L)
