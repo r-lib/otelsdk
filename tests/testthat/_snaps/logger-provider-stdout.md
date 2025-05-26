@@ -52,7 +52,7 @@
       [1] "INFO"
       
       $body
-      [1] "This is a {type} log message."
+      [1] "This is a structured log message."
       
       $attributes
       $attributes$type
@@ -75,7 +75,7 @@
       [1] "INFO"
       
       $body
-      [1] "This is a {type} log message with attributes"
+      [1] "This is a structured log message with attributes"
       
       $attributes
       $attributes$foo

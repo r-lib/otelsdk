@@ -61,7 +61,7 @@ create_collector_transformer <- function(record) {
     val <- eval(parse(text = text, keep.source = FALSE), envir)
     val <- as_otel_attribute_value(val)
     record[[text]] <- val
-    text
+    eval(parse(text = text, keep.source = FALSE), envir)
   }
 }
 
@@ -74,6 +74,6 @@ extract_otel_attributes <- function(
 ) {
   record <- as.environment(.attributes %||% new.env(parent = emptyenv()))
   .transformer <- .transformer %||% create_collector_transformer(record)
-  glue(text, .envir = .envir, .transformer = .transformer, ...)
-  list(text = text, attributes = as.list(record))
+  prsd <- glue(text, .envir = .envir, .transformer = .transformer, ...)
+  list(text = prsd, attributes = as.list(record))
 }

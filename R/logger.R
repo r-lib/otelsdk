@@ -85,16 +85,13 @@ logger_new <- function(
       }
 
       # `attributes` overwrites attributes in the message
-      embedded_attributes <- extract_otel_attributes(
-        msg,
-        .envir = .envir
-      )$attributes
-      attributes <- utils::modifyList(embedded_attributes, as.list(attributes))
+      prsd <- extract_otel_attributes(msg, .envir = .envir)
+      attributes <- utils::modifyList(prsd$attributes, as.list(attributes))
 
       .Call(
         otel_log,
         self$xptr,
-        msg,
+        prsd$text,
         severity,
         event_id,
         span_id,
