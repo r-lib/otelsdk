@@ -19,23 +19,23 @@ logger_new <- function(
     #   .Call(otel_emit_log_record, self$xptr, log_record)
     #   invisible(self)
     # },
-    trace = function(msg = "", severity = "trace", ...) {
-      self$log(msg = msg, severity = severity, ...)
+    trace = function(msg = "", ..., .envir = parent.frame()) {
+      self$log(msg = msg, severity = "trace", ..., .envir = .envir)
     },
-    debug = function(msg = "", severity = "debug", ...) {
-      self$log(msg = msg, severity = severity, ...)
+    debug = function(msg = "", ..., .envir = parent.frame()) {
+      self$log(msg = msg, severity = "debug", ..., .envir = .envir)
     },
-    info = function(msg = "", severity = "info", ...) {
-      self$log(msg = msg, severity = severity, ...)
+    info = function(msg = "", ..., .envir = parent.frame()) {
+      self$log(msg = msg, severity = "info", ..., .envir = .envir)
     },
-    warn = function(msg = "", severity = "warn", ...) {
-      self$log(msg = msg, severity = severity, ...)
+    warn = function(msg = "", ..., .envir = parent.frame()) {
+      self$log(msg = msg, severity = "warn", ..., .envir = .envir)
     },
-    error = function(msg = "", severity = "error", ...) {
-      self$log(msg = msg, severity = severity, ...)
+    error = function(msg = "", ..., .envir = parent.frame()) {
+      self$log(msg = msg, severity = "error", ..., .envir = .envir)
     },
-    fatal = function(msg = "", severity = "fatal", ...) {
-      self$log(msg = msg, severity = severity, ...)
+    fatal = function(msg = "", ..., .envir = parent.frame()) {
+      self$log(msg = msg, severity = "fatal", ..., .envir = .envir)
     },
     is_enabled = function(severity = "info", event_id = NULL) {
       severity <- as_log_severity(severity)
