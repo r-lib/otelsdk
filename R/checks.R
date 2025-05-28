@@ -350,7 +350,7 @@ as_output_file <- function(x, null = TRUE, call = NULL) {
 }
 
 as_log_severity <- function(x, spec = FALSE, call = NULL) {
-  choices <- if (spec) log_severity_levels_spec else log_severity_levels
+  choices <- if (spec) log_severity_levels_spec() else otel::log_severity_levels
   if (is_string(x) && x %in% names(choices)) {
     return(choices[x])
   } else if (is_count(x) && x %in% choices) {
@@ -367,9 +367,9 @@ as_log_severity <- function(x, spec = FALSE, call = NULL) {
   } else {
     stop(glue(c(
       "Invalid argument: {format(call[[2]])} must be an integer log level, ",
-      "between {min(choices)} and {max(log_severity_levels)}",
+      "between {min(choices)} and {max(otel::log_severity_levels)}",
       if (spec) {
-        paste0(", or ", max(log_severity_levels_spec))
+        paste0(", or ", max(log_severity_levels_spec()))
       },
       ", but it is {if (is_count(x)) x else typename(x)}."
     )))

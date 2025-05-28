@@ -44,7 +44,7 @@ logger_new <- function(
     },
     get_minimum_severity = function() {
       ms <- .Call(otel_get_minimum_log_severity, self$xptr)
-      log_severity_levels[match(ms, log_severity_levels)]
+      otel::log_severity_levels[match(ms, otel::log_severity_levels)]
     },
     set_minimum_severity = function(minimum_severity) {
       minimum_severity <- as_log_severity(minimum_severity)
@@ -131,37 +131,11 @@ logger_new <- function(
 #   # TODO
 # }
 
-log_severity_levels <- c(
-  "trace" = 1L,
-  "trace2" = 2L,
-  "trace3" = 3L,
-  "trace4" = 4L,
-  "debug" = 5L,
-  "debug2" = 6L,
-  "debug3" = 7L,
-  "debug4" = 8L,
-  "info" = 9L,
-  "info2" = 10L,
-  "info3" = 11L,
-  "info4" = 12L,
-  "warn" = 13L,
-  "warn2" = 14L,
-  "warn3" = 15L,
-  "warn4" = 16L,
-  "error" = 17L,
-  "error2" = 18L,
-  "error3" = 19L,
-  "error4" = 20L,
-  "fatal" = 21L,
-  "fatal2" = 22L,
-  "fatal3" = 23L,
-  "fatal4" = 24L,
-  NULL
-)
-
-log_severity_levels_spec <- c(
-  "invalid" = 0L,
-  log_severity_levels,
-  "maximumseverity" = 255L,
-  NULL
-)
+log_severity_levels_spec <- function() {
+  c(
+    "invalid" = 0L,
+    otel::log_severity_levels,
+    "maximumseverity" = 255L,
+    NULL
+  )
+}

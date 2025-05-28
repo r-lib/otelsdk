@@ -2,7 +2,7 @@ test_that("logger_provider_stdstream", {
   logger_provider <- logger_provider_stdstream_new()
   logger <- logger_provider$get_logger("mylogger")
   expect_true(logger$is_enabled())
-  expect_equal(logger$get_minimum_severity(), log_severity_levels["info"])
+  expect_equal(logger$get_minimum_severity(), otel::log_severity_levels["info"])
 })
 
 test_that("log to file", {
@@ -12,7 +12,7 @@ test_that("log to file", {
   lgr <- lp$get_logger("mylogger")
 
   expect_true(lgr$is_enabled())
-  expect_equal(lgr$get_minimum_severity(), log_severity_levels["info"])
+  expect_equal(lgr$get_minimum_severity(), otel::log_severity_levels["info"])
   lgr$log("This is a simple log message")
   lgr$log("This is a warning", severity = "warn")
 
