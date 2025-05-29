@@ -7,6 +7,7 @@
 #include "otel_common.h"
 
 void r2c_attributes(SEXP r, struct otel_attributes *c);
+SEXP c2r_otel_instrumentation_scope(struct otel_instrumentation_scope_t *is);
 
 SEXP otel_fail(void);
 SEXP otel_error_object(void);
@@ -14,6 +15,8 @@ SEXP otel_init_constants(SEXP env);
 
 SEXP otel_create_tracer_provider_stdstream(SEXP stream);
 SEXP otel_create_tracer_provider_http(void);
+SEXP otel_create_tracer_provider_memory(SEXP buffer_size);
+SEXP otel_tracer_provider_memory_get_spans(SEXP provider);
 SEXP otel_tracer_provider_flush(SEXP provider);
 SEXP otel_get_tracer(
   SEXP provider, SEXP name, SEXP version, SEXP schema_url,
@@ -103,6 +106,7 @@ SEXP otel_gauge_record(
   SEXP gauge, SEXP value, SEXP attributes, SEXP unit);
 
 SEXP rf_get_list_element(SEXP list, const char *str);
+SEXP rf_otel_string_to_strsxp(struct otel_string *s);
 SEXP glue_(SEXP x, SEXP f, SEXP open_arg, SEXP close_arg, SEXP cli_arg);
 SEXP trim_(SEXP x);
 
@@ -116,6 +120,8 @@ static const R_CallMethodDef callMethods[]  = {
 
   CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
+  CALLDEF(otel_create_tracer_provider_memory, 1),
+  CALLDEF(otel_tracer_provider_memory_get_spans, 1),
   CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 5),
   CALLDEF(otel_get_current_span_context, 1),
@@ -193,8 +199,8 @@ void R_init_otelsdk(DllInfo *dll) {
   otel_init_context_storage();
 }
 
-static SEXP otel_span_kinds = NULL;
-static SEXP otel_span_status_codes = NULL;
+SEXP otel_span_kinds = NULL;
+SEXP otel_span_status_codes = NULL;
 
 SEXP otel_init_constants(SEXP env) {
   R_PreserveObject(env);
@@ -265,6 +271,14 @@ SEXP otel_create_tracer_provider_stdstream(SEXP stream) {
 
 SEXP otel_create_tracer_provider_http(void) {
   void *tracer_provider_ = otel_create_tracer_provider_http_();
+  SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_create_tracer_provider_memory(SEXP buffer_size) {
+  int cbuffer_size = INTEGER(buffer_size)[0];
+  void *tracer_provider_ = otel_create_tracer_provider_memory_(cbuffer_size);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
   return xptr;

@@ -7,6 +7,7 @@ OTEL_CPP_LIBS =  \
 	install/lib/libopentelemetry_exporter_otlp_http_log.a \
 	install/lib/libopentelemetry_exporter_otlp_http_metric.a \
 	install/lib/libopentelemetry_exporter_ostream_metrics.a \
+	install/lib/libopentelemetry_exporter_in_memory.a \
 	install/lib/libopentelemetry_http_client_curl.a \
 	install/lib/libopentelemetry_otlp_recordable.a \
 	install/lib/libopentelemetry_trace.a \
@@ -18,7 +19,7 @@ OTEL_CPP_LIBS =  \
 
 OBJECTS = meter.o meter-sdk.o \
 	init.o span.o glue.o utils.o context.o context-storage.o \
-	tracer-sdk.o tracer-api.o logger.o logger-sdk.o
+	tracer.o tracer-sdk.o tracer-api.o logger.o logger-sdk.o
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2
 PKG_LIBS = \
@@ -29,6 +30,7 @@ PKG_LIBS = \
 	-lopentelemetry_exporter_otlp_http_log \
 	-lopentelemetry_exporter_otlp_http_metric \
 	-lopentelemetry_exporter_ostream_metrics \
+	-lopentelemetry_exporter_in_memory \
 	-lopentelemetry_http_client_curl \
 	-lopentelemetry_otlp_recordable \
 	-lopentelemetry_trace \
