@@ -115,6 +115,42 @@ struct otel_tracer_provider_http_options_t {
   double retry_policy_backoff_multiplier;
 };
 
+struct otel_instrumentation_scope_t {
+  struct otel_string name;
+  struct otel_string version;
+  struct otel_string schema_url;
+  // TODO: attributes
+};
+
+struct otel_span_data1_t {
+  struct otel_string trace_id;
+  struct otel_string span_id;
+  // SpanContext does not seem useful?
+  struct otel_string parent;
+  struct otel_string name;
+  char flags[2];
+  int kind;
+  int status;
+  struct otel_string description;
+  // Other stuff from Resource?
+  struct otel_string schema_url;
+  struct otel_instrumentation_scope_t instrumentation_scope;
+  double start_time;
+  double duration;
+  // TODO: attributes
+  // TODO: events
+  // TODO: links
+};
+
+struct otel_span_data_t {
+  struct otel_span_data1_t *a;
+  size_t count;
+};
+
+void otel_string_free(struct otel_string *s);
+void otel_instrumentation_scope_free(
+  struct otel_instrumentation_scope_t *is);
+void otel_span_data_free(struct otel_span_data_t *cdata);
 extern const char *otel_http_request_content_type_str[];
 
 void otel_tracer_provider_finally_(void *tracer_provider);
@@ -132,6 +168,9 @@ void otel_gauge_finally_(void *gauge);
 
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
+void *otel_create_tracer_provider_memory_(int buffer_size);
+struct otel_span_data_t *otel_tracer_provider_memory_get_spans_(
+  void *tracer_provider);
 void otel_tracer_provider_flush_(void *tracer_provider);
 void *otel_get_tracer_(
     void *tracer_provider_, const char *name, const char *version,

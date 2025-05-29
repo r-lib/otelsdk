@@ -19,6 +19,13 @@ SEXP rf_get_list_element(SEXP list, const char *str) {
   return elmt;
 }
 
+SEXP rf_otel_string_to_strsxp(struct otel_string *s) {
+  SEXP cxp = PROTECT(Rf_mkCharLen(s->s, s->size));
+  SEXP res = Rf_ScalarString(cxp);
+  UNPROTECT(1);
+  return res;
+}
+
 void r2c_attribute(
   const char *name, SEXP value, struct otel_attribute *attr) {
 
@@ -91,4 +98,58 @@ void r2c_attributes(SEXP r, struct otel_attributes *c) {
   for (R_len_t i = 0; i < c->count; i++) {
     r2c_attribute(CHAR(STRING_ELT(nms, i)), VECTOR_ELT(r, i), c->a + i);
   }
+}
+
+void otel_string_free(struct otel_string *s) {
+  if (s->s) {
+    free(s->s);
+    s->s = NULL;
+  }
+  s->size = 0;
+}
+
+void otel_instrumentation_scope_free(
+  struct otel_instrumentation_scope_t *is) {
+    if (!is) return;
+    otel_string_free(&is->name);
+    otel_string_free(&is->version);
+    otel_string_free(&is->schema_url);
+  }
+
+void otel_span_data_free(struct otel_span_data_t *cdata) {
+  if (!cdata) {
+    if (!cdata->a) {
+      for (int i = 0; i < cdata->count; i++) {
+        struct otel_span_data1_t *xi = &cdata->a[i];
+        otel_string_free(&xi->trace_id);
+        otel_string_free(&xi->span_id);
+        otel_string_free(&xi->parent);
+        otel_string_free(&xi->name);
+        otel_string_free(&xi->description);
+        otel_string_free(&xi->schema_url);
+        otel_instrumentation_scope_free(&xi->instrumentation_scope);
+        if (xi->description.s) {
+          free(xi->description.s);
+          xi->description.s = NULL;
+          xi->description.size = 0;
+        }
+      }
+      free(cdata->a);
+      cdata->a = NULL;
+      cdata->count = 0;
+    }
+    free(cdata);
+  }
+}
+
+SEXP c2r_otel_instrumentation_scope(struct otel_instrumentation_scope_t *is) {
+  const char *nms[] = { "name", "version", "schema_url", "" };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, rf_otel_string_to_strsxp(&is->name));
+  SET_VECTOR_ELT(res, 1, rf_otel_string_to_strsxp(&is->version));
+  SET_VECTOR_ELT(res, 2, rf_otel_string_to_strsxp(&is->schema_url));
+  Rf_setAttrib(
+    res, R_ClassSymbol, Rf_mkString("otel_instrumentation_scope_data"));
+  UNPROTECT(1);
+  return res;
 }

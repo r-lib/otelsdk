@@ -9,6 +9,7 @@
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter_factory.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
@@ -22,7 +23,9 @@ namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
 namespace trace_exporter = opentelemetry::exporter::trace;
 namespace otlp           = opentelemetry::exporter::otlp;
+namespace memory         = opentelemetry::exporter::memory;
 namespace nostd          = opentelemetry::nostd;
+namespace resource       = opentelemetry::sdk::resource;
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
@@ -52,6 +55,65 @@ void otel_string_to_char(const nostd::string_view &inp, struct otel_string &outp
   } else {
     outp.size = len + 1;
   }
+}
+
+int otel_string_from_trace_id(
+    const trace_api::TraceId &trace_id, struct otel_string *s) {
+  const auto sz = trace_api::TraceId::kSize;
+  s->s = (char*) malloc(2 * sz);
+  if (!s->s) {
+    return 1;
+  }
+  s->size = 2 * sz;
+  trace_id.ToLowerBase16(nostd::span<char, 2 * sz>(s->s, 2 * sz));
+  return 0;
+}
+
+int otel_string_from_span_id(
+    const trace_api::SpanId &span_id, struct otel_string *s) {
+  const auto sz = trace_api::SpanId::kSize;
+  s->s = (char*) malloc(2 * sz);
+  if (!s->s) {
+    return 1;
+  }
+  s->size = 2 * sz;
+  span_id.ToLowerBase16(nostd::span<char, 2 * sz>(s->s, 2 * sz));
+  return 0;
+}
+
+int otel_string_from_string (const std::string &str, struct otel_string *s) {
+  const auto sz = str.size();
+  s->s = (char*) malloc(sz);
+  if (!s->s) {
+    return 1;
+  }
+  s->size = sz;
+  memcpy(s->s, str.c_str(), sz);
+  return 0;
+}
+
+int otel_string_from_string_view(
+    const nostd::string_view &sv, struct otel_string *s) {
+  const auto sz = sv.size();
+  s->s = (char*) malloc(sz);
+  if (!s->s) {
+    return 1;
+  }
+  s->size = sz;
+  memcpy(s->s, sv.data(), sz);
+  return 0;
+}
+
+int otel_instrumentation_scope_from(
+    trace_sdk::InstrumentationScope &is,
+    struct otel_instrumentation_scope_t *cis) {
+  const std::string &nm = is.GetName();
+  const std::string &vs = is.GetVersion();
+  const std::string &su = is.GetSchemaURL();
+  if (otel_string_from_string(nm, &cis->name)) return 1;
+  if (otel_string_from_string(vs, &cis->version)) return 1;
+  if (otel_string_from_string(su, &cis->schema_url)) return 1;
+  return 0;
 }
 
 template<class Compare>
@@ -145,6 +207,66 @@ void *otel_create_tracer_provider_http_(void) {
   tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
   return (void*) tps;
+}
+
+void *otel_create_tracer_provider_memory_(int buffer_size) {
+  struct otel_tracer_provider *tps = new otel_tracer_provider;
+  tps->spandata.reset(new memory::InMemorySpanData(buffer_size));
+  auto exporter  = memory::InMemorySpanExporterFactory::Create(tps->spandata);
+  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+
+  tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+
+  return (void*) tps;
+}
+
+#define BAIL_IF_NOT(x) do { \
+  if (!(x)) { otel_span_data_free(cdata); return nullptr; } } while (0)
+
+#define BAIL_IF(x) do { \
+  if (x) { otel_span_data_free(cdata); return nullptr; } } while (0)
+
+struct otel_span_data_t *otel_tracer_provider_memory_get_spans_(void *tracer_provider_) {
+  struct otel_tracer_provider *tps =
+    (struct otel_tracer_provider *) tracer_provider_;
+  memory::InMemorySpanData &spandata = *tps->spandata;
+  std::vector<std::unique_ptr<trace_sdk::SpanData>> data = spandata.Get();
+  struct otel_span_data_t *cdata = (struct otel_span_data_t*)
+    malloc(sizeof(struct otel_span_data_t));
+  BAIL_IF_NOT(cdata);
+  cdata->a = (struct otel_span_data1_t*)
+    malloc(sizeof(struct otel_span_data1_t) * data.size());
+  BAIL_IF_NOT(cdata->a);
+  cdata->count = data.size();
+  for (auto i = 0; i < data.size(); i++) {
+    trace_api::TraceId trace_id = data[i]->GetTraceId();
+    BAIL_IF(otel_string_from_trace_id(trace_id, &cdata->a[i].trace_id));
+    trace_api::SpanId span_id = data[i]->GetSpanId();
+    BAIL_IF(otel_string_from_span_id(span_id, &cdata->a[i].span_id));
+    nostd::string_view name = data[i]->GetName();
+    BAIL_IF(otel_string_from_string_view(name, &cdata->a[i].name));
+    trace_api::SpanId parent_id = data[i]->GetParentSpanId();
+    BAIL_IF(otel_string_from_span_id(parent_id, &cdata->a[i].parent));
+    trace_api::SpanKind kind = data[i]->GetSpanKind();
+    cdata->a[i].kind = static_cast<int>(kind);
+    trace_api::StatusCode status = data[i]->GetStatus();
+    cdata->a[i].status = static_cast<int>(status);
+    nostd::string_view dsc = data[i]->GetDescription();
+    BAIL_IF(otel_string_from_string_view(dsc, &cdata->a[i].description));
+    std::chrono::nanoseconds st = data[i]->GetStartTime().time_since_epoch();
+    cdata->a[i].start_time = st.count() / 1000.0 / 1000.0 / 1000.0;
+    std::chrono::nanoseconds dur = data[i]->GetDuration();
+    cdata->a[i].duration = dur.count() / 1000.0 / 1000.0 / 1000.0;
+    trace_api::TraceFlags tf = data[i]->GetFlags();
+    tf.ToLowerBase16(nostd::span<char, 2>(cdata->a[i].flags, 2));
+    resource::Resource res = data[i]->GetResource();
+    const std::string &schema_url = res.GetSchemaURL();
+    BAIL_IF(otel_string_from_string(schema_url, &cdata->a[i].schema_url));
+    trace_sdk::InstrumentationScope is = data[i]->GetInstrumentationScope();
+    BAIL_IF(otel_instrumentation_scope_from(
+      is, &cdata->a[i].instrumentation_scope));
+  }
+  return cdata;
 }
 
 void otel_tracer_provider_flush_(void *tracer_provider_) {
