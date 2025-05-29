@@ -10,6 +10,7 @@ void r2c_attributes(SEXP r, struct otel_attributes *c);
 
 SEXP otel_fail(void);
 SEXP otel_error_object(void);
+SEXP otel_init_constants(SEXP env);
 
 SEXP otel_create_tracer_provider_stdstream(SEXP stream);
 SEXP otel_create_tracer_provider_http(void);
@@ -111,6 +112,7 @@ SEXP trim_(SEXP x);
 static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_fail, 0),
   CALLDEF(otel_error_object, 0),
+  CALLDEF(otel_init_constants, 1),
 
   CALLDEF(otel_create_tracer_provider_stdstream, 1),
   CALLDEF(otel_create_tracer_provider_http, 0),
@@ -189,6 +191,17 @@ void R_init_otelsdk(DllInfo *dll) {
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);
   otel_init_context_storage();
+}
+
+static SEXP otel_span_kinds = NULL;
+static SEXP otel_span_status_codes = NULL;
+
+SEXP otel_init_constants(SEXP env) {
+  R_PreserveObject(env);
+  otel_span_kinds = Rf_findVarInFrame(env, Rf_install("span_kinds"));
+  otel_span_status_codes =
+    Rf_findVarInFrame(env, Rf_install("span_status_codes"));
+  return R_NilValue;
 }
 
 void otel_tracer_provider_finally(SEXP x) {

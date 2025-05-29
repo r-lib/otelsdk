@@ -51,7 +51,7 @@ span_new <- function(
     # },
 
     set_status = function(status_code = NULL, description = NULL) {
-      status_code <- as_choice(status_code, span_status_codes)
+      status_code <- as_choice(status_code, the$span_status_codes)
       description <- as_string(description)
       .Call(otel_span_set_status, self$xptr, status_code, description)
       self$status_set <- TRUE
@@ -68,7 +68,7 @@ span_new <- function(
       options <- as_end_span_options(options)
       # if NULL, then we leave it as is, maybe it was explicitly set
       if (!is.null(status_code)) {
-        status_code <- as_choice(status_code, c(span_status_codes, "auto"))
+        status_code <- as_choice(status_code, c(the$span_status_codes, "auto"))
         # if 'auto' then we are in 'on.exit()', check if this is an error
         # hopefully returnValue() works for this
         if (status_code == 3L) {
@@ -142,16 +142,6 @@ span_new <- function(
 default_span_name <- "<NA>"
 
 random_token <- "DxMi8lklYBT6z835eeMF1AjL90ioUMIP"
-
-span_kinds <- c(
-  default = "internal",
-  "server",
-  "client",
-  "producer",
-  "consumer"
-)
-
-span_status_codes <- c(default = "unset", "ok", "error")
 
 span_context_new <- function(xptr) {
   self <- new_object(
