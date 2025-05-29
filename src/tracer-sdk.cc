@@ -104,6 +104,13 @@ int otel_string_from_string_view(
   return 0;
 }
 
+int otel_trace_flags_from(
+    const trace_api::TraceFlags &flags, struct otel_trace_flags_t *cflags) {
+  cflags->is_sampled = flags.IsSampled();
+  cflags->is_random = flags.IsRandom();
+  return 0;
+}
+
 int otel_instrumentation_scope_from(
     trace_sdk::InstrumentationScope &is,
     struct otel_instrumentation_scope_t *cis) {
@@ -258,7 +265,7 @@ struct otel_span_data_t *otel_tracer_provider_memory_get_spans_(void *tracer_pro
     std::chrono::nanoseconds dur = data[i]->GetDuration();
     cdata->a[i].duration = dur.count() / 1000.0 / 1000.0 / 1000.0;
     trace_api::TraceFlags tf = data[i]->GetFlags();
-    tf.ToLowerBase16(nostd::span<char, 2>(cdata->a[i].flags, 2));
+    BAIL_IF(otel_trace_flags_from(tf, &cdata->a[i].flags));
     resource::Resource res = data[i]->GetResource();
     const std::string &schema_url = res.GetSchemaURL();
     BAIL_IF(otel_string_from_string(schema_url, &cdata->a[i].schema_url));

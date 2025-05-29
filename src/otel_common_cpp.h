@@ -81,6 +81,9 @@ int otel_string_from_trace_id(
 int otel_string_from_span_id(
   const trace_api::SpanId &span_id, struct otel_string *s);
 
+int otel_trace_flags_from(
+  const trace_api::TraceFlags &flags, struct otel_trace_flags *cflags);
+
 int otel_instrumentation_scope_from(
   trace_sdk::InstrumentationScope &is,
   struct otel_instrumentation_scope_t *cis);

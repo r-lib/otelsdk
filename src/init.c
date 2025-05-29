@@ -199,8 +199,8 @@ void R_init_otelsdk(DllInfo *dll) {
   otel_init_context_storage();
 }
 
-static SEXP otel_span_kinds = NULL;
-static SEXP otel_span_status_codes = NULL;
+SEXP otel_span_kinds = NULL;
+SEXP otel_span_status_codes = NULL;
 
 SEXP otel_init_constants(SEXP env) {
   R_PreserveObject(env);

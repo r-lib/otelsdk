@@ -19,7 +19,7 @@ SEXP rf_get_list_element(SEXP list, const char *str) {
   return elmt;
 }
 
-SEXP rf_otel_string_to_strsxp(struct otel_string *s) {
+SEXP rf_otel_string_to_strsxp(const struct otel_string *s) {
   SEXP cxp = PROTECT(Rf_mkCharLen(s->s, s->size));
   SEXP res = Rf_ScalarString(cxp);
   UNPROTECT(1);
@@ -142,7 +142,16 @@ void otel_span_data_free(struct otel_span_data_t *cdata) {
   }
 }
 
-SEXP c2r_otel_instrumentation_scope(struct otel_instrumentation_scope_t *is) {
+SEXP c2r_otel_trace_flags(const struct otel_trace_flags_t *flags) {
+  const char *nms[] = { "sampled", "random", "" };
+  SEXP res = Rf_mkNamed(LGLSXP, nms);
+  LOGICAL(res)[0] = flags->is_sampled;
+  LOGICAL(res)[1] = flags->is_random;
+  return res;
+}
+
+SEXP c2r_otel_instrumentation_scope(
+    const struct otel_instrumentation_scope_t *is) {
   const char *nms[] = { "name", "version", "schema_url", "" };
   SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
   SET_VECTOR_ELT(res, 0, rf_otel_string_to_strsxp(&is->name));

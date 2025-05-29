@@ -115,6 +115,11 @@ struct otel_tracer_provider_http_options_t {
   double retry_policy_backoff_multiplier;
 };
 
+struct otel_trace_flags_t {
+  int is_sampled;
+  int is_random;
+};
+
 struct otel_instrumentation_scope_t {
   struct otel_string name;
   struct otel_string version;
@@ -128,7 +133,7 @@ struct otel_span_data1_t {
   // SpanContext does not seem useful?
   struct otel_string parent;
   struct otel_string name;
-  char flags[2];
+  struct otel_trace_flags_t flags;
   int kind;
   int status;
   struct otel_string description;
