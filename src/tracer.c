@@ -1,7 +1,7 @@
 #define R_USE_C99_IN_CXX 1
 #include <Rinternals.h>
 
-#include "otel_r_common.h"
+#include "otel_common_r.h"
 
 SEXP otel_tracer_provider_memory_get_spans(SEXP provider) {
   if (TYPEOF(provider) != EXTPTRSXP) {
