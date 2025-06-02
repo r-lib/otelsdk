@@ -345,6 +345,9 @@ void otel_event_free(struct otel_event *event) {
 void otel_events_free(struct otel_events *events) {
   if (!events) return;
   if (events->a) {
+    for (size_t i = 0; i < events->count; i++) {
+      otel_event_free(&events->a[i]);
+    }
     free(events->a);
     events->a = NULL;
   }

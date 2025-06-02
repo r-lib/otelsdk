@@ -122,16 +122,14 @@ test_that("update_name", {
 test_that("record_exception", {
   # output from cli / processx / rlang might change
   skip_on_cran()
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
-  trc <- trc_prv$get_tracer("mytracer")
-  spn1 <- trc$start_span()
-  spn1$record_exception(base_error())
-  spn1$end()
-  trc$flush()
-  spns <- parse_spans(tmp)
-  expect_equal(names(spns[[1]]$events), "exception")
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span()
+    spn1$record_exception(base_error())
+    spn1$end()
+  })[["traces"]]
+
+  expect_equal(spns[[1]][["events"]][[1]][["name"]], "exception")
   expect_match(
     spns[[1]]$events[[1]]$attributes$exception.message,
     "boo!",
@@ -143,7 +141,7 @@ test_that("record_exception", {
   )
   expect_equal(
     spns[[1]]$events[[1]]$attributes$exception.type,
-    "[simpleError,error,condition]"
+    c("simpleError", "error", "condition")
   )
 })
 
