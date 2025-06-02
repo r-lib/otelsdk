@@ -277,6 +277,11 @@ test_that("as_output_file", {
     as_output_file(tmp3)
   })
 
+  # permissions do not matter if we are root
+  skip_on_cran()
+  if (ps::ps_os_type()[["POSIX"]] && ps::ps_uids()[["effective"]] == 0) {
+    skip("test does not work as root user")
+  }
   dir.create(tmp2)
   file.create(tmp3)
   Sys.chmod(tmp3, "0100")

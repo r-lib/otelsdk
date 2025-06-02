@@ -441,7 +441,7 @@ SEXP otel_tracer_provider_http_options(void) {
     ""
   };
   SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
-  SET_VECTOR_ELT(res, 0, Rf_mkString(opts.url.s));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&opts.url));
   SET_VECTOR_ELT(res, 1,
     Rf_mkString(otel_http_request_content_type_str[opts.content_type])
   );
@@ -451,16 +451,16 @@ SEXP otel_tracer_provider_http_options(void) {
   SET_VECTOR_ELT(res, 5, c2r_otel_named_strings(&opts.http_headers));
   SET_VECTOR_ELT(res, 6, Rf_ScalarLogical(opts.ssl_insecure_skip_verify));
   SET_VECTOR_ELT(res, 7, c2r_otel_string(&opts.ssl_ca_cert_path));
-  SET_VECTOR_ELT(res, 8, Rf_mkString(opts.ssl_ca_cert_string.s));
-  SET_VECTOR_ELT(res, 9, Rf_mkString(opts.ssl_client_key_path.s));
-  SET_VECTOR_ELT(res, 10, Rf_mkString(opts.ssl_client_key_string.s));
-  SET_VECTOR_ELT(res, 11, Rf_mkString(opts.ssl_client_cert_path.s));
-  SET_VECTOR_ELT(res, 12, Rf_mkString(opts.ssl_client_cert_string.s));
-  SET_VECTOR_ELT(res, 13, Rf_mkString(opts.ssl_min_tls.s));
-  SET_VECTOR_ELT(res, 14, Rf_mkString(opts.ssl_max_tls.s));
-  SET_VECTOR_ELT(res, 15, Rf_mkString(opts.ssl_cipher.s));
-  SET_VECTOR_ELT(res, 16, Rf_mkString(opts.ssl_cipher_suite.s));
-  SET_VECTOR_ELT(res, 17, Rf_mkString(opts.compression.s));
+  SET_VECTOR_ELT(res, 8, c2r_otel_string(&opts.ssl_ca_cert_string));
+  SET_VECTOR_ELT(res, 9, c2r_otel_string(&opts.ssl_client_key_path));
+  SET_VECTOR_ELT(res, 10, c2r_otel_string(&opts.ssl_client_key_string));
+  SET_VECTOR_ELT(res, 11, c2r_otel_string(&opts.ssl_client_cert_path));
+  SET_VECTOR_ELT(res, 12, c2r_otel_string(&opts.ssl_client_cert_string));
+  SET_VECTOR_ELT(res, 13, c2r_otel_string(&opts.ssl_min_tls));
+  SET_VECTOR_ELT(res, 14, c2r_otel_string(&opts.ssl_max_tls));
+  SET_VECTOR_ELT(res, 15, c2r_otel_string(&opts.ssl_cipher));
+  SET_VECTOR_ELT(res, 16, c2r_otel_string(&opts.ssl_cipher_suite));
+  SET_VECTOR_ELT(res, 17, c2r_otel_string(&opts.compression));
   SET_VECTOR_ELT(res, 18, Rf_ScalarInteger(opts.retry_policy_max_attempts));
   SET_VECTOR_ELT(res, 19, Rf_ScalarReal(opts.retry_policy_initial_backoff));
   SET_VECTOR_ELT(res, 20, Rf_ScalarReal(opts.retry_policy_max_backoff));
