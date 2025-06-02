@@ -1,43 +1,35 @@
 test_that("named and unnamed spans", {
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
   spn1 <- trc$start_span()
   spn2 <- trc$start_span("my")
   spn2$end()
   spn1$end()
-  trc$flush()
 
-  spns <- parse_spans(tmp)
+  spns <- trc_prv$get_spans()
   expect_equal(spns[[1]]$name, "my")
   expect_equal(spns[[2]]$name, default_span_name)
 })
 
 test_that("close span automatically", {
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
   do <- function(name = NULL) {
     spn1 <- trc$start_span(name)
   }
   do("1")
   do("2")
-  trc$flush()
 
-  spns <- parse_spans(tmp)
+  spns <- trc_prv$get_spans()
   # they are not stacked
-  expect_equal(spns[[1]]$parent_span_id, "0000000000000000")
-  expect_equal(spns[[2]]$parent_span_id, "0000000000000000")
-  expect_equal(spns[[1]]$status, "Ok")
-  expect_equal(spns[[2]]$status, "Ok")
+  expect_equal(spns[[1]]$parent, "0000000000000000")
+  expect_equal(spns[[2]]$parent, "0000000000000000")
+  expect_equal(spns[[1]]$status, "ok")
+  expect_equal(spns[[2]]$status, "ok")
 })
 
 test_that("close span automatically, on error", {
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
   do <- function(name = NULL) {
     spn1 <- trc$start_span(name)
@@ -45,29 +37,24 @@ test_that("close span automatically, on error", {
   }
   try(do("1"), silent = TRUE)
   try(do("2"), silent = TRUE)
-  trc$flush()
 
-  spns <- parse_spans(tmp)
+  spns <- trc_prv$get_spans()
   # they are not stacked
-  expect_equal(spns[[1]]$parent_span_id, "0000000000000000")
-  expect_equal(spns[[2]]$parent_span_id, "0000000000000000")
-  expect_equal(spns[[1]]$status, "Error")
-  expect_equal(spns[[2]]$status, "Error")
+  expect_equal(spns[[1]]$parent, "0000000000000000")
+  expect_equal(spns[[2]]$parent, "0000000000000000")
+  expect_equal(spns[[1]]$status, "error")
+  expect_equal(spns[[2]]$status, "error")
 })
 
 test_that("is_recording", {
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
   spn1 <- trc$start_span()
   expect_true(spn1$is_recording())
 })
 
 test_that("set_attribute", {
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
   spn1 <- trc$start_span()
   spn2 <- trc$start_span("my")
@@ -76,10 +63,9 @@ test_that("set_attribute", {
   spn2$end()
   spn1$set_attribute("key", "updated")
   spn1$end()
-  trc$flush()
 
-  spns <- parse_spans(tmp)
-  expect_equal(spns[[1]]$attributes, list(key = "[a,b,c]"))
+  spns <- trc_prv$get_spans()
+  expect_equal(spns[[1]]$attributes, list(key = letters[1:3]))
   expect_equal(spns[[2]]$attributes, list(key = "updated"))
 })
 
@@ -111,33 +97,27 @@ test_that("add_event", {
 })
 
 test_that("set_status", {
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
   do <- function() {
     spn1 <- trc$start_span()
     spn1$set_status("Unset", description = "Testing preset Unset")
   }
   do()
-  trc$flush()
 
-  spns <- parse_spans(tmp)
-  expect_equal(spns[[1]]$parent_span_id, "0000000000000000")
-  expect_equal(spns[[1]]$status, "Unset")
+  spns <- trc_prv$get_spans()
+  expect_equal(spns[[1]]$parent, "0000000000000000")
+  expect_equal(spns[[1]]$status, "unset")
   expect_equal(spns[[1]]$description, "Testing preset Unset")
 })
 
 test_that("update_name", {
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
+  trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
   spn1 <- trc$start_span()
   spn1$update_name("good")
   spn1$end()
-  trc$flush()
-  spns <- parse_spans(tmp)
+  spns <- trc_prv$get_spans()
   expect_equal(spns[[1]]$name, "good")
 })
 

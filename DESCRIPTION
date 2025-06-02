@@ -23,6 +23,7 @@ Suggests:
     callr,
     cli,
     processx,
+    ps,
     rlang,
     testthat (>= 3.0.0),
     withr
