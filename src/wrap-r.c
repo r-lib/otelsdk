@@ -378,3 +378,39 @@ SEXP c2r_otel_events(const struct otel_events *events) {
   UNPROTECT(2);
   return res;
 }
+
+void otel_span_link_free(struct otel_span_link *link) {
+  if (!link) return;
+  otel_string_free(&link->trace_id);
+  otel_string_free(&link->span_id);
+  otel_attributes_free(&link->attributes);
+}
+
+void otel_span_links_free(struct otel_span_links *links) {
+  if (!links) return;
+  if (links->a) {
+    for (size_t i = 0; i < links->count; i++) {
+      otel_span_link_free(&links->a[i]);
+    }
+    free(links->a);
+    links->a = NULL;
+  }
+  links->count = 0;
+}
+
+SEXP c2r_otel_span_links(const struct otel_span_links *links) {
+  R_xlen_t nlinks = links->count;
+  SEXP res = PROTECT(Rf_allocVector(VECSXP, nlinks));
+  const char *lnknms[] = { "trace_id", "span_id", "attributes", "" };
+  for (R_xlen_t i = 0; i < nlinks; i++) {
+    SEXP lnk = PROTECT(Rf_mkNamed(VECSXP, lnknms));
+    SET_VECTOR_ELT(lnk, 0, c2r_otel_string(&links->a[i].trace_id));
+    SET_VECTOR_ELT(lnk, 1, c2r_otel_string(&links->a[i].span_id));
+    SET_VECTOR_ELT(lnk, 2, c2r_otel_attributes(&links->a[i].attributes));
+    SET_VECTOR_ELT(res, i, lnk);
+    UNPROTECT(1);
+  }
+
+  UNPROTECT(1);
+  return res;
+}

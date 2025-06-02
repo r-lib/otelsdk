@@ -125,6 +125,10 @@ int cc2c_otel_string_array(
   const std::vector<std::string> &a, struct otel_string_array &ca);
 
 int cc2c_otel_events(
-  const std::vector<trace_sdk::SpanDataEvent> &e, struct otel_events &ce);
+  const std::vector<trace_sdk::SpanDataEvent> &events,
+  struct otel_events &cevents);
+int cc2c_otel_links(
+  const std::vector<trace_sdk::SpanDataLink> &links,
+  struct otel_span_links &clinks);
 
 #endif

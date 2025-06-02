@@ -20,7 +20,7 @@ SEXP c2r_otel_instrumentation_scope(
   const struct otel_instrumentation_scope_t *is);
 
 SEXP c2r_otel_attributes(const struct otel_attributes *attrs);
-
 SEXP c2r_otel_events(const struct otel_events *events);
+SEXP c2r_otel_span_links(const struct otel_span_links *links);
 
 #endif

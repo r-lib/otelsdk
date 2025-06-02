@@ -350,3 +350,42 @@ int cc2c_otel_events(
 
   return 0;
 }
+
+int cc2c_otel_links(
+    const std::vector<trace_sdk::SpanDataLink> &links,
+    struct otel_span_links &clinks) {
+  try {
+    size_t sz = links.size();
+    clinks.a = (struct otel_span_link*)
+      malloc(sizeof(struct otel_span_link) * sz);
+    if (!clinks.a) return 1;
+    clinks.count = sz;
+
+    size_t i = 0;
+    for (auto it: links) {
+      const trace_api::SpanContext &spc = it.GetSpanContext();
+      const trace_api::TraceId &trace_id = spc.trace_id();
+      if (cc2c_otel_string(trace_id, clinks.a[i].trace_id)) {
+        throw std::runtime_error("");
+      }
+      const trace_api::SpanId &span_id = spc.span_id();
+      if (cc2c_otel_string(span_id, clinks.a[i].span_id)) {
+        throw std::runtime_error("");
+      }
+      const std::unordered_map<std::string, common_sdk::OwnedAttributeValue>
+        &attr = it.GetAttributes();
+      if (cc2c_otel_attributes(attr, clinks.a[i].attributes)) {
+        throw std::runtime_error("");
+      }
+      i++;
+    }
+
+    return 0;
+
+  } catch (...) {
+    otel_span_links_free(&clinks);
+    return 1;
+  }
+
+  return 0;
+}

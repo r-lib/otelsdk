@@ -160,8 +160,22 @@ struct otel_events {
   size_t count;
 };
 
-void otel_event_free(struct otel_event *events);
-void otel_events_free(struct otel_events *event);
+void otel_event_free(struct otel_event *event);
+void otel_events_free(struct otel_events *events);
+
+struct otel_span_link {
+  struct otel_string trace_id;
+  struct otel_string span_id;
+  struct otel_attributes attributes;
+};
+
+struct otel_span_links {
+  struct otel_span_link *a;
+  size_t count;
+};
+
+void otel_span_link_free(struct otel_span_link *link);
+void otel_span_links_free(struct otel_span_links *links);
 
 struct otel_span_data1_t {
   struct otel_string trace_id;
@@ -180,7 +194,7 @@ struct otel_span_data1_t {
   double duration;
   struct otel_attributes attributes;
   struct otel_events events;
-  // TODO: links
+  struct otel_span_links links;
 };
 
 struct otel_span_data_t {
