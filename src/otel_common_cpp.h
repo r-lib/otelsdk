@@ -19,6 +19,7 @@ namespace metrics_api    = opentelemetry::metrics;
 namespace metrics_sdk    = opentelemetry::sdk::metrics;
 namespace nostd          = opentelemetry::nostd;
 namespace memory         = opentelemetry::exporter::memory;
+namespace common_sdk     = opentelemetry::sdk::common;
 
 struct otel_span {
   nostd::shared_ptr<trace_api::Span> ptr;
@@ -69,23 +70,58 @@ struct otel_gauge {
   nostd::unique_ptr<metrics_api::Gauge<double>> ptr;
 };
 
-void otel_string_to_char(const std::string &inp, struct otel_string &outp);
-void otel_string_to_char(
-  const nostd::string_view &inp, struct otel_string &outp);
+int cc2c_otel_string(const std::string &str, struct otel_string &s);
+int cc2c_otel_string(const nostd::string_view &sv, struct otel_string &s);
+int cc2c_otel_string(
+  const trace_api::TraceId &trace_id, struct otel_string &s);
+int cc2c_otel_string(
+  const trace_api::SpanId &span_id, struct otel_string &s);
 
-int otel_string_from_string (const std::string &str, struct otel_string *s);
-int otel_string_from_string_view(
-  const nostd::string_view &sv, struct otel_string *s);
-int otel_string_from_trace_id(
-  const trace_api::TraceId &trace_id, struct otel_string *s);
-int otel_string_from_span_id(
-  const trace_api::SpanId &span_id, struct otel_string *s);
+template<class Compare>
+int cc2c_otel_strings(
+  const std::multimap<std::string, std::string, Compare> &map,
+  struct otel_strings &outp) {
 
-int otel_trace_flags_from(
-  const trace_api::TraceFlags &flags, struct otel_trace_flags *cflags);
+  outp.a = (struct otel_string*)
+    malloc(sizeof(struct otel_string) * map.size() * 2);
+  if (!outp.a) return 1;
+  size_t idx = 0;
+  for (auto it: map) {
+    if (cc2c_otel_string(it.first, outp.a[idx++])) return 1;
+    if (cc2c_otel_string(it.second, outp.a[idx++])) return 1;
+  }
+  return 0;
+}
 
-int otel_instrumentation_scope_from(
+int cc2c_otel_trace_flags(
+  const trace_api::TraceFlags &flags, struct otel_trace_flags_t &cflags);
+
+int cc2c_otel_instrumentation_scope(
   trace_sdk::InstrumentationScope &is,
-  struct otel_instrumentation_scope_t *cis);
+  struct otel_instrumentation_scope_t &cis) noexcept;
+
+int cc2c_otel_attribute(
+    const std::string &key, const common_sdk::OwnedAttributeValue &attr,
+    struct otel_attribute &cattr);
+int cc2c_otel_attributes(
+  const std::unordered_map<std::string, common_sdk::OwnedAttributeValue> &attrs,
+  struct otel_attributes &cattrs);
+
+int cc2c_otel_boolean_array(
+  const std::vector<bool> &a, struct otel_boolean_array &ca);
+int cc2c_otel_int64_array(
+  const std::vector<int64_t> &a, struct otel_int64_array &ca);
+int cc2c_otel_int64_array(
+  const std::vector<int32_t> &a, struct otel_int64_array &ca);
+int cc2c_otel_double_array(
+  const std::vector<double> &a, struct otel_double_array &ca);
+int cc2c_otel_double_array(
+  const std::vector<uint32_t> &a, struct otel_double_array &ca);
+int cc2c_otel_double_array(
+  const std::vector<uint64_t> &a, struct otel_double_array &ca);
+int cc2c_otel_double_array(
+  const std::vector<uint8_t> &a, struct otel_double_array &ca);
+int cc2c_otel_string_array(
+  const std::vector<std::string> &a, struct otel_string_array &ca);
 
 #endif

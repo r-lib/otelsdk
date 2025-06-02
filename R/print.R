@@ -18,6 +18,23 @@ format_instrumentation_scope <- function(x) {
   paste0(c("", lns), collapse = "\n")
 }
 
+format_attributes <- function(x) {
+  opt <- options(width = getOption("width") - 9)
+  on.exit(options(opt), add = TRUE)
+  paste(
+    collapse = "\n",
+    c(
+      "",
+      unlist(mapply(names(x), x, FUN = function(n, x) {
+        c(
+          paste0("    ", n, ":"),
+          paste0("        ", capture.output(print(x)))
+        )
+      }))
+    )
+  )
+}
+
 format1 <- function(x, ...) {
   vapply(lapply(x, format, ...), paste0, character(1), collapse = "\n")
 }
@@ -34,6 +51,10 @@ format.otel_span_data <- function(x, ...) {
   if ("instrumentation_scope" %in% x$key) {
     x["instrumentation_scope", ]$fmt <-
       format_instrumentation_scope(x["instrumentation_scope", ]$value[[1]])
+  }
+  if ("attributes" %in% x$key) {
+    x["attributes", ]$fmt <-
+      format_attributes(x["attributes", ]$value[[1]])
   }
   c(
     "<otel_span_data>",

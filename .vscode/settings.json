@@ -71,5 +71,13 @@
         "variant": "cpp",
         "vector": "cpp",
         "algorithm": "cpp"
-    }
+    },
+    "C_Cpp.default.includePath": [
+        "/Library/Frameworks/R.framework/Versions/Current/Headers/**",
+        "src/cpp/api/include",
+        "src/cpp/sdk/include",
+        "src/cpp/exporters/memory/include/",
+        "src/cpp/exporters/otlp/include/",
+        "src/cpp/exporters/ostream/include/"
+    ]
 }

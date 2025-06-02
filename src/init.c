@@ -5,9 +5,9 @@
 #include <R_ext/Rdynload.h>
 
 #include "otel_common.h"
-
-void r2c_attributes(SEXP r, struct otel_attributes *c);
-SEXP c2r_otel_instrumentation_scope(struct otel_instrumentation_scope_t *is);
+#include "otel_common_r.h"
+#include "errors.h"
+#include "cleancall.h"
 
 SEXP otel_fail(void);
 SEXP otel_error_object(void);
@@ -106,7 +106,6 @@ SEXP otel_gauge_record(
   SEXP gauge, SEXP value, SEXP attributes, SEXP unit);
 
 SEXP rf_get_list_element(SEXP list, const char *str);
-SEXP rf_otel_string_to_strsxp(struct otel_string *s);
 SEXP glue_(SEXP x, SEXP f, SEXP open_arg, SEXP close_arg, SEXP cli_arg);
 SEXP trim_(SEXP x);
 
@@ -114,6 +113,8 @@ SEXP trim_(SEXP x);
   { #name, (DL_FUNC)&name, n }
 
 static const R_CallMethodDef callMethods[]  = {
+  CLEANCALL_METHOD_RECORD,
+
   CALLDEF(otel_fail, 0),
   CALLDEF(otel_error_object, 0),
   CALLDEF(otel_init_constants, 1),
@@ -196,6 +197,7 @@ void R_init_otelsdk(DllInfo *dll) {
   R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);
+  cleancall_init();
   otel_init_context_storage();
 }
 
@@ -407,67 +409,11 @@ const char *otel_http_request_content_type_str[] = {
   "binary"
 };
 
-SEXP raw_to_string(SEXP r, size_t count) {
-  SEXP res = PROTECT(Rf_allocVector(STRSXP, count));
-  char *s = (char*) RAW(r);
-  for (int i = 0; i < count; i++) {
-    size_t l = strlen(s);
-    SET_STRING_ELT(res, i, Rf_mkCharLenCE(s, l, CE_UTF8));
-    s += l + 1;
-  }
-  UNPROTECT(1);
-  return res;
-}
-
-static SEXP raw_to_named_string(SEXP r, size_t count) {
-  count /= 2;
-  SEXP res = PROTECT(Rf_allocVector(STRSXP, count));
-  SEXP nms = PROTECT(Rf_allocVector(STRSXP, count));
-  char *s = (char*) RAW(r);
-  for (int i = 0; i < count; i++) {
-    size_t l = strlen(s);
-    SET_STRING_ELT(res, i, Rf_mkCharLenCE(s, l, CE_UTF8));
-    s += l + 1;
-    l = strlen(s);
-    SET_STRING_ELT(nms, i, Rf_mkCharLenCE(s, l, CE_UTF8));
-    s += l + 1;
-  }
-  Rf_setAttrib(res, R_NamesSymbol, nms);
-  UNPROTECT(2);
-  return res;
-}
-
 SEXP otel_tracer_provider_http_options(void) {
   struct otel_tracer_provider_http_options_t opts = { 0 };
-  otel_tracer_provider_http_default_options_(&opts);
-  SEXP url = PROTECT(Rf_allocVector(RAWSXP, opts.url.size));
-  opts.url.s = (char*) RAW(url);
-  SEXP http_headers = PROTECT(Rf_allocVector(RAWSXP, opts.http_headers.size));
-  opts.http_headers.s = (char*) RAW(http_headers);
-  SEXP ssl_ca_cert_path = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_ca_cert_path.size));
-  opts.ssl_ca_cert_path.s = (char*) RAW(ssl_ca_cert_path);
-  SEXP ssl_ca_cert_string = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_ca_cert_string.size));
-  opts.ssl_ca_cert_string.s = (char*) RAW(ssl_ca_cert_string);
-  SEXP ssl_client_key_path = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_client_key_path.size));
-  opts.ssl_client_key_path.s = (char*) RAW(ssl_client_key_path);
-  SEXP ssl_client_key_string = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_client_key_string.size));
-  opts.ssl_client_key_string.s = (char*) RAW(ssl_client_key_string);
-  SEXP ssl_client_cert_path = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_client_cert_path.size));
-  opts.ssl_client_cert_path.s = (char*) RAW(ssl_client_cert_path);
-  SEXP ssl_client_cert_string = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_client_cert_string.size));
-  opts.ssl_client_cert_string.s = (char*) RAW(ssl_client_cert_string);
-  SEXP ssl_min_tls = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_min_tls.size));
-  opts.ssl_min_tls.s = (char*) RAW(ssl_min_tls);
-  SEXP ssl_max_tls = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_max_tls.size));
-  opts.ssl_max_tls.s = (char*) RAW(ssl_max_tls);
-  SEXP ssl_cipher = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_cipher.size));
-  opts.ssl_cipher.s = (char*) RAW(ssl_cipher);
-  SEXP ssl_cipher_suite = PROTECT(Rf_allocVector(RAWSXP, opts.ssl_cipher_suite.size));
-  opts.ssl_cipher_suite.s = (char*) RAW(ssl_cipher_suite);
-  SEXP compression = PROTECT(Rf_allocVector(RAWSXP, opts.compression.size));
-  opts.compression.s = (char*) RAW(compression);
-
-  otel_tracer_provider_http_default_options_(&opts);
+  if (otel_tracer_provider_http_default_options_(&opts)) {
+    R_THROW_SYSTEM_ERROR("Failed to query OpenTelemetry HTTP options");
+  }
 
   const char *nms[] = {
     "url",
@@ -502,11 +448,9 @@ SEXP otel_tracer_provider_http_options(void) {
   SET_VECTOR_ELT(res, 2, Rf_ScalarLogical(opts.use_json_name));
   SET_VECTOR_ELT(res, 3, Rf_ScalarLogical(opts.console_debug));
   SET_VECTOR_ELT(res, 4, Rf_ScalarReal(opts.timeout));
-  SET_VECTOR_ELT(res, 5,
-    raw_to_named_string(http_headers, opts.http_headers.count)
-  );
+  SET_VECTOR_ELT(res, 5, c2r_otel_named_strings(&opts.http_headers));
   SET_VECTOR_ELT(res, 6, Rf_ScalarLogical(opts.ssl_insecure_skip_verify));
-  SET_VECTOR_ELT(res, 7, Rf_mkString(opts.ssl_ca_cert_path.s));
+  SET_VECTOR_ELT(res, 7, c2r_otel_string(&opts.ssl_ca_cert_path));
   SET_VECTOR_ELT(res, 8, Rf_mkString(opts.ssl_ca_cert_string.s));
   SET_VECTOR_ELT(res, 9, Rf_mkString(opts.ssl_client_key_path.s));
   SET_VECTOR_ELT(res, 10, Rf_mkString(opts.ssl_client_key_string.s));
@@ -522,6 +466,6 @@ SEXP otel_tracer_provider_http_options(void) {
   SET_VECTOR_ELT(res, 20, Rf_ScalarReal(opts.retry_policy_max_backoff));
   SET_VECTOR_ELT(res, 21, Rf_ScalarReal(opts.retry_policy_backoff_multiplier));
 
-  UNPROTECT(14);
+  UNPROTECT(1);
   return res;
 }

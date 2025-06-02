@@ -102,12 +102,11 @@ void *otel_get_logger_(
   return (void*) ls;
 }
 
-void *otel_logger_get_name_(void *logger_, struct otel_string *cname) {
+int otel_logger_get_name_(void *logger_, struct otel_string *cname) {
   struct otel_logger *ls = (struct otel_logger*) logger_;
   logs_api::Logger &logger = *(ls->ptr);
   const nostd::string_view name = logger.GetName();
-  otel_string_to_char(name, *cname);
-  return NULL;
+  return cc2c_otel_string(name, *cname);
 }
 
 logs_api::Severity to_severity(int x) {

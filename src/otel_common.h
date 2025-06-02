@@ -3,9 +3,11 @@
 
 #ifdef __cplusplus
 #include <cstdint>
+#include <cstddef>
 extern "C" {
 #else
 #include "stdint.h"
+#include "stddef.h"
 #endif
 
 struct otel_scoped_span {
@@ -23,11 +25,14 @@ struct otel_string {
   size_t size;
 };
 
+void otel_string_free(struct otel_string *s);
+
 struct otel_strings {
-  char *s;
+  struct otel_string *a;
   size_t count;
-  size_t size;
 };
+
+void otel_strings_free(struct otel_strings *s);
 
 enum otel_attribute_type {
   k_string,
@@ -40,25 +45,35 @@ enum otel_attribute_type {
   k_int64_array
 };
 
+// if storage == NULL, then it does not own the strings
 struct otel_string_array {
   char **a;
+  char *storage;
   size_t count;
 };
+
+void otel_string_array_free(struct otel_string_array *a);
 
 struct otel_boolean_array {
   int *a;
   size_t count;
 };
 
+void otel_boolean_array_free(struct otel_boolean_array *a);
+
 struct otel_double_array {
   double *a;
   size_t count;
 };
 
+void otel_double_array_free(struct otel_double_array *a);
+
 struct otel_int64_array {
   int64_t *a;
   size_t count;
 };
+
+void otel_int64_array_free(struct otel_int64_array *a);
 
 struct otel_attribute {
   enum otel_attribute_type type;
@@ -75,10 +90,14 @@ struct otel_attribute {
   } val;
 };
 
+void otel_attribute_free(struct otel_attribute *attr);
+
 struct otel_attributes {
   struct otel_attribute *a;
   size_t count;
 };
+
+void otel_attributes_free(struct otel_attributes *attrs);
 
 struct otel_link {
   void *span;
@@ -127,6 +146,9 @@ struct otel_instrumentation_scope_t {
   // TODO: attributes
 };
 
+void otel_instrumentation_scope_free(
+  struct otel_instrumentation_scope_t *is);
+
 struct otel_span_data1_t {
   struct otel_string trace_id;
   struct otel_string span_id;
@@ -142,7 +164,7 @@ struct otel_span_data1_t {
   struct otel_instrumentation_scope_t instrumentation_scope;
   double start_time;
   double duration;
-  // TODO: attributes
+  struct otel_attributes attributes;
   // TODO: events
   // TODO: links
 };
@@ -152,10 +174,8 @@ struct otel_span_data_t {
   size_t count;
 };
 
-void otel_string_free(struct otel_string *s);
-void otel_instrumentation_scope_free(
-  struct otel_instrumentation_scope_t *is);
 void otel_span_data_free(struct otel_span_data_t *cdata);
+
 extern const char *otel_http_request_content_type_str[];
 
 void otel_tracer_provider_finally_(void *tracer_provider);
@@ -175,7 +195,7 @@ void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
 void *otel_create_tracer_provider_memory_(int buffer_size);
 struct otel_span_data_t *otel_tracer_provider_memory_get_spans_(
-  void *tracer_provider);
+  void *tracer_provider, struct otel_span_data_t *cdata);
 void otel_tracer_provider_flush_(void *tracer_provider);
 void *otel_get_tracer_(
     void *tracer_provider_, const char *name, const char *version,
@@ -229,7 +249,7 @@ void otel_deactivate_session_(void *id_);
 void otel_finish_session_(void *id_);
 void otel_finish_all_sessions_(void);
 
-void otel_tracer_provider_http_default_options_(
+int otel_tracer_provider_http_default_options_(
   struct otel_tracer_provider_http_options_t *opts);
 
 void otel_logger_provider_finally_(void *logger_provider);
@@ -242,7 +262,7 @@ void *otel_get_logger_(
   void *logger_provider, const char *name, int minimum_severity,
   const char *version, const char *schema_url,
   struct otel_attributes *attributes);
-void *otel_logger_get_name_(void *logger, struct otel_string *name);
+int otel_logger_get_name_(void *logger, struct otel_string *name);
 int otel_logger_is_enabled_(void *logger_, int severity_);
 void otel_log_(
   void *logger_, const char *format_, int severity_, const char *span_id_,

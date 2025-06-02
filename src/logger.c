@@ -130,13 +130,12 @@ SEXP otel_logger_get_name(SEXP logger) {
   }
 
   struct otel_string cname = { 0 };
-  otel_logger_get_name_(logger_, &cname);
-  SEXP rname = PROTECT(Rf_allocVector(RAWSXP, cname.size));
-  cname.s = (char*) RAW(rname);
-  otel_logger_get_name_(logger_, &cname);
-  SEXP name = PROTECT(Rf_mkString((char*) RAW(rname)));
-
-  UNPROTECT(2);
+  if (otel_logger_get_name_(logger_, &cname)) {
+    Rf_error("Out of memory when allocating OpenTelemetry logger name");
+  }
+  SEXP name = Rf_ScalarString(Rf_mkCharLen(cname.s, cname.size));
+  // TODO: use cleancall
+  otel_string_free(&cname);
   return name;
 }
 
