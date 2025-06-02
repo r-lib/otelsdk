@@ -1,23 +1,23 @@
 test_that("tracer_new", {
-  trc_prv <- tracer_provider_stdstream_new()
+  trc_prv <- tracer_provider_memory_new()
   expect_equal(
     class(trc_prv),
-    c("otel_tracer_provider_stdstream", "otel_tracer_provider")
+    c("otel_tracer_provider_memory", "otel_tracer_provider")
   )
   trc <- trc_prv$get_tracer("mytracer")
   expect_equal(class(trc), "otel_tracer")
 })
 
 test_that("start_span", {
-  trc_prv <- tracer_provider_memory_new()
-  trc <- trc_prv$get_tracer("mytracer")
-  spn1 <- trc$start_span("spn1")
-  expect_equal(class(spn1), "otel_span")
-  spn2 <- trc$start_span("spn2")
-  spn2$end()
-  spn1$end()
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span("spn1")
+    expect_equal(class(spn1), "otel_span")
+    spn2 <- trc$start_span("spn2")
+    spn2$end()
+    spn1$end()
+  })[["traces"]]
 
-  spns <- trc_prv$get_spans()
   expect_equal(length(spns), 2)
   expect_equal(spns[[1]]$name, "spn2")
   expect_equal(spns[[2]]$name, "spn1")
@@ -45,32 +45,32 @@ test_that("is_enabled", {
 })
 
 test_that("sessions", {
-  trc_prv <- tracer_provider_memory_new()
-  trc <- trc_prv$get_tracer("mytracer")
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
 
-  spn0 <- trc$start_span("0") # 0
+    spn0 <- trc$start_span("0") # 0
 
-  sess1 <- trc$start_session() # 1
-  spn1 <- trc$start_span("1") # 1
+    sess1 <- trc$start_session() # 1
+    spn1 <- trc$start_span("1") # 1
 
-  sess2 <- trc$start_session() # 2
-  spn2 <- trc$start_span("2") # 2
+    sess2 <- trc$start_session() # 2
+    spn2 <- trc$start_span("2") # 2
 
-  trc$activate_session(sess1) # 1
-  spn11 <- trc$start_span("11") # 1
-  trc$deactivate_session(sess1) # 1
-  trc$finish_session(sess1) # 1
-  spn11$end() # 1
-  spn1$end() # 1
+    trc$activate_session(sess1) # 1
+    spn11 <- trc$start_span("11") # 1
+    trc$deactivate_session(sess1) # 1
+    trc$finish_session(sess1) # 1
+    spn11$end() # 1
+    spn1$end() # 1
 
-  spn2$end() # 2
-  trc$finish_all_sessions() # 2
+    spn2$end() # 2
+    trc$finish_all_sessions() # 2
 
-  spn01 <- trc$start_span("01") # 0
-  spn01$end() # 0
-  spn0$end() # 0
+    spn01 <- trc$start_span("01") # 0
+    spn01$end() # 0
+    spn0$end() # 0
+  })[["traces"]]
 
-  spns <- trc_prv$get_spans()
   nms <- vapply(spns, "[[", "", "name")
   expect_equal(nms, c("11", "1", "2", "01", "0"))
   names(spns) <- nms

@@ -1,26 +1,26 @@
 test_that("named and unnamed spans", {
-  trc_prv <- tracer_provider_memory_new()
-  trc <- trc_prv$get_tracer("mytracer")
-  spn1 <- trc$start_span()
-  spn2 <- trc$start_span("my")
-  spn2$end()
-  spn1$end()
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span()
+    spn2 <- trc$start_span("my")
+    spn2$end()
+    spn1$end()
+  })[["traces"]]
 
-  spns <- trc_prv$get_spans()
   expect_equal(spns[[1]]$name, "my")
   expect_equal(spns[[2]]$name, default_span_name)
 })
 
 test_that("close span automatically", {
-  trc_prv <- tracer_provider_memory_new()
-  trc <- trc_prv$get_tracer("mytracer")
-  do <- function(name = NULL) {
-    spn1 <- trc$start_span(name)
-  }
-  do("1")
-  do("2")
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    do <- function(name = NULL) {
+      spn1 <- trc$start_span(name)
+    }
+    do("1")
+    do("2")
+  })[["traces"]]
 
-  spns <- trc_prv$get_spans()
   # they are not stacked
   expect_equal(spns[[1]]$parent, "0000000000000000")
   expect_equal(spns[[2]]$parent, "0000000000000000")
@@ -29,16 +29,16 @@ test_that("close span automatically", {
 })
 
 test_that("close span automatically, on error", {
-  trc_prv <- tracer_provider_memory_new()
-  trc <- trc_prv$get_tracer("mytracer")
-  do <- function(name = NULL) {
-    spn1 <- trc$start_span(name)
-    stop("oops")
-  }
-  try(do("1"), silent = TRUE)
-  try(do("2"), silent = TRUE)
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    do <- function(name = NULL) {
+      spn1 <- trc$start_span(name)
+      stop("oops")
+    }
+    try(do("1"), silent = TRUE)
+    try(do("2"), silent = TRUE)
+  })[["traces"]]
 
-  spns <- trc_prv$get_spans()
   # they are not stacked
   expect_equal(spns[[1]]$parent, "0000000000000000")
   expect_equal(spns[[2]]$parent, "0000000000000000")
@@ -54,17 +54,17 @@ test_that("is_recording", {
 })
 
 test_that("set_attribute", {
-  trc_prv <- tracer_provider_memory_new()
-  trc <- trc_prv$get_tracer("mytracer")
-  spn1 <- trc$start_span()
-  spn2 <- trc$start_span("my")
-  spn2$set_attribute("key", letters[1:3])
-  spn1$set_attribute("key", "gone")
-  spn2$end()
-  spn1$set_attribute("key", "updated")
-  spn1$end()
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span()
+    spn2 <- trc$start_span("my")
+    spn2$set_attribute("key", letters[1:3])
+    spn1$set_attribute("key", "gone")
+    spn2$end()
+    spn1$set_attribute("key", "updated")
+    spn1$end()
+  })[["traces"]]
 
-  spns <- trc_prv$get_spans()
   expect_equal(spns[[1]]$attributes, list(key = letters[1:3]))
   expect_equal(spns[[2]]$attributes, list(key = "updated"))
 })
@@ -97,27 +97,28 @@ test_that("add_event", {
 })
 
 test_that("set_status", {
-  trc_prv <- tracer_provider_memory_new()
-  trc <- trc_prv$get_tracer("mytracer")
-  do <- function() {
-    spn1 <- trc$start_span()
-    spn1$set_status("Unset", description = "Testing preset Unset")
-  }
-  do()
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    do <- function() {
+      spn1 <- trc$start_span()
+      spn1$set_status("Unset", description = "Testing preset Unset")
+    }
+    do()
+  })[["traces"]]
 
-  spns <- trc_prv$get_spans()
   expect_equal(spns[[1]]$parent, "0000000000000000")
   expect_equal(spns[[1]]$status, "unset")
   expect_equal(spns[[1]]$description, "Testing preset Unset")
 })
 
 test_that("update_name", {
-  trc_prv <- tracer_provider_memory_new()
-  trc <- trc_prv$get_tracer("mytracer")
-  spn1 <- trc$start_span()
-  spn1$update_name("good")
-  spn1$end()
-  spns <- trc_prv$get_spans()
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span()
+    spn1$update_name("good")
+    spn1$end()
+  })[["traces"]]
+
   expect_equal(spns[[1]]$name, "good")
 })
 
