@@ -26,10 +26,15 @@ format_attributes <- function(x) {
     c(
       "",
       unlist(mapply(names(x), x, FUN = function(n, x) {
-        c(
-          paste0("    ", n, ":"),
-          paste0("        ", capture.output(print(x)))
-        )
+        if (is_string(x)) {
+          paste0("    ", format(n, width = 23), ": ", encodeString(x))
+        } else {
+          fmt <- capture.output(print(x))
+          c(
+            paste0("    ", n, ":"),
+            paste0("        ", fmt)
+          )
+        }
       }))
     )
   )
@@ -55,6 +60,10 @@ format.otel_span_data <- function(x, ...) {
   if ("attributes" %in% x$key) {
     x["attributes", ]$fmt <-
       format_attributes(x["attributes", ]$value[[1]])
+  }
+  if ("resource_attributes" %in% x$key) {
+    x["resource_attributes", ]$fmt <-
+      format_attributes(x["resource_attributes", ]$value[[1]])
   }
   c(
     "<otel_span_data>",

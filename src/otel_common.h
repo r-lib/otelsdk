@@ -158,9 +158,9 @@ struct otel_span_data1_t {
   struct otel_trace_flags_t flags;
   int kind;
   int status;
-  struct otel_string description;
-  // Other stuff from Resource?
   struct otel_string schema_url;
+  struct otel_string description;
+  struct otel_attributes resource_attributes;
   struct otel_instrumentation_scope_t instrumentation_scope;
   double start_time;
   double duration;

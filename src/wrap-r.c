@@ -78,12 +78,14 @@ void otel_span_data_free(struct otel_span_data_t *cdata) {
         otel_string_free(&xi->name);
         otel_string_free(&xi->description);
         otel_string_free(&xi->schema_url);
+        otel_attributes_free(&xi->resource_attributes);
         otel_instrumentation_scope_free(&xi->instrumentation_scope);
         if (xi->description.s) {
           free(xi->description.s);
           xi->description.s = NULL;
           xi->description.size = 0;
         }
+        otel_attributes_free(&xi->attributes);
       }
       free(cdata->a);
       cdata->a = NULL;

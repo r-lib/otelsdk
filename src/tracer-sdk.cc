@@ -145,6 +145,9 @@ struct otel_span_data_t *otel_tracer_provider_memory_get_spans_(
     resource::Resource res = data[i]->GetResource();
     const std::string &schema_url = res.GetSchemaURL();
     BAIL_IF(cc2c_otel_string(schema_url, cdata->a[i].schema_url));
+    std::unordered_map<std::string, common_sdk::OwnedAttributeValue> rattr =
+      res.GetAttributes();
+    BAIL_IF(cc2c_otel_attributes(rattr, cdata->a[i].resource_attributes));
     trace_sdk::InstrumentationScope is = data[i]->GetInstrumentationScope();
     BAIL_IF(cc2c_otel_instrumentation_scope(
       is, cdata->a[i].instrumentation_scope));
