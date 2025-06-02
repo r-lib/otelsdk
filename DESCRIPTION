@@ -18,7 +18,8 @@ RoxygenNote: 7.3.2.9000
 SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
     GNU make
 Imports:
-    otel
+    otel,
+    utils
 Suggests:
     callr,
     cli,

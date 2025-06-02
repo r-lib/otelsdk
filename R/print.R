@@ -29,7 +29,7 @@ format_attributes <- function(x) {
         if (is_string(x)) {
           paste0("    ", format(n, width = 23), ": ", encodeString(x))
         } else {
-          fmt <- capture.output(print(x))
+          fmt <- utils::capture.output(print(x))
           c(
             paste0("    ", n, ":"),
             paste0("        ", fmt)
