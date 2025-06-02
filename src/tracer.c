@@ -25,7 +25,7 @@ SEXP otel_tracer_provider_memory_get_spans(SEXP provider) {
   const char *nms[] = {
     "trace_id", "span_id", "name", "flags", "parent", "description",
     "resource_attributes", "schema_url", "instrumentation_scope", "kind",
-    "status", "start_time", "duration", "attributes", ""
+    "status", "start_time", "duration", "attributes", "events", ""
   };
   SEXP posix_class = PROTECT(R_NilValue);
   if (data.count > 0) {
@@ -55,6 +55,7 @@ SEXP otel_tracer_provider_memory_get_spans(SEXP provider) {
     Rf_setAttrib(VECTOR_ELT(xi, 11), R_ClassSymbol, posix_class);
     SET_VECTOR_ELT(xi, 12, Rf_ScalarReal(data.a[i].duration));
     SET_VECTOR_ELT(xi, 13, c2r_otel_attributes(&data.a[i].attributes));
+    SET_VECTOR_ELT(xi, 14, c2r_otel_events(&data.a[i].events));
     Rf_setAttrib(xi, R_ClassSymbol, Rf_mkString("otel_span_data"));
   }
   otel_span_data_free(&data);

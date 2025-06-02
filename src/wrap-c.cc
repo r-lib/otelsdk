@@ -1,6 +1,11 @@
 #include "otel_common.h"
 #include "otel_common_cpp.h"
 
+#include "opentelemetry/sdk/common/attribute_utils.h"
+
+namespace common_sdk = opentelemetry::sdk::common;
+
+
 int cc2c_otel_string(
     const trace_api::TraceId &trace_id, struct otel_string &s) {
   const auto sz = trace_api::TraceId::kSize;
@@ -307,5 +312,41 @@ int cc2c_otel_string_array(
     *pos = '\0';
     pos++;
   }
+  return 0;
+}
+
+int cc2c_otel_events(
+    const std::vector<trace_sdk::SpanDataEvent> &events,
+    struct otel_events &cevents) {
+  try {
+    size_t sz = events.size();
+    cevents.a = (struct otel_event*)
+      malloc(sizeof(struct otel_event) * sz);
+    if (!cevents.a) return 1;
+    cevents.count = sz;
+
+    size_t i = 0;
+    for (auto it: events) {
+      std::string name = it.GetName();
+      std::chrono::nanoseconds ts = it.GetTimestamp().time_since_epoch();
+      cevents.a[i].timestamp = ts.count() / 1000.0 / 1000.0 / 1000.0;
+      const std::unordered_map<std::string, common_sdk::OwnedAttributeValue>
+        &attr = it.GetAttributes();
+      if (cc2c_otel_string(name, cevents.a[i].name)) {
+        throw std::runtime_error("");
+      }
+      if (cc2c_otel_attributes(attr, cevents.a[i].attributes)) {
+        throw std::runtime_error("");
+      }
+      i++;
+    }
+
+    return 0;
+
+  } catch (...) {
+    otel_events_free(&cevents);
+    return 1;
+  }
+
   return 0;
 }

@@ -21,4 +21,6 @@ SEXP c2r_otel_instrumentation_scope(
 
 SEXP c2r_otel_attributes(const struct otel_attributes *attrs);
 
+SEXP c2r_otel_events(const struct otel_events *events);
+
 #endif

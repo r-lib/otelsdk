@@ -149,6 +149,20 @@ struct otel_instrumentation_scope_t {
 void otel_instrumentation_scope_free(
   struct otel_instrumentation_scope_t *is);
 
+struct otel_event {
+  struct otel_string name;
+  double timestamp;
+  struct otel_attributes attributes;
+};
+
+struct otel_events {
+  struct otel_event *a;
+  size_t count;
+};
+
+void otel_event_free(struct otel_event *events);
+void otel_events_free(struct otel_events *event);
+
 struct otel_span_data1_t {
   struct otel_string trace_id;
   struct otel_string span_id;
@@ -165,7 +179,7 @@ struct otel_span_data1_t {
   double start_time;
   double duration;
   struct otel_attributes attributes;
-  // TODO: events
+  struct otel_events events;
   // TODO: links
 };
 

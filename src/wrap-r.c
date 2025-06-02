@@ -86,6 +86,7 @@ void otel_span_data_free(struct otel_span_data_t *cdata) {
           xi->description.size = 0;
         }
         otel_attributes_free(&xi->attributes);
+        otel_events_free(&xi->events);
       }
       free(cdata->a);
       cdata->a = NULL;
@@ -330,6 +331,46 @@ SEXP c2r_otel_attributes(const struct otel_attributes *attrs) {
     SET_STRING_ELT(nms, i, Rf_mkCharCE(attrs->a[i].name, CE_UTF8));
   }
   Rf_setAttrib(res, R_NamesSymbol, nms);
+
+  UNPROTECT(2);
+  return res;
+}
+
+void otel_event_free(struct otel_event *event) {
+  if (!event) return;
+  otel_string_free(&event->name);
+  otel_attributes_free(&event->attributes);
+}
+
+void otel_events_free(struct otel_events *events) {
+  if (!events) return;
+  if (events->a) {
+    free(events->a);
+    events->a = NULL;
+  }
+  events->count = 0;
+}
+
+SEXP c2r_otel_events(const struct otel_events *events) {
+  R_xlen_t nevents = events->count;
+  SEXP res = PROTECT(Rf_allocVector(VECSXP, nevents));
+  const char *evnms[] = { "name", "timestamp", "attributes", "" };
+  SEXP posix_class = PROTECT(R_NilValue);
+  if (events->count > 0) {
+    UNPROTECT(1);
+    posix_class = PROTECT(Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(posix_class, 0, Rf_mkChar("POSIXct"));
+    SET_STRING_ELT(posix_class, 1, Rf_mkChar("POSIXt"));
+  }
+  for (R_xlen_t i = 0; i < nevents; i++) {
+    SEXP ev = PROTECT(Rf_mkNamed(VECSXP, evnms));
+    SET_VECTOR_ELT(ev, 0, c2r_otel_string(&events->a[i].name));
+    SET_VECTOR_ELT(ev, 1, Rf_ScalarReal(events->a[i].timestamp));
+    Rf_setAttrib(VECTOR_ELT(ev, 1), R_ClassSymbol, posix_class);
+    SET_VECTOR_ELT(ev, 2, c2r_otel_attributes(&events->a[i].attributes));
+    SET_VECTOR_ELT(res, i, ev);
+    UNPROTECT(1);
+  }
 
   UNPROTECT(2);
   return res;

@@ -70,29 +70,26 @@ test_that("set_attribute", {
 })
 
 test_that("add_event", {
-  tmp <- tempfile(fileext = "otel")
-  on.exit(unlink(tmp), add = TRUE)
-  trc_prv <- tracer_provider_stdstream_new(tmp)
-  trc <- trc_prv$get_tracer("mytracer")
-  spn1 <- trc$start_span()
-  spn2 <- trc$start_span("my")
-  spn2$add_event("ev", attributes = list(key = "value", key2 = 1:5))
-  spn2$add_event("ev2", attributes = list(x = letters[1:4]))
-  spn2$end()
-  spn1$end()
-  trc$flush()
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span()
+    spn2 <- trc$start_span("my")
+    spn2$add_event("ev", attributes = list(key = "value", key2 = 1:5))
+    spn2$add_event("ev2", attributes = list(x = letters[1:4]))
+    spn2$end()
+    spn1$end()
+  })[["traces"]]
 
-  spns <- parse_spans(tmp)
   expect_equal(length(spns[[1]]$events), 2)
   expect_equal(spns[[1]]$events[[1]]$name, "ev")
   expect_equal(
-    spns[[1]]$events[[1]]$attributes,
-    list(key = "value", key2 = "[1,2,3,4,5]")
+    sort_named_list(spns[[1]]$events[[1]]$attributes),
+    list(key = "value", key2 = as.double(1:5))
   )
   expect_equal(spns[[1]]$events[[2]]$name, "ev2")
   expect_equal(
     spns[[1]]$events[[2]]$attributes,
-    list(x = "[a,b,c,d]")
+    list(x = letters[1:4])
   )
 })
 

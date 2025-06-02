@@ -154,6 +154,8 @@ struct otel_span_data_t *otel_tracer_provider_memory_get_spans_(
     std::unordered_map<std::string, common_sdk::OwnedAttributeValue> attr =
       data[i]->GetAttributes();
     BAIL_IF(cc2c_otel_attributes(attr, cdata->a[i].attributes));
+    const std::vector<trace_sdk::SpanDataEvent> &events = data[i]->GetEvents();
+    BAIL_IF(cc2c_otel_events(events, cdata->a[i].events));
   }
   return cdata;
 }
