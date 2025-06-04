@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
@@ -17,12 +18,14 @@
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
+#include "opentelemetry/exporters/memory/in_memory_metric_exporter_factory.h"
 
 namespace metrics_sdk      = opentelemetry::sdk::metrics;
 namespace common           = opentelemetry::common;
 namespace metrics_exporter = opentelemetry::exporter::metrics;
 namespace metrics_api      = opentelemetry::metrics;
 namespace otlp             = opentelemetry::exporter::otlp;
+namespace memory           = opentelemetry::exporter::memory;
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
@@ -132,6 +135,75 @@ void *otel_create_meter_provider_http_(
 
   mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
   return (void*) mps;
+}
+
+void *otel_create_meter_provider_memory_(
+    int export_interval, int export_timeout, int buffer_size,
+    int temporality) {
+  struct otel_meter_provider *mps = new otel_meter_provider;
+  mps->metricdata.reset(new memory::CircularBufferInMemoryMetricData(buffer_size));
+
+  std::string version{"1.2.0"};
+  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
+
+  // Initialize and set the global MeterProvider
+  metrics_sdk::PeriodicExportingMetricReaderOptions reader_options;
+  reader_options.export_interval_millis =
+    std::chrono::milliseconds(export_interval);
+  reader_options.export_timeout_millis  =
+    std::chrono::milliseconds(export_timeout);
+
+  auto exporter = memory::InMemoryMetricExporterFactory::Create(mps->metricdata);
+  auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
+    std::move(exporter),
+    reader_options
+  );
+  auto context = metrics_sdk::MeterContextFactory::Create();
+  context->AddMetricReader(std::move(reader));
+
+  mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
+  return (void*) mps;
+}
+
+#define BAIL() throw std::runtime_error("");
+
+int otel_meter_provider_memory_get_metrics_(
+    void *meter_provider_, struct otel_metric_data_t *data) {
+  try {
+    struct otel_meter_provider *mps =
+      (struct otel_meter_provider *) meter_provider_;
+    memory::CircularBufferInMemoryMetricData &metricdata = *mps->metricdata;
+    std::vector<std::unique_ptr<metrics_sdk::ResourceMetrics>> data =
+      metricdata.Get();
+    for (const auto &rm: data) {
+      const common_sdk::AttributeMap &resattrs = rm->resource_->GetAttributes();
+      for (const metrics_sdk::ScopeMetrics &smd: rm->scope_metric_data_) {
+        const std::string &scopename = smd.scope_->GetName();
+        const std::string &scopeversion = smd.scope_->GetVersion();
+        const std::string &scopeschemaurl = smd.scope_->GetSchemaURL();
+        const common_sdk::AttributeMap &scopeattr = smd.scope_->GetAttributes();
+        for (const metrics_sdk::MetricData &md: smd.metric_data_) {
+          const metrics_sdk::InstrumentDescriptor &instr =
+            md.instrument_descriptor;
+          const metrics_sdk::AggregationTemporality &at =
+            md.aggregation_temporality;
+          common::SystemTimestamp start = md.start_ts;
+          common::SystemTimestamp end = md.end_ts;
+          for (const metrics_sdk::PointDataAttributes &dp: md.point_data_attr_) {
+            const metrics_sdk::PointAttributes &pattr = dp.attributes;
+            const metrics_sdk::PointType &pd = dp.point_data;
+//            cc2c_point_type(pd, struct otel_point_)
+          }
+        }
+      }
+    }
+
+
+    return 0;
+  } catch(...) {
+    otel_metric_data_free(data);
+    return 1;
+  }
 }
 
 void otel_meter_provider_flush_(void *meter_provider_, int timeout) {

@@ -1,7 +1,10 @@
+#include <errno.h>
+
 #define R_USE_C99_IN_CXX 1
 #include <Rinternals.h>
 
 #include "otel_common_r.h"
+#include "errors.h"
 
 SEXP otel_tracer_provider_memory_get_spans(SEXP provider) {
   if (TYPEOF(provider) != EXTPTRSXP) {
@@ -19,7 +22,9 @@ SEXP otel_tracer_provider_memory_get_spans(SEXP provider) {
   }
 
   struct otel_span_data_t data = { 0 };
-  otel_tracer_provider_memory_get_spans_(tracer_provider_, &data);
+  if (otel_tracer_provider_memory_get_spans_(tracer_provider_, &data)) {
+    R_THROW_MAYBE_SYSTEM_ERROR("Cannot get spans from memory tracer provider");
+  }
 
   SEXP res = PROTECT(Rf_allocVector(VECSXP, data.count));
   const char *nms[] = {

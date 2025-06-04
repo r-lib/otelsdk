@@ -10,6 +10,7 @@
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/exporters/memory/in_memory_metric_data.h"
 
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
@@ -48,6 +49,7 @@ struct otel_logger {
 struct otel_meter_provider {
   std::unique_ptr<metrics_sdk::MeterProvider> ptr;
   std::fstream stream;
+  std::shared_ptr<memory::CircularBufferInMemoryMetricData> metricdata;
 };
 
 struct otel_meter {
@@ -103,9 +105,30 @@ int cc2c_otel_instrumentation_scope(
 int cc2c_otel_attribute(
     const std::string &key, const common_sdk::OwnedAttributeValue &attr,
     struct otel_attribute &cattr);
-int cc2c_otel_attributes(
-  const std::unordered_map<std::string, common_sdk::OwnedAttributeValue> &attrs,
-  struct otel_attributes &cattrs);
+
+template<typename T>
+int cc2c_otel_attributes(const T &attrs, struct otel_attributes &cattrs) {
+  try {
+    size_t sz = attrs.size();
+    cattrs.a = (struct otel_attribute*)
+      malloc(sizeof(struct otel_attribute) * sz);
+    if (!cattrs.a) return 1;
+    cattrs.count = sz;
+
+    size_t i = 0;
+    for (auto it: attrs) {
+      const std::string &key = it.first;
+      const common_sdk::OwnedAttributeValue &val = it.second;
+      if (cc2c_otel_attribute(key, val, cattrs.a[i++])) return 1;
+    }
+
+    return 0;
+
+  } catch (...) {
+    otel_attributes_free(&cattrs);
+    return 1;
+  }
+}
 
 int cc2c_otel_boolean_array(
   const std::vector<bool> &a, struct otel_boolean_array &ca);

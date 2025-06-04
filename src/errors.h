@@ -159,4 +159,12 @@ SEXP r_throw_system_error(const char *func, const char *filename, int line,
                           const char *msg, ...);
 #endif
 
+#define R_THROW_MAYBE_SYSTEM_ERROR(...) do {   \
+    if (errno != 0) {                          \
+      R_THROW_SYSTEM_ERROR(__VA_ARGS__);       \
+    } else {                                   \
+      R_THROW_ERROR(__VA_ARGS__);              \
+    } \
+  } while (0)
+
 #endif

@@ -414,3 +414,7 @@ SEXP c2r_otel_span_links(const struct otel_span_links *links) {
   UNPROTECT(1);
   return res;
 }
+
+void otel_metric_data_free(struct otel_metric_data_t *cdata) {
+  // TODO
+}

@@ -22,6 +22,7 @@ tracer_provider_memory_new <- function(buffer_size = 100) {
   self$xptr <- .Call(otel_create_tracer_provider_memory, buffer_size)
   self
 }
+
 tracer_provider_memory <- list(
   new = tracer_provider_memory_new
 )

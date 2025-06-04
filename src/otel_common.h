@@ -204,6 +204,12 @@ struct otel_span_data_t {
 
 void otel_span_data_free(struct otel_span_data_t *cdata);
 
+struct otel_metric_data_t {
+  // TODO
+};
+
+void otel_metric_data_free(struct otel_metric_data_t *cdata);
+
 extern const char *otel_http_request_content_type_str[];
 
 void otel_tracer_provider_finally_(void *tracer_provider);
@@ -222,7 +228,7 @@ void otel_gauge_finally_(void *gauge);
 void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
 void *otel_create_tracer_provider_memory_(int buffer_size);
-struct otel_span_data_t *otel_tracer_provider_memory_get_spans_(
+int otel_tracer_provider_memory_get_spans_(
   void *tracer_provider, struct otel_span_data_t *cdata);
 void otel_tracer_provider_flush_(void *tracer_provider);
 void *otel_get_tracer_(
@@ -302,6 +308,11 @@ void *otel_create_meter_provider_stdstream_(
   const char *stream, int export_interval, int export_timeout);
 void *otel_create_meter_provider_http_(
   int export_interval, int export_timeout);
+void *otel_create_meter_provider_memory_(
+    int export_interval, int export_timeout, int cbuffer_size,
+    int ctemporality);
+int otel_meter_provider_memory_get_metrics_(
+  void *meter_provider_, struct otel_metric_data_t *data);
 void otel_meter_provider_flush_(void *tracer_provider, int timeout);
 void otel_meter_provider_shutdown_(void *tracer_provider, int timeout);
 void *otel_get_meter_(

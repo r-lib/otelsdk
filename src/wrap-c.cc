@@ -181,31 +181,6 @@ int cc2c_otel_attribute(
   }
 }
 
-int cc2c_otel_attributes(
-    const std::unordered_map<std::string, common_sdk::OwnedAttributeValue> &attrs,
-    struct otel_attributes &cattrs) {
-  try {
-    size_t sz = attrs.size();
-    cattrs.a = (struct otel_attribute*)
-      malloc(sizeof(struct otel_attribute) * sz);
-    if (!cattrs.a) return 1;
-    cattrs.count = sz;
-
-    size_t i = 0;
-    for (auto it: attrs) {
-      const std::string &key = it.first;
-      const common_sdk::OwnedAttributeValue &val = it.second;
-      if (cc2c_otel_attribute(key, val, cattrs.a[i++])) return 1;
-    }
-
-    return 0;
-
-  } catch (...) {
-    otel_attributes_free(&cattrs);
-    return 1;
-  }
-}
-
 int cc2c_otel_boolean_array(
     const std::vector<bool> &a, struct otel_boolean_array &ca) {
   ca.a = (int*) malloc(sizeof(int) * a.size());

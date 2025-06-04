@@ -55,6 +55,44 @@ SEXP otel_create_meter_provider_http(
   return xptr;
 }
 
+SEXP otel_create_meter_provider_memory(
+    SEXP export_interval, SEXP export_timeout, SEXP buffer_size,
+    SEXP temporality) {
+  int cexport_interval = INTEGER(export_interval)[0];
+  int cexport_timeout = INTEGER(export_timeout)[0];
+  int cbuffer_size = INTEGER(buffer_size)[0];
+  int ctemporality = INTEGER(temporality)[0];
+  void *meter_provider_ = otel_create_meter_provider_memory_(
+    cexport_interval, cexport_timeout, cbuffer_size, ctemporality);
+  SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_meter_provider_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_meter_provider_memory_get_metrics(SEXP provider) {
+  if (TYPEOF(provider) != EXTPTRSXP) {
+    Rf_warningcall(
+      R_NilValue,
+      "OpenTelemetry: invalid meter provider pointer."
+    );
+    return R_NilValue;
+  }
+  void *meter_provider_ = R_ExternalPtrAddr(provider);
+  if (!meter_provider_) {
+    Rf_error(
+      "Opentelemetry meter provider cleaned up already, internal error."
+    );
+  }
+
+  struct otel_metric_data_t data = { 0 };
+  otel_meter_provider_memory_get_metrics_(meter_provider_, &data);
+
+  // TODO
+
+  otel_metric_data_free(&data);
+  return R_NilValue;
+}
+
 SEXP otel_get_meter(
     SEXP provider, SEXP name, SEXP version, SEXP schema_url,
     SEXP attributes) {

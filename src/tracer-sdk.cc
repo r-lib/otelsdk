@@ -105,61 +105,62 @@ void *otel_create_tracer_provider_memory_(int buffer_size) {
   return (void*) tps;
 }
 
-#define BAIL_IF_NOT(x) do { \
-  if (!(x)) { otel_span_data_free(cdata); return nullptr; } } while (0)
+#define BAIL() throw std::runtime_error("");
 
-#define BAIL_IF(x) do { \
-  if (x) { otel_span_data_free(cdata); return nullptr; } } while (0)
-
-struct otel_span_data_t *otel_tracer_provider_memory_get_spans_(
+int otel_tracer_provider_memory_get_spans_(
     void *tracer_provider_, struct otel_span_data_t *cdata) {
-  struct otel_tracer_provider *tps =
-    (struct otel_tracer_provider *) tracer_provider_;
-  memory::InMemorySpanData &spandata = *tps->spandata;
-  std::vector<std::unique_ptr<trace_sdk::SpanData>> data = spandata.Get();
-  cdata->a = (struct otel_span_data1_t*)
-    malloc(sizeof(struct otel_span_data1_t) * data.size());
-  BAIL_IF_NOT(cdata->a);
-  cdata->count = data.size();
-  for (auto i = 0; i < data.size(); i++) {
-    trace_api::TraceId trace_id = data[i]->GetTraceId();
-    BAIL_IF(cc2c_otel_string(trace_id, cdata->a[i].trace_id));
-    trace_api::SpanId span_id = data[i]->GetSpanId();
-    BAIL_IF(cc2c_otel_string(span_id, cdata->a[i].span_id));
-    nostd::string_view name = data[i]->GetName();
-    BAIL_IF(cc2c_otel_string(name, cdata->a[i].name));
-    trace_api::SpanId parent_id = data[i]->GetParentSpanId();
-    BAIL_IF(cc2c_otel_string(parent_id, cdata->a[i].parent));
-    trace_api::SpanKind kind = data[i]->GetSpanKind();
-    cdata->a[i].kind = static_cast<int>(kind);
-    trace_api::StatusCode status = data[i]->GetStatus();
-    cdata->a[i].status = static_cast<int>(status);
-    nostd::string_view dsc = data[i]->GetDescription();
-    BAIL_IF(cc2c_otel_string(dsc, cdata->a[i].description));
-    std::chrono::nanoseconds st = data[i]->GetStartTime().time_since_epoch();
-    cdata->a[i].start_time = st.count() / 1000.0 / 1000.0 / 1000.0;
-    std::chrono::nanoseconds dur = data[i]->GetDuration();
-    cdata->a[i].duration = dur.count() / 1000.0 / 1000.0 / 1000.0;
-    trace_api::TraceFlags tf = data[i]->GetFlags();
-    BAIL_IF(cc2c_otel_trace_flags(tf, cdata->a[i].flags));
-    resource::Resource res = data[i]->GetResource();
-    const std::string &schema_url = res.GetSchemaURL();
-    BAIL_IF(cc2c_otel_string(schema_url, cdata->a[i].schema_url));
-    std::unordered_map<std::string, common_sdk::OwnedAttributeValue> rattr =
-      res.GetAttributes();
-    BAIL_IF(cc2c_otel_attributes(rattr, cdata->a[i].resource_attributes));
-    trace_sdk::InstrumentationScope is = data[i]->GetInstrumentationScope();
-    BAIL_IF(cc2c_otel_instrumentation_scope(
-      is, cdata->a[i].instrumentation_scope));
-    std::unordered_map<std::string, common_sdk::OwnedAttributeValue> attr =
-      data[i]->GetAttributes();
-    BAIL_IF(cc2c_otel_attributes(attr, cdata->a[i].attributes));
-    const std::vector<trace_sdk::SpanDataEvent> &events = data[i]->GetEvents();
-    BAIL_IF(cc2c_otel_events(events, cdata->a[i].events));
-    const std::vector<trace_sdk::SpanDataLink> &links = data[i]->GetLinks();
-    BAIL_IF(cc2c_otel_links(links, cdata->a[i].links));
+  try {
+    struct otel_tracer_provider *tps =
+      (struct otel_tracer_provider *) tracer_provider_;
+    memory::InMemorySpanData &spandata = *tps->spandata;
+    std::vector<std::unique_ptr<trace_sdk::SpanData>> data = spandata.Get();
+    cdata->a = (struct otel_span_data1_t*)
+      malloc(sizeof(struct otel_span_data1_t) * data.size());
+    if (!cdata->a) BAIL();
+    cdata->count = data.size();
+    for (auto i = 0; i < data.size(); i++) {
+      trace_api::TraceId trace_id = data[i]->GetTraceId();
+      if (cc2c_otel_string(trace_id, cdata->a[i].trace_id)) BAIL();
+      trace_api::SpanId span_id = data[i]->GetSpanId();
+      if (cc2c_otel_string(span_id, cdata->a[i].span_id)) BAIL();
+      nostd::string_view name = data[i]->GetName();
+      if (cc2c_otel_string(name, cdata->a[i].name)) BAIL();
+      trace_api::SpanId parent_id = data[i]->GetParentSpanId();
+      if (cc2c_otel_string(parent_id, cdata->a[i].parent)) BAIL();
+      trace_api::SpanKind kind = data[i]->GetSpanKind();
+      cdata->a[i].kind = static_cast<int>(kind);
+      trace_api::StatusCode status = data[i]->GetStatus();
+      cdata->a[i].status = static_cast<int>(status);
+      nostd::string_view dsc = data[i]->GetDescription();
+      if (cc2c_otel_string(dsc, cdata->a[i].description)) BAIL();
+      std::chrono::nanoseconds st = data[i]->GetStartTime().time_since_epoch();
+      cdata->a[i].start_time = st.count() / 1000.0 / 1000.0 / 1000.0;
+      std::chrono::nanoseconds dur = data[i]->GetDuration();
+      cdata->a[i].duration = dur.count() / 1000.0 / 1000.0 / 1000.0;
+      trace_api::TraceFlags tf = data[i]->GetFlags();
+      if (cc2c_otel_trace_flags(tf, cdata->a[i].flags)) BAIL();
+      resource::Resource res = data[i]->GetResource();
+      const std::string &schema_url = res.GetSchemaURL();
+      if (cc2c_otel_string(schema_url, cdata->a[i].schema_url)) BAIL();
+      std::unordered_map<std::string, common_sdk::OwnedAttributeValue> rattr =
+        res.GetAttributes();
+      if (cc2c_otel_attributes(rattr, cdata->a[i].resource_attributes)) BAIL();
+      trace_sdk::InstrumentationScope is = data[i]->GetInstrumentationScope();
+      if (cc2c_otel_instrumentation_scope(
+        is, cdata->a[i].instrumentation_scope)) BAIL();
+      std::unordered_map<std::string, common_sdk::OwnedAttributeValue> attr =
+        data[i]->GetAttributes();
+      if (cc2c_otel_attributes(attr, cdata->a[i].attributes)) BAIL();
+      const std::vector<trace_sdk::SpanDataEvent> &events = data[i]->GetEvents();
+      if (cc2c_otel_events(events, cdata->a[i].events)) BAIL();
+      const std::vector<trace_sdk::SpanDataLink> &links = data[i]->GetLinks();
+      if (cc2c_otel_links(links, cdata->a[i].links)) BAIL();
+    }
+    return 0;
+  } catch(...) {
+    otel_span_data_free(cdata);
+    return 1;
   }
-  return cdata;
 }
 
 void otel_tracer_provider_flush_(void *tracer_provider_) {
