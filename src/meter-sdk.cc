@@ -168,7 +168,7 @@ void *otel_create_meter_provider_memory_(
 #define BAIL() throw std::runtime_error("");
 
 int otel_meter_provider_memory_get_metrics_(
-    void *meter_provider_, struct otel_metric_data_t *data) {
+    void *meter_provider_, struct otel_metric_data *data) {
   try {
     struct otel_meter_provider *mps =
       (struct otel_meter_provider *) meter_provider_;

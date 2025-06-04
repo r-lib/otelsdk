@@ -54,7 +54,7 @@ int cc2c_otel_string(
 }
 
 int cc2c_otel_trace_flags(
-    const trace_api::TraceFlags &flags, struct otel_trace_flags_t &cflags) {
+    const trace_api::TraceFlags &flags, struct otel_trace_flags &cflags) {
   cflags.is_sampled = flags.IsSampled();
   cflags.is_random = flags.IsRandom();
   return 0;
@@ -62,7 +62,7 @@ int cc2c_otel_trace_flags(
 
 int cc2c_otel_instrumentation_scope(
     trace_sdk::InstrumentationScope &is,
-    struct otel_instrumentation_scope_t &cis) noexcept {
+    struct otel_instrumentation_scope &cis) noexcept {
   try {
     const std::string &nm = is.GetName();
     const std::string &vs = is.GetVersion();

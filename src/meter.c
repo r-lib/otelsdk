@@ -84,7 +84,7 @@ SEXP otel_meter_provider_memory_get_metrics(SEXP provider) {
     );
   }
 
-  struct otel_metric_data_t data = { 0 };
+  struct otel_metric_data data = { 0 };
   otel_meter_provider_memory_get_metrics_(meter_provider_, &data);
 
   // TODO

@@ -96,11 +96,11 @@ int cc2c_otel_strings(
 }
 
 int cc2c_otel_trace_flags(
-  const trace_api::TraceFlags &flags, struct otel_trace_flags_t &cflags);
+  const trace_api::TraceFlags &flags, struct otel_trace_flags &cflags);
 
 int cc2c_otel_instrumentation_scope(
   trace_sdk::InstrumentationScope &is,
-  struct otel_instrumentation_scope_t &cis) noexcept;
+  struct otel_instrumentation_scope &cis) noexcept;
 
 int cc2c_otel_attribute(
     const std::string &key, const common_sdk::OwnedAttributeValue &attr,

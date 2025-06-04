@@ -21,7 +21,7 @@ SEXP otel_tracer_provider_memory_get_spans(SEXP provider) {
     );
   }
 
-  struct otel_span_data_t data = { 0 };
+  struct otel_span_data data = { 0 };
   if (otel_tracer_provider_memory_get_spans_(tracer_provider_, &data)) {
     R_THROW_MAYBE_SYSTEM_ERROR("Cannot get spans from memory tracer provider");
   }

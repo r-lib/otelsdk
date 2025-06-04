@@ -14,10 +14,10 @@ SEXP c2r_otel_string(const struct otel_string *s);
 SEXP c2r_otel_strings(const struct otel_strings *s);
 SEXP c2r_otel_named_strings(const struct otel_strings *s);
 
-SEXP c2r_otel_trace_flags(const struct otel_trace_flags_t *flags);
+SEXP c2r_otel_trace_flags(const struct otel_trace_flags *flags);
 
 SEXP c2r_otel_instrumentation_scope(
-  const struct otel_instrumentation_scope_t *is);
+  const struct otel_instrumentation_scope *is);
 
 SEXP c2r_otel_attributes(const struct otel_attributes *attrs);
 SEXP c2r_otel_events(const struct otel_events *events);

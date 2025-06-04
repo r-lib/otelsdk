@@ -47,7 +47,7 @@ SEXP c2r_otel_named_strings(const struct otel_strings *s) {
 }
 
 void otel_instrumentation_scope_free(
-    struct otel_instrumentation_scope_t *is) {
+    struct otel_instrumentation_scope *is) {
   if (!is) return;
   otel_string_free(&is->name);
   otel_string_free(&is->version);
@@ -55,7 +55,7 @@ void otel_instrumentation_scope_free(
 }
 
 SEXP c2r_otel_instrumentation_scope(
-    const struct otel_instrumentation_scope_t *is) {
+    const struct otel_instrumentation_scope *is) {
   const char *nms[] = { "name", "version", "schema_url", "" };
   SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
   SET_VECTOR_ELT(res, 0, c2r_otel_string(&is->name));
@@ -67,11 +67,11 @@ SEXP c2r_otel_instrumentation_scope(
   return res;
 }
 
-void otel_span_data_free(struct otel_span_data_t *cdata) {
+void otel_span_data_free(struct otel_span_data *cdata) {
   if (cdata) {
     if (cdata->a) {
       for (int i = 0; i < cdata->count; i++) {
-        struct otel_span_data1_t *xi = &cdata->a[i];
+        struct otel_span_data1 *xi = &cdata->a[i];
         otel_string_free(&xi->trace_id);
         otel_string_free(&xi->span_id);
         otel_string_free(&xi->parent);
@@ -95,7 +95,7 @@ void otel_span_data_free(struct otel_span_data_t *cdata) {
   }
 }
 
-SEXP c2r_otel_trace_flags(const struct otel_trace_flags_t *flags) {
+SEXP c2r_otel_trace_flags(const struct otel_trace_flags *flags) {
   const char *nms[] = { "sampled", "random", "" };
   SEXP res = Rf_mkNamed(LGLSXP, nms);
   LOGICAL(res)[0] = flags->is_sampled;
@@ -415,6 +415,6 @@ SEXP c2r_otel_span_links(const struct otel_span_links *links) {
   return res;
 }
 
-void otel_metric_data_free(struct otel_metric_data_t *cdata) {
+void otel_metric_data_free(struct otel_metric_data *cdata) {
   // TODO
 }

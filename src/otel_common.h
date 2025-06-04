@@ -109,7 +109,7 @@ struct otel_links {
   size_t count;
 };
 
-struct otel_tracer_provider_http_options_t {
+struct otel_tracer_provider_http_options {
   struct otel_string url;
   enum otel_http_request_content_type content_type;
   int use_json_name;
@@ -134,12 +134,12 @@ struct otel_tracer_provider_http_options_t {
   double retry_policy_backoff_multiplier;
 };
 
-struct otel_trace_flags_t {
+struct otel_trace_flags {
   int is_sampled;
   int is_random;
 };
 
-struct otel_instrumentation_scope_t {
+struct otel_instrumentation_scope {
   struct otel_string name;
   struct otel_string version;
   struct otel_string schema_url;
@@ -147,7 +147,7 @@ struct otel_instrumentation_scope_t {
 };
 
 void otel_instrumentation_scope_free(
-  struct otel_instrumentation_scope_t *is);
+  struct otel_instrumentation_scope *is);
 
 struct otel_event {
   struct otel_string name;
@@ -177,19 +177,19 @@ struct otel_span_links {
 void otel_span_link_free(struct otel_span_link *link);
 void otel_span_links_free(struct otel_span_links *links);
 
-struct otel_span_data1_t {
+struct otel_span_data1 {
   struct otel_string trace_id;
   struct otel_string span_id;
   // SpanContext does not seem useful?
   struct otel_string parent;
   struct otel_string name;
-  struct otel_trace_flags_t flags;
+  struct otel_trace_flags flags;
   int kind;
   int status;
   struct otel_string schema_url;
   struct otel_string description;
   struct otel_attributes resource_attributes;
-  struct otel_instrumentation_scope_t instrumentation_scope;
+  struct otel_instrumentation_scope instrumentation_scope;
   double start_time;
   double duration;
   struct otel_attributes attributes;
@@ -197,18 +197,18 @@ struct otel_span_data1_t {
   struct otel_span_links links;
 };
 
-struct otel_span_data_t {
-  struct otel_span_data1_t *a;
+struct otel_span_data {
+  struct otel_span_data1 *a;
   size_t count;
 };
 
-void otel_span_data_free(struct otel_span_data_t *cdata);
+void otel_span_data_free(struct otel_span_data *cdata);
 
-struct otel_metric_data_t {
+struct otel_metric_data {
   // TODO
 };
 
-void otel_metric_data_free(struct otel_metric_data_t *cdata);
+void otel_metric_data_free(struct otel_metric_data *cdata);
 
 extern const char *otel_http_request_content_type_str[];
 
@@ -229,7 +229,7 @@ void *otel_create_tracer_provider_stdstream_(const char *stream);
 void *otel_create_tracer_provider_http_(void);
 void *otel_create_tracer_provider_memory_(int buffer_size);
 int otel_tracer_provider_memory_get_spans_(
-  void *tracer_provider, struct otel_span_data_t *cdata);
+  void *tracer_provider, struct otel_span_data *cdata);
 void otel_tracer_provider_flush_(void *tracer_provider);
 void *otel_get_tracer_(
     void *tracer_provider_, const char *name, const char *version,
@@ -284,7 +284,7 @@ void otel_finish_session_(void *id_);
 void otel_finish_all_sessions_(void);
 
 int otel_tracer_provider_http_default_options_(
-  struct otel_tracer_provider_http_options_t *opts);
+  struct otel_tracer_provider_http_options *opts);
 
 void otel_logger_provider_finally_(void *logger_provider);
 void *otel_create_logger_provider_stdstream_(const char *stream);
@@ -312,7 +312,7 @@ void *otel_create_meter_provider_memory_(
     int export_interval, int export_timeout, int cbuffer_size,
     int ctemporality);
 int otel_meter_provider_memory_get_metrics_(
-  void *meter_provider_, struct otel_metric_data_t *data);
+  void *meter_provider_, struct otel_metric_data *data);
 void otel_meter_provider_flush_(void *tracer_provider, int timeout);
 void otel_meter_provider_shutdown_(void *tracer_provider, int timeout);
 void *otel_get_meter_(

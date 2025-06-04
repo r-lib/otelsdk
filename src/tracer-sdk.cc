@@ -108,14 +108,14 @@ void *otel_create_tracer_provider_memory_(int buffer_size) {
 #define BAIL() throw std::runtime_error("");
 
 int otel_tracer_provider_memory_get_spans_(
-    void *tracer_provider_, struct otel_span_data_t *cdata) {
+    void *tracer_provider_, struct otel_span_data *cdata) {
   try {
     struct otel_tracer_provider *tps =
       (struct otel_tracer_provider *) tracer_provider_;
     memory::InMemorySpanData &spandata = *tps->spandata;
     std::vector<std::unique_ptr<trace_sdk::SpanData>> data = spandata.Get();
-    cdata->a = (struct otel_span_data1_t*)
-      malloc(sizeof(struct otel_span_data1_t) * data.size());
+    cdata->a = (struct otel_span_data1*)
+      malloc(sizeof(struct otel_span_data1) * data.size());
     if (!cdata->a) BAIL();
     cdata->count = data.size();
     for (auto i = 0; i < data.size(); i++) {
@@ -188,7 +188,7 @@ void *otel_get_tracer_(
 }
 
 int otel_tracer_provider_http_default_options_(
-  struct otel_tracer_provider_http_options_t *copts) {
+  struct otel_tracer_provider_http_options *copts) {
 
   otlp::OtlpHttpExporterOptions *opts =
     new otlp::OtlpHttpExporterOptions();
