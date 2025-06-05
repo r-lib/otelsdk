@@ -61,16 +61,19 @@ void otel_span_context_finally_(void *span_context_) {
   delete span_context;
 }
 
-void *otel_create_tracer_provider_stdstream_(const char *stream) {
+void *otel_create_tracer_provider_stdstream_(
+  const char *stream, struct otel_attributes *resource_attributes) {
   int sout = !strcmp(stream, "stdout");
   int serr = !strcmp(stream, "stderr");
   struct otel_tracer_provider *tps = new otel_tracer_provider;
+  RKeyValueIterable attributes_(*resource_attributes);
 
   if (sout || serr) {
     std::ostream &out = sout ? std::cout : std::cerr;
     auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(out);
     auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-    tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+    tps->ptr = trace_sdk::TracerProviderFactory::Create(
+      std::move(processor), resource::Resource::Create(&attributes_));
     return (void*) tps;
 
   } else {
@@ -79,28 +82,34 @@ void *otel_create_tracer_provider_stdstream_(const char *stream) {
     tps->stream.rdbuf()->pubsetbuf(0,0);
     auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(tps->stream);
     auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-    tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+    tps->ptr = trace_sdk::TracerProviderFactory::Create(
+      std::move(processor), resource::Resource::Create(&attributes_));
     return tps;
   }
 }
 
-void *otel_create_tracer_provider_http_(void) {
+void *otel_create_tracer_provider_http_(struct otel_attributes *resource_attributes) {
   auto exporter  = otlp::OtlpHttpExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
+  RKeyValueIterable attributes_(*resource_attributes);
   struct otel_tracer_provider *tps = new otel_tracer_provider;
-  tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+  tps->ptr = trace_sdk::TracerProviderFactory::Create(
+    std::move(processor), resource::Resource::Create(&attributes_));
 
   return (void*) tps;
 }
 
-void *otel_create_tracer_provider_memory_(int buffer_size) {
+void *otel_create_tracer_provider_memory_(
+  int buffer_size, struct otel_attributes *resource_attributes) {
+  RKeyValueIterable attributes_(*resource_attributes);
   struct otel_tracer_provider *tps = new otel_tracer_provider;
   tps->spandata.reset(new memory::InMemorySpanData(buffer_size));
   auto exporter  = memory::InMemorySpanExporterFactory::Create(tps->spandata);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
-  tps->ptr = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+  tps->ptr = trace_sdk::TracerProviderFactory::Create(
+    std::move(processor), resource::Resource::Create(&attributes_));
 
   return (void*) tps;
 }
