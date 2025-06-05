@@ -143,7 +143,7 @@ struct otel_instrumentation_scope {
   struct otel_string name;
   struct otel_string version;
   struct otel_string schema_url;
-  // TODO: attributes
+  struct otel_attributes attributes;
 };
 
 void otel_instrumentation_scope_free(

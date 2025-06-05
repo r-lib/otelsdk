@@ -4,6 +4,7 @@
 #include "Rinternals.h"
 
 #include "otel_common.h"
+#include "otel_common_r.h"
 
 void otel_string_free(struct otel_string *s) {
   if (!s) return;
@@ -52,15 +53,17 @@ void otel_instrumentation_scope_free(
   otel_string_free(&is->name);
   otel_string_free(&is->version);
   otel_string_free(&is->schema_url);
+  otel_attributes_free(&is->attributes);
 }
 
 SEXP c2r_otel_instrumentation_scope(
     const struct otel_instrumentation_scope *is) {
-  const char *nms[] = { "name", "version", "schema_url", "" };
+  const char *nms[] = { "name", "version", "schema_url", "attributes", "" };
   SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
   SET_VECTOR_ELT(res, 0, c2r_otel_string(&is->name));
   SET_VECTOR_ELT(res, 1, c2r_otel_string(&is->version));
   SET_VECTOR_ELT(res, 2, c2r_otel_string(&is->schema_url));
+  SET_VECTOR_ELT(res, 3, c2r_otel_attributes(&is->attributes));
   Rf_setAttrib(
     res, R_ClassSymbol, Rf_mkString("otel_instrumentation_scope_data"));
   UNPROTECT(1);

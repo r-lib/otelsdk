@@ -67,9 +67,11 @@ int cc2c_otel_instrumentation_scope(
     const std::string &nm = is.GetName();
     const std::string &vs = is.GetVersion();
     const std::string &su = is.GetSchemaURL();
+    const trace_sdk::InstrumentationScopeAttributes &at = is.GetAttributes();
     if (cc2c_otel_string(nm, cis.name)) throw std::runtime_error("");
     if (cc2c_otel_string(vs, cis.version)) throw std::runtime_error("");
     if (cc2c_otel_string(su, cis.schema_url)) throw std::runtime_error("");
+    if (cc2c_otel_attributes(at, cis.attributes)) throw std::runtime_error("");
     return 0;
   } catch(...) {
     otel_instrumentation_scope_free(&cis);

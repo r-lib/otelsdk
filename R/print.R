@@ -14,6 +14,9 @@ format_instrumentation_scope <- function(x) {
   x <- data.frame(row.names = names(x), key = names(x), value = I(unclass(x)))
   x$label <- paste0(format(x$key), " : ")
   x$fmt <- format1(x$value)
+  if ("attributes" %in% x$key) {
+    x["attributes", ]$fmt <- format_attributes(x["attributes", ]$value[[1]])
+  }
   lns <- paste0("    ", x$label, x$fmt)
   paste0(c("", lns), collapse = "\n")
 }
