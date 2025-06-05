@@ -241,9 +241,12 @@ void otel_up_down_counter_finally_(void *up_down_counter);
 void otel_histogram_finally_(void *histogram);
 void otel_gauge_finally_(void *gauge);
 
-void *otel_create_tracer_provider_stdstream_(const char *stream);
-void *otel_create_tracer_provider_http_(void);
-void *otel_create_tracer_provider_memory_(int buffer_size);
+void *otel_create_tracer_provider_stdstream_(
+  const char *stream, struct otel_attributes *resource_attributes);
+void *otel_create_tracer_provider_http_(
+  struct otel_attributes *resource_attributes);
+void *otel_create_tracer_provider_memory_(
+  int buffer_size, struct otel_attributes *resource_attributes);
 int otel_tracer_provider_memory_get_spans_(
   void *tracer_provider, struct otel_span_data *cdata);
 void otel_tracer_provider_flush_(void *tracer_provider);
