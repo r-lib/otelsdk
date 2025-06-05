@@ -421,3 +421,10 @@ SEXP c2r_otel_span_links(const struct otel_span_links *links) {
 void otel_metric_data_free(struct otel_metric_data *cdata) {
   // TODO
 }
+
+void otel_session_free(struct otel_session *sess) {
+  if (!sess) return;
+  otel_string_free(&sess->id);
+  otel_string_free(&sess->trace_id);
+  otel_string_free(&sess->span_id);
+}

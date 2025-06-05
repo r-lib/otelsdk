@@ -53,9 +53,11 @@ SEXP otel_extract_http_context(SEXP headers);
 
 SEXP otel_start_session(void);
 SEXP otel_activate_session(SEXP sess);
-SEXP otel_deactivate_session(SEXP sess);
+SEXP otel_deactivate_session(void);
 SEXP otel_finish_session(SEXP sess);
 SEXP otel_finish_all_sessions(void);
+
+SEXP otel_debug_current_session(void);
 
 SEXP otel_tracer_provider_http_options(void);
 
@@ -155,9 +157,11 @@ static const R_CallMethodDef callMethods[]  = {
 
   CALLDEF(otel_start_session, 0),
   CALLDEF(otel_activate_session, 1),
-  CALLDEF(otel_deactivate_session, 1),
+  CALLDEF(otel_deactivate_session, 0),
   CALLDEF(otel_finish_session, 1),
   CALLDEF(otel_finish_all_sessions, 0),
+  CALLDEF(otel_debug_current_session, 0),
+
   CALLDEF(otel_tracer_provider_http_options, 0),
 
   CALLDEF(otel_create_logger_provider_stdstream, 1),
@@ -383,14 +387,8 @@ SEXP otel_activate_session(SEXP sess) {
   return R_NilValue;
 }
 
-SEXP otel_deactivate_session(SEXP sess) {
-  if (TYPEOF(sess) != EXTPTRSXP) {
-    Rf_error("OpenTelemetry: invalid session pointer.");
-  }
-  void *sess_ = R_ExternalPtrAddr(sess);
-  if (sess_) {
-    otel_deactivate_session_(sess_);
-  }
+SEXP otel_deactivate_session(void) {
+  otel_deactivate_session_();
   return R_NilValue;
 }
 

@@ -35,8 +35,8 @@ tracer_new <- function(
     activate_session = function(session) {
       .Call(otel_activate_session, session)
     },
-    deactivate_session = function(session) {
-      .Call(otel_deactivate_session, session)
+    deactivate_session = function() {
+      .Call(otel_deactivate_session)
     },
     finish_session = function(session) {
       .Call(otel_finish_session, session)
@@ -68,4 +68,14 @@ tracer_new <- function(
     self$attributes
   )
   self
+}
+
+# for debugging
+
+otel_current_session <- function() {
+  .Call(otel_debug_current_session)
+}
+
+get_span_id <- function(span) {
+  span$get_context()$get_span_id()
 }

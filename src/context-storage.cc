@@ -4,6 +4,9 @@
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/trace/span.h"
 
+#include "otel_common.h"
+#include "otel_common_cpp.h"
+
 namespace ctx   = opentelemetry::context;
 namespace nostd = opentelemetry::nostd;
 namespace trace = opentelemetry::trace;
@@ -18,6 +21,7 @@ public:
   friend bool operator<(const SessionId& l, const SessionId r) {
     return l.id < r.id;
   }
+  const std::string &Get() { return id; }
 
 private:
   std::string id;
@@ -72,8 +76,8 @@ public:
     GetStackSet().SelectStack(id);
   }
 
-  void DeactivateSession(SessionId &id) {
-    GetStackSet().UnselectStack(id);
+  void DeactivateSession() {
+    GetStackSet().UnselectStack();
   }
 
   void FinishSession(SessionId &id) {
@@ -177,7 +181,7 @@ private:
   public:
     StackSet() : is_default_(true) { }
 
-    Stack &GetCurrent() {
+    Stack &GetCurrentStack() {
       if (is_default_) {
         return default_;
       } else {
@@ -186,9 +190,11 @@ private:
     }
 
     SessionId NewStack() {
+      Stack &old = GetCurrentStack();
       is_default_ = false;
       current_ = SessionId();
       sessions_[current_] = Stack();
+      sessions_[current_].Push(old.Top());
       return current_;
     }
 
@@ -197,7 +203,7 @@ private:
       current_ = id;
     }
 
-    void UnselectStack(SessionId &id) {
+    void UnselectStack() {
       is_default_ = true;
     }
 
@@ -225,7 +231,7 @@ private:
   }
 
   Stack &GetStack() {
-    return GetStackSet().GetCurrent();
+    return GetStackSet().GetCurrentStack();
   }
 };
 
@@ -243,11 +249,11 @@ void ActivateSession(SessionId &id) {
   rstr->ActivateSession(id);
 }
 
-void DeactivateSession(SessionId &id) {
+void DeactivateSession() {
   nostd::shared_ptr<ctx::RuntimeContextStorage> &str = GetRContextStorage();
   r_otel::RContextStorage *rstr =
     static_cast<r_otel::RContextStorage*>(str.get());
-  rstr->DeactivateSession(id);
+  rstr->DeactivateSession();
 }
 
 void FinishSession(SessionId &id) {
@@ -280,7 +286,7 @@ void otel_init_context_storage_(void) {
 
 extern "C" {
 
-extern void otel_init_context_storage(void) {
+void otel_init_context_storage(void) {
   otel_init_context_storage_();
 }
 
@@ -299,9 +305,8 @@ void otel_activate_session_(void *id_) {
   r_otel::ActivateSession(*id);
 }
 
-void otel_deactivate_session_(void *id_) {
-  r_otel::SessionId *id = (r_otel::SessionId*) id_;
-  r_otel::DeactivateSession(*id);
+void otel_deactivate_session_() {
+  r_otel::DeactivateSession();
 }
 
 void otel_finish_session_(void *id_) {
@@ -310,6 +315,34 @@ void otel_finish_session_(void *id_) {
 
 void otel_finish_all_sessions_(void) {
   r_otel::FinishAllSessions();
+}
+
+int otel_debug_current_session_(struct otel_session *sess) {
+  try {
+    nostd::shared_ptr<ctx::RuntimeContextStorage> &str = GetRContextStorage();
+    r_otel::RContextStorage *rstr =
+      static_cast<r_otel::RContextStorage*>(str.get());
+    ctx::Context cctx = rstr->GetCurrent();
+    ctx::ContextValue spanv = cctx.GetValue(trace::kSpanKey);
+    if (nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(spanv)) {
+      const trace::Span &span =
+        *nostd::get<nostd::shared_ptr<trace::Span>>(spanv);
+      trace::SpanContext spanctx = span.GetContext();
+      const trace::TraceId &trace_id = spanctx.trace_id();
+      const trace::SpanId &span_id = spanctx.span_id();
+      cc2c_otel_string(trace_id, sess->trace_id);
+      cc2c_otel_string(span_id, sess->span_id);
+    }
+    return 0;
+
+  } catch(...) {
+    otel_session_free(sess);
+    return 1;
+  }
+}
+
+void otel_debug_sessions_(struct otel_sessions *sess) {
+  // TODO
 }
 
 }

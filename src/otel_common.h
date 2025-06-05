@@ -208,6 +208,22 @@ struct otel_metric_data {
   // TODO
 };
 
+struct otel_session {
+  int is_default;
+  struct otel_string id;
+  struct otel_string trace_id;
+  struct otel_string span_id;
+};
+
+void otel_session_free(struct otel_session *sess);
+
+struct otel_sessions {
+  int is_default;
+  struct otel_string active_stack_id;
+  struct otel_session *a;
+  size_t count;
+};
+
 void otel_metric_data_free(struct otel_metric_data *cdata);
 
 extern const char *otel_http_request_content_type_str[];
@@ -279,9 +295,11 @@ void *otel_extract_http_context_(
   const char *traceparent, const char *tracestate);
 void *otel_start_session_(void);
 void otel_activate_session_(void *id_);
-void otel_deactivate_session_(void *id_);
+void otel_deactivate_session_(void);
 void otel_finish_session_(void *id_);
 void otel_finish_all_sessions_(void);
+
+int otel_debug_current_session_(struct otel_session *sess);
 
 int otel_tracer_provider_http_default_options_(
   struct otel_tracer_provider_http_options *opts);
