@@ -137,6 +137,12 @@ void otel_double_array_free(struct otel_double_array *a) {
   a->count = 0;
 }
 
+SEXP c2r_otel_double_array(const struct otel_double_array *a) {
+  SEXP res = Rf_allocVector(REALSXP, a->count);
+  memcpy(REAL(res), a->a, sizeof(double) * a->count);
+  return res;
+}
+
 void otel_int64_array_free(struct otel_int64_array *a) {
   if (!a) return;
   if (a->a) {
@@ -418,8 +424,260 @@ SEXP c2r_otel_span_links(const struct otel_span_links *links) {
   return res;
 }
 
+void otel_sum_point_data_free(struct otel_sum_point_data *d) {
+  if (!d) return;
+  // nothing to do here
+}
+
+void otel_histogram_point_data_free(struct otel_histogram_point_data *d) {
+  if (!d) return;
+  otel_double_array_free(&d->boundaries);
+  otel_double_array_free(&d->counts);
+}
+
+void otel_last_value_point_data_free(struct otel_last_value_point_data *d) {
+  if (!d) return;
+  // nothing to do here
+}
+
+void otel_drop_point_data_free(struct otel_drop_point_data *d) {
+  if (!d) return;
+  // nothing to do here
+}
+
+void otel_point_data_attributes_free(struct otel_point_data_attributes *pda) {
+  if (!pda) return;
+  otel_attributes_free(&pda->attributes);
+  switch (pda->point_type) {
+    case k_sum_point_data:
+      otel_sum_point_data_free(&pda->value.sum_point_data);
+      break;
+    case k_histogram_point_data:
+      otel_histogram_point_data_free(&pda->value.histogram_point_data);
+      break;
+    case k_last_value_point_data:
+      otel_last_value_point_data_free(&pda->value.last_value_point_data);
+      break;
+    case k_drop_point_data:
+      otel_drop_point_data_free(&pda->value.drop_point_data);
+      break;
+    default:
+      break;
+  }
+}
+
+void otel_metric1_data_free(struct otel_metric1_data *d) {
+  if (!d) return;
+  otel_string_free(&d->instrument_name);
+  otel_string_free(&d->instrument_description);
+  otel_string_free(&d->instrument_unit);
+  if (d->point_data_attr) {
+    for (size_t i = 0; i < d->count; i++) {
+      otel_point_data_attributes_free(&d->point_data_attr[i]);
+    }
+    free(d->point_data_attr);
+    d->point_data_attr = NULL;
+  }
+  d->count = 0;
+}
+
+void otel_scope_metrics_free(struct otel_scope_metrics *sm) {
+  if (!sm) return;
+  otel_instrumentation_scope_free(&sm->instrumentation_scope);
+  if (sm->metric_data) {
+    for (size_t i = 0; i < sm->count; i++) {
+      otel_metric1_data_free(&sm->metric_data[i]);
+    }
+    free(sm->metric_data);
+    sm->metric_data = NULL;
+  }
+  sm->count = 0;
+}
+
+void otel_resource_metrics_free(struct otel_resource_metrics *rm) {
+  if (!rm) return;
+  otel_attributes_free(&rm->attributes);
+  if (rm->scope_metric_data) {
+    for (size_t i = 0; i < rm->count; i++) {
+      otel_scope_metrics_free(&rm->scope_metric_data[i]);
+    }
+    free(rm->scope_metric_data);
+    rm->scope_metric_data = NULL;
+  }
+  rm->count = 0;
+}
+
 void otel_metric_data_free(struct otel_metric_data *cdata) {
-  // TODO
+  if (!cdata) return;
+  if (cdata->a) {
+    for (size_t i = 0; i < cdata->count; i++) {
+      otel_resource_metrics_free(&cdata->a[i]);
+    }
+    free(cdata->a);
+    cdata->a = NULL;
+  }
+  cdata->count = 0;
+}
+
+SEXP c2r_otel_sum_point_data(struct otel_sum_point_data *d) {
+  const char *nms[] = { "value_type", "value", "is_monotonic", "" };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, Rf_ScalarInteger(d->value_type));
+  double value = d->value_type ==
+    k_value_type_int64 ? d->value.int64 : d->value.dbl;
+  SET_VECTOR_ELT(res, 1, Rf_ScalarReal(value));
+  SET_VECTOR_ELT(res, 2, Rf_ScalarLogical(d->is_monotonic));
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP c2r_otel_histogram_point_data(struct otel_histogram_point_data *d) {
+  const char *nms[] = {
+    "boundaries", "value_type", "sum", "min", "max", "counts", "count",
+    "record_min_max", ""
+  };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_double_array(&d->boundaries));
+  SET_VECTOR_ELT(res, 1, Rf_ScalarInteger(d->value_type));
+  double sum = d->value_type == k_value_type_int64 ? d->sum.int64 : d->sum.dbl;
+  SET_VECTOR_ELT(res, 2, Rf_ScalarReal(sum));
+  double min = d->value_type == k_value_type_int64 ? d->min.int64 : d->min.dbl;
+  SET_VECTOR_ELT(res, 3, Rf_ScalarReal(min));
+  double max = d->value_type == k_value_type_int64 ? d->max.int64 : d->max.dbl;
+  SET_VECTOR_ELT(res, 4, Rf_ScalarReal(max));
+  SET_VECTOR_ELT(res, 5, c2r_otel_double_array(&d->counts));
+  SET_VECTOR_ELT(res, 6, Rf_ScalarInteger(d->count));
+  SET_VECTOR_ELT(res, 7, Rf_ScalarLogical(d->record_min_max));
+
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP c2r_otel_last_value_point_data(struct otel_last_value_point_data *d) {
+  const char *nms[] = {
+    "value_type", "value", "is_lastvalue_valid", "sample_ts", ""
+  };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, Rf_ScalarInteger(d->value_type));
+  double value =
+    d->value_type == k_value_type_int64 ? d->value.int64 : d->value.dbl;
+  SET_VECTOR_ELT(res, 1, Rf_ScalarReal(value));
+  SET_VECTOR_ELT(res, 2, Rf_ScalarLogical(d->is_lastvalue_valid));
+  SET_VECTOR_ELT(res, 3, Rf_ScalarReal(d->sample_ts));
+
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP c2r_otel_drop_point_data(struct otel_drop_point_data *d) {
+  // no real data here
+  return R_NilValue;
+}
+
+SEXP c2r_otel_point_data_attributes(struct otel_point_data_attributes *pda) {
+  const char *nms[] = { "attributes", "point_type", "value", "" };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_attributes(&pda->attributes));
+  SET_VECTOR_ELT(res, 1, Rf_ScalarInteger(pda->point_type));
+  switch (pda->point_type) {
+    case k_sum_point_data:
+      SET_VECTOR_ELT(
+        res, 2,
+        c2r_otel_sum_point_data(&pda->value.sum_point_data)
+      );
+      break;
+    case k_histogram_point_data:
+      SET_VECTOR_ELT(
+        res, 2,
+        c2r_otel_histogram_point_data(&pda->value.histogram_point_data)
+      );
+      break;
+    case k_last_value_point_data:
+      SET_VECTOR_ELT(
+        res, 2,
+        c2r_otel_last_value_point_data(&pda->value.last_value_point_data)
+      );
+      break;
+    case k_drop_point_data:
+      SET_VECTOR_ELT(
+        res, 2,
+        c2r_otel_drop_point_data(&pda->value.drop_point_data)
+      );
+      break;
+    default:
+      break;
+  }
+
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
+  const char *nms[] =
+    { "instrument_name", "instrument_description", "instrument_unit",
+      "instrument_type", "instrument_value_type", "aggregation_temporality",
+      "start_time", "end_time", "point_data_attr", "" };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&d->instrument_name));
+  SET_VECTOR_ELT(res, 1, c2r_otel_string(&d->instrument_description));
+  SET_VECTOR_ELT(res, 2, c2r_otel_string(&d->instrument_unit));
+  SET_VECTOR_ELT(res, 3, Rf_ScalarInteger(d->instrument_type));
+  SET_VECTOR_ELT(res, 4, Rf_ScalarInteger(d->instrument_value_type));
+  SET_VECTOR_ELT(res, 5, Rf_ScalarInteger(d->aggregation_temporality));
+  SET_VECTOR_ELT(res, 6, Rf_ScalarReal(d->start_time));
+  SET_VECTOR_ELT(res, 7, Rf_ScalarReal(d->end_time));
+  SET_VECTOR_ELT(res, 8, Rf_allocVector(VECSXP, d->count));
+  for (size_t i = 0; i < d->count; i++) {
+    SET_VECTOR_ELT(
+      VECTOR_ELT(res, 8), i,
+      c2r_otel_point_data_attributes(&d->point_data_attr[i])
+    );
+  }
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP c2r_otel_scope_metrics(struct otel_scope_metrics *sm) {
+  const char *nms[] = { "instrumentation_scope", "metric_data", "" };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(
+    res, 0,
+    c2r_otel_instrumentation_scope(&sm->instrumentation_scope)
+  );
+  SET_VECTOR_ELT(res, 1, Rf_allocVector(VECSXP, sm->count));
+  for (size_t i = 0; i < sm->count; i++) {
+    SET_VECTOR_ELT(
+      VECTOR_ELT(res, 1), i,
+      c2r_otel_metric1_data(&sm->metric_data[i])
+    );
+  }
+
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP c2r_otel_resource_metrics(struct otel_resource_metrics *rm) {
+  const char *nms[] = { "attributes", "scope_metric_data", "" };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_attributes(&rm->attributes));
+  SET_VECTOR_ELT(res, 1, Rf_allocVector(VECSXP, rm->count));
+  for (size_t i = 0; i < rm->count; i++) {
+    SET_VECTOR_ELT(
+      VECTOR_ELT(res, 1), i,
+      c2r_otel_scope_metrics(&rm->scope_metric_data[i])
+    );
+  }
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP c2r_otel_metric_data(const struct otel_metric_data *data) {
+  SEXP res = PROTECT(Rf_allocVector(VECSXP, data->count));
+  for (size_t i = 0; i < data->count; i++) {
+    SET_VECTOR_ELT(res, i, c2r_otel_resource_metrics(&data->a[i]));
+  }
+  UNPROTECT(1);
+  return res;
 }
 
 void otel_session_free(struct otel_session *sess) {

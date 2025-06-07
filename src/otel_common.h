@@ -204,9 +204,111 @@ struct otel_span_data {
 
 void otel_span_data_free(struct otel_span_data *cdata);
 
-struct otel_metric_data {
-  // TODO
+union otel_metrics_value_type {
+  int64_t int64;
+  double dbl;
 };
+
+enum otel_value_type {
+  k_value_type_int64,
+  k_value_type_double
+};
+
+struct otel_sum_point_data {
+  int value_type;
+  union otel_metrics_value_type value;
+  int is_monotonic;
+};
+
+void otel_sum_point_data_free(struct otel_sum_point_data *d);
+
+struct otel_histogram_point_data {
+  struct otel_double_array boundaries;
+  int value_type;
+  union otel_metrics_value_type sum;
+  union otel_metrics_value_type min;
+  union otel_metrics_value_type max;
+  struct otel_double_array counts;
+  int64_t count;
+  int record_min_max;
+};
+
+void otel_histogram_point_data_free(struct otel_histogram_point_data *d);
+
+struct otel_last_value_point_data {
+  int value_type;
+  union otel_metrics_value_type value;
+  int is_lastvalue_valid;
+  double sample_ts;
+};
+
+void otel_last_value_point_data_free(struct otel_last_value_point_data *d);
+
+struct otel_drop_point_data {
+  // do data in this one, but a C struct needs something to be
+  // ABI compatible with C++
+  int dummy;
+};
+
+void otel_drop_point_data_free(struct otel_drop_point_data *d);
+
+enum otel_point_type {
+  k_sum_point_data,
+  k_histogram_point_data,
+  k_last_value_point_data,
+  k_drop_point_data
+};
+
+struct otel_point_data_attributes {
+  struct otel_attributes attributes;
+  int point_type;
+  union {
+    struct otel_sum_point_data sum_point_data;
+    struct otel_histogram_point_data histogram_point_data;
+    struct otel_last_value_point_data last_value_point_data;
+    struct otel_drop_point_data drop_point_data;
+  } value;
+};
+
+void otel_point_data_attributes_free(struct otel_point_data_attributes *pda);
+
+struct otel_metric1_data {
+  struct otel_point_data_attributes *point_data_attr;
+  size_t count;
+  struct otel_string instrument_name;
+  struct otel_string instrument_description;
+  struct otel_string instrument_unit;
+  int instrument_type;
+  int instrument_value_type;
+  int aggregation_temporality;
+  double start_time;
+  double end_time;
+};
+
+void otel_metric1_data_free(struct otel_metric1_data *d);
+
+struct otel_scope_metrics {
+  struct otel_metric1_data *metric_data;
+  size_t count;
+  struct otel_instrumentation_scope instrumentation_scope;
+};
+
+void otel_scope_metrics_free(struct otel_scope_metrics *sm);
+
+struct otel_resource_metrics {
+  struct otel_scope_metrics *scope_metric_data;
+  size_t count;
+  struct otel_attributes attributes;
+};
+
+void otel_resource_metrics_free(struct otel_resource_metrics *rm);
+
+struct otel_metric_data {
+  struct otel_resource_metrics *a;
+  size_t count;
+};
+
+void otel_metric_data_free(struct otel_metric_data *cdata);
 
 struct otel_session {
   int is_default;
@@ -215,16 +317,14 @@ struct otel_session {
   struct otel_string span_id;
 };
 
-void otel_session_free(struct otel_session *sess);
-
 struct otel_sessions {
-  int is_default;
-  struct otel_string active_stack_id;
   struct otel_session *a;
   size_t count;
+  int is_default;
+  struct otel_string active_stack_id;
 };
 
-void otel_metric_data_free(struct otel_metric_data *cdata);
+void otel_session_free(struct otel_session *sess);
 
 extern const char *otel_http_request_content_type_str[];
 

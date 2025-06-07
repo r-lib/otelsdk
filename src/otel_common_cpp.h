@@ -84,11 +84,13 @@ int cc2c_otel_strings(
   const std::multimap<std::string, std::string, Compare> &map,
   struct otel_strings &outp) {
 
+  size_t sz = map.size();
   outp.a = (struct otel_string*)
-    malloc(sizeof(struct otel_string) * map.size() * 2);
+    malloc(sizeof(struct otel_string) * sz * 2);
   if (!outp.a) return 1;
   size_t idx = 0;
   for (auto it: map) {
+    if (idx >= sz) break;
     if (cc2c_otel_string(it.first, outp.a[idx++])) return 1;
     if (cc2c_otel_string(it.second, outp.a[idx++])) return 1;
   }
@@ -117,6 +119,7 @@ int cc2c_otel_attributes(const T &attrs, struct otel_attributes &cattrs) {
 
     size_t i = 0;
     for (auto it: attrs) {
+      if (i >= sz) break;
       const std::string &key = it.first;
       const common_sdk::OwnedAttributeValue &val = it.second;
       if (cc2c_otel_attribute(key, val, cattrs.a[i++])) return 1;

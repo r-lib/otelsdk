@@ -2,6 +2,8 @@
 #include <Rinternals.h>
 
 #include "otel_common.h"
+#include "otel_common_r.h"
+#include "errors.h"
 
 void r2c_attributes(SEXP r, struct otel_attributes *c);
 
@@ -85,12 +87,16 @@ SEXP otel_meter_provider_memory_get_metrics(SEXP provider) {
   }
 
   struct otel_metric_data data = { 0 };
-  otel_meter_provider_memory_get_metrics_(meter_provider_, &data);
+  if (otel_meter_provider_memory_get_metrics_(meter_provider_, &data)) {
+    R_THROW_MAYBE_SYSTEM_ERROR(
+      "Cannot retrieve recorded OpenTelemetry metrics"
+    );
+  }
 
-  // TODO
+  SEXP res = c2r_otel_metric_data(&data);
 
   otel_metric_data_free(&data);
-  return R_NilValue;
+  return res;
 }
 
 SEXP otel_get_meter(
