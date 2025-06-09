@@ -204,19 +204,21 @@ struct otel_span_data {
 
 void otel_span_data_free(struct otel_span_data *cdata);
 
-union otel_metrics_value_type {
+enum otel_value_type {
+  k_value_int64,
+  k_value_double
+};
+
+extern const char *otel_value_type_names[];
+
+union otel_value {
   int64_t int64;
   double dbl;
 };
 
-enum otel_value_type {
-  k_value_type_int64,
-  k_value_type_double
-};
-
 struct otel_sum_point_data {
-  int value_type;
-  union otel_metrics_value_type value;
+  enum otel_value_type value_type;
+  union otel_value value;
   int is_monotonic;
 };
 
@@ -224,10 +226,10 @@ void otel_sum_point_data_free(struct otel_sum_point_data *d);
 
 struct otel_histogram_point_data {
   struct otel_double_array boundaries;
-  int value_type;
-  union otel_metrics_value_type sum;
-  union otel_metrics_value_type min;
-  union otel_metrics_value_type max;
+  enum otel_value_type value_type;
+  union otel_value sum;
+  union otel_value min;
+  union otel_value max;
   struct otel_double_array counts;
   int64_t count;
   int record_min_max;
@@ -236,8 +238,8 @@ struct otel_histogram_point_data {
 void otel_histogram_point_data_free(struct otel_histogram_point_data *d);
 
 struct otel_last_value_point_data {
-  int value_type;
-  union otel_metrics_value_type value;
+  enum otel_value_type value_type;
+  union otel_value value;
   int is_lastvalue_valid;
   double sample_ts;
 };
@@ -259,9 +261,11 @@ enum otel_point_type {
   k_drop_point_data
 };
 
+extern const char *otel_point_type_names[];
+
 struct otel_point_data_attributes {
   struct otel_attributes attributes;
-  int point_type;
+  enum otel_point_type point_type;
   union {
     struct otel_sum_point_data sum_point_data;
     struct otel_histogram_point_data histogram_point_data;
@@ -272,15 +276,51 @@ struct otel_point_data_attributes {
 
 void otel_point_data_attributes_free(struct otel_point_data_attributes *pda);
 
+enum otel_instrument_type {
+  k_counter,
+  k_histogram,
+  k_updown_counter,
+  k_observable_counter,
+  k_observable_gauge,
+  k_observable_updown_counter,
+  k_gauge
+};
+
+extern const char *otel_instrument_type_names[];
+
+enum otel_instrument_value_type {
+  k_value_type_int,
+  k_value_type_long,
+  k_value_type_float,
+  k_value_type_double
+};
+
+union otel_instrument_value {
+  int intval;
+  long longval;
+  float floatval;
+  double doubleval;
+};
+
+extern const char *otel_instrument_value_type_names[];
+
+enum otel_aggregation_temporality {
+  k_unspecified,
+  k_delta,
+  k_cumulative
+};
+
+extern const char *otel_aggregation_temporality_names[];
+
 struct otel_metric1_data {
   struct otel_point_data_attributes *point_data_attr;
   size_t count;
   struct otel_string instrument_name;
   struct otel_string instrument_description;
   struct otel_string instrument_unit;
-  int instrument_type;
-  int instrument_value_type;
-  int aggregation_temporality;
+  enum otel_instrument_type instrument_type;
+  enum otel_instrument_value_type instrument_value_type;
+  enum otel_aggregation_temporality aggregation_temporality;
   double start_time;
   double end_time;
 };

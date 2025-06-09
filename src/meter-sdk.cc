@@ -226,11 +226,11 @@ int otel_meter_provider_memory_get_metrics_(
           if (cc2c_otel_string(instr.name_, cmd.instrument_name)) BAIL("");
           if (cc2c_otel_string(instr.description_, cmd.instrument_description)) BAIL("");
           if (cc2c_otel_string(instr.unit_, cmd.instrument_unit)) BAIL("");
-          cmd.instrument_type = static_cast<int>(instr.type_);
-          cmd.instrument_value_type = static_cast<int>(instr.value_type_);
+          cmd.instrument_type = static_cast<enum otel_instrument_type>(instr.type_);
+          cmd.instrument_value_type = static_cast<enum otel_instrument_value_type>(instr.value_type_);
           const metrics_sdk::AggregationTemporality &at =
             md.aggregation_temporality;
-          cmd.aggregation_temporality = static_cast<int>(at);
+          cmd.aggregation_temporality = static_cast<enum otel_aggregation_temporality>(at);
           std::chrono::nanoseconds start = md.start_ts.time_since_epoch();
           cmd.start_time = start.count() / 1000.0 / 1000.0 / 1000.0;
           std::chrono::nanoseconds end = md.end_ts.time_since_epoch();
@@ -250,11 +250,11 @@ int otel_meter_provider_memory_get_metrics_(
               cdp.value.sum_point_data.is_monotonic = d.is_monotonic_;
               if (nostd::holds_alternative<int64_t>(d.value_)) {
                 int64_t v = nostd::get<int64_t>(d.value_);
-                cdp.value.sum_point_data.value_type = k_value_type_int64;
+                cdp.value.sum_point_data.value_type = k_value_int64;
                 cdp.value.sum_point_data.value.int64 = v;
               } else {
                 double v = nostd::get<double>(d.value_);
-                cdp.value.sum_point_data.value_type = k_value_type_double;
+                cdp.value.sum_point_data.value_type = k_value_double;
                 cdp.value.sum_point_data.value.dbl = v;
               }
             } else if (nostd::holds_alternative<metrics_sdk::HistogramPointData>(pd)) {
@@ -262,7 +262,7 @@ int otel_meter_provider_memory_get_metrics_(
                 nostd::get<metrics_sdk::HistogramPointData>(pd);
               cdp.point_type = k_histogram_point_data;
               if (nostd::holds_alternative<int64_t>(d.sum_)) {
-                cdp.value.histogram_point_data.value_type = k_value_type_int64;
+                cdp.value.histogram_point_data.value_type = k_value_int64;
                 cdp.value.histogram_point_data.sum.int64 =
                   nostd::get<int64_t>(d.sum_);
                 cdp.value.histogram_point_data.min.int64 =
@@ -270,7 +270,7 @@ int otel_meter_provider_memory_get_metrics_(
                 cdp.value.histogram_point_data.max.int64 =
                   nostd::get<int64_t>(d.max_);
               } else {
-                cdp.value.histogram_point_data.value_type = k_value_type_double;
+                cdp.value.histogram_point_data.value_type = k_value_double;
                 cdp.value.histogram_point_data.sum.dbl =
                   nostd::get<double>(d.sum_);
                 cdp.value.histogram_point_data.min.dbl =
@@ -294,11 +294,11 @@ int otel_meter_provider_memory_get_metrics_(
                 nostd::get<metrics_sdk::LastValuePointData>(pd);
               cdp.point_type = k_last_value_point_data;
               if (nostd::holds_alternative<int64_t>(d.value_)) {
-                cdp.value.last_value_point_data.value_type = k_value_type_int64;
+                cdp.value.last_value_point_data.value_type = k_value_int64;
                 cdp.value.last_value_point_data.value.int64 =
                   nostd::get<int64_t>(d.value_);
               } else {
-                cdp.value.last_value_point_data.value_type = k_value_type_double;
+                cdp.value.last_value_point_data.value_type = k_value_double;
                 cdp.value.last_value_point_data.value.dbl =
                   nostd::get<double>(d.value_);
               }

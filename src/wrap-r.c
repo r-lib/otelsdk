@@ -5,6 +5,7 @@
 
 #include "otel_common.h"
 #include "otel_common_r.h"
+#include "errors.h"
 
 void otel_string_free(struct otel_string *s) {
   if (!s) return;
@@ -519,15 +520,62 @@ void otel_metric_data_free(struct otel_metric_data *cdata) {
   cdata->count = 0;
 }
 
+SEXP c2r_otel_instrument_value_type(
+    enum otel_instrument_value_type type, union otel_instrument_value *v) {
+  double value = NA_REAL;
+  switch (type) {
+    case k_value_type_int:
+      value = v->intval;
+      break;
+    case k_value_type_long:
+      value = v->longval;
+      break;
+    case k_value_type_float:
+      value = v->floatval;
+      break;
+    case k_value_type_double:
+      value = v->doubleval;
+      break;
+    default:
+      break;
+  }
+  return Rf_ScalarReal(value);
+}
+
+SEXP c2r_otel_value(enum otel_value_type type, union otel_value *v) {
+  double value = NA_REAL;
+  switch (type) {
+    case k_value_int64:
+      value = v->int64;
+      break;
+    case k_value_double:
+      value = v->dbl;
+      break;
+    default:
+      break;
+  }
+  return Rf_ScalarReal(value);
+}
+
+const char *otel_value_type_names[] = { "int64", "double" };
+const size_t otel_value_type_names_size = 2;
+
+SEXP c2r_otel_value_type(enum otel_value_type t) {
+  if (t >= otel_value_type_names_size) {
+    R_THROW_ERROR("Internal OpenTelemetry error, unknown value type");
+  }
+  return mkString(otel_value_type_names[t]);
+}
+
 SEXP c2r_otel_sum_point_data(struct otel_sum_point_data *d) {
   const char *nms[] = { "value_type", "value", "is_monotonic", "" };
   SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
-  SET_VECTOR_ELT(res, 0, Rf_ScalarInteger(d->value_type));
-  double value = d->value_type ==
-    k_value_type_int64 ? d->value.int64 : d->value.dbl;
-  SET_VECTOR_ELT(res, 1, Rf_ScalarReal(value));
+  SET_VECTOR_ELT(res, 0, c2r_otel_value_type(d->value_type));
+  SET_VECTOR_ELT(res, 1, c2r_otel_value(d->value_type, &d->value));
   SET_VECTOR_ELT(res, 2, Rf_ScalarLogical(d->is_monotonic));
-  UNPROTECT(1);
+  SEXP cls = PROTECT(Rf_mkString("otel_sum_point_data"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(2);
   return res;
 }
 
@@ -538,18 +586,16 @@ SEXP c2r_otel_histogram_point_data(struct otel_histogram_point_data *d) {
   };
   SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
   SET_VECTOR_ELT(res, 0, c2r_otel_double_array(&d->boundaries));
-  SET_VECTOR_ELT(res, 1, Rf_ScalarInteger(d->value_type));
-  double sum = d->value_type == k_value_type_int64 ? d->sum.int64 : d->sum.dbl;
-  SET_VECTOR_ELT(res, 2, Rf_ScalarReal(sum));
-  double min = d->value_type == k_value_type_int64 ? d->min.int64 : d->min.dbl;
-  SET_VECTOR_ELT(res, 3, Rf_ScalarReal(min));
-  double max = d->value_type == k_value_type_int64 ? d->max.int64 : d->max.dbl;
-  SET_VECTOR_ELT(res, 4, Rf_ScalarReal(max));
+  SET_VECTOR_ELT(res, 1, c2r_otel_value_type(d->value_type));
+  SET_VECTOR_ELT(res, 2, c2r_otel_value(d->value_type, &d->sum));
+  SET_VECTOR_ELT(res, 3, c2r_otel_value(d->value_type, &d->min));
+  SET_VECTOR_ELT(res, 4, c2r_otel_value(d->value_type, &d->max));
   SET_VECTOR_ELT(res, 5, c2r_otel_double_array(&d->counts));
   SET_VECTOR_ELT(res, 6, Rf_ScalarInteger(d->count));
   SET_VECTOR_ELT(res, 7, Rf_ScalarLogical(d->record_min_max));
-
-  UNPROTECT(1);
+  SEXP cls = PROTECT(Rf_mkString("otel_histogram_point_data"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(2);
   return res;
 }
 
@@ -558,27 +604,46 @@ SEXP c2r_otel_last_value_point_data(struct otel_last_value_point_data *d) {
     "value_type", "value", "is_lastvalue_valid", "sample_ts", ""
   };
   SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
-  SET_VECTOR_ELT(res, 0, Rf_ScalarInteger(d->value_type));
-  double value =
-    d->value_type == k_value_type_int64 ? d->value.int64 : d->value.dbl;
-  SET_VECTOR_ELT(res, 1, Rf_ScalarReal(value));
+  SET_VECTOR_ELT(res, 0, c2r_otel_value_type(d->value_type));
+  SET_VECTOR_ELT(res, 1, c2r_otel_value(d->value_type, &d->value));
   SET_VECTOR_ELT(res, 2, Rf_ScalarLogical(d->is_lastvalue_valid));
   SET_VECTOR_ELT(res, 3, Rf_ScalarReal(d->sample_ts));
-
-  UNPROTECT(1);
+  SEXP posix_class = PROTECT(Rf_allocVector(STRSXP, 2));
+  SET_STRING_ELT(posix_class, 0, Rf_mkChar("POSIXct"));
+  SET_STRING_ELT(posix_class, 1, Rf_mkChar("POSIXt"));
+  Rf_setAttrib(VECTOR_ELT(res, 3), R_ClassSymbol, posix_class);
+  SEXP cls = PROTECT(Rf_mkString("otel_last_value_point_data"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(3);
   return res;
 }
 
 SEXP c2r_otel_drop_point_data(struct otel_drop_point_data *d) {
   // no real data here
+  const char *nms[] = { "" };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SEXP cls = PROTECT(Rf_mkString("otel_drop_point_data"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(2);
   return R_NilValue;
 }
+
+const char *otel_point_type_names[4] = {
+  "sum_point_data", "histogram_point_data", "last_value_point_data",
+  "drop_point_data"
+};
 
 SEXP c2r_otel_point_data_attributes(struct otel_point_data_attributes *pda) {
   const char *nms[] = { "attributes", "point_type", "value", "" };
   SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
   SET_VECTOR_ELT(res, 0, c2r_otel_attributes(&pda->attributes));
-  SET_VECTOR_ELT(res, 1, Rf_ScalarInteger(pda->point_type));
+  if (pda->point_type >= sizeof(otel_point_type_names) / sizeof(const char *)) {
+    R_THROW_ERROR(
+      "Internal OpenTelemetry error, invalid otel_point_data_attributes "
+      "point_type"
+    );
+  }
+  SET_VECTOR_ELT(res, 1, Rf_mkString(otel_point_type_names[pda->point_type]));
   switch (pda->point_type) {
     case k_sum_point_data:
       SET_VECTOR_ELT(
@@ -608,9 +673,32 @@ SEXP c2r_otel_point_data_attributes(struct otel_point_data_attributes *pda) {
       break;
   }
 
-  UNPROTECT(1);
+  SEXP cls = PROTECT(Rf_mkString("otel_point_data_attributes"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(2);
   return res;
 }
+
+const char *otel_metrics_value_type_names[] = {
+  "int", "long", "float", "double"
+};
+const size_t otel_metrics_value_type_names_size = 4;
+
+const char *otel_instrument_type_names[] = {
+  "counter", "histogram", "updowncounter", "observablecounter",
+  "observablegauge", "observableupdowncounter", "gauge"
+};
+const size_t otel_instrument_type_names_size = 7;
+
+const char *otel_instrument_value_type_names[] = {
+  "int", "long", "float", "double"
+};
+const size_t otel_instrument_value_type_names_size = 4;
+
+const char *otel_aggregation_temporality_names[] = {
+  "unspecified", "delta", "cumulative"
+};
+const size_t otel_aggregation_temporality_names_size = 3;
 
 SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
   const char *nms[] =
@@ -621,11 +709,39 @@ SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
   SET_VECTOR_ELT(res, 0, c2r_otel_string(&d->instrument_name));
   SET_VECTOR_ELT(res, 1, c2r_otel_string(&d->instrument_description));
   SET_VECTOR_ELT(res, 2, c2r_otel_string(&d->instrument_unit));
-  SET_VECTOR_ELT(res, 3, Rf_ScalarInteger(d->instrument_type));
-  SET_VECTOR_ELT(res, 4, Rf_ScalarInteger(d->instrument_value_type));
-  SET_VECTOR_ELT(res, 5, Rf_ScalarInteger(d->aggregation_temporality));
+  if (d->instrument_type >=
+      sizeof(otel_instrument_type_names) / sizeof(const char*)) {
+    R_THROW_ERROR(
+      "Internal OpenTelemetry error, invalid otel_metric1_data instrument_type"
+    );
+  }
+  SET_VECTOR_ELT(res, 3,
+    Rf_mkString(otel_instrument_type_names[d->instrument_type]));
+  if (d->instrument_value_type >=
+      sizeof(otel_instrument_value_type_names) / sizeof(const char*)) {
+    R_THROW_ERROR(
+      "Internal OpenTelemetry error, invalid otel_metric1_data "
+      "instrument_value_type"
+    );
+  }
+  SET_VECTOR_ELT(res, 4,
+    Rf_mkString(otel_instrument_value_type_names[d->instrument_value_type]));
+  if (d->aggregation_temporality >=
+      sizeof(otel_aggregation_temporality_names) / sizeof(const char*)) {
+    R_THROW_ERROR(
+      "Internal OpenTelemetry error, invalid otel_metric1_data"
+      "aggregation_temporality"
+    );
+  }
+  SET_VECTOR_ELT(res, 5,
+    Rf_mkString(otel_aggregation_temporality_names[d->aggregation_temporality]));
   SET_VECTOR_ELT(res, 6, Rf_ScalarReal(d->start_time));
   SET_VECTOR_ELT(res, 7, Rf_ScalarReal(d->end_time));
+  SEXP posix_class = PROTECT(Rf_allocVector(STRSXP, 2));
+  SET_STRING_ELT(posix_class, 0, Rf_mkChar("POSIXct"));
+  SET_STRING_ELT(posix_class, 1, Rf_mkChar("POSIXt"));
+  Rf_setAttrib(VECTOR_ELT(res, 6), R_ClassSymbol, posix_class);
+  Rf_setAttrib(VECTOR_ELT(res, 7), R_ClassSymbol, posix_class);
   SET_VECTOR_ELT(res, 8, Rf_allocVector(VECSXP, d->count));
   for (size_t i = 0; i < d->count; i++) {
     SET_VECTOR_ELT(
@@ -633,7 +749,9 @@ SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
       c2r_otel_point_data_attributes(&d->point_data_attr[i])
     );
   }
-  UNPROTECT(1);
+  SEXP cls = PROTECT(Rf_mkString("otel_metric1_data"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(3);
   return res;
 }
 
@@ -652,7 +770,9 @@ SEXP c2r_otel_scope_metrics(struct otel_scope_metrics *sm) {
     );
   }
 
-  UNPROTECT(1);
+  SEXP cls = PROTECT(Rf_mkString("otel_scope_metrics"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(2);
   return res;
 }
 
@@ -667,7 +787,9 @@ SEXP c2r_otel_resource_metrics(struct otel_resource_metrics *rm) {
       c2r_otel_scope_metrics(&rm->scope_metric_data[i])
     );
   }
-  UNPROTECT(1);
+  SEXP cls = PROTECT(Rf_mkString("otel_resource_metrics"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(2);
   return res;
 }
 
@@ -676,7 +798,9 @@ SEXP c2r_otel_metric_data(const struct otel_metric_data *data) {
   for (size_t i = 0; i < data->count; i++) {
     SET_VECTOR_ELT(res, i, c2r_otel_resource_metrics(&data->a[i]));
   }
-  UNPROTECT(1);
+  SEXP cls = PROTECT(Rf_mkString("otel_metric_data"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(2);
   return res;
 }
 
