@@ -467,7 +467,7 @@ void otel_point_data_attributes_free(struct otel_point_data_attributes *pda) {
   }
 }
 
-void otel_metric1_data_free(struct otel_metric1_data *d) {
+void otel_metric_data_free(struct otel_metric_data *d) {
   if (!d) return;
   otel_string_free(&d->instrument_name);
   otel_string_free(&d->instrument_description);
@@ -487,7 +487,7 @@ void otel_scope_metrics_free(struct otel_scope_metrics *sm) {
   otel_instrumentation_scope_free(&sm->instrumentation_scope);
   if (sm->metric_data) {
     for (size_t i = 0; i < sm->count; i++) {
-      otel_metric1_data_free(&sm->metric_data[i]);
+      otel_metric_data_free(&sm->metric_data[i]);
     }
     free(sm->metric_data);
     sm->metric_data = NULL;
@@ -508,7 +508,7 @@ void otel_resource_metrics_free(struct otel_resource_metrics *rm) {
   rm->count = 0;
 }
 
-void otel_metric_data_free(struct otel_metric_data *cdata) {
+void otel_metrics_data_free(struct otel_metrics_data *cdata) {
   if (!cdata) return;
   if (cdata->a) {
     for (size_t i = 0; i < cdata->count; i++) {
@@ -685,8 +685,8 @@ const char *otel_metrics_value_type_names[] = {
 const size_t otel_metrics_value_type_names_size = 4;
 
 const char *otel_instrument_type_names[] = {
-  "counter", "histogram", "updowncounter", "observablecounter",
-  "observablegauge", "observableupdowncounter", "gauge"
+  "counter", "histogram", "up_down_counter", "observable_counter",
+  "observable_gauge", "observable_up_down_counter", "gauge"
 };
 const size_t otel_instrument_type_names_size = 7;
 
@@ -700,7 +700,7 @@ const char *otel_aggregation_temporality_names[] = {
 };
 const size_t otel_aggregation_temporality_names_size = 3;
 
-SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
+SEXP c2r_otel_metric_data(struct otel_metric_data *d) {
   const char *nms[] =
     { "instrument_name", "instrument_description", "instrument_unit",
       "instrument_type", "instrument_value_type", "aggregation_temporality",
@@ -712,7 +712,7 @@ SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
   if (d->instrument_type >=
       sizeof(otel_instrument_type_names) / sizeof(const char*)) {
     R_THROW_ERROR(
-      "Internal OpenTelemetry error, invalid otel_metric1_data instrument_type"
+      "Internal OpenTelemetry error, invalid otel_metric_data instrument_type"
     );
   }
   SET_VECTOR_ELT(res, 3,
@@ -720,7 +720,7 @@ SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
   if (d->instrument_value_type >=
       sizeof(otel_instrument_value_type_names) / sizeof(const char*)) {
     R_THROW_ERROR(
-      "Internal OpenTelemetry error, invalid otel_metric1_data "
+      "Internal OpenTelemetry error, invalid otel_metric_data "
       "instrument_value_type"
     );
   }
@@ -729,7 +729,7 @@ SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
   if (d->aggregation_temporality >=
       sizeof(otel_aggregation_temporality_names) / sizeof(const char*)) {
     R_THROW_ERROR(
-      "Internal OpenTelemetry error, invalid otel_metric1_data"
+      "Internal OpenTelemetry error, invalid otel_metric_data"
       "aggregation_temporality"
     );
   }
@@ -749,7 +749,7 @@ SEXP c2r_otel_metric1_data(struct otel_metric1_data *d) {
       c2r_otel_point_data_attributes(&d->point_data_attr[i])
     );
   }
-  SEXP cls = PROTECT(Rf_mkString("otel_metric1_data"));
+  SEXP cls = PROTECT(Rf_mkString("otel_metric_data"));
   Rf_setAttrib(res, R_ClassSymbol, cls);
   UNPROTECT(3);
   return res;
@@ -766,7 +766,7 @@ SEXP c2r_otel_scope_metrics(struct otel_scope_metrics *sm) {
   for (size_t i = 0; i < sm->count; i++) {
     SET_VECTOR_ELT(
       VECTOR_ELT(res, 1), i,
-      c2r_otel_metric1_data(&sm->metric_data[i])
+      c2r_otel_metric_data(&sm->metric_data[i])
     );
   }
 
@@ -793,12 +793,12 @@ SEXP c2r_otel_resource_metrics(struct otel_resource_metrics *rm) {
   return res;
 }
 
-SEXP c2r_otel_metric_data(const struct otel_metric_data *data) {
+SEXP c2r_otel_metrics_data(const struct otel_metrics_data *data) {
   SEXP res = PROTECT(Rf_allocVector(VECSXP, data->count));
   for (size_t i = 0; i < data->count; i++) {
     SET_VECTOR_ELT(res, i, c2r_otel_resource_metrics(&data->a[i]));
   }
-  SEXP cls = PROTECT(Rf_mkString("otel_metric_data"));
+  SEXP cls = PROTECT(Rf_mkString("otel_metrics_data"));
   Rf_setAttrib(res, R_ClassSymbol, cls);
   UNPROTECT(2);
   return res;

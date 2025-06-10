@@ -312,7 +312,7 @@ enum otel_aggregation_temporality {
 
 extern const char *otel_aggregation_temporality_names[];
 
-struct otel_metric1_data {
+struct otel_metric_data {
   struct otel_point_data_attributes *point_data_attr;
   size_t count;
   struct otel_string instrument_name;
@@ -325,10 +325,10 @@ struct otel_metric1_data {
   double end_time;
 };
 
-void otel_metric1_data_free(struct otel_metric1_data *d);
+void otel_metric_data_free(struct otel_metric_data *d);
 
 struct otel_scope_metrics {
-  struct otel_metric1_data *metric_data;
+  struct otel_metric_data *metric_data;
   size_t count;
   struct otel_instrumentation_scope instrumentation_scope;
 };
@@ -343,12 +343,12 @@ struct otel_resource_metrics {
 
 void otel_resource_metrics_free(struct otel_resource_metrics *rm);
 
-struct otel_metric_data {
+struct otel_metrics_data {
   struct otel_resource_metrics *a;
   size_t count;
 };
 
-void otel_metric_data_free(struct otel_metric_data *cdata);
+void otel_metrics_data_free(struct otel_metrics_data *cdata);
 
 struct otel_session {
   int is_default;
@@ -470,7 +470,7 @@ void *otel_create_meter_provider_memory_(
     int export_interval, int export_timeout, int cbuffer_size,
     int ctemporality);
 int otel_meter_provider_memory_get_metrics_(
-  void *meter_provider_, struct otel_metric_data *data);
+  void *meter_provider_, struct otel_metrics_data *data);
 void otel_meter_provider_flush_(void *tracer_provider, int timeout);
 void otel_meter_provider_shutdown_(void *tracer_provider, int timeout);
 void *otel_get_meter_(

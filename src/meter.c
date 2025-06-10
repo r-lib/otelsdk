@@ -86,16 +86,16 @@ SEXP otel_meter_provider_memory_get_metrics(SEXP provider) {
     );
   }
 
-  struct otel_metric_data data = { 0 };
+  struct otel_metrics_data data = { 0 };
   if (otel_meter_provider_memory_get_metrics_(meter_provider_, &data)) {
     R_THROW_MAYBE_SYSTEM_ERROR(
       "Cannot retrieve recorded OpenTelemetry metrics"
     );
   }
 
-  SEXP res = c2r_otel_metric_data(&data);
+  SEXP res = c2r_otel_metrics_data(&data);
 
-  otel_metric_data_free(&data);
+  otel_metrics_data_free(&data);
   return res;
 }
 

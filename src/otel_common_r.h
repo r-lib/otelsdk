@@ -30,9 +30,9 @@ SEXP c2r_otel_histogram_point_data(struct otel_histogram_point_data *d);
 SEXP c2r_otel_last_value_point_data(struct otel_last_value_point_data *d);
 SEXP c2r_otel_drop_point_data(struct otel_drop_point_data *d);
 SEXP c2r_otel_point_data_attributes(struct otel_point_data_attributes *pda);
-SEXP c2r_otel_metric1_data(struct otel_metric1_data *d);
+SEXP c2r_otel_metric_data(struct otel_metric_data *d);
 SEXP c2r_otel_scope_metrics(struct otel_scope_metrics *sm);
 SEXP c2r_otel_resource_metrics(struct otel_resource_metrics *rm);
-SEXP c2r_otel_metric_data(const struct otel_metric_data *data);
+SEXP c2r_otel_metrics_data(const struct otel_metrics_data *data);
 
 #endif

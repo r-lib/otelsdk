@@ -171,7 +171,7 @@ void *otel_create_meter_provider_memory_(
   throw std::runtime_error(""); } while (0)
 
 int otel_meter_provider_memory_get_metrics_(
-    void *meter_provider_, struct otel_metric_data *cdata) {
+    void *meter_provider_, struct otel_metrics_data *cdata) {
   try {
     struct otel_meter_provider *mps =
       (struct otel_meter_provider *) meter_provider_;
@@ -199,10 +199,10 @@ int otel_meter_provider_memory_get_metrics_(
       for (const metrics_sdk::ScopeMetrics &smd: rm->scope_metric_data_) {
         struct otel_scope_metrics &csmd = crm.scope_metric_data[smdidx++];
         csmd.count = smd.metric_data_.size();
-        csmd.metric_data = (struct otel_metric1_data *)
-          malloc(sizeof(struct otel_metric1_data) * csmd.count);
+        csmd.metric_data = (struct otel_metric_data *)
+          malloc(sizeof(struct otel_metric_data) * csmd.count);
         if (!csmd.metric_data) BAIL("");
-        memset(csmd.metric_data, 0, sizeof(struct otel_metric1_data) * csmd.count);
+        memset(csmd.metric_data, 0, sizeof(struct otel_metric_data) * csmd.count);
 
         const std::string &sn = smd.scope_->GetName();
         if (cc2c_otel_string(sn, csmd.instrumentation_scope.name)) BAIL("");
@@ -215,7 +215,7 @@ int otel_meter_provider_memory_get_metrics_(
 
         size_t mdidx = 0;
         for (const metrics_sdk::MetricData &md: smd.metric_data_) {
-          struct otel_metric1_data &cmd = csmd.metric_data[mdidx++];
+          struct otel_metric_data &cmd = csmd.metric_data[mdidx++];
           cmd.count = md.point_data_attr_.size();
           cmd.point_data_attr = (struct otel_point_data_attributes*)
             malloc(sizeof(struct otel_point_data_attributes) * cmd.count);
@@ -320,7 +320,7 @@ int otel_meter_provider_memory_get_metrics_(
 
     return 0;
   } catch(...) {
-    otel_metric_data_free(cdata);
+    otel_metrics_data_free(cdata);
     return 1;
   }
 }
