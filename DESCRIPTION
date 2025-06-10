@@ -1,5 +1,5 @@
 Package: otelsdk
-Title: R Implementation of 'OpenTelemetry', exporters
+Title: R Implementation of 'OpenTelemetry', Exporters
 Version: 0.0.0.9000
 Authors@R:
     person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("aut", "cre"))
