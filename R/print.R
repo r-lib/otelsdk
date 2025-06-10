@@ -127,9 +127,9 @@ format.otel_histogram_point_data <- function(x, ...) {
     paste0("max           : ", x[["max"]]),
     paste0("count         : ", x[["count"]]),
     paste0("counts [", length(x[["counts"]]), "]:"),
-    paste0("    ", capture.output(print(x[["counts"]]))),
+    paste0("    ", utils::capture.output(print(x[["counts"]]))),
     paste0("boundaries [", length(x[["boundaries"]]), "]:"),
-    paste0("    ", capture.output(print(x[["boundaries"]])))
+    paste0("    ", utils::capture.output(print(x[["boundaries"]])))
   )
 }
 
