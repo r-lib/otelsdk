@@ -18,6 +18,10 @@ meter_provider_memory_new <- function(
     flush = function() {
       # noop currently
     },
+    shutdown = function(timeout = NULL) {
+      .Call(otel_meter_provider_shutdown, self$xptr, timeout)
+      invisible(self)
+    },
     get_metrics = function() {
       .Call(otel_meter_provider_memory_get_metrics, self$xptr)
     }
