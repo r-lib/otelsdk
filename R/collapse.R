@@ -27,8 +27,12 @@ collapse <- function(
 collapse_head_notrim <- function(x, trunc, sep, sep2, last, ellipsis) {
   lnx <- length(x)
 
-  if (lnx == 1L) return(x)
-  if (lnx == 2L) return(paste0(x, collapse = sep2))
+  if (lnx == 1L) {
+    return(x)
+  }
+  if (lnx == 2L) {
+    return(paste0(x, collapse = sep2))
+  }
   if (lnx <= trunc) {
     # no truncation
     return(paste0(
@@ -66,7 +70,9 @@ collapse_head <- function(x, sep, sep2, last, trunc, width, ellipsis) {
   # complex case, with width wrapping
   # first we truncate
   tcd <- lnx > trunc
-  if (tcd) x <- x[1:trunc]
+  if (tcd) {
+    x <- x[1:trunc]
+  }
 
   # then we calculate the width w/o trimming
   wx <- nchar(x)
@@ -159,5 +165,5 @@ trim <- function(x) {
   if (length(x) == 0L || !has_newline(x)) {
     return(x)
   }
-  .Call(trim_, x)
+  ccall(trim_, x)
 }

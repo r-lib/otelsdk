@@ -25,11 +25,11 @@ logger_provider_stdstream_new <- function(stream = NULL) {
       )
     },
     flush = function() {
-      .Call(otel_logger_provider_flush, self$xptr)
+      ccall(otel_logger_provider_flush, self$xptr)
     }
   )
 
-  self$xptr <- .Call(otel_create_logger_provider_stdstream, stream)
+  self$xptr <- ccall(otel_create_logger_provider_stdstream, stream)
   self
 }
 

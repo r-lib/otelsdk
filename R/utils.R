@@ -29,7 +29,7 @@ get_env <- function(n) {
 get_current_error <- function() {
   fail <- NULL
   err <- tryCatch(
-    suppressWarnings(.Call(otel_error_object)),
+    suppressWarnings(ccall(otel_error_object)),
     error = function(e) {
       fail <<- e
       NULL

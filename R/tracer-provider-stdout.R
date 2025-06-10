@@ -16,11 +16,11 @@ tracer_provider_stdstream_new <- function(stream = NULL) {
       tracer_new(self, name, version, schema_url, attributes, ...)
     },
     flush = function() {
-      .Call(otel_tracer_provider_flush, self$xptr)
+      ccall(otel_tracer_provider_flush, self$xptr)
     }
   )
 
-  self$xptr <- .Call(otel_create_tracer_provider_stdstream, stream)
+  self$xptr <- ccall(otel_create_tracer_provider_stdstream, stream)
   self
 }
 

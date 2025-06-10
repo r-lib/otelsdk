@@ -10,13 +10,13 @@ logger_new <- function(
   self <- new_object(
     "otel_logger",
     get_name = function() {
-      .Call(otel_logger_get_name, self$xptr)
+      ccall(otel_logger_get_name, self$xptr)
     },
     # create_log_record = function() {
     #   log_record_new()
     # },
     # emit_log_record = function(log_record) {
-    #   .Call(otel_emit_log_record, self$xptr, log_record)
+    #   ccall(otel_emit_log_record, self$xptr, log_record)
     #   invisible(self)
     # },
     trace = function(msg = "", ..., .envir = parent.frame()) {
@@ -40,15 +40,15 @@ logger_new <- function(
     is_enabled = function(severity = "info", event_id = NULL) {
       severity <- as_log_severity(severity)
       event_id <- as_event_id(event_id)
-      .Call(otel_logger_is_enabled, self$xptr, severity, event_id)
+      ccall(otel_logger_is_enabled, self$xptr, severity, event_id)
     },
     get_minimum_severity = function() {
-      ms <- .Call(otel_get_minimum_log_severity, self$xptr)
+      ms <- ccall(otel_get_minimum_log_severity, self$xptr)
       otel::log_severity_levels[match(ms, otel::log_severity_levels)]
     },
     set_minimum_severity = function(minimum_severity) {
       minimum_severity <- as_log_severity(minimum_severity)
-      .Call(otel_set_minimum_log_severity, self$xptr, minimum_severity)
+      ccall(otel_set_minimum_log_severity, self$xptr, minimum_severity)
       invisible(self)
     },
     log = function(
@@ -88,7 +88,7 @@ logger_new <- function(
       prsd <- extract_otel_attributes(msg, .envir = .envir)
       attributes <- utils::modifyList(prsd$attributes, as.list(attributes))
 
-      .Call(
+      ccall(
         otel_log,
         self$xptr,
         prsd$text,
@@ -115,7 +115,7 @@ logger_new <- function(
   self$version <- as_string(version)
   self$schema_url <- as_string(schema_url)
   self$attributes <- as_otel_attributes(attributes)
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_get_logger,
     self$provider$xptr,
     self$name,
