@@ -99,6 +99,7 @@ up_down_counter_new <- function(
 
 histogram_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
+    "otel_histogram",
     record = function(value, attributes = NULL, context = NULL) {
       # TODO: check args
       value <- as.double(value)
@@ -117,6 +118,7 @@ histogram_new <- function(meter, name, description = NULL, unit = NULL) {
 
 gauge_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
+    "otel_gauge",
     record = function(value, attributes = NULL, context = NULL) {
       # TODO: check args
       value <- as.double(value)
