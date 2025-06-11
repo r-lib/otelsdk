@@ -19,7 +19,12 @@ tracer_provider_memory_new <- function(buffer_size = 100) {
   )
 
   buffer_size <- as_count(buffer_size, positive = TRUE)
-  self$xptr <- ccall(otel_create_tracer_provider_memory, buffer_size)
+  attributes <- as_otel_attributes(the$default_resource_attributes)
+  self$xptr <- ccall(
+    otel_create_tracer_provider_memory,
+    buffer_size,
+    attributes
+  )
   self
 }
 

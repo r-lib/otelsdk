@@ -19,8 +19,8 @@ tracer_provider_stdstream_new <- function(stream = NULL) {
       ccall(otel_tracer_provider_flush, self$xptr)
     }
   )
-
-  self$xptr <- ccall(otel_create_tracer_provider_stdstream, stream)
+  attributes <- as_otel_attributes(the$default_resource_attributes)
+  self$xptr <- ccall(otel_create_tracer_provider_stdstream, stream, attributes)
   self
 }
 

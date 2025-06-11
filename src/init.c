@@ -13,9 +13,9 @@ SEXP otel_fail(void);
 SEXP otel_error_object(void);
 SEXP otel_init_constants(SEXP env);
 
-SEXP otel_create_tracer_provider_stdstream(SEXP stream);
-SEXP otel_create_tracer_provider_http(void);
-SEXP otel_create_tracer_provider_memory(SEXP buffer_size);
+SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes);
+SEXP otel_create_tracer_provider_http(SEXP attributes);
+SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes);
 SEXP otel_tracer_provider_memory_get_spans(SEXP provider);
 SEXP otel_tracer_provider_flush(SEXP provider);
 SEXP otel_get_tracer(
@@ -125,9 +125,9 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_error_object, 0),
   CALLDEF(otel_init_constants, 1),
 
-  CALLDEF(otel_create_tracer_provider_stdstream, 1),
-  CALLDEF(otel_create_tracer_provider_http, 0),
-  CALLDEF(otel_create_tracer_provider_memory, 1),
+  CALLDEF(otel_create_tracer_provider_stdstream, 2),
+  CALLDEF(otel_create_tracer_provider_http, 1),
+  CALLDEF(otel_create_tracer_provider_memory, 2),
   CALLDEF(otel_tracer_provider_memory_get_spans, 1),
   CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 5),
@@ -273,24 +273,32 @@ void otel_session_finally(SEXP x) {
   }
 }
 
-SEXP otel_create_tracer_provider_stdstream(SEXP stream) {
+SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes) {
   const char *cstream = CHAR(STRING_ELT(stream, 0));
-  void *tracer_provider_ = otel_create_tracer_provider_stdstream_(cstream);
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  void *tracer_provider_ = otel_create_tracer_provider_stdstream_(
+    cstream, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
   return xptr;
 }
 
-SEXP otel_create_tracer_provider_http(void) {
-  void *tracer_provider_ = otel_create_tracer_provider_http_();
+SEXP otel_create_tracer_provider_http(SEXP attributes) {
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  void *tracer_provider_ = otel_create_tracer_provider_http_(&attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
   return xptr;
 }
 
-SEXP otel_create_tracer_provider_memory(SEXP buffer_size) {
+SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes) {
   int cbuffer_size = INTEGER(buffer_size)[0];
-  void *tracer_provider_ = otel_create_tracer_provider_memory_(cbuffer_size);
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  void *tracer_provider_ = otel_create_tracer_provider_memory_(
+    cbuffer_size, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
   return xptr;
