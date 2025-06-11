@@ -34,7 +34,7 @@ if [ "$UNAME" = "Windows" ]; then
           cat src/extra/cmake/R-4.3/protobuf-targets.cmake.in |
               sed "s|@RTOOLS43@|${RT}|" |
               cat > src/extra/cmake/R-4.3/protobuf-targets.cmake
-	  ;;
+          ;;
       4.2.*)
       ;;
       4.1.*)
