@@ -22,14 +22,19 @@ if [ "$UNAME" = "Windows" ]; then
     CMAKE_PREFIX_PATH=""
     case "$R_VERSION" in
       4.4.*)
-	  CMAKE_PREFIX_PATH="../extra/cmake/R-4.4"
+          CMAKE_PREFIX_PATH="../extra/cmake/R-4.4"
           RT="`echo $RTOOLS44_HOME | sed 's|\\\\|/|g'`"
           cat src/extra/cmake/R-4.4/protobuf-targets.cmake.in |
               sed "s|@RTOOLS44@|${RT}|" |
               cat > src/extra/cmake/R-4.4/protobuf-targets.cmake
           ;;
       4.3.*)
-      ;;
+          CMAKE_PREFIX_PATH="../extra/cmake/R-4.3"
+          RT="`echo ${RTOOLS43_HOME-c:/rtools43} | sed 's|\\\\|/|g'`"
+          cat src/extra/cmake/R-4.3/protobuf-targets.cmake.in |
+              sed "s|@RTOOLS43@|${RT}|" |
+              cat > src/extra/cmake/R-4.3/protobuf-targets.cmake
+	  ;;
       4.2.*)
       ;;
       4.1.*)

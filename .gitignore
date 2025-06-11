@@ -6,4 +6,4 @@
 /src/cpp
 /src/install
 /README.html
-/src/extra/cmake/R-4.4/protobuf-targets.cmake
+/src/extra/cmake/R-4.*/protobuf-targets.cmake
