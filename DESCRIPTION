@@ -26,6 +26,7 @@ Suggests:
     processx,
     ps,
     rlang,
+    spelling,
     testthat (>= 3.0.0),
     withr
 Remotes:
