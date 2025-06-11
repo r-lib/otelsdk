@@ -13,3 +13,4 @@
 ^README\.Rmd$
 ^[\.]?air\.toml$
 ^\.vscode$
+^src/extra/cmake/R-4[.]4/protobuf-targets[.]cmake$
