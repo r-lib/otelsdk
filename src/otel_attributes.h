@@ -18,7 +18,7 @@ public:
   virtual bool ForEachKeyValue(
       nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
       callback) const noexcept {
-    for (auto i = 0; i < attributes_.count; i++) {
+    for (size_t i = 0; i < attributes_.count; i++) {
       struct otel_attribute &attr = attributes_.a[i];
       bool cont = true;
       switch (attr.type) {
@@ -44,7 +44,7 @@ public:
         case k_boolean_array: {
             size_t c = attr.val.boolean_array.count;
             bool *v = new bool[c];
-            for (auto i = 0; i < c; i++) {
+            for (size_t i = 0; i < c; i++) {
               v[i] = attr.val.boolean_array.a[i];
             }
             nostd::span<const bool> vv(v, c);

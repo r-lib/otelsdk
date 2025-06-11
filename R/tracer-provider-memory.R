@@ -14,13 +14,13 @@ tracer_provider_memory_new <- function(buffer_size = 100) {
       # noop currently
     },
     get_spans = function() {
-      .Call(otel_tracer_provider_memory_get_spans, self$xptr)
+      ccall(otel_tracer_provider_memory_get_spans, self$xptr)
     }
   )
 
   buffer_size <- as_count(buffer_size, positive = TRUE)
   attributes <- as_otel_attributes(the$default_resource_attributes)
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_create_tracer_provider_memory,
     buffer_size,
     attributes

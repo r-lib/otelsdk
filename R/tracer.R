@@ -26,30 +26,30 @@ tracer_new <- function(
     },
     is_enabled = function(...) TRUE,
     get_current_span_context = function() {
-      xptr <- .Call(otel_get_current_span_context, self$xptr)
+      xptr <- ccall(otel_get_current_span_context, self$xptr)
       span_context_new(xptr)
     },
     start_session = function() {
-      .Call(otel_start_session)
+      ccall(otel_start_session)
     },
     activate_session = function(session) {
-      .Call(otel_activate_session, session)
+      ccall(otel_activate_session, session)
     },
     deactivate_session = function() {
-      .Call(otel_deactivate_session)
+      ccall(otel_deactivate_session)
     },
     finish_session = function(session) {
-      .Call(otel_finish_session, session)
+      ccall(otel_finish_session, session)
     },
     finish_all_sessions = function() {
-      .Call(otel_finish_all_sessions)
+      ccall(otel_finish_all_sessions)
     },
     flush = function() {
       self$provider$flush()
     },
     extract_http_context = function(headers) {
       headers <- as_http_context_headers(headers)
-      xptr <- .Call(otel_extract_http_context, headers)
+      xptr <- ccall(otel_extract_http_context, headers)
       span_context_new(xptr)
     }
   )
@@ -59,7 +59,7 @@ tracer_new <- function(
   self$version <- as_string(version)
   self$schema_url <- as_string(schema_url)
   self$attributes <- as_otel_attributes(attributes)
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_get_tracer,
     self$provider$xptr,
     self$name,
@@ -73,7 +73,7 @@ tracer_new <- function(
 # for debugging
 
 otel_current_session <- function() {
-  .Call(otel_debug_current_session)
+  ccall(otel_debug_current_session)
 }
 
 get_span_id <- function(span) {

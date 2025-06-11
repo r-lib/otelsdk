@@ -165,43 +165,162 @@ void *otel_create_meter_provider_memory_(
   return (void*) mps;
 }
 
-#define BAIL() throw std::runtime_error("");
+#define BAIL(msg) do {                                    \
+  std::cerr << "Error: " << msg << " "                    \
+            << __FILE__ << ":" << __LINE__ << std::endl;  \
+  throw std::runtime_error(""); } while (0)
 
 int otel_meter_provider_memory_get_metrics_(
-    void *meter_provider_, struct otel_metric_data *data) {
+    void *meter_provider_, struct otel_metrics_data *cdata) {
   try {
     struct otel_meter_provider *mps =
       (struct otel_meter_provider *) meter_provider_;
     memory::CircularBufferInMemoryMetricData &metricdata = *mps->metricdata;
     std::vector<std::unique_ptr<metrics_sdk::ResourceMetrics>> data =
       metricdata.Get();
+
+    cdata->count = data.size();
+    cdata->a = (struct otel_resource_metrics*)
+      malloc(sizeof(struct otel_resource_metrics) * cdata->count);
+    if (!cdata->a) BAIL("Out of memory");
+
+    size_t rmidx = 0;
     for (const auto &rm: data) {
+      struct otel_resource_metrics &crm = cdata->a[rmidx++];
+      crm.count = rm->scope_metric_data_.size();
+      crm.scope_metric_data = (struct otel_scope_metrics *)
+        malloc(sizeof(struct otel_scope_metrics) * crm.count);
+      if (!crm.scope_metric_data) BAIL("");
+      memset(crm.scope_metric_data, 0, sizeof(struct otel_scope_metrics) * crm.count);
       const common_sdk::AttributeMap &resattrs = rm->resource_->GetAttributes();
+      if (cc2c_otel_attributes(resattrs, crm.attributes)) BAIL("");
+
+      size_t smdidx = 0;
       for (const metrics_sdk::ScopeMetrics &smd: rm->scope_metric_data_) {
-        const std::string &scopename = smd.scope_->GetName();
-        const std::string &scopeversion = smd.scope_->GetVersion();
-        const std::string &scopeschemaurl = smd.scope_->GetSchemaURL();
-        const common_sdk::AttributeMap &scopeattr = smd.scope_->GetAttributes();
+        struct otel_scope_metrics &csmd = crm.scope_metric_data[smdidx++];
+        csmd.count = smd.metric_data_.size();
+        csmd.metric_data = (struct otel_metric_data *)
+          malloc(sizeof(struct otel_metric_data) * csmd.count);
+        if (!csmd.metric_data) BAIL("");
+        memset(csmd.metric_data, 0, sizeof(struct otel_metric_data) * csmd.count);
+
+        const std::string &sn = smd.scope_->GetName();
+        if (cc2c_otel_string(sn, csmd.instrumentation_scope.name)) BAIL("");
+        const std::string &sv = smd.scope_->GetVersion();
+        if (cc2c_otel_string(sv, csmd.instrumentation_scope.version)) BAIL("");
+        const std::string &ssu = smd.scope_->GetSchemaURL();
+        if (cc2c_otel_string(ssu, csmd.instrumentation_scope.schema_url)) BAIL("");
+        const common_sdk::AttributeMap &sattr = smd.scope_->GetAttributes();
+        if (cc2c_otel_attributes(sattr, csmd.instrumentation_scope.attributes)) BAIL("");
+
+        size_t mdidx = 0;
         for (const metrics_sdk::MetricData &md: smd.metric_data_) {
+          struct otel_metric_data &cmd = csmd.metric_data[mdidx++];
+          cmd.count = md.point_data_attr_.size();
+          cmd.point_data_attr = (struct otel_point_data_attributes*)
+            malloc(sizeof(struct otel_point_data_attributes) * cmd.count);
+          if (!cmd.point_data_attr) BAIL("");
+          memset(cmd.point_data_attr, 0, sizeof(struct otel_point_data_attributes) * cmd.count);
           const metrics_sdk::InstrumentDescriptor &instr =
             md.instrument_descriptor;
+          if (cc2c_otel_string(instr.name_, cmd.instrument_name)) BAIL("");
+          if (cc2c_otel_string(instr.description_, cmd.instrument_description)) BAIL("");
+          if (cc2c_otel_string(instr.unit_, cmd.instrument_unit)) BAIL("");
+          cmd.instrument_type = static_cast<enum otel_instrument_type>(instr.type_);
+          cmd.instrument_value_type = static_cast<enum otel_instrument_value_type>(instr.value_type_);
           const metrics_sdk::AggregationTemporality &at =
             md.aggregation_temporality;
-          common::SystemTimestamp start = md.start_ts;
-          common::SystemTimestamp end = md.end_ts;
+          cmd.aggregation_temporality = static_cast<enum otel_aggregation_temporality>(at);
+          std::chrono::nanoseconds start = md.start_ts.time_since_epoch();
+          cmd.start_time = start.count() / 1000.0 / 1000.0 / 1000.0;
+          std::chrono::nanoseconds end = md.end_ts.time_since_epoch();
+          cmd.end_time = end.count() / 1000.0 / 1000.0 / 1000.0;
+          size_t dpidx = 0;
           for (const metrics_sdk::PointDataAttributes &dp: md.point_data_attr_) {
+            struct otel_point_data_attributes &cdp =
+              cmd.point_data_attr[dpidx++];
             const metrics_sdk::PointAttributes &pattr = dp.attributes;
+            if (cc2c_otel_attributes(pattr, cdp.attributes)) BAIL("");
             const metrics_sdk::PointType &pd = dp.point_data;
-//            cc2c_point_type(pd, struct otel_point_)
+
+            if (nostd::holds_alternative<metrics_sdk::SumPointData>(pd)) {
+              const metrics_sdk::SumPointData &d =
+                nostd::get<metrics_sdk::SumPointData>(pd);
+              cdp.point_type = k_sum_point_data;
+              cdp.value.sum_point_data.is_monotonic = d.is_monotonic_;
+              if (nostd::holds_alternative<int64_t>(d.value_)) {
+                int64_t v = nostd::get<int64_t>(d.value_);
+                cdp.value.sum_point_data.value_type = k_value_int64;
+                cdp.value.sum_point_data.value.int64 = v;
+              } else {
+                double v = nostd::get<double>(d.value_);
+                cdp.value.sum_point_data.value_type = k_value_double;
+                cdp.value.sum_point_data.value.dbl = v;
+              }
+            } else if (nostd::holds_alternative<metrics_sdk::HistogramPointData>(pd)) {
+              const metrics_sdk::HistogramPointData &d =
+                nostd::get<metrics_sdk::HistogramPointData>(pd);
+              cdp.point_type = k_histogram_point_data;
+              if (nostd::holds_alternative<int64_t>(d.sum_)) {
+                cdp.value.histogram_point_data.value_type = k_value_int64;
+                cdp.value.histogram_point_data.sum.int64 =
+                  nostd::get<int64_t>(d.sum_);
+                cdp.value.histogram_point_data.min.int64 =
+                  nostd::get<int64_t>(d.min_);
+                cdp.value.histogram_point_data.max.int64 =
+                  nostd::get<int64_t>(d.max_);
+              } else {
+                cdp.value.histogram_point_data.value_type = k_value_double;
+                cdp.value.histogram_point_data.sum.dbl =
+                  nostd::get<double>(d.sum_);
+                cdp.value.histogram_point_data.min.dbl =
+                  nostd::get<double>(d.min_);
+                cdp.value.histogram_point_data.max.dbl =
+                  nostd::get<double>(d.max_);
+              }
+              cdp.value.histogram_point_data.count = d.count_;
+              cdp.value.histogram_point_data.record_min_max = d.record_min_max_;
+              if (cc2c_otel_double_array(
+                  d.boundaries_, cdp.value.histogram_point_data.boundaries)) {
+                BAIL("");
+              }
+              if (cc2c_otel_double_array(
+                  d.counts_, cdp.value.histogram_point_data.counts)) {
+                BAIL("");
+              }
+
+            } else if (nostd::holds_alternative<metrics_sdk::LastValuePointData>(pd)) {
+              const metrics_sdk::LastValuePointData &d =
+                nostd::get<metrics_sdk::LastValuePointData>(pd);
+              cdp.point_type = k_last_value_point_data;
+              if (nostd::holds_alternative<int64_t>(d.value_)) {
+                cdp.value.last_value_point_data.value_type = k_value_int64;
+                cdp.value.last_value_point_data.value.int64 =
+                  nostd::get<int64_t>(d.value_);
+              } else {
+                cdp.value.last_value_point_data.value_type = k_value_double;
+                cdp.value.last_value_point_data.value.dbl =
+                  nostd::get<double>(d.value_);
+              }
+              cdp.value.last_value_point_data.is_lastvalue_valid =
+                d.is_lastvalue_valid_;
+              std::chrono::nanoseconds t = d.sample_ts_.time_since_epoch();
+              cdp.value.last_value_point_data.sample_ts =
+                t.count() / 1000.0 / 1000.0 / 1000.0;
+
+            } else if (nostd::holds_alternative<metrics_sdk::DropPointData>(pd)) {
+              cdp.point_type = k_drop_point_data;
+            } else {
+              BAIL("");
+            }
           }
         }
       }
     }
 
-
     return 0;
   } catch(...) {
-    otel_metric_data_free(data);
+    otel_metrics_data_free(cdata);
     return 1;
   }
 }

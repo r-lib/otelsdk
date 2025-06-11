@@ -204,9 +204,151 @@ struct otel_span_data {
 
 void otel_span_data_free(struct otel_span_data *cdata);
 
-struct otel_metric_data {
-  // TODO
+enum otel_value_type {
+  k_value_int64,
+  k_value_double
 };
+
+extern const char *otel_value_type_names[];
+
+union otel_value {
+  int64_t int64;
+  double dbl;
+};
+
+struct otel_sum_point_data {
+  enum otel_value_type value_type;
+  union otel_value value;
+  int is_monotonic;
+};
+
+void otel_sum_point_data_free(struct otel_sum_point_data *d);
+
+struct otel_histogram_point_data {
+  struct otel_double_array boundaries;
+  enum otel_value_type value_type;
+  union otel_value sum;
+  union otel_value min;
+  union otel_value max;
+  struct otel_double_array counts;
+  int64_t count;
+  int record_min_max;
+};
+
+void otel_histogram_point_data_free(struct otel_histogram_point_data *d);
+
+struct otel_last_value_point_data {
+  enum otel_value_type value_type;
+  union otel_value value;
+  int is_lastvalue_valid;
+  double sample_ts;
+};
+
+void otel_last_value_point_data_free(struct otel_last_value_point_data *d);
+
+struct otel_drop_point_data {
+  // do data in this one, but a C struct needs something to be
+  // ABI compatible with C++
+  int dummy;
+};
+
+void otel_drop_point_data_free(struct otel_drop_point_data *d);
+
+enum otel_point_type {
+  k_sum_point_data,
+  k_histogram_point_data,
+  k_last_value_point_data,
+  k_drop_point_data
+};
+
+extern const char *otel_point_type_names[];
+
+struct otel_point_data_attributes {
+  struct otel_attributes attributes;
+  enum otel_point_type point_type;
+  union {
+    struct otel_sum_point_data sum_point_data;
+    struct otel_histogram_point_data histogram_point_data;
+    struct otel_last_value_point_data last_value_point_data;
+    struct otel_drop_point_data drop_point_data;
+  } value;
+};
+
+void otel_point_data_attributes_free(struct otel_point_data_attributes *pda);
+
+enum otel_instrument_type {
+  k_counter,
+  k_histogram,
+  k_updown_counter,
+  k_observable_counter,
+  k_observable_gauge,
+  k_observable_updown_counter,
+  k_gauge
+};
+
+extern const char *otel_instrument_type_names[];
+
+enum otel_instrument_value_type {
+  k_value_type_int,
+  k_value_type_long,
+  k_value_type_float,
+  k_value_type_double
+};
+
+union otel_instrument_value {
+  int intval;
+  long longval;
+  float floatval;
+  double doubleval;
+};
+
+extern const char *otel_instrument_value_type_names[];
+
+enum otel_aggregation_temporality {
+  k_unspecified,
+  k_delta,
+  k_cumulative
+};
+
+extern const char *otel_aggregation_temporality_names[];
+
+struct otel_metric_data {
+  struct otel_point_data_attributes *point_data_attr;
+  size_t count;
+  struct otel_string instrument_name;
+  struct otel_string instrument_description;
+  struct otel_string instrument_unit;
+  enum otel_instrument_type instrument_type;
+  enum otel_instrument_value_type instrument_value_type;
+  enum otel_aggregation_temporality aggregation_temporality;
+  double start_time;
+  double end_time;
+};
+
+void otel_metric_data_free(struct otel_metric_data *d);
+
+struct otel_scope_metrics {
+  struct otel_metric_data *metric_data;
+  size_t count;
+  struct otel_instrumentation_scope instrumentation_scope;
+};
+
+void otel_scope_metrics_free(struct otel_scope_metrics *sm);
+
+struct otel_resource_metrics {
+  struct otel_scope_metrics *scope_metric_data;
+  size_t count;
+  struct otel_attributes attributes;
+};
+
+void otel_resource_metrics_free(struct otel_resource_metrics *rm);
+
+struct otel_metrics_data {
+  struct otel_resource_metrics *a;
+  size_t count;
+};
+
+void otel_metrics_data_free(struct otel_metrics_data *cdata);
 
 struct otel_session {
   int is_default;
@@ -215,16 +357,14 @@ struct otel_session {
   struct otel_string span_id;
 };
 
-void otel_session_free(struct otel_session *sess);
-
 struct otel_sessions {
-  int is_default;
-  struct otel_string active_stack_id;
   struct otel_session *a;
   size_t count;
+  int is_default;
+  struct otel_string active_stack_id;
 };
 
-void otel_metric_data_free(struct otel_metric_data *cdata);
+void otel_session_free(struct otel_session *sess);
 
 extern const char *otel_http_request_content_type_str[];
 
@@ -333,7 +473,7 @@ void *otel_create_meter_provider_memory_(
     int export_interval, int export_timeout, int cbuffer_size,
     int ctemporality);
 int otel_meter_provider_memory_get_metrics_(
-  void *meter_provider_, struct otel_metric_data *data);
+  void *meter_provider_, struct otel_metrics_data *data);
 void otel_meter_provider_flush_(void *tracer_provider, int timeout);
 void otel_meter_provider_shutdown_(void *tracer_provider, int timeout);
 void *otel_get_meter_(

@@ -63,7 +63,7 @@ get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
 if(_IMPORT_PREFIX STREQUAL "/")
   set(_IMPORT_PREFIX "")
 endif()
-set(_IMPORT_PREFIX "C:/rtools44/x86_64-w64-mingw32.static.posix")
+set(_IMPORT_PREFIX "@RTOOLS44@/x86_64-w64-mingw32.static.posix")
 
 # Create imported target protobuf::libprotobuf-lite
 add_library(protobuf::libprotobuf-lite STATIC IMPORTED)

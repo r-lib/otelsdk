@@ -20,12 +20,12 @@ meter_provider_http_new <- function(
       # noop
     },
     shutdown = function(timeout = NULL) {
-      .Call(otel_meter_provider_shutdown, self$xptr, timeout)
+      ccall(otel_meter_provider_shutdown, self$xptr, timeout)
       invisible(self)
     }
   )
 
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_create_meter_provider_http,
     export_interval,
     export_timeout

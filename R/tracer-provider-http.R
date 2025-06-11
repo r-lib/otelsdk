@@ -16,12 +16,12 @@ tracer_provider_http_new <- function() {
   )
 
   attributes <- as_otel_attributes(the$default_resource_attributes)
-  self$xptr <- .Call(otel_create_tracer_provider_http, attributes)
+  self$xptr <- ccall(otel_create_tracer_provider_http, attributes)
   self
 }
 
 tracer_provider_http_options <- function() {
-  .Call(otel_tracer_provider_http_options)
+  ccall(otel_tracer_provider_http_options)
 }
 
 #' Tracer provider to export over HTTP

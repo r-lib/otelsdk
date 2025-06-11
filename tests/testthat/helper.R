@@ -76,8 +76,9 @@ sort_named_list <- function(x) {
 }
 
 record_object <- function(expr, envir = parent.frame()) {
-  rds <- tempfile(fileext = ".rds")
-  rs <- tempfile(fileext = ".R")
+  unixpath <- function(x) gsub("\\", "/", x, fixed = TRUE)
+  rds <- unixpath(tempfile(fileext = ".rds"))
+  rs <- unixpath(tempfile(fileext = ".R"))
   defer(unlink(c(rds, rs)), envir = envir)
   writeLines(
     c(deparse(expr), sprintf("saveRDS(.Last.value, '%s')", rds)),
@@ -90,7 +91,9 @@ record_object <- function(expr, envir = parent.frame()) {
 base_error <- local({
   err <- NULL
   function() {
-    if (!is.null(err)) return(err)
+    if (!is.null(err)) {
+      return(err)
+    }
     err <<- record_object(quote(
       tryCatch(stop("boo!"), error = function(e) e)
     ))
@@ -101,7 +104,9 @@ base_error <- local({
 cli_error <- local({
   err <- NULL
   function() {
-    if (!is.null(err)) return(err)
+    if (!is.null(err)) {
+      return(err)
+    }
     err <<- record_object(quote(
       tryCatch(
         cli::cli_abort(c(
@@ -119,7 +124,9 @@ cli_error <- local({
 processx_error <- local({
   err <- NULL
   function() {
-    if (!is.null(err)) return(err)
+    if (!is.null(err)) {
+      return(err)
+    }
     err <<- record_object(quote(
       tryCatch(
         processx::run("false"),
@@ -133,7 +140,9 @@ processx_error <- local({
 callr_error <- local({
   err <- NULL
   function() {
-    if (!is.null(err)) return(err)
+    if (!is.null(err)) {
+      return(err)
+    }
     err <<- record_object(quote(
       tryCatch(
         callr::r(function() 1 + ""),

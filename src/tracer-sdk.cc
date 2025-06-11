@@ -127,7 +127,7 @@ int otel_tracer_provider_memory_get_spans_(
       malloc(sizeof(struct otel_span_data1) * data.size());
     if (!cdata->a) BAIL();
     cdata->count = data.size();
-    for (auto i = 0; i < data.size(); i++) {
+    for (size_t i = 0; i < data.size(); i++) {
       trace_api::TraceId trace_id = data[i]->GetTraceId();
       if (cc2c_otel_string(trace_id, cdata->a[i].trace_id)) BAIL();
       trace_api::SpanId span_id = data[i]->GetSpanId();

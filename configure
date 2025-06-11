@@ -18,8 +18,32 @@ else
     CXX_STANDARD=14
 fi
 
+set
+
 if [ "$UNAME" = "Windows" ]; then
-    CMAKE_PREFIX_PATH="../extra/cmake"
+    CMAKE_PREFIX_PATH=""
+    case "$R_VERSION" in
+      4.4.*)
+          CMAKE_PREFIX_PATH="../extra/cmake/R-4.4"
+          RT="`echo ${RTOOLS44_HOME-C:/rtools44} | sed 's|\\\\|/|g'`"
+          cat src/extra/cmake/R-4.4/protobuf-targets.cmake.in |
+              sed "s|@RTOOLS44@|${RT}|" |
+              cat > src/extra/cmake/R-4.4/protobuf-targets.cmake
+          ;;
+      4.3.*)
+          CMAKE_PREFIX_PATH="../extra/cmake/R-4.3"
+          RT="`echo ${RTOOLS43_HOME-C:/rtools43} | sed 's|\\\\|/|g'`"
+          cat src/extra/cmake/R-4.3/protobuf-targets.cmake.in |
+              sed "s|@RTOOLS43@|${RT}|" |
+              cat > src/extra/cmake/R-4.3/protobuf-targets.cmake
+          ;;
+      4.2.*)
+      ;;
+      4.1.*)
+      ;;
+      4.0.*)
+      ;;
+    esac
     PROTOBUF_LIBS="`pkg-config --libs protobuf`"
     LIBCURL_LIBS="`pkg-config --libs libcurl`"
     XCFLAGS="-DCURL_STATICLIB"

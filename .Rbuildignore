@@ -11,5 +11,7 @@
 ^codecov\.yml$
 ^\.covrignore$
 ^README\.Rmd$
+^README\.html$
 ^[\.]?air\.toml$
 ^\.vscode$
+^src/extra/cmake/R-4[.]./protobuf-targets[.]cmake$

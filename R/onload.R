@@ -20,5 +20,5 @@ the <- new.env(parent = emptyenv())
   )
   the$span_kinds <- otel::span_kinds
   the$span_status_codes <- otel::span_status_codes
-  .Call(otel_init_constants, the)
+  ccall(otel_init_constants, the)
 }

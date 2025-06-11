@@ -84,7 +84,7 @@ test_that("get_current_error", {
   err <- NULL
   f <- function() {
     on.exit(err <<- get_current_error(), add = TRUE)
-    .Call(otel_fail)
+    ccall(otel_fail)
   }
   tryCatch(f(), error = function(e) NULL)
   expect_equal(
@@ -110,11 +110,11 @@ test_that("get_current_error", {
 })
 
 test_that("get_current_error, failure", {
-  fake(get_current_error, ".Call", function(...) stop("Shucks."))
+  fake(get_current_error, "ccall", function(...) stop("Shucks."))
   expect_snapshot({
     get_current_error()
   })
-  fake(get_current_error, ".Call", list(FALSE))
+  fake(get_current_error, "ccall", list(FALSE))
   expect_snapshot({
     get_current_error()
   })

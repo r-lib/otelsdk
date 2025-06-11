@@ -35,7 +35,7 @@ glue <- function(
     eval_func <- as.character(.transformer(expr, .envir) %||% character())
   }
 
-  res <- .Call(glue_, text, f, .open, .close, .cli)
+  res <- ccall(glue_, text, f, .open, .close, .cli)
 
   res <- drop_null(res)
   if (any(lengths(res) == 0L)) {

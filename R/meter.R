@@ -43,7 +43,7 @@ meter_new <- function(
   self$version <- as_string(version)
   self$schema_url <- as_string(schema_url)
   self$attributes <- as_otel_attributes(attributes)
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_get_meter,
     self$provider$xptr,
     self$name,
@@ -60,10 +60,10 @@ counter_new <- function(meter, name, description = NULL, unit = NULL) {
     add = function(value = 1L, attributes = NULL, context = NULL) {
       # TODO: check args
       value <- as.double(value)
-      .Call(otel_counter_add, self$xptr, value, attributes, context)
+      ccall(otel_counter_add, self$xptr, value, attributes, context)
     }
   )
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_create_counter,
     meter$xptr,
     name,
@@ -84,10 +84,10 @@ up_down_counter_new <- function(
     add = function(value = 1L, attributes = NULL, context = NULL) {
       # TODO: check args
       value <- as.double(value)
-      .Call(otel_up_down_counter_add, self$xptr, value, attributes, context)
+      ccall(otel_up_down_counter_add, self$xptr, value, attributes, context)
     }
   )
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_create_up_down_counter,
     meter$xptr,
     name,
@@ -99,13 +99,14 @@ up_down_counter_new <- function(
 
 histogram_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
+    "otel_histogram",
     record = function(value, attributes = NULL, context = NULL) {
       # TODO: check args
       value <- as.double(value)
-      .Call(otel_histogram_record, self$xptr, value, attributes, context)
+      ccall(otel_histogram_record, self$xptr, value, attributes, context)
     }
   )
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_create_histogram,
     meter$xptr,
     name,
@@ -117,13 +118,14 @@ histogram_new <- function(meter, name, description = NULL, unit = NULL) {
 
 gauge_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
+    "otel_gauge",
     record = function(value, attributes = NULL, context = NULL) {
       # TODO: check args
       value <- as.double(value)
-      .Call(otel_gauge_record, self$xptr, value, attributes, context)
+      ccall(otel_gauge_record, self$xptr, value, attributes, context)
     }
   )
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_create_gauge,
     meter$xptr,
     name,

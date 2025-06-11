@@ -24,7 +24,7 @@ logger_provider_http_new <- function() {
     }
   )
 
-  self$xptr <- .Call(otel_create_logger_provider_http)
+  self$xptr <- ccall(otel_create_logger_provider_http)
   self
 }
 

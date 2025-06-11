@@ -23,16 +23,16 @@ meter_provider_stdstream_new <- function(
     },
     flush = function(timeout = NULL) {
       # TODO: check arg
-      .Call(otel_meter_provider_flush, self$xptr, timeout)
+      ccall(otel_meter_provider_flush, self$xptr, timeout)
       invisible(self)
     },
     shutdown = function(timeout = NULL) {
-      .Call(otel_meter_provider_shutdown, self$xptr, timeout)
+      ccall(otel_meter_provider_shutdown, self$xptr, timeout)
       invisible(self)
     }
   )
 
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_create_meter_provider_stdstream,
     stream,
     export_interval,

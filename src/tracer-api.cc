@@ -24,7 +24,7 @@ namespace detail = opentelemetry::trace::propagation::detail;
 std::vector<nostd::string_view> otel_string_array_to_vec(
     struct otel_string_array &s) {
   std::vector<nostd::string_view> v(s.count);
-  for (auto i = 0; i < s.count; i++) {
+  for (size_t i = 0; i < s.count; i++) {
     v[i] = s.a[i];
   }
   return v;
@@ -35,7 +35,7 @@ class RSpanContextKeyValueIterable:
 public:
   RSpanContextKeyValueIterable(struct otel_links &links) : links_(links) {
     num_real_links = 0;
-    for (auto i = 0; i < links_.count; i++) {
+    for (size_t i = 0; i < links_.count; i++) {
       if (links_.a[i].span) num_real_links++;
     }
   }
@@ -43,7 +43,7 @@ public:
     nostd::function_ref<
       bool(trace::SpanContext, const common::KeyValueIterable&)
     > callback) const noexcept {
-    for (auto i = 0; i < links_.count; i++) {
+    for (size_t i = 0; i < links_.count; i++) {
       if (!links_.a[i].span) continue;
       struct otel_span *ss = (struct otel_span *) links_.a[i].span;
       trace::Span &span = *(ss->ptr);
@@ -177,7 +177,7 @@ void otel_span_set_attribute_(void *span_, struct otel_attribute *attr) {
     case k_boolean_array: {
         size_t c = attr->val.boolean_array.count;
         bool *v = new bool[c];
-        for (auto i = 0; i < c; i++) {
+        for (size_t i = 0; i < c; i++) {
           v[i] = attr->val.boolean_array.a[i];
         }
         nostd::span<const bool> vv(v, c);

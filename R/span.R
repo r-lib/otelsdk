@@ -17,22 +17,22 @@ span_new <- function(
     "otel_span",
 
     get_context = function() {
-      xptr <- .Call(otel_span_get_context, self$xptr)
+      xptr <- ccall(otel_span_get_context, self$xptr)
       span_context_new(xptr)
     },
 
     is_valid = function() {
-      .Call(otel_span_is_valid, self$xptr)
+      ccall(otel_span_is_valid, self$xptr)
     },
 
     is_recording = function() {
-      .Call(otel_span_is_recording, self$xptr)
+      ccall(otel_span_is_recording, self$xptr)
     },
 
     set_attribute = function(name, value = NULL) {
       name <- as_string(name, null = FALSE)
       value <- as_otel_attribute_value(value)
-      .Call(otel_span_set_attribute, self$xptr, name, value)
+      ccall(otel_span_set_attribute, self$xptr, name, value)
       invisible(self)
     },
 
@@ -40,27 +40,27 @@ span_new <- function(
       name <- as_string(name, null = FALSE)
       attributes <- as_otel_attributes(attributes)
       timestamp <- as_timestamp(timestamp)
-      .Call(otel_span_add_event, self$xptr, name, attributes, timestamp)
+      ccall(otel_span_add_event, self$xptr, name, attributes, timestamp)
       invisible(self)
     },
 
     # This needs ABI v2
     # add_link = function(link) {
-    #   .Call(otel_span_add_link, self$xptr, link)
+    #   ccall(otel_span_add_link, self$xptr, link)
     #   invisible(self)
     # },
 
     set_status = function(status_code = NULL, description = NULL) {
       status_code <- as_choice(status_code, the$span_status_codes)
       description <- as_string(description)
-      .Call(otel_span_set_status, self$xptr, status_code, description)
+      ccall(otel_span_set_status, self$xptr, status_code, description)
       self$status_set <- TRUE
       invisible(self)
     },
 
     update_name = function(name) {
       name <- as_string(name, null = FALSE)
-      .Call(otel_span_update_name, self$xptr, name)
+      ccall(otel_span_update_name, self$xptr, name)
       invisible(self)
     },
 
@@ -103,7 +103,7 @@ span_new <- function(
           }
         }
       }
-      .Call(otel_span_end, self$xptr, options, status_code)
+      ccall(otel_span_end, self$xptr, options, status_code)
       invisible(self)
     },
 
@@ -122,7 +122,7 @@ span_new <- function(
   self$name <- name
   self$status_set <- FALSE
 
-  self$xptr <- .Call(
+  self$xptr <- ccall(
     otel_start_span,
     self$tracer$xptr,
     self$name,
@@ -148,25 +148,25 @@ span_context_new <- function(xptr) {
     "otel_span_context",
 
     is_valid = function() {
-      .Call(otel_span_context_is_valid, self$xptr)
+      ccall(otel_span_context_is_valid, self$xptr)
     },
     get_trace_flags = function() {
-      .Call(otel_span_context_get_trace_flags, self$xptr)
+      ccall(otel_span_context_get_trace_flags, self$xptr)
     },
     get_trace_id = function() {
-      .Call(otel_span_context_get_trace_id, self$xptr)
+      ccall(otel_span_context_get_trace_id, self$xptr)
     },
     get_span_id = function() {
-      .Call(otel_span_context_get_span_id, self$xptr)
+      ccall(otel_span_context_get_span_id, self$xptr)
     },
     is_remote = function() {
-      .Call(otel_span_context_is_remote, self$xptr)
+      ccall(otel_span_context_is_remote, self$xptr)
     },
     is_sampled = function() {
-      .Call(otel_span_context_is_sampled, self$xptr)
+      ccall(otel_span_context_is_sampled, self$xptr)
     },
     to_http_headers = function() {
-      hdrs <- .Call(otel_span_context_to_headers, self$xptr)
+      hdrs <- ccall(otel_span_context_to_headers, self$xptr)
       hdrs[hdrs != ""]
     }
   )
