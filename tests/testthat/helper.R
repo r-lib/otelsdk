@@ -76,8 +76,9 @@ sort_named_list <- function(x) {
 }
 
 record_object <- function(expr, envir = parent.frame()) {
-  rds <- tempfile(fileext = ".rds")
-  rs <- tempfile(fileext = ".R")
+  unixpath <- function(x) gsub("\\", "/", x, fixed = TRUE)
+  rds <- unixpath(tempfile(fileext = ".rds"))
+  rs <- unixpath(tempfile(fileext = ".R"))
   defer(unlink(c(rds, rs)), envir = envir)
   writeLines(
     c(deparse(expr), sprintf("saveRDS(.Last.value, '%s')", rds)),
