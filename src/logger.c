@@ -141,6 +141,7 @@ SEXP otel_logger_get_name(SEXP logger) {
 
 SEXP otel_emit_log_record(SEXP logger, SEXP log_record) {
   // TODO
+  return R_NilValue;
 }
 
 SEXP otel_logger_is_enabled(SEXP logger, SEXP severity, SEXP event_id) {
