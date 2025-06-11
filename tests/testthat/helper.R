@@ -91,7 +91,9 @@ record_object <- function(expr, envir = parent.frame()) {
 base_error <- local({
   err <- NULL
   function() {
-    if (!is.null(err)) return(err)
+    if (!is.null(err)) {
+      return(err)
+    }
     err <<- record_object(quote(
       tryCatch(stop("boo!"), error = function(e) e)
     ))
@@ -102,7 +104,9 @@ base_error <- local({
 cli_error <- local({
   err <- NULL
   function() {
-    if (!is.null(err)) return(err)
+    if (!is.null(err)) {
+      return(err)
+    }
     err <<- record_object(quote(
       tryCatch(
         cli::cli_abort(c(
@@ -120,7 +124,9 @@ cli_error <- local({
 processx_error <- local({
   err <- NULL
   function() {
-    if (!is.null(err)) return(err)
+    if (!is.null(err)) {
+      return(err)
+    }
     err <<- record_object(quote(
       tryCatch(
         processx::run("false"),
@@ -134,7 +140,9 @@ processx_error <- local({
 callr_error <- local({
   err <- NULL
   function() {
-    if (!is.null(err)) return(err)
+    if (!is.null(err)) {
+      return(err)
+    }
     err <<- record_object(quote(
       tryCatch(
         callr::r(function() 1 + ""),
