@@ -19,6 +19,7 @@ else
 fi
 
 if [ "$UNAME" = "Windows" ]; then
+    # https://bugs.r-project.org/show_bug.cgi?id=18869
     CMAKE_PREFIX_PATH=""
     case "$R_VERSION" in
       4.4.*)
