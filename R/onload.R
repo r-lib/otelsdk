@@ -10,7 +10,7 @@ the <- new.env(parent = emptyenv())
     "telemetry.sdk.version" = as.character(utils::packageVersion("otelsdk")),
     # See: https://opentelemetry.io/docs/specs/semconv/resource/process/#process-runtimes
     "process.runtime.name" = "R",
-    "process.runtime.version" = paste0(R.version$major, ".", R.version$minor),
+    "process.runtime.version" = as.character(getRversion()),
     "process.runtime.description" = R.version.string,
     # See: https://opentelemetry.io/docs/specs/semconv/resource/process/#process
     "process.pid" = Sys.getpid(),
