@@ -16,7 +16,9 @@ is_named <- function(x) {
 }
 
 as_timestamp <- function(x, null = TRUE, call = NULL) {
-  if (null && is.null(x)) return(x)
+  if (null && is.null(x)) {
+    return(x)
+  }
   if (inherits(x, "POSIXt") && length(x) == 1 && !is.na(x)) {
     return(as.double(x))
   }
@@ -49,8 +51,12 @@ as_timestamp <- function(x, null = TRUE, call = NULL) {
 }
 
 as_span <- function(x, null = TRUE, na = TRUE, call = NULL) {
-  if (null && is.null(x)) return(x)
-  if (na && is_na(x)) return(NA)
+  if (null && is.null(x)) {
+    return(x)
+  }
+  if (na && is_na(x)) {
+    return(NA)
+  }
   if (inherits(x, "otel_span")) {
     return(x)
   }
@@ -63,8 +69,12 @@ as_span <- function(x, null = TRUE, na = TRUE, call = NULL) {
 }
 
 as_span_context <- function(x, null = TRUE, na = TRUE, call = NULL) {
-  if (null && is.null(x)) return(x)
-  if (na && is_na(x)) return(x)
+  if (null && is.null(x)) {
+    return(x)
+  }
+  if (na && is_na(x)) {
+    return(x)
+  }
   if (inherits(x, "otel_span_context")) {
     return(x)
   }
@@ -77,8 +87,12 @@ as_span_context <- function(x, null = TRUE, na = TRUE, call = NULL) {
 }
 
 as_span_parent <- function(x, null = TRUE, na = TRUE, call = NULL) {
-  if (null && is.null(x)) return(x)
-  if (na && is_na(x)) return(x)
+  if (null && is.null(x)) {
+    return(x)
+  }
+  if (na && is_na(x)) {
+    return(x)
+  }
   if (inherits(x, "otel_span")) {
     return(x$get_context())
   } else if (inherits(x, "otel_span_context")) {
@@ -115,8 +129,12 @@ as_choice <- function(x, choices, null = TRUE, call = NULL) {
 }
 
 as_env <- function(x, null = TRUE, call = NULL) {
-  if (null && is.null(x)) return(x)
-  if (is.environment(x)) return(x)
+  if (null && is.null(x)) {
+    return(x)
+  }
+  if (is.environment(x)) {
+    return(x)
+  }
 
   call <- call %||% match.call()
   stop(glue(c(
@@ -126,8 +144,12 @@ as_env <- function(x, null = TRUE, call = NULL) {
 }
 
 as_string <- function(x, null = TRUE, call = NULL) {
-  if (null & is.null(x)) return(x)
-  if (is_string(x)) return(x)
+  if (null & is.null(x)) {
+    return(x)
+  }
+  if (is_string(x)) {
+    return(x)
+  }
 
   call <- call %||% match.call()
   stop(glue(c(
@@ -321,7 +343,9 @@ as_end_span_options <- function(options, call = NULL) {
 }
 
 as_output_file <- function(x, null = TRUE, call = NULL) {
-  if (null && is.null(x)) return(x)
+  if (null && is.null(x)) {
+    return(x)
+  }
 
   call <- call %||% match.call()
   x <- as_string(x, call = substitute(as_string(x), list(x = call[[2]])))
@@ -382,7 +406,9 @@ as_event_id <- function(x, null = TRUE, call = NULL) {
 }
 
 as_span_id <- function(x, null = TRUE, call = NULL) {
-  if (null && is.null(x)) return(x)
+  if (null && is.null(x)) {
+    return(x)
+  }
   nc <- span_id_size() * 2L
   if (is_string(x) && nchar(x) == nc && grepl("^[0-9a-fA-F]+$", x)) {
     return(tolower(x))
@@ -408,7 +434,9 @@ as_span_id <- function(x, null = TRUE, call = NULL) {
 }
 
 as_trace_id <- function(x, null = TRUE, call = NULL) {
-  if (null && is.null(x)) return(x)
+  if (null && is.null(x)) {
+    return(x)
+  }
   nc <- trace_id_size() * 2L
   if (is_string(x) && nchar(x) == nc && grepl("^[0-9a-fA-F]+$", x)) {
     return(tolower(x))
@@ -445,7 +473,9 @@ is_count <- function(x, positive = FALSE) {
 
 as_count <- function(x, positive = FALSE, call = NULL) {
   limit <- if (positive) 1L else 0L
-  if (is_count(x, positive = positive)) return(as.integer(x))
+  if (is_count(x, positive = positive)) {
+    return(as.integer(x))
+  }
 
   call <- call %||% match.call()
   if (is.numeric(x) && length(x) != 1) {

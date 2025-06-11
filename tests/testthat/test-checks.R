@@ -315,8 +315,7 @@ test_that("as_log_severity", {
   })
 })
 
-test_that("as_event_id", {
-})
+test_that("as_event_id", {})
 
 test_that("as_span_id", {
   nc <- span_id_size() * 2L
@@ -354,8 +353,7 @@ test_that("as_trace_id", {
   })
 })
 
-test_that("as_trace_flags", {
-})
+test_that("as_trace_flags", {})
 
 test_that("is_count", {
   expect_true(is_count(1L))
