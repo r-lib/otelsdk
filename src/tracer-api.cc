@@ -65,7 +65,7 @@ private:
 
 extern "C" {
 
-void *otel_get_current_span_context_(void *tracer_) {
+void *otel_get_active_span_context_(void *tracer_) {
   struct otel_tracer *ts = (struct otel_tracer *) tracer_;
   trace::Tracer &tracer = *(ts->ptr);
 
@@ -90,7 +90,10 @@ struct otel_scoped_span otel_start_span_(
 
   trace::StartSpanOptions opts;
   if (parent_) {
-    opts.parent = *((trace_api::SpanContext*) parent_);
+    trace_api::SpanContext *pctx = (trace_api::SpanContext*) parent_;
+    if (pctx->IsValid()) {
+      opts.parent = *((trace_api::SpanContext*) parent_);
+    }
   }
   if (start_system_time_) {
     std::chrono::duration<double, std::ratio<1, 1>> ts(*start_system_time_);

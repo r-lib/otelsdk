@@ -21,12 +21,10 @@ SEXP otel_tracer_provider_flush(SEXP provider);
 SEXP otel_get_tracer(
   SEXP provider, SEXP name, SEXP version, SEXP schema_url,
   SEXP attributes);
-SEXP otel_get_current_span_context(SEXP tracer);
+SEXP otel_get_active_span_context(SEXP tracer);
 
 SEXP otel_start_span(
-  SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
-  SEXP parent
-);
+  SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options);
 SEXP otel_span_get_context(SEXP span);
 SEXP otel_span_is_valid(SEXP span);
 SEXP otel_span_is_recording(SEXP span);
@@ -38,7 +36,11 @@ SEXP otel_span_add_event(
 // SEXP otel_span_add_link(SEXP span, SEXP link);
 SEXP otel_span_set_status(SEXP span, SEXP status_code, SEXP description);
 SEXP otel_span_update_name(SEXP span, SEXP name);
-SEXP otel_span_end(SEXP span, SEXP options, SEXP status_code);
+SEXP otel_span_end(SEXP span, SEXP options, SEXP status_code, SEXP session);
+SEXP otel_debug_current_session(void);
+SEXP otel_session_start(void);
+SEXP otel_session_activate(SEXP session);
+SEXP otel_session_deactivate(SEXP session);
 
 SEXP otel_span_id_size(void);
 SEXP otel_trace_id_size(void);
@@ -50,14 +52,6 @@ SEXP otel_span_context_is_remote(SEXP span_context);
 SEXP otel_span_context_is_sampled(SEXP span_context);
 SEXP otel_span_context_to_headers(SEXP span_context);
 SEXP otel_extract_http_context(SEXP headers);
-
-SEXP otel_start_session(void);
-SEXP otel_activate_session(SEXP sess);
-SEXP otel_deactivate_session(void);
-SEXP otel_finish_session(SEXP sess);
-SEXP otel_finish_all_sessions(void);
-
-SEXP otel_debug_current_session(void);
 
 SEXP otel_tracer_provider_http_options(void);
 
@@ -131,7 +125,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_tracer_provider_memory_get_spans, 1),
   CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 5),
-  CALLDEF(otel_get_current_span_context, 1),
+  CALLDEF(otel_get_active_span_context, 1),
   CALLDEF(otel_start_span, 5),
   CALLDEF(otel_span_get_context, 1),
   CALLDEF(otel_span_is_valid, 1),
@@ -142,7 +136,7 @@ static const R_CallMethodDef callMethods[]  = {
   // CALLDEF(otel_span_add_link, 2),
   CALLDEF(otel_span_set_status, 3),
   CALLDEF(otel_span_update_name, 2),
-  CALLDEF(otel_span_end, 3),
+  CALLDEF(otel_span_end, 4),
 
   CALLDEF(otel_span_id_size, 0),
   CALLDEF(otel_trace_id_size, 0),
@@ -155,11 +149,9 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_context_to_headers, 1),
   CALLDEF(otel_extract_http_context, 1),
 
-  CALLDEF(otel_start_session, 0),
-  CALLDEF(otel_activate_session, 1),
-  CALLDEF(otel_deactivate_session, 0),
-  CALLDEF(otel_finish_session, 1),
-  CALLDEF(otel_finish_all_sessions, 0),
+  CALLDEF(otel_session_start, 0),
+  CALLDEF(otel_session_activate, 1),
+  CALLDEF(otel_session_deactivate, 1),
   CALLDEF(otel_debug_current_session, 0),
 
   CALLDEF(otel_tracer_provider_http_options, 0),
@@ -261,18 +253,6 @@ void otel_span_context_finally(SEXP x) {
   }
 }
 
-void otel_session_finally(SEXP x) {
-  if (TYPEOF(x) != EXTPTRSXP) {
-    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid session pointer.");
-    return;
-  }
-  void *sess_ = R_ExternalPtrAddr(x);
-  if (sess_) {
-    otel_session_finally_(sess_);
-    R_ClearExternalPtr(x);
-  }
-}
-
 SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes) {
   const char *cstream = CHAR(STRING_ELT(stream, 0));
   struct otel_attributes attributes_;
@@ -348,7 +328,7 @@ SEXP otel_get_tracer(
   return xptr;
 }
 
-SEXP otel_get_current_span_context(SEXP tracer) {
+SEXP otel_get_active_span_context(SEXP tracer) {
   if (TYPEOF(tracer) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid tracer pointer.");
   }
@@ -357,7 +337,7 @@ SEXP otel_get_current_span_context(SEXP tracer) {
     Rf_error("Opentelemetry tracer cleaned up already, internal error.");
   }
 
-  void *span_context_ = otel_get_current_span_context_(tracer_);
+  void *span_context_ = otel_get_active_span_context_(tracer_);
   SEXP xptr = R_MakeExternalPtr(span_context_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_span_context_finally, (Rboolean) 1);
   return xptr;
@@ -371,49 +351,6 @@ SEXP otel_span_id_size(void) {
 SEXP otel_trace_id_size(void) {
   int sz = otel_trace_id_size_();
   return Rf_ScalarInteger(sz);
-}
-
-SEXP otel_start_session(void) {
-  void *sess_ = otel_start_session_();
-  SEXP res = PROTECT(R_MakeExternalPtr(sess_, R_NilValue, R_NilValue));
-  R_RegisterCFinalizerEx(res, otel_session_finally, (Rboolean) 1);
-  UNPROTECT(1);
-  return res;
-}
-
-SEXP otel_activate_session(SEXP sess) {
-  if (TYPEOF(sess) != EXTPTRSXP) {
-    Rf_error("OpenTelemetry: invalid session pointer.");
-  }
-  void *sess_ = R_ExternalPtrAddr(sess);
-  if (!sess_) {
-    Rf_error(
-      "OpenTelemetry error: invalid session id, session already ended?"
-    );
-  }
-  otel_activate_session_(sess_);
-  return R_NilValue;
-}
-
-SEXP otel_deactivate_session(void) {
-  otel_deactivate_session_();
-  return R_NilValue;
-}
-
-SEXP otel_finish_session(SEXP sess) {
-  if (TYPEOF(sess) != EXTPTRSXP) {
-    Rf_error("OpenTelemetry: invalid session pointer.");
-  }
-  void *sess_ = R_ExternalPtrAddr(sess);
-  if (sess_) {
-    otel_finish_session_(sess_);
-  }
-  return R_NilValue;
-}
-
-SEXP otel_finish_all_sessions(void) {
-  otel_finish_all_sessions_();
-  return R_NilValue;
 }
 
 const char *otel_http_request_content_type_str[] = {

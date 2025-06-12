@@ -58,33 +58,32 @@ test_that("sessions", {
     spn0 <- trc$start_span("0") # 0
     expect_active_span(spn0)
 
-    sess1 <- trc$start_session() # 1
-    expect_active_span(spn0)
+    sess1 <- trc$start_session("sess1") # 1
+    expect_active_span(sess1)
     spn1 <- trc$start_span("1") # 1
     expect_active_span(spn1)
 
-    trc$deactivate_session()
-    sess2 <- trc$start_session() # 2
+    sess1$deactivate_session()
     expect_active_span(spn0)
+    sess2 <- trc$start_session("sess2") # 2
+    expect_active_span(sess2)
     spn2 <- trc$start_span("2") # 2
     expect_active_span(spn2)
 
-    trc$activate_session(sess1) # 1
+    sess1$activate_session() # 1
     expect_active_span(spn1)
     spn11 <- trc$start_span("11") # 1
     expect_active_span(spn11)
-    trc$deactivate_session() # 0
-    expect_active_span(spn0)
-    trc$finish_session(sess1) # 0
+    sess1$deactivate_session() # 0
     expect_active_span(spn0)
     spn11$end() # 0
     expect_active_span(spn0)
     spn1$end() # 0
     expect_active_span(spn0)
+    sess1$end()
+    expect_active_span(spn0)
 
     spn2$end() # 2
-    expect_active_span(spn0)
-    trc$finish_all_sessions() # 2
     expect_active_span(spn0)
 
     spn01 <- trc$start_span("01") # 0
@@ -93,14 +92,17 @@ test_that("sessions", {
     expect_active_span(spn0)
     spn0$end() # 0
     expect_active_span("")
+
+    sess2$end()
+    expect_active_span("")
   })[["traces"]]
 
   nms <- vapply(spns, "[[", "", "name")
-  expect_equal(nms, c("11", "1", "2", "01", "0"))
+  expect_equal(nms, c("11", "1", "sess1", "2", "01", "0", "sess2"))
   names(spns) <- nms
   expect_equal(spns[["0"]]$parent, "0000000000000000")
-  expect_equal(spns[["1"]]$parent, spns[["0"]]$span_id)
-  expect_equal(spns[["2"]]$parent, spns[["0"]]$span_id)
+  expect_equal(spns[["1"]]$parent, spns[["sess1"]]$span_id)
+  expect_equal(spns[["2"]]$parent, spns[["sess2"]]$span_id)
   expect_equal(spns[["11"]]$parent, spns[["1"]]$span_id)
   expect_equal(spns[["01"]]$parent, spns[["0"]]$span_id)
 })
