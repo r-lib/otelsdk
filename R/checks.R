@@ -10,6 +10,10 @@ is_string <- function(x, na = FALSE) {
   }
 }
 
+is_flag <- function(x) {
+  is.logical(x) && length(x) == 1 && !is.na(x)
+}
+
 is_named <- function(x) {
   nms <- names(x)
   length(x) == length(nms) && !anyNA(nms) && all(nms != "")
@@ -154,6 +158,18 @@ as_string <- function(x, null = TRUE, call = NULL) {
   call <- call %||% match.call()
   stop(glue(c(
     "Invalid argument: {format(call[[2]])} must be a string scalar, ",
+    "but it is {typename(x)}."
+  )))
+}
+
+as_flag <- function(x, call = NULL) {
+  if (is_flag(x)) {
+    return(x)
+  }
+
+  call <- call %||% match.call()
+  stop(glue(c(
+    "Invalid argument: {format(call[[2]])} must a flag (logical scalar), ",
     "but it is {typename(x)}."
   )))
 }

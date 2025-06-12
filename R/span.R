@@ -4,7 +4,8 @@ span_new <- function(
   attributes = NULL,
   links = NULL,
   options = NULL,
-  scope
+  scope,
+  session = FALSE
 ) {
   name <- name %||% default_span_name
   name <- as_string(name)
@@ -12,6 +13,7 @@ span_new <- function(
   links <- as_span_links(links)
   options <- as_span_options(options)
   scope <- as_env(scope)
+  session <- as_flag(session)
 
   self <- new_object(
     "otel_span",
@@ -103,7 +105,7 @@ span_new <- function(
           }
         }
       }
-      ccall(otel_span_end, self$xptr, options, status_code)
+      ccall(otel_span_end, self$xptr, options, status_code, self$session)
       invisible(self)
     },
 
@@ -115,12 +117,32 @@ span_new <- function(
       invisible(self)
     },
 
+    activate_session = function() {
+      if (!is.null(self$session)) {
+        ccall(otel_session_activate, self$session)
+      }
+    },
+
+    deactivate_session = function() {
+      if (!is.null(self$session)) {
+        ccall(otel_session_deactivate, self$session)
+      }
+    },
+
     name = NULL
   )
 
   self$tracer <- tracer
   self$name <- name
   self$status_set <- FALSE
+
+  options$parent <- options$parent %||%
+    as_span_parent(tracer$get_active_span_context())$xptr
+
+  # after looking up the parent, so the parent is in the previous session
+  if (session) {
+    self$session <- ccall(otel_session_start)
+  }
 
   self$xptr <- ccall(
     otel_start_span,

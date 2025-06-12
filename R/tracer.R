@@ -25,24 +25,25 @@ tracer_new <- function(
       )
     },
     is_enabled = function(...) TRUE,
-    get_current_span_context = function() {
-      xptr <- ccall(otel_get_current_span_context, self$xptr)
+    get_active_span_context = function() {
+      xptr <- ccall(otel_get_active_span_context, self$xptr)
       span_context_new(xptr)
     },
-    start_session = function() {
-      ccall(otel_start_session)
-    },
-    activate_session = function(session) {
-      ccall(otel_activate_session, session)
-    },
-    deactivate_session = function() {
-      ccall(otel_deactivate_session)
-    },
-    finish_session = function(session) {
-      ccall(otel_finish_session, session)
-    },
-    finish_all_sessions = function() {
-      ccall(otel_finish_all_sessions)
+    start_session = function(
+      name = NULL,
+      attributes = NULL,
+      links = NULL,
+      options = NULL
+    ) {
+      span_new(
+        self,
+        name = name,
+        attributes = attributes,
+        links = links,
+        options = options,
+        scope = NULL,
+        session = TRUE
+      )
     },
     flush = function() {
       self$provider$flush()

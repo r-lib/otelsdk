@@ -190,11 +190,9 @@ private:
     }
 
     SessionId NewStack() {
-      Stack &old = GetCurrentStack();
       is_default_ = false;
       current_ = SessionId();
       sessions_[current_] = Stack();
-      sessions_[current_].Push(old.Top());
       return current_;
     }
 
@@ -295,26 +293,18 @@ void otel_session_finally_(void *id_) {
   r_otel::FinishSession(*id);
 }
 
-void *otel_start_session_(void) {
+void *otel_session_start_() {
   r_otel::SessionId *id = new r_otel::SessionId{r_otel::StartSession()};
   return (void*) id;
 }
 
-void otel_activate_session_(void *id_) {
+void otel_session_activate_(void *id_) {
   r_otel::SessionId *id = (r_otel::SessionId*) id_;
   r_otel::ActivateSession(*id);
 }
 
-void otel_deactivate_session_() {
+void otel_session_deactivate_(void *id_) {
   r_otel::DeactivateSession();
-}
-
-void otel_finish_session_(void *id_) {
-  otel_session_finally_(id_);
-}
-
-void otel_finish_all_sessions_(void) {
-  r_otel::FinishAllSessions();
 }
 
 int otel_debug_current_session_(struct otel_session *sess) {
