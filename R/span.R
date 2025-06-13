@@ -117,8 +117,12 @@ span_new <- function(
       invisible(self)
     },
 
-    activate_session = function() {
+    activate_session = function(scope = parent.frame()) {
       if (!is.null(self$session)) {
+        scope <- as_env(scope)
+        if (!is.null(scope) && !is_na(scope)) {
+          defer(self$deactivate_session(), envir = scope)
+        }
         ccall(otel_session_activate, self$session)
       }
     },
@@ -142,6 +146,9 @@ span_new <- function(
   # after looking up the parent, so the parent is in the previous session
   if (session) {
     self$session <- ccall(otel_session_start)
+    if (!is.null(scope) && !is_na(scope)) {
+      defer(self$deactivate_session(), envir = scope)
+    }
   }
 
   self$xptr <- ccall(
@@ -153,7 +160,7 @@ span_new <- function(
     options
   )
   self$scoped <- FALSE
-  if (!is.null(scope) && !is_na(scope)) {
+  if (!session && !is.null(scope) && !is_na(scope)) {
     self$scoped <- TRUE
     defer(self$end(status_code = "auto"), envir = scope)
   }
