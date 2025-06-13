@@ -8,7 +8,7 @@ logger_provider_stdstream_new <- function(stream = NULL) {
     c("otel_logger_provider_stdstream", "otel_logger_provider"),
     get_logger = function(
       name = NULL,
-      minimum_severity = "info",
+      minimum_severity = NULL,
       version = NULL,
       schema_url = NULL,
       attributes = NULL,

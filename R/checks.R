@@ -389,7 +389,10 @@ as_output_file <- function(x, null = TRUE, call = NULL) {
   x
 }
 
-as_log_severity <- function(x, spec = FALSE, call = NULL) {
+as_log_severity <- function(x, null = TRUE, spec = FALSE, call = NULL) {
+  if (null && is.null(x)) {
+    return(x)
+  }
   choices <- if (spec) log_severity_levels_spec() else otel::log_severity_levels
   if (is_string(x) && x %in% names(choices)) {
     return(choices[x])

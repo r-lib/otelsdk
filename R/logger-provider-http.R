@@ -3,7 +3,7 @@ logger_provider_http_new <- function() {
     c("otel_logger_provider_http", "otel_logger_provider"),
     get_logger = function(
       name = NULL,
-      minimum_severity = "info",
+      minimum_severity = NULL,
       version = NULL,
       schema_url = NULL,
       attributes = NULL,

@@ -1,7 +1,7 @@
 logger_new <- function(
   provider,
   name = NULL,
-  minimum_severity = "info",
+  minimum_severity = NULL,
   version = NULL,
   schema_url = NULL,
   attributes = NULL,
@@ -110,7 +110,9 @@ logger_new <- function(
   )
   name <- name %||% get_env("OTEL_SERVICE_NAME") %||% "R"
   self$provider <- provider
-  minimum_severity <- as_log_severity(minimum_severity)
+  minimum_severity <- as_log_severity(
+    minimum_severity %||% get_default_log_severity()
+  )
   self$name <- as_string(name)
   self$version <- as_string(version)
   self$schema_url <- as_string(schema_url)
@@ -139,3 +141,22 @@ log_severity_levels_spec <- function() {
     NULL
   )
 }
+
+get_default_log_severity <- function() {
+  level0 <- Sys.getenv(otel_log_level_var, otel_log_level_default)
+  level <- tolower(level0)
+  if (level %in% names(otel::log_severity_levels)) {
+    return(level)
+  }
+  if (level %in% otel::log_severity_levels) {
+    return(as.integer(level))
+  }
+  cchoices <- paste(names(otel::log_severity_levels), collapse = ", ")
+  stop(glue(c(
+    "Invalid OpenTelemetry log level from the {otel_log_level_var} ",
+    "environment variable. Must be one of {cchoices}, but it is '{level0}'."
+  )))
+}
+
+otel_log_level_var <- "OTEL_LOG_LEVEL"
+otel_log_level_default <- "info"
