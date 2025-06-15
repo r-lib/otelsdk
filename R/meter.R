@@ -57,9 +57,18 @@ meter_new <- function(
 counter_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
     "otel_counter",
-    add = function(value = 1L, attributes = NULL, span_context = NULL) {
+    add = function(
+      value = 1L,
+      attributes = NULL,
+      span_context = NULL,
+      session = NULL,
+      session_scope = parent.frame()
+    ) {
       # TODO: check args
       value <- as.double(value)
+      if (!is.null(session)) {
+        session$activate_session(scope = session_scope)
+      }
       ccall(otel_counter_add, self$xptr, value, attributes, span_context)
     }
   )
@@ -81,9 +90,18 @@ up_down_counter_new <- function(
 ) {
   self <- new_object(
     "otel_up_down_counter",
-    add = function(value = 1L, attributes = NULL, span_context = NULL) {
+    add = function(
+      value = 1L,
+      attributes = NULL,
+      span_context = NULL,
+      session = NULL,
+      session_scope = parent.frame()
+    ) {
       # TODO: check args
       value <- as.double(value)
+      if (!is.null(session)) {
+        session$activate_session(scope = session_scope)
+      }
       ccall(
         otel_up_down_counter_add,
         self$xptr,
@@ -106,8 +124,17 @@ up_down_counter_new <- function(
 histogram_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
     "otel_histogram",
-    record = function(value, attributes = NULL, span_context = NULL) {
+    record = function(
+      value,
+      attributes = NULL,
+      span_context = NULL,
+      session = NULL,
+      session_scope = parent.frame()
+    ) {
       # TODO: check args
+      if (!is.null(session)) {
+        session$activate_session(scope = session_scope)
+      }
       value <- as.double(value)
       ccall(otel_histogram_record, self$xptr, value, attributes, span_context)
     }
@@ -125,8 +152,17 @@ histogram_new <- function(meter, name, description = NULL, unit = NULL) {
 gauge_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
     "otel_gauge",
-    record = function(value, attributes = NULL, span_context = NULL) {
+    record = function(
+      value,
+      attributes = NULL,
+      span_context = NULL,
+      session = NULL,
+      session_scope = parent.frame()
+    ) {
       # TODO: check args
+      if (!is.null(session)) {
+        session$activate_session(scope = session_scope)
+      }
       value <- as.double(value)
       ccall(otel_gauge_record, self$xptr, value, attributes, span_context)
     }
