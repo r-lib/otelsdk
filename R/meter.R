@@ -57,10 +57,10 @@ meter_new <- function(
 counter_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
     "otel_counter",
-    add = function(value = 1L, attributes = NULL, context = NULL) {
+    add = function(value = 1L, attributes = NULL, span_context = NULL) {
       # TODO: check args
       value <- as.double(value)
-      ccall(otel_counter_add, self$xptr, value, attributes, context)
+      ccall(otel_counter_add, self$xptr, value, attributes, span_context)
     }
   )
   self$xptr <- ccall(
@@ -81,10 +81,16 @@ up_down_counter_new <- function(
 ) {
   self <- new_object(
     "otel_up_down_counter",
-    add = function(value = 1L, attributes = NULL, context = NULL) {
+    add = function(value = 1L, attributes = NULL, span_context = NULL) {
       # TODO: check args
       value <- as.double(value)
-      ccall(otel_up_down_counter_add, self$xptr, value, attributes, context)
+      ccall(
+        otel_up_down_counter_add,
+        self$xptr,
+        value,
+        attributes,
+        span_context
+      )
     }
   )
   self$xptr <- ccall(
@@ -100,10 +106,10 @@ up_down_counter_new <- function(
 histogram_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
     "otel_histogram",
-    record = function(value, attributes = NULL, context = NULL) {
+    record = function(value, attributes = NULL, span_context = NULL) {
       # TODO: check args
       value <- as.double(value)
-      ccall(otel_histogram_record, self$xptr, value, attributes, context)
+      ccall(otel_histogram_record, self$xptr, value, attributes, span_context)
     }
   )
   self$xptr <- ccall(
@@ -119,10 +125,10 @@ histogram_new <- function(meter, name, description = NULL, unit = NULL) {
 gauge_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
     "otel_gauge",
-    record = function(value, attributes = NULL, context = NULL) {
+    record = function(value, attributes = NULL, span_context = NULL) {
       # TODO: check args
       value <- as.double(value)
-      ccall(otel_gauge_record, self$xptr, value, attributes, context)
+      ccall(otel_gauge_record, self$xptr, value, attributes, span_context)
     }
   )
   self$xptr <- ccall(
