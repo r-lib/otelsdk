@@ -18,7 +18,21 @@ the <- new.env(parent = emptyenv())
     # See: https://opentelemetry.io/docs/specs/semconv/resource/os/
     "os.type" = tolower(Sys.info()['sysname'])
   )
-  the$span_kinds <- otel::span_kinds
-  the$span_status_codes <- otel::span_status_codes
+  the$span_kinds <- span_kinds
+  the$span_status_codes <- span_status_codes
   ccall(otel_init_constants, the)
 }
+
+# Cannot get this from otel because an otel .onLoad might trigger an
+# otelsdk load, and the otelsdk .onLoad cannot refer to a half-loaded
+# otel in this case.
+
+span_kinds <- c(
+  default = "internal",
+  "server",
+  "client",
+  "producer",
+  "consumer"
+)
+
+span_status_codes <- c(default = "unset", "ok", "error")
