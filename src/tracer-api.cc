@@ -12,10 +12,11 @@
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/propagation/detail/string.h"
 
-namespace trace  = opentelemetry::trace;
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
-namespace detail = opentelemetry::trace::propagation::detail;
+namespace trace   = opentelemetry::trace;
+namespace nostd   = opentelemetry::nostd;
+namespace common  = opentelemetry::common;
+namespace detail  = opentelemetry::trace::propagation::detail;
+namespace context = opentelemetry::context;
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
@@ -83,13 +84,18 @@ struct otel_scoped_span otel_start_span_(
   double *start_system_time_,
   double *start_steady_time_,
   void* parent_,
+  int is_root_span_,
   int span_kind_) {
 
   RKeyValueIterable attributes(*attributes_);
   RSpanContextKeyValueIterable links(*links_);
 
   trace::StartSpanOptions opts;
-  if (parent_) {
+  context::Context ctx;
+  if (is_root_span_) {
+    ctx = ctx.SetValue(trace_api::kIsRootSpanKey, true);
+    opts.parent = ctx;
+  } else if (parent_) {
     trace_api::SpanContext *pctx = (trace_api::SpanContext*) parent_;
     if (pctx->IsValid()) {
       opts.parent = *((trace_api::SpanContext*) parent_);

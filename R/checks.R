@@ -95,12 +95,12 @@ as_span_parent <- function(x, null = TRUE, na = TRUE, call = NULL) {
     return(x)
   }
   if (na && is_na(x)) {
-    return(x)
+    return(NA)
   }
   if (inherits(x, "otel_span")) {
-    return(x$get_context())
+    return(x$get_context()$xptr)
   } else if (inherits(x, "otel_span_context")) {
-    return(x)
+    return(x$xptr)
   }
 
   stop(glue(c(
@@ -293,7 +293,6 @@ as_span_options <- function(options, call = NULL) {
     options[["start_steady_time"]] <-
       as_timestamp(options[["start_steady_time"]])
     options[["parent"]] <- as_span_parent(options[["parent"]], na = TRUE)
-    options[["parent"]] <- options[["parent"]]$xptr
     options[["kind"]] <- as_choice(options[["kind"]], the$span_kinds)
     return(options)
   }

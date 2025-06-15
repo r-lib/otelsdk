@@ -70,12 +70,18 @@ SEXP otel_start_span(
   }
 
   void *parent_ = NULL;
+  int is_root_span_ = 0;
   SEXP parent = rf_get_list_element(options, "parent");
   if (!Rf_isNull(parent)) {
-    if (TYPEOF(parent) != EXTPTRSXP) {
-      Rf_error("OpenTelemetry: invalid span pointer to parent span.");
+    if (TYPEOF(parent) == LGLSXP && Rf_length(parent) == 1 &&
+        LOGICAL(parent)[0] == NA_LOGICAL) {
+      is_root_span_ = 1;
+    } else {
+      if (TYPEOF(parent) != EXTPTRSXP) {
+        Rf_error("OpenTelemetry: invalid span pointer to parent span.");
+      }
+      parent_ = R_ExternalPtrAddr(parent);
     }
-    parent_ = R_ExternalPtrAddr(parent);
   }
   double *start_system_time_ = NULL;
   SEXP start_system_time =
@@ -101,6 +107,7 @@ SEXP otel_start_span(
     start_system_time_,
     start_steady_time_,
     parent_,
+    is_root_span_,
     span_kind_
   );
   SEXP res = PROTECT(Rf_allocVector(VECSXP, 2));

@@ -163,3 +163,17 @@ test_that("format_exception", {
     format_exception(callr_error())
   })
 })
+
+test_that("create a root span", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span("1")
+    spn2 <- trc$start_span("2", options = list(parent = NA))
+    spn2$end()
+    spn1$end()
+  })[["traces"]]
+
+  expect_equal(length(spns), 2)
+  expect_equal(spns[[1]]$parent, otel::invalid_span_id)
+  expect_equal(spns[[2]]$parent, otel::invalid_span_id)
+})

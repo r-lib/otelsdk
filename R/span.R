@@ -141,7 +141,7 @@ span_new <- function(
   self$status_set <- FALSE
 
   options$parent <- options$parent %||%
-    as_span_parent(tracer$get_active_span_context())$xptr
+    as_span_parent(tracer$get_active_span_context())
 
   # after looking up the parent, so the parent is in the previous session
   if (session) {

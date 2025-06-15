@@ -403,6 +403,7 @@ struct otel_scoped_span otel_start_span_(
   double *start_system_time,
   double *start_steady_time,
   void *parent,
+  int is_root_span,
   int span_kind
 );
 void *otel_span_get_context_(void *span);
