@@ -536,7 +536,7 @@ as_http_context_headers <- function(headers, call = NULL) {
   if (!is.list(headers) || !is_named((headers))) {
     stop(glue(c(
       "Invalid argument: {format(call[[2]])} must be a named list, but it ",
-      "is a {typename(x)}."
+      "is a {typename(headers)}."
     )))
   } else if (!is.null(traceparent) && !is_string(traceparent)) {
     stop(glue(c(
