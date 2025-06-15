@@ -521,6 +521,7 @@ as_count <- function(x, positive = FALSE, call = NULL) {
 
 as_http_context_headers <- function(headers, call = NULL) {
   if (is.list(headers) && is_named(headers)) {
+    names(headers) <- tolower(names(headers))
     traceparent <- headers[["traceparent"]]
     tracestate <- headers[["tracestate"]]
     if (
