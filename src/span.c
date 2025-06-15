@@ -232,7 +232,7 @@ SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
 }
 
 SEXP otel_span_end(
-    SEXP scoped_span, SEXP options, SEXP status_code, SEXP session) {
+    SEXP scoped_span, SEXP options, SEXP status_code) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
   SEXP scope = VECTOR_ELT(scoped_span, 1);
   if (TYPEOF(span) != EXTPTRSXP) {
@@ -272,12 +272,36 @@ void otel_session_finally(SEXP x) {
   }
 }
 
+void otel_session_copy_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid session pointer.");
+    return;
+  }
+  void *sess_ = R_ExternalPtrAddr(x);
+  if (sess_) {
+    otel_session_copy_finally_(sess_);
+    R_ClearExternalPtr(x);
+  }
+}
+
 SEXP otel_session_start(void) {
   void *sess_ = otel_session_start_();
   SEXP res = PROTECT(R_MakeExternalPtr(sess_, R_NilValue, R_NilValue));
   R_RegisterCFinalizerEx(res, otel_session_finally, (Rboolean) 1);
   UNPROTECT(1);
   return res;
+}
+
+SEXP otel_get_current_session(void) {
+  void *sess_ = otel_get_current_session_();
+  if (sess_) {
+    SEXP res = PROTECT(R_MakeExternalPtr(sess_, R_NilValue, R_NilValue));
+    R_RegisterCFinalizerEx(res, otel_session_copy_finally, (Rboolean) 1);
+    UNPROTECT(1);
+    return res;
+  } else {
+    return R_NilValue;
+  }
 }
 
 SEXP otel_session_activate(SEXP sess) {

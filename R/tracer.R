@@ -13,7 +13,8 @@ tracer_new <- function(
       attributes = NULL,
       links = NULL,
       options = NULL,
-      scope = parent.frame()
+      scope = parent.frame(),
+      session = NULL
     ) {
       span_new(
         self,
@@ -21,7 +22,8 @@ tracer_new <- function(
         attributes = attributes,
         links = links,
         options = options,
-        scope = scope
+        scope = scope,
+        session = session
       )
     },
     is_enabled = function(...) TRUE,

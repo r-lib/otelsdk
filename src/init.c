@@ -36,7 +36,8 @@ SEXP otel_span_add_event(
 // SEXP otel_span_add_link(SEXP span, SEXP link);
 SEXP otel_span_set_status(SEXP span, SEXP status_code, SEXP description);
 SEXP otel_span_update_name(SEXP span, SEXP name);
-SEXP otel_span_end(SEXP span, SEXP options, SEXP status_code, SEXP session);
+SEXP otel_span_end(SEXP span, SEXP options, SEXP status_code);
+SEXP otel_get_current_session(void);
 SEXP otel_debug_current_session(void);
 SEXP otel_session_start(void);
 SEXP otel_session_activate(SEXP session);
@@ -136,7 +137,7 @@ static const R_CallMethodDef callMethods[]  = {
   // CALLDEF(otel_span_add_link, 2),
   CALLDEF(otel_span_set_status, 3),
   CALLDEF(otel_span_update_name, 2),
-  CALLDEF(otel_span_end, 4),
+  CALLDEF(otel_span_end, 3),
 
   CALLDEF(otel_span_id_size, 0),
   CALLDEF(otel_trace_id_size, 0),
@@ -152,6 +153,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_session_start, 0),
   CALLDEF(otel_session_activate, 1),
   CALLDEF(otel_session_deactivate, 1),
+  CALLDEF(otel_get_current_session, 0),
   CALLDEF(otel_debug_current_session, 0),
 
   CALLDEF(otel_tracer_provider_http_options, 0),

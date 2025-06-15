@@ -72,6 +72,10 @@ public:
     return GetStackSet().NewStack();
   }
 
+  std::pair<bool, SessionId> GetCurrentSession() {
+    return GetStackSet().GetCurrentStackId();
+  }
+
   void ActivateSession(SessionId &id) {
     GetStackSet().SelectStack(id);
   }
@@ -189,6 +193,14 @@ private:
       }
     }
 
+    std::pair<bool, SessionId> GetCurrentStackId() {
+      if (is_default_) {
+        return std::pair<bool, SessionId>(true, SessionId());
+      } else {
+        return std::pair<bool, SessionId>(false, current_);
+      }
+    }
+
     SessionId NewStack() {
       is_default_ = false;
       current_ = SessionId();
@@ -230,6 +242,10 @@ private:
 
   Stack &GetStack() {
     return GetStackSet().GetCurrentStack();
+  }
+
+  std::pair<bool, SessionId> GetStackId() {
+    return GetStackSet().GetCurrentStackId();
   }
 };
 
@@ -291,6 +307,12 @@ void otel_init_context_storage(void) {
 void otel_session_finally_(void *id_) {
   r_otel::SessionId *id = (r_otel::SessionId*) id_;
   r_otel::FinishSession(*id);
+  delete id;
+}
+
+void otel_session_copy_finally_(void *id_) {
+  r_otel::SessionId *id = (r_otel::SessionId*) id_;
+  delete id;
 }
 
 void *otel_session_start_() {
@@ -335,4 +357,18 @@ void otel_debug_sessions_(struct otel_sessions *sess) {
   // TODO
 }
 
+}
+
+void *otel_get_current_session_() {
+  nostd::shared_ptr<ctx::RuntimeContextStorage> &str = GetRContextStorage();
+  r_otel::RContextStorage *rstr =
+    static_cast<r_otel::RContextStorage*>(str.get());
+  std::pair<bool, r_otel::SessionId> crnt = rstr->GetCurrentSession();
+  if (crnt.first) {
+    return nullptr;
+  } else {
+    r_otel::SessionId *id = new r_otel::SessionId();
+    *id = crnt.second;
+    return id;
+  }
 }

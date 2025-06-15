@@ -374,6 +374,7 @@ void otel_span_finally_(void *span);
 void otel_span_context_finally_(void *span_context_);
 void otel_scope_finally_(void *scope);
 void otel_session_finally_(void *sess);
+void otel_session_copy_finally_(void *sess);
 void otel_logger_finally_(void *logger);
 void otel_meter_finally_(void *meter);
 void otel_counter_finally_(void *counter);
@@ -442,6 +443,7 @@ void *otel_session_start_(void);
 void otel_session_activate_(void *session);
 void otel_session_deactivate_(void *session);
 
+void *otel_get_current_session_(void);
 int otel_debug_current_session_(struct otel_session *sess);
 
 int otel_tracer_provider_http_default_options_(
