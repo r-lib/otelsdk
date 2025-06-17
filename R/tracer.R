@@ -36,7 +36,8 @@ tracer_new <- function(
       attributes = NULL,
       links = NULL,
       options = NULL,
-      scope = parent.frame()
+      scope = parent.frame(),
+      session = NULL
     ) {
       span_new(
         self,
@@ -45,7 +46,8 @@ tracer_new <- function(
         links = links,
         options = options,
         scope = scope,
-        session = TRUE
+        session = session,
+        new_session = TRUE
       )
     },
     flush = function() {

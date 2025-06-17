@@ -5,7 +5,8 @@ span_new <- function(
   links = NULL,
   options = NULL,
   scope,
-  session = NULL
+  session = NULL,
+  new_session = FALSE
 ) {
   name <- name %||% default_span_name
   name <- as_string(name)
@@ -14,6 +15,7 @@ span_new <- function(
   options <- as_span_options(options)
   scope <- as_env(scope)
   # TODO: session
+  new_session <- as_flag(new_session)
 
   self <- new_object(
     "otel_span",
@@ -145,7 +147,7 @@ span_new <- function(
   self$session <- NULL
 
   # if the new span is in a session, we need to activate it here
-  if (!isTRUE(session) && !is.null(session)) {
+  if (!is.null(session)) {
     session$activate_session(scope = scope)
     self$session <- session$session
   }
@@ -154,14 +156,14 @@ span_new <- function(
     as_span_parent(tracer$get_active_span_context())
 
   # this is a session span
-  if (isTRUE(session)) {
+  if (new_session) {
     self$session <- ccall(otel_session_start)
     if (!is.null(scope) && !is_na(scope)) {
       defer(self$deactivate_session(), envir = scope)
     }
   }
 
-  # use the current session
+  # otherwise the the current session, we need to switch to this in $end()
   if (is.null(session)) {
     self$session <- get_current_session()
   }
@@ -176,7 +178,7 @@ span_new <- function(
   )
   self$scoped <- FALSE
   # do not auto-close a session span
-  if (!isTRUE(session) && !is.null(scope) && !is_na(scope)) {
+  if (!new_session && !is.null(scope) && !is_na(scope)) {
     self$scoped <- TRUE
     defer(self$end(status_code = "auto"), envir = scope)
   }

@@ -181,3 +181,27 @@ test_that("sessions, suggested practices", {
   expect_equal(spns[["serial"]]$parent, spns[["2"]]$span_id)
   expect_equal(spns[["serial2"]]$parent, spns[["serial"]]$span_id)
 })
+
+test_that("nested sessions", {
+  create_inner_span <- function(name, tracer, session = NULL) {
+    tracer$start_session(name, session = session)
+  }
+
+  spans <- otelsdk::with_otel_record({
+    trc <- otel::get_tracer("test")
+
+    # This example works with start_span(), but fails with start_session().
+    outer <- trc$start_session("outer", options = list(parent = NA))
+
+    # Emulate two "concurrent" operations that create session spans.
+    inner1 <- create_inner_span("inner1", trc, session = outer)
+    inner2 <- create_inner_span("inner2", trc, session = outer)
+
+    inner1$end()
+    inner2$end()
+    outer$end()
+  })[["traces"]]
+
+  expect_equal(spans[["inner1"]]$parent, spans[["outer"]]$span_id)
+  expect_equal(spans[["inner2"]]$parent, spans[["outer"]]$span_id)
+})
