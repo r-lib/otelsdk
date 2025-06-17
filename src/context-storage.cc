@@ -18,8 +18,14 @@ namespace r_otel {
 class SessionId {
 public:
   SessionId() : id(std::to_string(nxt())) {}
-  friend bool operator<(const SessionId& l, const SessionId r) {
+  friend bool operator<(const SessionId& l, const SessionId& r) {
     return l.id < r.id;
+  }
+  friend bool operator==(const SessionId& l, const SessionId& r) {
+    return l.id == r.id;
+  }
+  friend bool operator!=(const SessionId& l, const SessionId& r) {
+    return l.id != r.id;
   }
   const std::string &Get() { return id; }
 
@@ -205,25 +211,42 @@ private:
       is_default_ = false;
       current_ = SessionId();
       sessions_[current_] = Stack();
+      active_session.push_back(current_);
       return current_;
     }
 
     void SelectStack(SessionId &id) {
+      if (active_session.size() == 0 || active_session.back() != id) {
+        active_session.push_back(id);
+      }
       is_default_ = false;
       current_ = id;
     }
 
     void UnselectStack() {
-      is_default_ = true;
+      if (active_session.size() > 0) active_session.pop_back();
+      while (active_session.size() > 0 &&
+             sessions_.find(active_session.back()) == sessions_.end()) {
+        active_session.pop_back();
+      }
+      if (active_session.size() == 0) {
+        is_default_ = true;
+      } else {
+        current_ = active_session.back();
+      }
     }
 
     void RemoveStack(SessionId &id) {
       sessions_.erase(id);
-      is_default_ = true;
+      if (current_ == id) {
+        UnselectStack();
+      }
     }
 
+    // not used currently?
     void RemoveAllStacks(void) {
       sessions_.clear();
+      active_session.clear();
       is_default_ = true;
     }
 
@@ -233,6 +256,7 @@ private:
     Stack default_;
     std::map<SessionId, Stack> sessions_;
     SessionId current_;
+    std::vector<SessionId> active_session;
   };
 
   StackSet &GetStackSet() {

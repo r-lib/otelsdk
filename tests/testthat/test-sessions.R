@@ -1,3 +1,64 @@
+test_that("sessions", {
+  expect_active_span <- function(id) {
+    if (inherits(id, "otel_span")) {
+      id <- id$get_context()$get_span_id()
+    }
+    expect_equal(otel_current_session()$span_id, id)
+  }
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+
+    expect_active_span("")
+    spn0 <- trc$start_span("0") # 0
+    expect_active_span(spn0)
+
+    sess1 <- trc$start_session("sess1") # 1
+    expect_active_span(sess1)
+    spn1 <- trc$start_span("1") # 1
+    expect_active_span(spn1)
+
+    sess1$deactivate_session()
+    expect_active_span(spn0)
+    sess2 <- trc$start_session("sess2") # 2
+    expect_active_span(sess2)
+    spn2 <- trc$start_span("2") # 2
+    expect_active_span(spn2)
+
+    sess1$activate_session() # 1
+    expect_active_span(spn1)
+    spn11 <- trc$start_span("11") # 1
+    expect_active_span(spn11)
+    sess1$deactivate_session() # 2
+    sess2$deactivate_session() # 0
+    expect_active_span(spn0)
+    spn11$end() # 0
+    expect_active_span(spn0)
+    spn1$end() # 0
+    expect_active_span(spn0)
+    sess1$end()
+    expect_active_span(spn0)
+
+    spn2$end() # 2
+    expect_active_span(spn0)
+
+    spn01 <- trc$start_span("01") # 0
+    expect_active_span(spn01)
+    spn01$end() # 0
+    expect_active_span(spn0)
+    spn0$end() # 0
+    expect_active_span("")
+
+    sess2$end()
+    expect_active_span("")
+  })[["traces"]]
+
+  expect_equal(spns[["0"]]$parent, "0000000000000000")
+  expect_equal(spns[["1"]]$parent, spns[["sess1"]]$span_id)
+  expect_equal(spns[["2"]]$parent, spns[["sess2"]]$span_id)
+  expect_equal(spns[["11"]]$parent, spns[["1"]]$span_id)
+  expect_equal(spns[["01"]]$parent, spns[["0"]]$span_id)
+})
+
 test_that("sessions, manually closing everything", {
   expect_active_span <- function(id) {
     if (inherits(id, "otel_span")) {
@@ -196,6 +257,30 @@ test_that("nested sessions", {
     # Emulate two "concurrent" operations that create session spans.
     inner1 <- create_inner_span("inner1", trc, session = outer)
     inner2 <- create_inner_span("inner2", trc, session = outer)
+
+    inner1$end()
+    inner2$end()
+    outer$end()
+  })[["traces"]]
+
+  expect_equal(spans[["inner1"]]$parent, spans[["outer"]]$span_id)
+  expect_equal(spans[["inner2"]]$parent, spans[["outer"]]$span_id)
+})
+
+test_that("nested sessions 2", {
+  create_inner_span <- function(name, tracer) {
+    tracer$start_session(name)
+  }
+
+  spans <- otelsdk::with_otel_record({
+    trc <- otel::get_tracer("test")
+
+    # This example works with start_span(), but fails with start_session().
+    outer <- trc$start_session("outer", options = list(parent = NA))
+
+    # Emulate two "concurrent" operations that create session spans.
+    inner1 <- create_inner_span("inner1", trc)
+    inner2 <- create_inner_span("inner2", trc)
 
     inner1$end()
     inner2$end()
