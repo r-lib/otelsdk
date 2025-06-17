@@ -14,7 +14,9 @@ tracer_provider_memory_new <- function(buffer_size = 100) {
       # noop currently
     },
     get_spans = function() {
-      ccall(otel_tracer_provider_memory_get_spans, self$xptr)
+      spans <- ccall(otel_tracer_provider_memory_get_spans, self$xptr)
+      names(spans) <- map_chr(spans, function(x) x[["name"]] %||% "")
+      spans
     }
   )
 

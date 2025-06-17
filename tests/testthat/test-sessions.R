@@ -47,9 +47,7 @@ test_that("sessions, manually closing everything", {
     fun()
   })[["traces"]]
 
-  nms <- map_chr(spns, "[[", "name")
-  names(spns) <- nms
-  expect_equal(sort(nms), sort(c(0:3, "01", "02", "sess", "serial")))
+  expect_equal(sort(names(spns)), sort(c(0:3, "01", "02", "sess", "serial")))
   expect_equal(spns[["0"]]$parent, otel::invalid_span_id)
   expect_equal(spns[["1"]]$parent, spns[["sess"]]$span_id)
   expect_equal(spns[["2"]]$parent, spns[["sess"]]$span_id)
@@ -108,9 +106,10 @@ test_that("sessions auto-close", {
     fun()
   })[["traces"]]
 
-  nms <- map_chr(spns, "[[", "name")
-  names(spns) <- nms
-  expect_equal(sort(nms), sort(c(0:3, "01", "02", "sess", "serial", "serial2")))
+  expect_equal(
+    sort(names(spns)),
+    sort(c(0:3, "01", "02", "sess", "serial", "serial2"))
+  )
   expect_equal(spns[["0"]]$parent, otel::invalid_span_id)
   expect_equal(spns[["1"]]$parent, spns[["sess"]]$span_id)
   expect_equal(spns[["2"]]$parent, spns[["sess"]]$span_id)
@@ -168,9 +167,10 @@ test_that("sessions, suggested practices", {
     fun()
   })[["traces"]]
 
-  nms <- map_chr(spns, "[[", "name")
-  names(spns) <- nms
-  expect_equal(sort(nms), sort(c(0:3, "01", "02", "sess", "serial", "serial2")))
+  expect_equal(
+    sort(names(spns)),
+    sort(c(0:3, "01", "02", "sess", "serial", "serial2"))
+  )
   expect_equal(spns[["0"]]$parent, otel::invalid_span_id)
   expect_equal(spns[["1"]]$parent, spns[["sess"]]$span_id)
   expect_equal(spns[["2"]]$parent, spns[["sess"]]$span_id)

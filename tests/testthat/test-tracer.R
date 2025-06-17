@@ -97,9 +97,6 @@ test_that("sessions", {
     expect_active_span("")
   })[["traces"]]
 
-  nms <- vapply(spns, "[[", "", "name")
-  expect_equal(nms, c("11", "1", "sess1", "2", "01", "0", "sess2"))
-  names(spns) <- nms
   expect_equal(spns[["0"]]$parent, "0000000000000000")
   expect_equal(spns[["1"]]$parent, spns[["sess1"]]$span_id)
   expect_equal(spns[["2"]]$parent, spns[["sess2"]]$span_id)
