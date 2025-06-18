@@ -234,16 +234,11 @@ SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
 SEXP otel_span_end(
     SEXP scoped_span, SEXP options, SEXP status_code) {
   SEXP span = VECTOR_ELT(scoped_span, 0);
-  SEXP scope = VECTOR_ELT(scoped_span, 1);
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
   void *span_ = R_ExternalPtrAddr(span);
-  if (TYPEOF(scope) != EXTPTRSXP) {
-    Rf_error("OpenTelemetry: invalid scope pointer.");
-  }
-  void *scope_ = R_ExternalPtrAddr(scope);
-  if (span_ && scope_) {
+  if (span_) {
     if (!Rf_isNull(status_code)) {
       int status_code_ = INTEGER(status_code)[0];
       otel_span_set_status_(span_, status_code_, NULL);
@@ -254,8 +249,7 @@ SEXP otel_span_end(
     if (!Rf_isNull(end_steady_time)) {
       end_steady_time_ = REAL(end_steady_time);
     }
-    otel_span_end_(span_, scope_, end_steady_time_);
-    R_ClearExternalPtr(scope);
+    otel_span_end_(span_, end_steady_time_);
   }
   return R_NilValue;
 }

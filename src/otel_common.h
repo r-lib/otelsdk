@@ -423,7 +423,7 @@ void otel_span_set_status_(
   char *description_
 );
 void otel_span_update_name_(void *span_, const char *name_);
-void otel_span_end_(void *span, void *scope, double *end_steady_time);
+void otel_span_end_(void *span, double *end_steady_time);
 
 int otel_span_context_is_valid_(void* span_context);
 char otel_span_context_get_trace_flags_(void* span_context);

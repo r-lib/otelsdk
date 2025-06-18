@@ -235,7 +235,7 @@ void otel_span_add_event_(
   }
 }
 
-void otel_span_end_(void *span_, void *scope_, double *end_steady_time_) {
+void otel_span_end_(void *span_, double *end_steady_time_) {
   struct otel_span *ss = (struct otel_span *) span_;
   trace::Span &span = *(ss->ptr);
   trace::EndSpanOptions opts;
@@ -245,8 +245,6 @@ void otel_span_end_(void *span_, void *scope_, double *end_steady_time_) {
     opts.end_steady_time = ts2;
   }
   span.End();
-  trace::Scope *scope = (trace::Scope*) scope_;
-  delete scope;
 }
 
 void otel_span_set_status_(
