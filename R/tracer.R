@@ -13,8 +13,7 @@ tracer_new <- function(
       attributes = NULL,
       links = NULL,
       options = NULL,
-      scope = parent.frame(),
-      session = NULL
+      scope = parent.frame()
     ) {
       span_new(
         self,
@@ -22,22 +21,15 @@ tracer_new <- function(
         attributes = attributes,
         links = links,
         options = options,
-        scope = scope,
-        session = session
+        scope = scope
       )
-    },
-    is_enabled = function(...) TRUE,
-    get_active_span_context = function() {
-      xptr <- ccall(otel_get_active_span_context, self$xptr)
-      span_context_new(xptr)
     },
     start_session = function(
       name = NULL,
       attributes = NULL,
       links = NULL,
       options = NULL,
-      scope = parent.frame(),
-      session = NULL
+      session_scope = parent.frame()
     ) {
       span_new(
         self,
@@ -45,10 +37,14 @@ tracer_new <- function(
         attributes = attributes,
         links = links,
         options = options,
-        scope = scope,
-        session = session,
-        new_session = TRUE
+        scope = session_scope,
+        session = TRUE
       )
+    },
+    is_enabled = function(...) TRUE,
+    get_active_span_context = function() {
+      xptr <- ccall(otel_get_active_span_context, self$xptr)
+      span_context_new(xptr)
     },
     flush = function() {
       self$provider$flush()
@@ -74,12 +70,6 @@ tracer_new <- function(
     self$attributes
   )
   self
-}
-
-# for debugging
-
-otel_current_session <- function() {
-  ccall(otel_debug_current_session)
 }
 
 get_span_id <- function(span) {

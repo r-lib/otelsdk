@@ -60,15 +60,10 @@ counter_new <- function(meter, name, description = NULL, unit = NULL) {
     add = function(
       value = 1L,
       attributes = NULL,
-      span_context = NULL,
-      session = NULL,
-      session_scope = parent.frame()
+      span_context = NULL
     ) {
       # TODO: check args
       value <- as.double(value)
-      if (!is.null(session)) {
-        session$activate_session(scope = session_scope)
-      }
       ccall(otel_counter_add, self$xptr, value, attributes, span_context)
     }
   )
@@ -93,15 +88,10 @@ up_down_counter_new <- function(
     add = function(
       value = 1L,
       attributes = NULL,
-      span_context = NULL,
-      session = NULL,
-      session_scope = parent.frame()
+      span_context = NULL
     ) {
       # TODO: check args
       value <- as.double(value)
-      if (!is.null(session)) {
-        session$activate_session(scope = session_scope)
-      }
       ccall(
         otel_up_down_counter_add,
         self$xptr,
@@ -127,14 +117,9 @@ histogram_new <- function(meter, name, description = NULL, unit = NULL) {
     record = function(
       value,
       attributes = NULL,
-      span_context = NULL,
-      session = NULL,
-      session_scope = parent.frame()
+      span_context = NULL
     ) {
       # TODO: check args
-      if (!is.null(session)) {
-        session$activate_session(scope = session_scope)
-      }
       value <- as.double(value)
       ccall(otel_histogram_record, self$xptr, value, attributes, span_context)
     }
@@ -155,14 +140,9 @@ gauge_new <- function(meter, name, description = NULL, unit = NULL) {
     record = function(
       value,
       attributes = NULL,
-      span_context = NULL,
-      session = NULL,
-      session_scope = parent.frame()
+      span_context = NULL
     ) {
       # TODO: check args
-      if (!is.null(session)) {
-        session$activate_session(scope = session_scope)
-      }
       value <- as.double(value)
       ccall(otel_gauge_record, self$xptr, value, attributes, span_context)
     }

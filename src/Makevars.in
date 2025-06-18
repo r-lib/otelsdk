@@ -19,7 +19,7 @@ OTEL_CPP_LIBS =  \
 	install/lib/libopentelemetry_proto.a
 
 OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
-	span.o context.o context-storage.o tracer.o tracer-sdk.o tracer-api.o \
+	span.o context.o tracer.o tracer-sdk.o tracer-api.o \
 	meter.o meter-sdk.o	logger.o logger-sdk.o
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2

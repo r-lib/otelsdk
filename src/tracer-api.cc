@@ -76,7 +76,7 @@ void *otel_get_active_span_context_(void *tracer_) {
   return (void*) span_context;
 }
 
-struct otel_scoped_span otel_start_span_(
+void * otel_start_span_(
   void *tracer_,
   const char *name,
   struct otel_attributes *attributes_,
@@ -124,10 +124,8 @@ struct otel_scoped_span otel_start_span_(
   trace::Tracer &tracer = *(ts->ptr);
   struct otel_span *ss = new struct otel_span;
   ss->ptr = tracer.StartSpan(name, attributes, opts);
-  trace::Scope *scope = new trace::Scope(ss->ptr);
 
-  struct otel_scoped_span sspan = { ss, scope };
-  return sspan;
+  return (void *) ss;
 }
 
 void *otel_span_get_context_(void *span_) {
@@ -235,7 +233,7 @@ void otel_span_add_event_(
   }
 }
 
-void otel_span_end_(void *span_, void *scope_, double *end_steady_time_) {
+void otel_span_end_(void *span_, double *end_steady_time_) {
   struct otel_span *ss = (struct otel_span *) span_;
   trace::Span &span = *(ss->ptr);
   trace::EndSpanOptions opts;
@@ -245,6 +243,15 @@ void otel_span_end_(void *span_, void *scope_, double *end_steady_time_) {
     opts.end_steady_time = ts2;
   }
   span.End();
+}
+
+void *otel_scope_start_(void *span_) {
+  struct otel_span *ss = (struct otel_span *) span_;
+  trace::Scope *scope = new trace::Scope(ss->ptr);
+  return (void*) scope;
+}
+
+void otel_scope_end_(void *scope_) {
   trace::Scope *scope = (trace::Scope*) scope_;
   delete scope;
 }

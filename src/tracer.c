@@ -68,23 +68,3 @@ SEXP otel_tracer_provider_memory_get_spans(SEXP provider) {
   UNPROTECT(2);
   return res;
 }
-
-SEXP otel_debug_current_session(void) {
-  struct otel_session sess = { 0 };
-  if (otel_debug_current_session_(&sess)) {
-    R_THROW_MAYBE_SYSTEM_ERROR(
-      "Cannot get debug info for current OpenTelemetry session"
-    );
-  }
-
-  const char *nms[] = { "is_default", "id", "trace_id", "span_id", "" };
-  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
-  SET_VECTOR_ELT(res, 0, Rf_ScalarLogical(sess.is_default));
-  SET_VECTOR_ELT(res, 1, c2r_otel_string(&sess.id));
-  SET_VECTOR_ELT(res, 2, c2r_otel_string(&sess.trace_id));
-  SET_VECTOR_ELT(res, 3, c2r_otel_string(&sess.span_id));
-
-  otel_session_free(&sess);
-  UNPROTECT(1);
-  return res;
-}

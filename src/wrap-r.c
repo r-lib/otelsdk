@@ -803,10 +803,3 @@ SEXP c2r_otel_metrics_data(const struct otel_metrics_data *data) {
   UNPROTECT(2);
   return res;
 }
-
-void otel_session_free(struct otel_session *sess) {
-  if (!sess) return;
-  otel_string_free(&sess->id);
-  otel_string_free(&sess->trace_id);
-  otel_string_free(&sess->span_id);
-}
