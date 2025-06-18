@@ -4,14 +4,16 @@ span_new <- function(
   attributes = NULL,
   links = NULL,
   options = NULL,
-  scope
+  scope,
+  session = FALSE
 ) {
   name <- name %||% default_span_name
   name <- as_string(name)
   attributes <- as_otel_attributes(attributes)
   links <- as_span_links(links)
   options <- as_span_options(options)
-  scope <- as_env(scope)
+  scope <- as_env(scope, null = FALSE)
+  session <- as_flag(session)
 
   self <- new_object(
     "otel_span",
@@ -115,8 +117,8 @@ span_new <- function(
       invisible(self)
     },
 
-    .deactivate = function() {
-      ccall(otel_span_deactivate, self$xptr)
+    activate = function(session_scope = parent.frame()) {
+      local_active_span(self, session_scope)
     },
 
     name = NULL
@@ -125,6 +127,7 @@ span_new <- function(
   self$tracer <- tracer
   self$name <- name
   self$status_set <- FALSE
+  self$session <- session
 
   self$xptr <- ccall(
     otel_start_span,
@@ -134,14 +137,24 @@ span_new <- function(
     links,
     options
   )
-  self$scoped <- FALSE
-  if (!is.null(scope) && !is_na(scope)) {
-    self$scoped <- TRUE
+
+  self$activate(session_scope = scope)
+  if (!session) {
     defer(self$end(status_code = "auto"), envir = scope)
-    defer(self$.deactivate(), envir = scope)
   }
 
   self
+}
+
+with_active_span <- function(span, expr) {
+  scope <- ccall(otel_scope_start, span$xptr)
+  defer(ccall(otel_scope_end, scope))
+  expr
+}
+
+local_active_span <- function(span, session_scope = parent.frame()) {
+  cscope <- ccall(otel_scope_start, span$xptr)
+  defer(ccall(otel_scope_end, cscope), envir = session_scope)
 }
 
 default_span_name <- "<NA>"

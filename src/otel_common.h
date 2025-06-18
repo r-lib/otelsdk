@@ -10,11 +10,6 @@ extern "C" {
 #include "stddef.h"
 #endif
 
-struct otel_scoped_span {
-  void *span;
-  void *scope;
-};
-
 enum otel_http_request_content_type {
   k_json,
   k_binary
@@ -378,7 +373,7 @@ void *otel_get_tracer_(
     const char *schema_url, struct otel_attributes *attributes);
 void *otel_get_active_span_context_(void *tracer);
 
-struct otel_scoped_span otel_start_span_(
+void *otel_start_span_(
   void *tracer,
   const char *name,
   struct otel_attributes *attr,
@@ -406,7 +401,9 @@ void otel_span_set_status_(
 );
 void otel_span_update_name_(void *span_, const char *name_);
 void otel_span_end_(void *span, double *end_steady_time);
-void otel_span_deactivate_(void *scope);
+
+void *otel_scope_start_(void *span);
+void otel_scope_end_(void *scope);
 
 int otel_span_context_is_valid_(void* span_context);
 char otel_span_context_get_trace_flags_(void* span_context);

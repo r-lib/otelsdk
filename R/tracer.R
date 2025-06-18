@@ -24,6 +24,23 @@ tracer_new <- function(
         scope = scope
       )
     },
+    start_session = function(
+      name = NULL,
+      attributes = NULL,
+      links = NULL,
+      options = NULL,
+      session_scope = parent.frame()
+    ) {
+      span_new(
+        self,
+        name = name,
+        attributes = attributes,
+        links = links,
+        options = options,
+        scope = session_scope,
+        session = TRUE
+      )
+    },
     is_enabled = function(...) TRUE,
     get_active_span_context = function() {
       xptr <- ccall(otel_get_active_span_context, self$xptr)

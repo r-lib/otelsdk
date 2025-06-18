@@ -58,8 +58,7 @@ SEXP otel_start_span(
     links_.a = (struct otel_link*)
       R_alloc(links_.count, sizeof(struct otel_link));
     for (R_len_t i = 0; i < links_.count; i++) {
-      SEXP scoped_span = VECTOR_ELT(VECTOR_ELT(links, i), 0);
-      SEXP linked_span = VECTOR_ELT(scoped_span, 0);
+      SEXP linked_span = VECTOR_ELT(VECTOR_ELT(links, i), 0);
       if (TYPEOF(linked_span) != EXTPTRSXP) {
         Rf_error("OpenTelemetry: invalid span pointer to linked span.");
       }
@@ -99,7 +98,7 @@ SEXP otel_start_span(
   int span_kind_ = INTEGER(span_kind)[0];
 
   const char *name_ = CHAR(STRING_ELT(name, 0));
-  struct otel_scoped_span sspan = otel_start_span_(
+  void *span_ = otel_start_span_(
     tracer_,
     name_,
     &attributes_,
@@ -110,17 +109,13 @@ SEXP otel_start_span(
     is_root_span_,
     span_kind_
   );
-  SEXP res = PROTECT(Rf_allocVector(VECSXP, 2));
-  SET_VECTOR_ELT(res, 0, R_MakeExternalPtr(sspan.span, R_NilValue, R_NilValue));
-  R_RegisterCFinalizerEx(VECTOR_ELT(res, 0), otel_span_finally, (Rboolean) 1);
-  SET_VECTOR_ELT(res, 1, R_MakeExternalPtr(sspan.scope, R_NilValue, R_NilValue));
-  R_RegisterCFinalizerEx(VECTOR_ELT(res, 1), otel_scope_finally, (Rboolean) 1);
+  SEXP res = PROTECT(R_MakeExternalPtr(span_, R_NilValue, R_NilValue));
+  R_RegisterCFinalizerEx(res, otel_span_finally, (Rboolean) 1);
   UNPROTECT(1);
   return res;
 }
 
-SEXP otel_span_get_context(SEXP scoped_span) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
+SEXP otel_span_get_context(SEXP span) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
@@ -134,8 +129,7 @@ SEXP otel_span_get_context(SEXP scoped_span) {
   return res;
 }
 
-SEXP otel_span_is_valid(SEXP scoped_span) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
+SEXP otel_span_is_valid(SEXP span) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
@@ -147,8 +141,7 @@ SEXP otel_span_is_valid(SEXP scoped_span) {
   return Rf_ScalarLogical(res);
 }
 
-SEXP otel_span_is_recording(SEXP scoped_span) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
+SEXP otel_span_is_recording(SEXP span) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
@@ -160,8 +153,7 @@ SEXP otel_span_is_recording(SEXP scoped_span) {
   return Rf_ScalarLogical(res);
 }
 
-SEXP otel_span_set_attribute(SEXP scoped_span, SEXP name, SEXP value) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
+SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
@@ -175,8 +167,7 @@ SEXP otel_span_set_attribute(SEXP scoped_span, SEXP name, SEXP value) {
 }
 
 SEXP otel_span_add_event(
-    SEXP scoped_span, SEXP name, SEXP attributes, SEXP timestamp) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
+    SEXP span, SEXP name, SEXP attributes, SEXP timestamp) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
@@ -201,8 +192,7 @@ SEXP otel_span_add_event(
 // }
 
 SEXP otel_span_set_status(
-    SEXP scoped_span, SEXP status_code, SEXP description) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
+    SEXP span, SEXP status_code, SEXP description) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
@@ -218,8 +208,7 @@ SEXP otel_span_set_status(
   return R_NilValue;
 }
 
-SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
+SEXP otel_span_update_name(SEXP span, SEXP name) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
@@ -232,8 +221,7 @@ SEXP otel_span_update_name(SEXP scoped_span, SEXP name) {
 }
 
 SEXP otel_span_end(
-    SEXP scoped_span, SEXP options, SEXP status_code) {
-  SEXP span = VECTOR_ELT(scoped_span, 0);
+    SEXP span, SEXP options, SEXP status_code) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");
   }
@@ -254,14 +242,28 @@ SEXP otel_span_end(
   return R_NilValue;
 }
 
-SEXP otel_span_deactivate(SEXP scoped_span) {
-  SEXP scope = VECTOR_ELT(scoped_span, 1);
+SEXP otel_scope_start(SEXP span) {
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
+  void *span_ = R_ExternalPtrAddr(span);
+  if (!span_) {
+    Rf_error("Cannot activate OpenTelemetry span, it already ended.");
+  }
+  void *scope_ = otel_scope_start_(span_);
+  SEXP res = PROTECT(R_MakeExternalPtr(scope_, R_NilValue, R_NilValue));
+  R_RegisterCFinalizerEx(res, otel_scope_finally, (Rboolean) 1);
+  UNPROTECT(1);
+  return res;
+}
+
+SEXP otel_scope_end(SEXP scope) {
   if (TYPEOF(scope) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid scope pointer.");
   }
   void *scope_ = R_ExternalPtrAddr(scope);
   if (scope_) {
-    otel_span_deactivate_(scope_);
+    otel_scope_end_(scope_);
     R_ClearExternalPtr(scope);
   }
   return R_NilValue;
