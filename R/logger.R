@@ -62,9 +62,7 @@ logger_new <- function(
       timestamp = Sys.time(),
       observed_timestamp = NULL,
       attributes = NULL,
-      .envir = parent.frame(),
-      session = NULL,
-      session_scope = parent.frame()
+      .envir = parent.frame()
     ) {
       msg <- as_string(msg, null = FALSE)
       severity <- as_log_severity(severity)
@@ -89,10 +87,6 @@ logger_new <- function(
       # `attributes` overwrites attributes in the message
       prsd <- extract_otel_attributes(msg, .envir = .envir)
       attributes <- utils::modifyList(prsd$attributes, as.list(attributes))
-
-      if (!is.null(session)) {
-        session$activate_session(scope = session_scope)
-      }
 
       ccall(
         otel_log,

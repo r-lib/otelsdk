@@ -247,6 +247,11 @@ void otel_span_end_(void *span_, double *end_steady_time_) {
   span.End();
 }
 
+void otel_span_deactivate_(void *scope_) {
+  trace::Scope *scope = (trace::Scope*) scope_;
+  delete scope;
+}
+
 void otel_span_set_status_(
     void *span_,
     int status_code_,

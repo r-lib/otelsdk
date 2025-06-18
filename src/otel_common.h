@@ -350,22 +350,6 @@ struct otel_metrics_data {
 
 void otel_metrics_data_free(struct otel_metrics_data *cdata);
 
-struct otel_session {
-  int is_default;
-  struct otel_string id;
-  struct otel_string trace_id;
-  struct otel_string span_id;
-};
-
-struct otel_sessions {
-  struct otel_session *a;
-  size_t count;
-  int is_default;
-  struct otel_string active_stack_id;
-};
-
-void otel_session_free(struct otel_session *sess);
-
 extern const char *otel_http_request_content_type_str[];
 
 void otel_tracer_provider_finally_(void *tracer_provider);
@@ -373,8 +357,6 @@ void otel_tracer_finally_(void *tracer);
 void otel_span_finally_(void *span);
 void otel_span_context_finally_(void *span_context_);
 void otel_scope_finally_(void *scope);
-void otel_session_finally_(void *sess);
-void otel_session_copy_finally_(void *sess);
 void otel_logger_finally_(void *logger);
 void otel_meter_finally_(void *meter);
 void otel_counter_finally_(void *counter);
@@ -424,6 +406,7 @@ void otel_span_set_status_(
 );
 void otel_span_update_name_(void *span_, const char *name_);
 void otel_span_end_(void *span, double *end_steady_time);
+void otel_span_deactivate_(void *scope);
 
 int otel_span_context_is_valid_(void* span_context);
 char otel_span_context_get_trace_flags_(void* span_context);
@@ -438,13 +421,6 @@ void otel_span_context_to_headers_(
   struct otel_string *tracestate);
 void *otel_extract_http_context_(
   const char *traceparent, const char *tracestate);
-
-void *otel_session_start_(void);
-void otel_session_activate_(void *session);
-void otel_session_deactivate_(void *session);
-
-void *otel_get_current_session_(void);
-int otel_debug_current_session_(struct otel_session *sess);
 
 int otel_tracer_provider_http_default_options_(
   struct otel_tracer_provider_http_options *opts);

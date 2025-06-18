@@ -254,75 +254,16 @@ SEXP otel_span_end(
   return R_NilValue;
 }
 
-void otel_session_finally(SEXP x) {
-  if (TYPEOF(x) != EXTPTRSXP) {
-    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid session pointer.");
-    return;
+SEXP otel_span_deactivate(SEXP scoped_span) {
+  SEXP scope = VECTOR_ELT(scoped_span, 1);
+  if (TYPEOF(scope) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid scope pointer.");
   }
-  void *sess_ = R_ExternalPtrAddr(x);
-  if (sess_) {
-    otel_session_finally_(sess_);
-    R_ClearExternalPtr(x);
+  void *scope_ = R_ExternalPtrAddr(scope);
+  if (scope_) {
+    otel_span_deactivate_(scope_);
+    R_ClearExternalPtr(scope);
   }
-}
-
-void otel_session_copy_finally(SEXP x) {
-  if (TYPEOF(x) != EXTPTRSXP) {
-    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid session pointer.");
-    return;
-  }
-  void *sess_ = R_ExternalPtrAddr(x);
-  if (sess_) {
-    otel_session_copy_finally_(sess_);
-    R_ClearExternalPtr(x);
-  }
-}
-
-SEXP otel_session_start(void) {
-  void *sess_ = otel_session_start_();
-  SEXP res = PROTECT(R_MakeExternalPtr(sess_, R_NilValue, R_NilValue));
-  R_RegisterCFinalizerEx(res, otel_session_finally, (Rboolean) 1);
-  UNPROTECT(1);
-  return res;
-}
-
-SEXP otel_get_current_session(void) {
-  void *sess_ = otel_get_current_session_();
-  if (sess_) {
-    SEXP res = PROTECT(R_MakeExternalPtr(sess_, R_NilValue, R_NilValue));
-    R_RegisterCFinalizerEx(res, otel_session_copy_finally, (Rboolean) 1);
-    UNPROTECT(1);
-    return res;
-  } else {
-    return R_NilValue;
-  }
-}
-
-SEXP otel_session_activate(SEXP sess) {
-  if (TYPEOF(sess) != EXTPTRSXP) {
-    Rf_error("OpenTelemetry: invalid session pointer.");
-  }
-  void *sess_ = R_ExternalPtrAddr(sess);
-  if (!sess_) {
-    Rf_error(
-      "OpenTelemetry error: invalid session id, session already ended?"
-    );
-  }
-  otel_session_activate_(sess_);
-  return R_NilValue;
-}
-
-SEXP otel_session_deactivate(SEXP sess) {
-  if (TYPEOF(sess) != EXTPTRSXP) {
-    Rf_error("OpenTelemetry: invalid session pointer.");
-  }
-  void *sess_ = R_ExternalPtrAddr(sess);
-  if (!sess_) {
-    Rf_error(
-      "OpenTelemetry error: invalid session id, session already ended?"
-    );
-  }
-  otel_session_deactivate_(sess_);
   return R_NilValue;
 }
 
