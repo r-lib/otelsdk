@@ -37,7 +37,7 @@ meter_new <- function(
       gauge_new(self, name, description, unit)
     }
   )
-  name <- name %||% get_env("OTEL_SERVICE_NAME") %||% "R"
+  name <- name %||% find_tracer_name()
   self$provider <- provider
   self$name <- as_string(name)
   self$version <- as_string(version)

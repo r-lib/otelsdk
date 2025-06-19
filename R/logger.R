@@ -108,7 +108,7 @@ logger_new <- function(
     },
     name = NULL
   )
-  name <- name %||% get_env("OTEL_SERVICE_NAME") %||% "R"
+  name <- name %||% find_tracer_name()
   self$provider <- provider
   minimum_severity <- as_log_severity(
     minimum_severity %||% get_default_log_severity()
