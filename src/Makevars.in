@@ -62,6 +62,7 @@ $(OBJECTS): $(OTEL_CPP_LIBS)
 $(OTEL_CPP_LIBS): vendor/opentelemetry-cpp.tgz
 	tar xzf vendor/opentelemetry-cpp.tgz --no-same-owner || \
 	    tar xzf vendor/opentelemetry-cpp.tgz
+	patch -p0 < vendor/opentelemetry-cpp.patch
 	@mkdir -p cpp/.git
 	(cd cpp; MAKEFLAGS= CC="$(CC)" CXX="$(CXX)" AR="$(AR)" \
 	RANLIB="$(RANLIB)" CPPFLAGS="$(CPPFLAGS)" \
