@@ -16,6 +16,7 @@ SEXP otel_init_constants(SEXP env);
 SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes);
 SEXP otel_create_tracer_provider_http(SEXP attributes);
 SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes);
+SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes);
 SEXP otel_tracer_provider_memory_get_spans(SEXP provider);
 SEXP otel_tracer_provider_flush(SEXP provider);
 SEXP otel_get_tracer(
@@ -121,6 +122,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_stdstream, 2),
   CALLDEF(otel_create_tracer_provider_http, 1),
   CALLDEF(otel_create_tracer_provider_memory, 2),
+  CALLDEF(otel_create_tracer_provider_file, 2),
   CALLDEF(otel_tracer_provider_memory_get_spans, 1),
   CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 5),
@@ -280,6 +282,33 @@ SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes) {
   return xptr;
 }
 
+SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes) {
+  SEXP file_pattern = rf_get_list_element(options, "file_pattern");
+  const char *file_pattern_ =
+    Rf_isNull(file_pattern) ? NULL : CHAR(STRING_ELT(file_pattern, 0));
+  SEXP alias_pattern = rf_get_list_element(options, "alias_pattern");
+  const char *alias_pattern_ =
+    Rf_isNull(alias_pattern) ? NULL : CHAR(STRING_ELT(alias_pattern, 0));
+  SEXP flush_interval = rf_get_list_element(options, "flush_interval");
+  double *flush_interval_ =
+    Rf_isNull(flush_interval) ? NULL : REAL(flush_interval);
+  SEXP flush_count = rf_get_list_element(options, "flush_count");
+  int *flush_count_ = Rf_isNull(flush_count) ? NULL : INTEGER(flush_count);
+  SEXP file_size = rf_get_list_element(options, "file_size");
+  double *file_size_ = Rf_isNull(file_size) ? NULL : REAL(file_size);
+  SEXP rotate_size = rf_get_list_element(options, "rotate_size");
+  int *rotate_size_ = Rf_isNull(rotate_size) ? NULL : INTEGER(rotate_size);
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+
+  void *tracer_provider_ = otel_create_tracer_provider_file_(
+    file_pattern_, alias_pattern_, flush_interval_, flush_count_,
+    file_size_, rotate_size_, &attributes_);
+  SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
+  return xptr;
+}
+
 SEXP otel_tracer_provider_flush(SEXP provider) {
   if (TYPEOF(provider) != EXTPTRSXP) {
     Rf_warningcall(
@@ -294,8 +323,8 @@ SEXP otel_tracer_provider_flush(SEXP provider) {
       "Opentelemetry tracer provider cleaned up already, internal error."
     );
   }
-  otel_tracer_provider_flush_(tracer_provider_);
-  return R_NilValue;
+  int res = otel_tracer_provider_flush_(tracer_provider_);
+  return Rf_ScalarLogical(res);
 }
 
 SEXP otel_get_tracer(

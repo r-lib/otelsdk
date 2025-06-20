@@ -365,9 +365,13 @@ void *otel_create_tracer_provider_http_(
   struct otel_attributes *resource_attributes);
 void *otel_create_tracer_provider_memory_(
   int buffer_size, struct otel_attributes *resource_attributes);
+void *otel_create_tracer_provider_file_(
+  const char *file_pattern, const char *alias_pattern, double *flush_interval,
+  int *flush_count, double *file_size, int *rotate_size,
+  struct otel_attributes *resource_attributes);
 int otel_tracer_provider_memory_get_spans_(
   void *tracer_provider, struct otel_span_data *cdata);
-void otel_tracer_provider_flush_(void *tracer_provider);
+int otel_tracer_provider_flush_(void *tracer_provider);
 void *otel_get_tracer_(
     void *tracer_provider_, const char *name, const char *version,
     const char *schema_url, struct otel_attributes *attributes);

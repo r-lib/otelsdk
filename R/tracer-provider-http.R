@@ -11,7 +11,7 @@ tracer_provider_http_new <- function() {
       tracer_new(self, name, version, schema_url, attributes, ...)
     },
     flush = function() {
-      # noop currently
+      ccall(otel_tracer_provider_flush, self$xptr)
     }
   )
 

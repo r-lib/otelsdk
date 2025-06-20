@@ -7,8 +7,10 @@ OTEL_CPP_LIBS =  \
 	install/lib/libopentelemetry_exporter_otlp_http_log.a \
 	install/lib/libopentelemetry_exporter_otlp_http_metric.a \
 	install/lib/libopentelemetry_exporter_ostream_metrics.a \
+	install/lib/libopentelemetry_exporter_otlp_file.a \
 	install/lib/libopentelemetry_exporter_in_memory.a \
 	install/lib/libopentelemetry_exporter_in_memory_metric.a \
+	install/lib/libopentelemetry_exporter_otlp_file_client.a \
 	install/lib/libopentelemetry_http_client_curl.a \
 	install/lib/libopentelemetry_otlp_recordable.a \
 	install/lib/libopentelemetry_trace.a \
@@ -31,8 +33,10 @@ PKG_LIBS = \
 	-lopentelemetry_exporter_otlp_http_log \
 	-lopentelemetry_exporter_otlp_http_metric \
 	-lopentelemetry_exporter_ostream_metrics \
+	-lopentelemetry_exporter_otlp_file \
 	-lopentelemetry_exporter_in_memory \
 	-lopentelemetry_exporter_in_memory_metric \
+	-lopentelemetry_exporter_otlp_file_client \
 	-lopentelemetry_http_client_curl \
 	-lopentelemetry_otlp_recordable \
 	-lopentelemetry_trace \
@@ -70,9 +74,9 @@ $(OTEL_CPP_LIBS): vendor/opentelemetry-cpp.tgz
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	-DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_STANDARD=@CXX_STANDARD@ \
 	-DWITH_ELASTICSEARCH=OFF -DWITH_EXAMPLES=OFF \
-	-DWITH_OTLP_GRPC=OFF -DWITH_OTLP_HTTP=ON -DWITH_ABSEIL=OFF \
-	-DWITH_PROMETHEUS=OFF -DBUILD_TESTING=OFF -DWITH_BENCHMARK=OFF \
-	-DWITH_FUNC_TESTS=OFF -DWITH_ETW=OFF)
+	-DWITH_OTLP_GRPC=OFF -DWITH_OTLP_HTTP=ON -DWITH_OTLP_FILE=ON \
+	-DWITH_ABSEIL=OFF -DWITH_PROMETHEUS=OFF -DBUILD_TESTING=OFF \
+	-DWITH_BENCHMARK=OFF -DWITH_FUNC_TESTS=OFF -DWITH_ETW=OFF)
 	@rm -rf cpp/.git
 	@if [ "@UNAME@" = "Windows" ]; then \
 		sed -i.bak -e 's/^M$$//' cpp/build/CMakeFiles/3.30.4/CompilerIdC/CMakeCCompilerId.c; \

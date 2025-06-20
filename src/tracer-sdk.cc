@@ -10,6 +10,9 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
@@ -101,12 +104,52 @@ void *otel_create_tracer_provider_http_(struct otel_attributes *resource_attribu
 }
 
 void *otel_create_tracer_provider_memory_(
-  int buffer_size, struct otel_attributes *resource_attributes) {
+    int buffer_size, struct otel_attributes *resource_attributes) {
   RKeyValueIterable attributes_(*resource_attributes);
   struct otel_tracer_provider *tps = new otel_tracer_provider;
   tps->spandata.reset(new memory::InMemorySpanData(buffer_size));
   auto exporter  = memory::InMemorySpanExporterFactory::Create(tps->spandata);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+
+  tps->ptr = trace_sdk::TracerProviderFactory::Create(
+    std::move(processor), resource::Resource::Create(&attributes_));
+
+  return (void*) tps;
+}
+
+void *otel_create_tracer_provider_file_(
+    const char *file_pattern, const char *alias_pattern, double *flush_interval,
+    int *flush_count, double *file_size, int *rotate_size,
+    struct otel_attributes *resource_attributes) {
+  RKeyValueIterable attributes_(*resource_attributes);
+  struct otel_tracer_provider *tps = new otel_tracer_provider;
+
+  otlp::OtlpFileExporterOptions opts;
+  otlp::OtlpFileClientFileSystemOptions backend_opts =
+    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
+  if (file_pattern) {
+    backend_opts.file_pattern = file_pattern;
+  }
+  if (alias_pattern) {
+    backend_opts.alias_pattern = alias_pattern;
+  }
+  if (flush_interval) {
+    backend_opts.flush_interval =
+      std::chrono::microseconds((int64_t) *flush_interval);
+  }
+  if (flush_count) {
+    backend_opts.flush_count = *flush_count;
+  }
+  if (file_size) {
+    backend_opts.file_size = *file_size;
+  }
+  if (rotate_size) {
+    backend_opts.rotate_size = *rotate_size;
+  }
+  opts.backend_options = backend_opts;
+  auto exporter = otlp::OtlpFileExporterFactory::Create(opts);
+  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(
+    std::move(exporter));
 
   tps->ptr = trace_sdk::TracerProviderFactory::Create(
     std::move(processor), resource::Resource::Create(&attributes_));
@@ -172,12 +215,14 @@ int otel_tracer_provider_memory_get_spans_(
   }
 }
 
-void otel_tracer_provider_flush_(void *tracer_provider_) {
+int otel_tracer_provider_flush_(void *tracer_provider_) {
   struct otel_tracer_provider *tps =
     (struct otel_tracer_provider *) tracer_provider_;
   if (tps->stream.is_open()) {
     tps->stream.flush();
   }
+  trace_sdk::TracerProvider &tracer_provider = *(tps->ptr);
+  return tracer_provider.ForceFlush();
 }
 
 void *otel_get_tracer_(
