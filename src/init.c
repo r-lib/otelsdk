@@ -77,6 +77,8 @@ SEXP otel_create_meter_provider_stdstream(
   SEXP stream, SEXP export_interval, SEXP export_timeout);
 SEXP otel_create_meter_provider_http(
   SEXP export_interval, SEXP export_timeout);
+SEXP otel_create_meter_provider_file(
+  SEXP export_interval, SEXP export_timeout, SEXP options);
 SEXP otel_create_meter_provider_memory(
   SEXP export_interval, SEXP export_timeout, SEXP buffer_size,
   SEXP temporality);
@@ -170,6 +172,7 @@ static const R_CallMethodDef callMethods[]  = {
 
   CALLDEF(otel_create_meter_provider_stdstream, 3),
   CALLDEF(otel_create_meter_provider_http, 2),
+  CALLDEF(otel_create_meter_provider_file, 3),
   CALLDEF(otel_create_meter_provider_memory, 4),
   CALLDEF(otel_meter_provider_memory_get_metrics, 1),
   CALLDEF(otel_get_meter, 5),
