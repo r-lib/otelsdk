@@ -62,22 +62,25 @@ fi
 # - if NOT_CRAN == "true", or
 # - if we are _not_ in `R CMD check`.
 CMAKE_BUILD_PARALLEL_LEVEL=""
-DO_PARALLEL=""
-if [ "$GITHUB_ACTIONS" = "true" ]; then
-  echo '** parallel build selected because of GitHub Action'
-  DO_PARALLEL=true
-elif [ "$NOT_CRAN" = "true" ]; then
-  echo '** parallel build selected because NOT_CRAN=true is set'
-  DO_PARALLEL=true
-fi
-if ! echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck &&
-   ! echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
-  echo '** parallel build selected because not in `R CMD check`'
-  DO_PARALLEL=true
+if [ "$DO_PARALLEL" = "false" ]; then
+    echo '** parallel build is off'
+else
+    if [ "$GITHUB_ACTIONS" = "true" ]; then
+	echo '** parallel build selected because of GitHub Action'
+	DO_PARALLEL=true
+    elif [ "$NOT_CRAN" = "true" ]; then
+	echo '** parallel build selected because NOT_CRAN=true is set'
+	DO_PARALLEL=true
+    fi
+    if ! echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck &&
+	    ! echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
+	echo '** parallel build selected because not in `R CMD check`'
+    DO_PARALLEL=true
+  fi
 fi
 
 # Look up number of processors, if parallel build.
-if [ -n "$DO_PARALLEL" ]; then
+if [ "$DO_PARALLEL" = "true" ]; then
   if [ -n "$NCPU" ]; then
     # already set
     true
