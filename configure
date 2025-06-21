@@ -52,9 +52,9 @@ elif [ "$UNAME" = "Darwin" ]; then
     PROTOBUF_LIBS="-lprotobuf"
     LIBCURL_LIBS="-lcurl"
 else
+    PROTOBUF_LIBS="`pkg-config --libs protobuf || echo '-lprotobuf'`"
+    LIBCURL_LIBS="`pkg-config --libs libcurl || echo '-lcurl'`"
     CMAKE_PREFIX_PATH=""
-    PROTOBUF_LIBS="-lprotobuf"
-    LIBCURL_LIBS="-lcurl"
 fi
 
 # We do parallel build if
