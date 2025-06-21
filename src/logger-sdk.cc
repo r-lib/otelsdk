@@ -1,5 +1,10 @@
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
 #include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -66,6 +71,24 @@ void *otel_create_logger_provider_http_(void) {
 
   return (void*) lps;
 }
+
+void *otel_create_logger_provider_file_(
+    struct otel_file_exporter_options *options) {
+  opentelemetry::exporter::otlp::OtlpFileLogRecordExporterOptions opts;
+  otlp::OtlpFileClientFileSystemOptions backend_opts =
+    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
+  c2cc_file_exporter_options(*options, backend_opts);
+  opts.backend_options = backend_opts;
+
+  auto exporter  = otlp::OtlpFileLogRecordExporterFactory::Create(opts);
+  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
+
+  struct otel_logger_provider *lps = new otel_logger_provider;
+  lps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
+
+  return (void*) lps;
+}
+
 
 void otel_logger_provider_flush_(void *logger_provider_) {
   struct otel_logger_provider *lps =

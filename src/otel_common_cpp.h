@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/exporters/memory/in_memory_metric_data.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
@@ -21,6 +22,7 @@ namespace metrics_sdk    = opentelemetry::sdk::metrics;
 namespace nostd          = opentelemetry::nostd;
 namespace memory         = opentelemetry::exporter::memory;
 namespace common_sdk     = opentelemetry::sdk::common;
+namespace otlp           = opentelemetry::exporter::otlp;
 
 struct otel_span {
   nostd::shared_ptr<trace_api::Span> ptr;
@@ -156,5 +158,9 @@ int cc2c_otel_events(
 int cc2c_otel_links(
   const std::vector<trace_sdk::SpanDataLink> &links,
   struct otel_span_links &clinks);
+
+void c2cc_file_exporter_options(
+  const struct otel_file_exporter_options &options,
+  otlp::OtlpFileClientFileSystemOptions &backeend_opts);
 
 #endif

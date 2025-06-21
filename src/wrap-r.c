@@ -271,6 +271,25 @@ void r2c_attributes(SEXP r, struct otel_attributes *c) {
   }
 }
 
+void r2c_file_exporter_options(
+    SEXP options, struct otel_file_exporter_options *coptions) {
+  SEXP file_pattern = rf_get_list_element(options, "file_pattern");
+  coptions->file_pattern =
+    Rf_isNull(file_pattern) ? NULL : CHAR(STRING_ELT(file_pattern, 0));
+  SEXP alias_pattern = rf_get_list_element(options, "alias_pattern");
+  coptions->alias_pattern =
+    Rf_isNull(alias_pattern) ? NULL : CHAR(STRING_ELT(alias_pattern, 0));
+  SEXP flush_interval = rf_get_list_element(options, "flush_interval");
+  coptions->flush_interval =
+    Rf_isNull(flush_interval) ? NULL : REAL(flush_interval);
+  SEXP flush_count = rf_get_list_element(options, "flush_count");
+  coptions->flush_count = Rf_isNull(flush_count) ? NULL : INTEGER(flush_count);
+  SEXP file_size = rf_get_list_element(options, "file_size");
+  coptions->file_size = Rf_isNull(file_size) ? NULL : REAL(file_size);
+  SEXP rotate_size = rf_get_list_element(options, "rotate_size");
+  coptions->rotate_size = Rf_isNull(rotate_size) ? NULL : INTEGER(rotate_size);
+}
+
 SEXP c2r_otel_attribute(const struct otel_attribute *attr) {
   SEXP res = R_NilValue;
   switch (attr->type) {

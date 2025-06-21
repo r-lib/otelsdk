@@ -118,8 +118,7 @@ void *otel_create_tracer_provider_memory_(
 }
 
 void *otel_create_tracer_provider_file_(
-    const char *file_pattern, const char *alias_pattern, double *flush_interval,
-    int *flush_count, double *file_size, int *rotate_size,
+    const struct otel_file_exporter_options *options,
     struct otel_attributes *resource_attributes) {
   RKeyValueIterable attributes_(*resource_attributes);
   struct otel_tracer_provider *tps = new otel_tracer_provider;
@@ -127,25 +126,7 @@ void *otel_create_tracer_provider_file_(
   otlp::OtlpFileExporterOptions opts;
   otlp::OtlpFileClientFileSystemOptions backend_opts =
     nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
-  if (file_pattern) {
-    backend_opts.file_pattern = file_pattern;
-  }
-  if (alias_pattern) {
-    backend_opts.alias_pattern = alias_pattern;
-  }
-  if (flush_interval) {
-    backend_opts.flush_interval =
-      std::chrono::microseconds((int64_t) *flush_interval);
-  }
-  if (flush_count) {
-    backend_opts.flush_count = *flush_count;
-  }
-  if (file_size) {
-    backend_opts.file_size = *file_size;
-  }
-  if (rotate_size) {
-    backend_opts.rotate_size = *rotate_size;
-  }
+  c2cc_file_exporter_options(*options, backend_opts);
   opts.backend_options = backend_opts;
   auto exporter = otlp::OtlpFileExporterFactory::Create(opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(

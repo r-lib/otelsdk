@@ -2,9 +2,34 @@
 #include "otel_common_cpp.h"
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 
 namespace common_sdk = opentelemetry::sdk::common;
+namespace otlp       = opentelemetry::exporter::otlp;
 
+void c2cc_file_exporter_options(
+    const struct otel_file_exporter_options &options,
+    otlp::OtlpFileClientFileSystemOptions &backend_opts) {
+  if (options.file_pattern) {
+    backend_opts.file_pattern = options.file_pattern;
+  }
+  if (options.alias_pattern) {
+    backend_opts.alias_pattern = options.alias_pattern;
+  }
+  if (options.flush_interval) {
+    backend_opts.flush_interval =
+      std::chrono::microseconds((int64_t) *options.flush_interval);
+  }
+  if (options.flush_count) {
+    backend_opts.flush_count = *options.flush_count;
+  }
+  if (options.file_size) {
+    backend_opts.file_size = *options.file_size;
+  }
+  if (options.rotate_size) {
+    backend_opts.rotate_size = *options.rotate_size;
+  }
+}
 
 int cc2c_otel_string(
     const trace_api::TraceId &trace_id, struct otel_string &s) {

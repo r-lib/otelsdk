@@ -2,6 +2,7 @@
 #include <Rinternals.h>
 
 #include "otel_common.h"
+#include "otel_common_r.h"
 
 void r2c_attributes(SEXP r, struct otel_attributes *c);
 
@@ -42,6 +43,15 @@ SEXP otel_create_logger_provider_stdstream(SEXP stream) {
 
 SEXP otel_create_logger_provider_http(void) {
   void *logger_provider_ = otel_create_logger_provider_http_();
+  SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
+  return xptr;
+}
+
+SEXP otel_create_logger_provider_file(SEXP options) {
+  struct otel_file_exporter_options options_;
+  r2c_file_exporter_options(options, &options_);
+  void *logger_provider_ = otel_create_logger_provider_file_(&options_);
   SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
   return xptr;
