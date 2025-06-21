@@ -19,6 +19,9 @@
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 #include "opentelemetry/exporters/memory/in_memory_metric_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h"
 
 namespace metrics_sdk      = opentelemetry::sdk::metrics;
 namespace common           = opentelemetry::common;
@@ -126,6 +129,39 @@ void *otel_create_meter_provider_http_(
     std::chrono::milliseconds(export_timeout);
 
   auto exporter = otlp::OtlpHttpMetricExporterFactory::Create();
+  auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
+    std::move(exporter),
+    reader_options
+  );
+  auto context = metrics_sdk::MeterContextFactory::Create();
+  context->AddMetricReader(std::move(reader));
+
+  mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
+  return (void*) mps;
+}
+
+void *otel_create_meter_provider_file_(
+    int export_interval, int export_timeout,
+    struct otel_file_exporter_options *options) {
+  struct otel_meter_provider *mps = new otel_meter_provider;
+
+  std::string version{"1.2.0"};
+  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
+
+  // Initialize and set the global MeterProvider
+  metrics_sdk::PeriodicExportingMetricReaderOptions reader_options;
+  reader_options.export_interval_millis =
+    std::chrono::milliseconds(export_interval);
+  reader_options.export_timeout_millis  =
+    std::chrono::milliseconds(export_timeout);
+
+  otlp::OtlpFileMetricExporterOptions opts;
+  otlp::OtlpFileClientFileSystemOptions backend_opts =
+    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
+  c2cc_file_exporter_options(*options, backend_opts);
+  opts.backend_options = backend_opts;
+
+  auto exporter = otlp::OtlpFileMetricExporterFactory::Create(opts);
   auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
     std::move(exporter),
     reader_options

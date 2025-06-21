@@ -104,6 +104,15 @@ struct otel_links {
   size_t count;
 };
 
+struct otel_file_exporter_options {
+  const char *file_pattern;
+  const char *alias_pattern;
+  double *flush_interval;
+  int *flush_count;
+  double *file_size;
+  int *rotate_size;
+};
+
 struct otel_tracer_provider_http_options {
   struct otel_string url;
   enum otel_http_request_content_type content_type;
@@ -365,9 +374,12 @@ void *otel_create_tracer_provider_http_(
   struct otel_attributes *resource_attributes);
 void *otel_create_tracer_provider_memory_(
   int buffer_size, struct otel_attributes *resource_attributes);
+void *otel_create_tracer_provider_file_(
+  const struct otel_file_exporter_options *options,
+  struct otel_attributes *resource_attributes);
 int otel_tracer_provider_memory_get_spans_(
   void *tracer_provider, struct otel_span_data *cdata);
-void otel_tracer_provider_flush_(void *tracer_provider);
+int otel_tracer_provider_flush_(void *tracer_provider);
 void *otel_get_tracer_(
     void *tracer_provider_, const char *name, const char *version,
     const char *schema_url, struct otel_attributes *attributes);
@@ -425,6 +437,8 @@ int otel_tracer_provider_http_default_options_(
 void otel_logger_provider_finally_(void *logger_provider);
 void *otel_create_logger_provider_stdstream_(const char *stream);
 void *otel_create_logger_provider_http_(void);
+void *otel_create_logger_provider_file_(
+  struct otel_file_exporter_options *options);
 void otel_logger_provider_flush_(void *tracer_provider);
 int otel_get_minimum_log_severity_(void *logger);
 void otel_set_minimum_log_severity_(void *logger, int minimum_severity);
@@ -444,6 +458,9 @@ void *otel_create_meter_provider_stdstream_(
   const char *stream, int export_interval, int export_timeout);
 void *otel_create_meter_provider_http_(
   int export_interval, int export_timeout);
+void *otel_create_meter_provider_file_(
+  int export_interval, int export_timeout,
+  struct otel_file_exporter_options *options);
 void *otel_create_meter_provider_memory_(
     int export_interval, int export_timeout, int cbuffer_size,
     int ctemporality);

@@ -82,3 +82,11 @@ find_tracer_name <- function() {
   }
   "org.r-project.R"
 }
+
+empty_atomic_as_null <- function(x) {
+  if (is.atomic(x) && length(x) == 0) {
+    NULL
+  } else {
+    x
+  }
+}

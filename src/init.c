@@ -16,6 +16,7 @@ SEXP otel_init_constants(SEXP env);
 SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes);
 SEXP otel_create_tracer_provider_http(SEXP attributes);
 SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes);
+SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes);
 SEXP otel_tracer_provider_memory_get_spans(SEXP provider);
 SEXP otel_tracer_provider_flush(SEXP provider);
 SEXP otel_get_tracer(
@@ -56,6 +57,7 @@ SEXP otel_tracer_provider_http_options(void);
 
 SEXP otel_create_logger_provider_stdstream(SEXP stream);
 SEXP otel_create_logger_provider_http(void);
+SEXP otel_create_logger_provider_file(SEXP options);
 SEXP otel_get_logger(
   SEXP provider, SEXP name, SEXP minimum_severity, SEXP version,
   SEXP schema_url, SEXP attributes);
@@ -75,6 +77,8 @@ SEXP otel_create_meter_provider_stdstream(
   SEXP stream, SEXP export_interval, SEXP export_timeout);
 SEXP otel_create_meter_provider_http(
   SEXP export_interval, SEXP export_timeout);
+SEXP otel_create_meter_provider_file(
+  SEXP export_interval, SEXP export_timeout, SEXP options);
 SEXP otel_create_meter_provider_memory(
   SEXP export_interval, SEXP export_timeout, SEXP buffer_size,
   SEXP temporality);
@@ -121,6 +125,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_stdstream, 2),
   CALLDEF(otel_create_tracer_provider_http, 1),
   CALLDEF(otel_create_tracer_provider_memory, 2),
+  CALLDEF(otel_create_tracer_provider_file, 2),
   CALLDEF(otel_tracer_provider_memory_get_spans, 1),
   CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 5),
@@ -155,6 +160,7 @@ static const R_CallMethodDef callMethods[]  = {
 
   CALLDEF(otel_create_logger_provider_stdstream, 1),
   CALLDEF(otel_create_logger_provider_http, 0),
+  CALLDEF(otel_create_logger_provider_file, 1),
   CALLDEF(otel_get_minimum_log_severity, 1),
   CALLDEF(otel_set_minimum_log_severity, 2),
   CALLDEF(otel_logger_provider_flush, 1),
@@ -166,6 +172,7 @@ static const R_CallMethodDef callMethods[]  = {
 
   CALLDEF(otel_create_meter_provider_stdstream, 3),
   CALLDEF(otel_create_meter_provider_http, 2),
+  CALLDEF(otel_create_meter_provider_file, 3),
   CALLDEF(otel_create_meter_provider_memory, 4),
   CALLDEF(otel_meter_provider_memory_get_metrics, 1),
   CALLDEF(otel_get_meter, 5),
@@ -280,6 +287,19 @@ SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes) {
   return xptr;
 }
 
+SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes) {
+  struct otel_file_exporter_options options_;
+  r2c_file_exporter_options(options, &options_);
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+
+  void *tracer_provider_ = otel_create_tracer_provider_file_(
+    &options_, &attributes_);
+  SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
+  return xptr;
+}
+
 SEXP otel_tracer_provider_flush(SEXP provider) {
   if (TYPEOF(provider) != EXTPTRSXP) {
     Rf_warningcall(
@@ -294,8 +314,8 @@ SEXP otel_tracer_provider_flush(SEXP provider) {
       "Opentelemetry tracer provider cleaned up already, internal error."
     );
   }
-  otel_tracer_provider_flush_(tracer_provider_);
-  return R_NilValue;
+  int res = otel_tracer_provider_flush_(tracer_provider_);
+  return Rf_ScalarLogical(res);
 }
 
 SEXP otel_get_tracer(

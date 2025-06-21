@@ -489,13 +489,23 @@ is_count <- function(x, positive = FALSE) {
   is.numeric(x) && length(x) == 1 && !is.na(x) && x >= limit
 }
 
-as_count <- function(x, positive = FALSE, call = NULL) {
-  limit <- if (positive) 1L else 0L
+as_count <- function(x, positive = FALSE, null = FALSE, call = NULL) {
+  if (is.null(x) && null) {
+    return(x)
+  }
   if (is_count(x, positive = positive)) {
     return(as.integer(x))
   }
 
+  if (is_string(x)) {
+    xi <- suppressWarnings(as.integer(x))
+    if (is_count(x, positive = positive)) {
+      return(xi)
+    }
+  }
+
   call <- call %||% match.call()
+  limit <- if (positive) 1L else 0L
   if (is.numeric(x) && length(x) != 1) {
     stop(glue(c(
       "Invalid argument: {format(call[[2]])} must be an integer ",
@@ -517,6 +527,22 @@ as_count <- function(x, positive = FALSE, call = NULL) {
       "integer scalar, but it is {typename(x)}."
     )))
   }
+}
+
+as_count_env <- function(ev, positive = FALSE) {
+  val <- get_env(ev)
+  if (is.null(val)) {
+    return(NULL)
+  }
+  x <- suppressWarnings(as.integer(val))
+  if (is_count(x, positive = positive)) {
+    return(x)
+  }
+  limit <- if (positive) 1L else 0L
+  proper <- if (positive) "positive" else "non-negative"
+  stop(glue(c(
+    "Invalid environment variable: {ev} must be a {proper} integer."
+  )))
 }
 
 as_http_context_headers <- function(headers, call = NULL) {
@@ -551,4 +577,212 @@ as_http_context_headers <- function(headers, call = NULL) {
       "{typename(tracestate)}."
     )))
   }
+}
+
+as_difftime_spec <- function(x, null = TRUE, call = NULL) {
+  if (is.null(x) && null) {
+    return(x)
+  }
+  if (inherits(x, "difftime") && length(x) == 1 && !is.na(x)) {
+    return(as.double(x, units = "secs") * 1000 * 1000)
+  }
+  if (is_count(x, positive = TRUE)) {
+    return(as.double(x) * 1000 * 1000)
+  }
+  if (is_string(x)) {
+    us <- parse_time_spec(x)
+    if (!is.na(us)) {
+      return(us)
+    }
+  }
+
+  call <- call %||% match.call()
+  if (inherits(x, "difftime")) {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must have length 1, and must ",
+      "not be `NA`."
+    )))
+  } else if (is_string(x)) {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be a time interval ",
+      "specification, a positive number with a time unit suffix: ",
+      "us (microseconds), ms (milliseconds), s (seconds), m (minutes), ",
+      "h (hours), or d (days)."
+    )))
+  } else {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be an integer scalar ",
+      "(seconds), a 'difftime' scalar, or a time interval specification. ",
+      "A time interval specification is apositive number with a time unit ",
+      "suffix: us (microseconds), ms (milliseconds), s (seconds), ",
+      "m (minutes), h (hours) or d (days). But it is a {typename(x)}."
+    )))
+  }
+}
+
+as_difftime_env <- function(ev) {
+  val <- get_env(ev)
+  if (is.null(val)) {
+    return(NULL)
+  }
+  us <- parse_time_spec(val)
+  if (!is.na(us)) {
+    return(us)
+  }
+  stop(glue(c(
+    "Invalid environment variable: {ev}='{val}'. It must be a time interval ",
+    "specification, a positive number with a time unit suffix: ",
+    "us (microseconds), ms (milliseconds), s (seconds), m (minutes), ",
+    "h (hours), or d (days)."
+  )))
+}
+
+# x must be a sting (scalar character), only light argument checking
+# Units: us / ms / s / m / h / d
+
+time_spec_units <- rbind.data.frame(
+  list(unit = "us", mult = 1),
+  list(unit = "micros", mult = 1),
+  list(unit = "microsec", mult = 1),
+  list(unit = "microsecs", mult = 1),
+  list(unit = "microsecond", mult = 1),
+  list(unit = "microseconds", mult = 1),
+  list(unit = "ms", mult = 1000),
+  list(unit = "millis", mult = 1000),
+  list(unit = "millisec", mult = 1000),
+  list(unit = "millisecs", mult = 1000),
+  list(unit = "millisecond", mult = 1000),
+  list(unit = "milliseconds", mult = 1000),
+  list(unit = "s", mult = 1000 * 1000),
+  list(unit = "sec", mult = 1000 * 1000),
+  list(unit = "secs", mult = 1000 * 1000),
+  list(unit = "second", mult = 1000 * 1000),
+  list(unit = "seconds", mult = 1000 * 1000),
+  list(unit = "m", mult = 60 * 1000 * 1000),
+  list(unit = "min", mult = 60 * 1000 * 1000),
+  list(unit = "mins", mult = 60 * 1000 * 1000),
+  list(unit = "minute", mult = 60 * 1000 * 1000),
+  list(unit = "minutes", mult = 60 * 1000 * 1000),
+  list(unit = "h", mult = 60 * 60 * 1000 * 1000),
+  list(unit = "hour", mult = 60 * 60 * 1000 * 1000),
+  list(unit = "hours", mult = 60 * 60 * 1000 * 1000),
+  list(unit = "d", mult = 24 * 60 * 1000 * 1000),
+  list(unit = "day", mult = 24 * 60 * 1000 * 1000),
+  list(unit = "days", mult = 24 * 60 * 1000 * 1000)
+)
+
+
+# need to order to find the correct unit, e.g. need to prefer 'ms' over 's'
+time_spec_units <- time_spec_units[
+  order(nchar(time_spec_units$unit), decreasing = TRUE),
+]
+
+parse_time_spec <- function(x) {
+  stopifnot(length(x) == 1)
+  x <- tolower(x)
+  wh <- which(endsWith(x, names(time_spec_units$unit)))[1]
+  if (is.na(wh)) {
+    return(NA_real_)
+  }
+  x <- substr(x, 1, nchar(x) - nchar(time_spec_units$unit[wh]))
+  as.double(x) * unname(time_spec_units$mult[wh])
+}
+
+as_bytes <- function(x, null = TRUE, call = NULL) {
+  if (is.null(x) && null) {
+    return(x)
+  }
+  if (is_count(x, positive = TRUE)) {
+    return(as.double(x))
+  }
+  if (is_string(x)) {
+    bts <- parse_bytes_spec(x)
+    if (!is.na(bts)) {
+      return(bts)
+    }
+  }
+
+  call <- call %||% match.call()
+  if (is_string(x)) {
+    stop(glue(c(
+      "Invalid argument: could not interpret {format(call[[2]])} as a ",
+      "number of bytes. It must be a number with unit suffix: one of ",
+      "B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB."
+    )))
+  } else {
+    stop(glue(c(
+      "Invalid argument: {format(call[[2]])} must be an integer (bytes) ",
+      "or a string sclar with a unit suffix. Known units are B, KB, KiB",
+      "MB, MiB, GB, GiB, TB, TiB, PB, PiB. But it is a {typename(x)}."
+    )))
+  }
+}
+
+as_bytes_env <- function(ev) {
+  val <- get_env(ev)
+  if (is.null(val)) {
+    return(NULL)
+  }
+  bts <- parse_bytes_spec(val)
+  if (!is.na(bts)) {
+    return(bts)
+  }
+  stop(glue(c(
+    "Invalid environment variable: {ev}='{val}'. It must be an integer ",
+    "with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, ",
+    "TB, TiB, PB, PiB."
+  )))
+}
+
+bytes_spec_units <- rbind.data.frame(
+  list(unit = "b", mult = 1),
+  list(unit = "byte", mult = 1),
+  list(unit = "bytes", mult = 1),
+  list(unit = "kb", mult = 1000),
+  list(unit = "kilobyte", mult = 1000),
+  list(unit = "kilobytes", mult = 1000),
+  list(unit = "mb", mult = 1000 * 1000),
+  list(unit = "megabyte", mult = 1000 * 1000),
+  list(unit = "megabytes", mult = 1000 * 1000),
+  list(unit = "gb", mult = 1000 * 1000 * 1000),
+  list(unit = "gigabyte", mult = 1000 * 1000 * 1000),
+  list(unit = "gigabytes", mult = 1000 * 1000 * 1000),
+  list(unit = "tb", mult = 1000 * 1000 * 1000 * 1000),
+  list(unit = "terabyte", mult = 1000 * 1000 * 1000 * 1000),
+  list(unit = "terabytes", mult = 1000 * 1000 * 1000 * 1000),
+  list(unit = "pb", mult = 1000 * 1000 * 1000 * 1000 * 1000),
+  list(unit = "petabyte", mult = 1000 * 1000 * 1000 * 1000 * 1000),
+  list(unit = "petabytes", mult = 1000 * 1000 * 1000 * 1000 * 1000),
+
+  list(unit = "kib", mult = 1024),
+  list(unit = "kibibyte", mult = 1024),
+  list(unit = "kibibytes", mult = 1024),
+  list(unit = "mib", mult = 1024 * 1024),
+  list(unit = "mebibyte", mult = 1024 * 1024),
+  list(unit = "mebibytes", mult = 1024 * 1024),
+  list(unit = "gib", mult = 1024 * 1024 * 1024),
+  list(unit = "gibibyte", mult = 1024 * 1024 * 1024),
+  list(unit = "gibibytes", mult = 1024 * 1024 * 1024),
+  list(unit = "tib", mult = 1024 * 1024 * 1024 * 1024),
+  list(unit = "tebibyte", mult = 1024 * 1024 * 1024 * 1024),
+  list(unit = "tebibytes", mult = 1024 * 1024 * 1024 * 1024),
+  list(unit = "pib", mult = 1024 * 1024 * 1024 * 1024 * 1024),
+  list(unit = "pebibyte", mult = 1024 * 1024 * 1024 * 1024 * 1024),
+  list(unit = "pebibytes", mult = 1024 * 1024 * 1024 * 1024 * 1024)
+)
+
+# need to order to find the correct unit, e.g. need to prefer 'kb' over 'b'
+bytes_spec_units <- bytes_spec_units[
+  order(nchar(bytes_spec_units$unit), decreasing = TRUE),
+]
+
+parse_bytes_spec <- function(x) {
+  stopifnot(length(x) == 1)
+  x <- tolower(x)
+  wh <- which(endsWith(x, names(bytes_spec_units$unit)))[1]
+  if (is.na(wh)) {
+    return(NA_real_)
+  }
+  x <- substr(x, 1, nchar(x) - nchar(bytes_spec_units$unit[wh]))
+  as.double(x) * unname(bytes_spec_units$mult[wh])
 }

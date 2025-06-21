@@ -23,6 +23,7 @@ Imports:
 Suggests:
     callr,
     cli,
+    jsonlite,
     processx,
     ps,
     rlang,
