@@ -28,7 +28,7 @@ OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2
 PKG_LIBS = \
-	-Linstall/lib libstdstream-exporter.a \
+	-Linstall/lib \
 	-lopentelemetry_exporter_ostream_span \
 	-lopentelemetry_exporter_otlp_http \
 	-lopentelemetry_exporter_otlp_http_client \
@@ -51,7 +51,8 @@ PKG_LIBS = \
 	-lopentelemetry_common \
 	-lopentelemetry_proto \
 	@PROTOBUF_LIBS@ \
-	@LIBCURL_LIBS@
+	@LIBCURL_LIBS@ \
+	libstdstream-exporter.a
 
 MAKEFLAGS=@MAKEFLAGS@
 
@@ -71,6 +72,7 @@ libstdstream-exporter.a: stdstream.o
 # https://stackoverflow.com/a/47951465/604364
 .INTERMEDIATE: otelcpplib
 $(OTEL_CPP_LIBS): otelcpplib
+	@true
 
 # need to build our proto lib with -DNDEBUG in CXXFLAGS, because of a bug:
 # https://github.com/protocolbuffers/protobuf/issues/9947
