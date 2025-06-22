@@ -98,8 +98,13 @@ if [ "$DO_PARALLEL" = "true" ]; then
     NCPU=""
   fi
   if expr "$NCPU" : '[1-9][0-9]*$' >/dev/null; then
-    echo '**'" using $NCPU processors (unless configured differently in Makeconf)."
     CMAKE_BUILD_PARALLEL_LEVEL="CMAKE_BUILD_PARALLEL_LEVEL=$NCPU"
+    if [ -z "$MAKEFLAGS" ]; then
+      echo '**'" using $NCPU processors (unless configured differently in Makeconf)"
+      MAKEFLAGS=-j${NCPU}
+    else
+      echo '**'" using $NCPU processors to build opentelemetry-cpp"
+    fi
   else
     echo '**'" parallel compilation is disabled."
     NCPU=""
@@ -118,4 +123,5 @@ cat src/Makevars.in |
   sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |
   sed "s|@MRPROPER@|${MRPROPER}|" |
   sed "s|@AX@|${AX}|" |
+  sed "s|@MAKEFLAGS@|${MAKEFLAGS}|" |
   cat > src/Makevars

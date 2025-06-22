@@ -54,20 +54,28 @@ PKG_LIBS = \
 	@LIBCURL_LIBS@
 
 all: $(SHLIB) strip @MRPROPER@
+MAKEFLAGS=@MAKEFLAGS@
+
 
 # need static libs before linking
 $(SHLIB): $(OTEL_CPP_LIBS) libstdstream-exporter.@AX@
 
 # need to extract headers before compiling R package
-$(OBJECTS): $(OTEL_CPP_LIBS)
+$(OBJECTS): otelcpplib
+stdstream.o: otelcpplib
 
 libstdstream-exporter.@AX@: stdstream.o
 	$(AR) rs libstdstream-exporter.@AX@ $^
 
+# Do not start multiple opentelemetry-cpp builds
+# https://stackoverflow.com/a/47951465/604364
+.INTERMEDIATE: otelcpplib
+$(OTEL_CPP_LIBS): otelcpplib
+
 # need to build our proto lib with -DNDEBUG in CXXFLAGS, because of a bug:
 # https://github.com/protocolbuffers/protobuf/issues/9947
 # https://stackoverflow.com/a/73074255/604364
-$(OTEL_CPP_LIBS): vendor/opentelemetry-cpp.tgz
+otelcpplib: vendor/opentelemetry-cpp.tgz
 	tar xzf vendor/opentelemetry-cpp.tgz --no-same-owner || \
 	    tar xzf vendor/opentelemetry-cpp.tgz
 	patch -p0 < vendor/opentelemetry-cpp.patch
