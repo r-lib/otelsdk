@@ -70,7 +70,6 @@ libstdstream-exporter.a: stdstream.o
 
 # Do not start multiple opentelemetry-cpp builds
 # https://stackoverflow.com/a/47951465/604364
-.INTERMEDIATE: otelcpplib
 $(OTEL_CPP_LIBS): otelcpplib
 	@true
 
@@ -78,6 +77,7 @@ $(OTEL_CPP_LIBS): otelcpplib
 # https://github.com/protocolbuffers/protobuf/issues/9947
 # https://stackoverflow.com/a/73074255/604364
 otelcpplib: vendor/opentelemetry-cpp.tgz
+	rm -f otelcpplib
 	tar xzf vendor/opentelemetry-cpp.tgz --no-same-owner || \
 	    tar xzf vendor/opentelemetry-cpp.tgz
 	patch -p0 < vendor/opentelemetry-cpp.patch
@@ -105,6 +105,7 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ cmake --build build)
 	(cd cpp; cmake --install build)
 	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
+	touch otelcpplib
 
 mrproper: $(SHLIB)
 	@rm -rf *.a install/lib/*.a \

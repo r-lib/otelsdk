@@ -18,7 +18,6 @@ else
     CXX_STANDARD=14
 fi
 
-MRPROPER=""
 AX="ax"
 if [ "$UNAME" = "Windows" ]; then
     # https://bugs.r-project.org/show_bug.cgi?id=18869
@@ -81,6 +80,7 @@ else
   fi
 fi
 
+MRPROPER=""
 if echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck ||
   echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
     MRPROPER="mrproper"
