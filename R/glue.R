@@ -19,14 +19,6 @@ glue <- function(
 ) {
   text <- paste0(text, collapse = "")
 
-  if (length(text) < 1L) {
-    return("")
-  }
-
-  if (is.na(text)) {
-    return("")
-  }
-
   if (.trim) {
     text <- trim(text)
   }
@@ -37,22 +29,11 @@ glue <- function(
 
   res <- ccall(glue_, text, f, .open, .close, .cli)
 
-  res <- drop_null(res)
-  if (any(lengths(res) == 0L)) {
-    return(character(0L))
-  }
-
-  res[] <- lapply(res, function(x) replace(x, is.na(x), "NA"))
-
-  do.call(paste0, res)
+  paste0(unlist(res), collapse = "")
 }
 
 identity_transformer <- function(text, envir) {
   eval(parse(text = text, keep.source = FALSE), envir)
-}
-
-drop_null <- function(x) {
-  x[!vapply(x, is.null, logical(1L))]
 }
 
 create_collector_transformer <- function(record) {
