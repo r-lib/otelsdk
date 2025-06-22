@@ -28,7 +28,7 @@ OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2
 PKG_LIBS = \
-	-Linstall/lib libstdstream-exporter.@AX@ \
+	-Linstall/lib libstdstream-exporter.a \
 	-lopentelemetry_exporter_ostream_span \
 	-lopentelemetry_exporter_otlp_http \
 	-lopentelemetry_exporter_otlp_http_client \
@@ -55,17 +55,17 @@ PKG_LIBS = \
 
 MAKEFLAGS=@MAKEFLAGS@
 
-all: $(SHLIB) strip mrproperx @MRPROPER@
+all: $(SHLIB) strip mrproper
 
 # need static libs before linking
-$(SHLIB): $(OTEL_CPP_LIBS) libstdstream-exporter.@AX@
+$(SHLIB): $(OTEL_CPP_LIBS) libstdstream-exporter.a
 
 # need to extract headers before compiling R package
 $(OBJECTS): otelcpplib
 stdstream.o: otelcpplib
 
-libstdstream-exporter.@AX@: stdstream.o
-	$(AR) rs libstdstream-exporter.@AX@ $^
+libstdstream-exporter.a: stdstream.o
+	$(AR) rs libstdstream-exporter.a $^
 
 # Do not start multiple opentelemetry-cpp builds
 # https://stackoverflow.com/a/47951465/604364
@@ -105,11 +105,9 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 
 mrproper: $(SHLIB)
-	@rm -rf *.@AX@
-
-mrproperx: $(SHLIB)
-	@rm -rf cpp/build/exporters/otlp/*.a cpp/build/sdk/src/common/*.a \
-		  cpp/build/exporters/ostream/*.a
+	@rm -rf *.a install/lib/*.a \
+		cpp/build/exporters/otlp/*.a cpp/build/sdk/src/common/*.a \
+		cpp/build/exporters/ostream/*.a
 
 strip: $(SHLIB)
 	@if which strip >/dev/null && which uname >/dev/null && test "`uname`" = "Linux" && test "$$_R_SHLIB_STRIP_" = "true" && test -n "$$R_STRIP_SHARED_LIB"; then \
@@ -118,4 +116,4 @@ strip: $(SHLIB)
 		$$R_STRIP_SHARED_LIB $(SHLIB); \
 	fi
 
-.PHONY: mrproper mrproperx strip
+.PHONY: mrproper strip

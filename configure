@@ -49,8 +49,6 @@ if [ "$UNAME" = "Windows" ]; then
     LIBCURL_LIBS="`pkg-config --libs libcurl`"
     XCFLAGS="-DCURL_STATICLIB"
     XCXXFLAGS="-DCURL_STATICLIB"
-    MRPROPER="mrproper"
-    AX="a"
 elif [ "$UNAME" = "Darwin" ]; then
     CMAKE_PREFIX_PATH="/opt/R/`arch`"
     PROTOBUF_LIBS="-lprotobuf"
@@ -122,6 +120,5 @@ cat src/Makevars.in |
   sed "s|@CMAKE_PREFIX_PATH@|${CMAKE_PREFIX_PATH}|" |
   sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |
   sed "s|@MRPROPER@|${MRPROPER}|" |
-  sed "s|@AX@|${AX}|" |
   sed "s|@MAKEFLAGS@|${MAKEFLAGS}|" |
   cat > src/Makevars
