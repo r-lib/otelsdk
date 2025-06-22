@@ -32,25 +32,25 @@ as_timestamp <- function(x, null = TRUE, call = NULL) {
 
   call <- call %||% match.call()
   if (inherits(x, "POSIXt") && length(x) == 0) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a time stamp ",
-      "(`POSIXt` scalar or numeric scalar), but it is an empty vector."
-    )))
+    stop(glue(
+      "Invalid argument: {format(call[[2]])} must be a time stamp \\
+       (`POSIXt` scalar or numeric scalar), but it is an empty vector."
+    ))
   } else if (inherits(x, "POSIXt") && length(x) > 1) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a time stamp ",
-      "(`POSIXt` scalar or numeric scalar), but it is too long."
-    )))
+    stop(glue(
+      "Invalid argument: {format(call[[2]])} must be a time stamp \\
+       (`POSIXt` scalar or numeric scalar), but it is too long."
+    ))
   } else if (inherits(x, "POSIXt") && length(x) == 1 && is.na(x)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a time stamp ",
-      "(`POSIXt` scalar or numeric scalar), but it is `NA`."
-    )))
+    stop(glue(
+      "Invalid argument: {format(call[[2]])} must be a time stamp \\
+       (`POSIXt` scalar or numeric scalar), but it is `NA`."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a time stamp ",
-      "(`POSIXt` scalar or numeric scalar), but it is {typename(x)}."
-    )))
+    stop(glue(
+      "Invalid argument: {format(call[[2]])} must be a time stamp \\
+      (`POSIXt` scalar or numeric scalar), but it is {typename(x)}."
+    ))
   }
 }
 
@@ -103,6 +103,7 @@ as_span_parent <- function(x, null = TRUE, na = TRUE, call = NULL) {
     return(x$xptr)
   }
 
+  call <- call %||% match.call()
   stop(glue(c(
     "Invalid argument: {format(call[[2]])} must be a span (`otel_span`) ",
     "or a span context (`otel_span_context`) object but it is {typename(x)}."
@@ -420,7 +421,7 @@ as_log_severity <- function(x, null = TRUE, spec = FALSE, call = NULL) {
 
 # TODO
 as_event_id <- function(x, null = TRUE, call = NULL) {
-  x
+  x # nocov
 }
 
 as_span_id <- function(x, null = TRUE, call = NULL) {
@@ -481,7 +482,7 @@ as_trace_id <- function(x, null = TRUE, call = NULL) {
 
 # TODO
 as_trace_flags <- function(x, null = TRUE, call = NULL) {
-  x
+  x # nocov
 }
 
 is_count <- function(x, positive = FALSE) {
@@ -499,7 +500,7 @@ as_count <- function(x, positive = FALSE, null = FALSE, call = NULL) {
 
   if (is_string(x)) {
     xi <- suppressWarnings(as.integer(x))
-    if (is_count(x, positive = positive)) {
+    if (is_count(xi, positive = positive)) {
       return(xi)
     }
   }
@@ -600,7 +601,8 @@ as_difftime_spec <- function(x, null = TRUE, call = NULL) {
   if (inherits(x, "difftime")) {
     stop(glue(c(
       "Invalid argument: {format(call[[2]])} must have length 1, and must ",
-      "not be `NA`."
+      "not be `NA`. ",
+      if (length(x) != 1) "It has length {length(x)}." else "It is `NA`."
     )))
   } else if (is_string(x)) {
     stop(glue(c(
@@ -624,6 +626,10 @@ as_difftime_env <- function(ev) {
   val <- get_env(ev)
   if (is.null(val)) {
     return(NULL)
+  }
+  xv <- suppressWarnings(as.double(val))
+  if (!is.na(xv)) {
+    return(xv * 1000 * 1000)
   }
   us <- parse_time_spec(val)
   if (!is.na(us)) {
@@ -666,9 +672,9 @@ time_spec_units <- rbind.data.frame(
   list(unit = "h", mult = 60 * 60 * 1000 * 1000),
   list(unit = "hour", mult = 60 * 60 * 1000 * 1000),
   list(unit = "hours", mult = 60 * 60 * 1000 * 1000),
-  list(unit = "d", mult = 24 * 60 * 1000 * 1000),
-  list(unit = "day", mult = 24 * 60 * 1000 * 1000),
-  list(unit = "days", mult = 24 * 60 * 1000 * 1000)
+  list(unit = "d", mult = 24 * 60 * 60 * 1000 * 1000),
+  list(unit = "day", mult = 24 * 60 * 60 * 1000 * 1000),
+  list(unit = "days", mult = 24 * 60 * 60 * 1000 * 1000)
 )
 
 
@@ -680,7 +686,7 @@ time_spec_units <- time_spec_units[
 parse_time_spec <- function(x) {
   stopifnot(length(x) == 1)
   x <- tolower(x)
-  wh <- which(endsWith(x, names(time_spec_units$unit)))[1]
+  wh <- which(endsWith(x, time_spec_units$unit))[1]
   if (is.na(wh)) {
     return(NA_real_)
   }
@@ -696,6 +702,10 @@ as_bytes <- function(x, null = TRUE, call = NULL) {
     return(as.double(x))
   }
   if (is_string(x)) {
+    bts <- suppressWarnings(as.double(x))
+    if (!is.na(bts)) {
+      return(bts)
+    }
     bts <- parse_bytes_spec(x)
     if (!is.na(bts)) {
       return(bts)
@@ -706,13 +716,13 @@ as_bytes <- function(x, null = TRUE, call = NULL) {
   if (is_string(x)) {
     stop(glue(c(
       "Invalid argument: could not interpret {format(call[[2]])} as a ",
-      "number of bytes. It must be a number with unit suffix: one of ",
+      "number of bytes. It must be a number with a unit suffix: one of ",
       "B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB."
     )))
   } else {
     stop(glue(c(
       "Invalid argument: {format(call[[2]])} must be an integer (bytes) ",
-      "or a string sclar with a unit suffix. Known units are B, KB, KiB",
+      "or a string scalar with a unit suffix. Known units are B, KB, KiB, ",
       "MB, MiB, GB, GiB, TB, TiB, PB, PiB. But it is a {typename(x)}."
     )))
   }
@@ -722,6 +732,10 @@ as_bytes_env <- function(ev) {
   val <- get_env(ev)
   if (is.null(val)) {
     return(NULL)
+  }
+  bts <- suppressWarnings(as.integer(val))
+  if (!is.na(bts)) {
+    return(bts)
   }
   bts <- parse_bytes_spec(val)
   if (!is.na(bts)) {
@@ -779,7 +793,7 @@ bytes_spec_units <- bytes_spec_units[
 parse_bytes_spec <- function(x) {
   stopifnot(length(x) == 1)
   x <- tolower(x)
-  wh <- which(endsWith(x, names(bytes_spec_units$unit)))[1]
+  wh <- which(endsWith(x, bytes_spec_units$unit))[1]
   if (is.na(wh)) {
     return(NA_real_)
   }
