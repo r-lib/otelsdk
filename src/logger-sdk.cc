@@ -39,39 +39,6 @@ void otel_logger_finally_(void *logger_) {
   delete ts;
 }
 
-void *otel_create_logger_provider_stdstream_(const char *stream) {
-  int sout = !strcmp(stream, "stdout");
-  int serr = !strcmp(stream, "stderr");
-  struct otel_logger_provider *tps = new otel_logger_provider;
-
-  if (sout || serr) {
-    std::ostream &out = sout ? std::cout : std::cerr;
-    auto exporter  = logs_exporter::OStreamLogRecordExporterFactory::Create(out);
-    auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
-    tps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
-    return (void*) tps;
-
-  } else {
-    tps->stream.open(stream, std::fstream::out | std::fstream::app);
-    // no buffering, because we use this for testing
-    tps->stream.rdbuf()->pubsetbuf(0,0);
-    auto exporter  = logs_exporter::OStreamLogRecordExporterFactory::Create(tps->stream);
-    auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
-    tps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
-    return tps;
-  }
-}
-
-void *otel_create_logger_provider_http_(void) {
-  auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create();
-  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
-
-  struct otel_logger_provider *lps = new otel_logger_provider;
-  lps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
-
-  return (void*) lps;
-}
-
 void *otel_create_logger_provider_file_(
     struct otel_file_exporter_options *options) {
   opentelemetry::exporter::otlp::OtlpFileLogRecordExporterOptions opts;

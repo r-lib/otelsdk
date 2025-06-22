@@ -1,5 +1,7 @@
 /src/*.o
 /src/*.so
+/src/*.a
+/src/*.ax
 /src/*.gcda
 /src/*.gcno
 /src/Makevars

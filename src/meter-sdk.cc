@@ -68,52 +68,6 @@ void otel_gauge_finally_(void *gauge_) {
   delete cs;
 }
 
-void *otel_create_meter_provider_stdstream_(
-    const char *stream, int export_interval, int export_timeout) {
-  int sout = !strcmp(stream, "stdout");
-  int serr = !strcmp(stream, "stderr");
-  struct otel_meter_provider *mps = new otel_meter_provider;
-
-  std::string version{"1.2.0"};
-  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
-
-  // Initialize and set the global MeterProvider
-  metrics_sdk::PeriodicExportingMetricReaderOptions reader_options;
-  reader_options.export_interval_millis =
-    std::chrono::milliseconds(export_interval);
-  reader_options.export_timeout_millis  =
-    std::chrono::milliseconds(export_timeout);
-
-  if (sout || serr) {
-    std::ostream &out = sout ? std::cout : std::cerr;
-    auto exporter = metrics_exporter::OStreamMetricExporterFactory::Create(out);
-    auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
-      std::move(exporter),
-      reader_options
-    );
-    auto context = metrics_sdk::MeterContextFactory::Create();
-    context->AddMetricReader(std::move(reader));
-
-    mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
-    return (void*) mps;
-
-  } else {
-    mps->stream.open(stream, std::fstream::out | std::fstream::app);
-    // no buffering, because we use this for testing
-    mps->stream.rdbuf()->pubsetbuf(0,0);
-    auto exporter = metrics_exporter::OStreamMetricExporterFactory::Create(mps->stream);
-    auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
-      std::move(exporter),
-      reader_options
-    );
-    auto context = metrics_sdk::MeterContextFactory::Create();
-    context->AddMetricReader(std::move(reader));
-
-    mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
-    return (void*) mps;
-  }
-}
-
 void *otel_create_meter_provider_http_(
     int export_interval, int export_timeout) {
   struct otel_meter_provider *mps = new otel_meter_provider;
@@ -202,8 +156,6 @@ void *otel_create_meter_provider_memory_(
 }
 
 #define BAIL(msg) do {                                    \
-  std::cerr << "Error: " << msg << " "                    \
-            << __FILE__ << ":" << __LINE__ << std::endl;  \
   throw std::runtime_error(""); } while (0)
 
 int otel_meter_provider_memory_get_metrics_(

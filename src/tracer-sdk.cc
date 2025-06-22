@@ -64,33 +64,6 @@ void otel_span_context_finally_(void *span_context_) {
   delete span_context;
 }
 
-void *otel_create_tracer_provider_stdstream_(
-  const char *stream, struct otel_attributes *resource_attributes) {
-  int sout = !strcmp(stream, "stdout");
-  int serr = !strcmp(stream, "stderr");
-  struct otel_tracer_provider *tps = new otel_tracer_provider;
-  RKeyValueIterable attributes_(*resource_attributes);
-
-  if (sout || serr) {
-    std::ostream &out = sout ? std::cout : std::cerr;
-    auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(out);
-    auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-    tps->ptr = trace_sdk::TracerProviderFactory::Create(
-      std::move(processor), resource::Resource::Create(&attributes_));
-    return (void*) tps;
-
-  } else {
-    tps->stream.open(stream, std::fstream::out | std::fstream::app);
-    // no buffering, because we use this for testing
-    tps->stream.rdbuf()->pubsetbuf(0,0);
-    auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create(tps->stream);
-    auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-    tps->ptr = trace_sdk::TracerProviderFactory::Create(
-      std::move(processor), resource::Resource::Create(&attributes_));
-    return tps;
-  }
-}
-
 void *otel_create_tracer_provider_http_(struct otel_attributes *resource_attributes) {
   auto exporter  = otlp::OtlpHttpExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));

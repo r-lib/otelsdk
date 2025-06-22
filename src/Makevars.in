@@ -28,7 +28,8 @@ OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2
 PKG_LIBS = \
-	-Linstall/lib -lopentelemetry_exporter_ostream_span \
+	-Linstall/lib libstdstream-exporter.@AX@ \
+	-lopentelemetry_exporter_ostream_span \
 	-lopentelemetry_exporter_otlp_http \
 	-lopentelemetry_exporter_otlp_http_client \
 	-lopentelemetry_exporter_ostream_logs \
@@ -52,13 +53,16 @@ PKG_LIBS = \
 	@PROTOBUF_LIBS@ \
 	@LIBCURL_LIBS@
 
-all: $(SHLIB) strip
+all: $(SHLIB) strip @MRPROPER@
 
 # need static libs before linking
-$(SHLIB): $(OTEL_CPP_LIBS)
+$(SHLIB): $(OTEL_CPP_LIBS) libstdstream-exporter.@AX@
 
 # need to extract headers before compiling R package
 $(OBJECTS): $(OTEL_CPP_LIBS)
+
+libstdstream-exporter.@AX@: stdstream.o
+	$(AR) rs libstdstream-exporter.@AX@ $^
 
 # need to build our proto lib with -DNDEBUG in CXXFLAGS, because of a bug:
 # https://github.com/protocolbuffers/protobuf/issues/9947
@@ -92,9 +96,14 @@ $(OTEL_CPP_LIBS): vendor/opentelemetry-cpp.tgz
 	(cd cpp; cmake --install build)
 	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 
+mrproper: $(SHLIB)
+	@rm -rf *.@AX@
+
 strip: $(SHLIB)
 	@if which strip >/dev/null && which uname >/dev/null && test "`uname`" = "Linux" && test "$$_R_SHLIB_STRIP_" = "true" && test -n "$$R_STRIP_SHARED_LIB"; then \
 		echo stripping $(SHLIB); \
 		echo $$R_STRIP_SHARED_LIB $(SHLIB); \
 		$$R_STRIP_SHARED_LIB $(SHLIB); \
 	fi
+
+.PHONY: mrproper strip

@@ -18,6 +18,8 @@ else
     CXX_STANDARD=14
 fi
 
+MRPROPER=""
+AX="ax"
 if [ "$UNAME" = "Windows" ]; then
     # https://bugs.r-project.org/show_bug.cgi?id=18869
     CMAKE_PREFIX_PATH=""
@@ -47,6 +49,8 @@ if [ "$UNAME" = "Windows" ]; then
     LIBCURL_LIBS="`pkg-config --libs libcurl`"
     XCFLAGS="-DCURL_STATICLIB"
     XCXXFLAGS="-DCURL_STATICLIB"
+    MRPROPER="mrproper"
+    AX="a"
 elif [ "$UNAME" = "Darwin" ]; then
     CMAKE_PREFIX_PATH="/opt/R/`arch`"
     PROTOBUF_LIBS="-lprotobuf"
@@ -112,4 +116,6 @@ cat src/Makevars.in |
   sed "s|@OTEL_CLEANUP@|${OTEL_CLEANUP}|" |
   sed "s|@CMAKE_PREFIX_PATH@|${CMAKE_PREFIX_PATH}|" |
   sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |
+  sed "s|@MRPROPER@|${MRPROPER}|" |
+  sed "s|@AX@|${AX}|" |
   cat > src/Makevars
