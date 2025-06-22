@@ -53,9 +53,9 @@ PKG_LIBS = \
 	@PROTOBUF_LIBS@ \
 	@LIBCURL_LIBS@
 
-all: $(SHLIB) strip @MRPROPER@
 MAKEFLAGS=@MAKEFLAGS@
 
+all: $(SHLIB) strip mrproperx @MRPROPER@
 
 # need static libs before linking
 $(SHLIB): $(OTEL_CPP_LIBS) libstdstream-exporter.@AX@
@@ -107,6 +107,10 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 mrproper: $(SHLIB)
 	@rm -rf *.@AX@
 
+mrproperx: $(SHLIB)
+	@rm -rf cpp/build/exporters/otlp/*.a cpp/build/sdk/src/common/*.a \
+		  cpp/build/exporters/ostream/*.a
+
 strip: $(SHLIB)
 	@if which strip >/dev/null && which uname >/dev/null && test "`uname`" = "Linux" && test "$$_R_SHLIB_STRIP_" = "true" && test -n "$$R_STRIP_SHARED_LIB"; then \
 		echo stripping $(SHLIB); \
@@ -114,4 +118,4 @@ strip: $(SHLIB)
 		$$R_STRIP_SHARED_LIB $(SHLIB); \
 	fi
 
-.PHONY: mrproper strip
+.PHONY: mrproper mrproperx strip
