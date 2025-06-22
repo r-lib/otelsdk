@@ -28,7 +28,7 @@ OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2
 PKG_LIBS = \
-	-Linstall/lib \
+	-Linstall/lib libstdstream-exporter.a \
 	-lopentelemetry_exporter_ostream_span \
 	-lopentelemetry_exporter_otlp_http \
 	-lopentelemetry_exporter_otlp_http_client \
