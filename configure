@@ -18,6 +18,7 @@ else
     CXX_STANDARD=14
 fi
 
+AX="ax"
 if [ "$UNAME" = "Windows" ]; then
     # https://bugs.r-project.org/show_bug.cgi?id=18869
     CMAKE_PREFIX_PATH=""
@@ -79,6 +80,12 @@ else
   fi
 fi
 
+MRPROPER=""
+if echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck ||
+  echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
+    MRPROPER="mrproper"
+fi
+
 # Look up number of processors, if parallel build.
 if [ "$DO_PARALLEL" = "true" ]; then
   if [ -n "$NCPU" ]; then
@@ -94,8 +101,13 @@ if [ "$DO_PARALLEL" = "true" ]; then
     NCPU=""
   fi
   if expr "$NCPU" : '[1-9][0-9]*$' >/dev/null; then
-    echo '**'" using $NCPU processors (unless configured differently in Makeconf)."
     CMAKE_BUILD_PARALLEL_LEVEL="CMAKE_BUILD_PARALLEL_LEVEL=$NCPU"
+    if [ -z "$MAKEFLAGS" ]; then
+      echo '**'" using $NCPU processors (unless configured differently in Makeconf)"
+      MAKEFLAGS=-j${NCPU}
+    else
+      echo '**'" using $NCPU processors to build opentelemetry-cpp"
+    fi
   else
     echo '**'" parallel compilation is disabled."
     NCPU=""
@@ -112,4 +124,6 @@ cat src/Makevars.in |
   sed "s|@OTEL_CLEANUP@|${OTEL_CLEANUP}|" |
   sed "s|@CMAKE_PREFIX_PATH@|${CMAKE_PREFIX_PATH}|" |
   sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |
+  sed "s|@MRPROPER@|${MRPROPER}|" |
+  sed "s|@MAKEFLAGS@|${MAKEFLAGS}|" |
   cat > src/Makevars

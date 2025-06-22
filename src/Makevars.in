@@ -28,7 +28,8 @@ OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2
 PKG_LIBS = \
-	-Linstall/lib -lopentelemetry_exporter_ostream_span \
+	-Linstall/lib libstdstream-exporter.a \
+	-lopentelemetry_exporter_ostream_span \
 	-lopentelemetry_exporter_otlp_http \
 	-lopentelemetry_exporter_otlp_http_client \
 	-lopentelemetry_exporter_ostream_logs \
@@ -50,20 +51,33 @@ PKG_LIBS = \
 	-lopentelemetry_common \
 	-lopentelemetry_proto \
 	@PROTOBUF_LIBS@ \
-	@LIBCURL_LIBS@
+	@LIBCURL_LIBS@ \
+	libstdstream-exporter.a
 
-all: $(SHLIB) strip
+MAKEFLAGS=@MAKEFLAGS@
+
+all: $(SHLIB) strip @MRPROPER@
 
 # need static libs before linking
-$(SHLIB): $(OTEL_CPP_LIBS)
+$(SHLIB): $(OTEL_CPP_LIBS) libstdstream-exporter.a
 
 # need to extract headers before compiling R package
-$(OBJECTS): $(OTEL_CPP_LIBS)
+$(OBJECTS): otelcpplib
+stdstream.o: otelcpplib
+
+libstdstream-exporter.a: stdstream.o
+	$(AR) rs libstdstream-exporter.a $^
+
+# Do not start multiple opentelemetry-cpp builds
+# https://stackoverflow.com/a/47951465/604364
+$(OTEL_CPP_LIBS): otelcpplib
+	@true
 
 # need to build our proto lib with -DNDEBUG in CXXFLAGS, because of a bug:
 # https://github.com/protocolbuffers/protobuf/issues/9947
 # https://stackoverflow.com/a/73074255/604364
-$(OTEL_CPP_LIBS): vendor/opentelemetry-cpp.tgz
+otelcpplib: vendor/opentelemetry-cpp.tgz
+	rm -f otelcpplib
 	tar xzf vendor/opentelemetry-cpp.tgz --no-same-owner || \
 	    tar xzf vendor/opentelemetry-cpp.tgz
 	patch -p0 < vendor/opentelemetry-cpp.patch
@@ -91,6 +105,12 @@ $(OTEL_CPP_LIBS): vendor/opentelemetry-cpp.tgz
 	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ cmake --build build)
 	(cd cpp; cmake --install build)
 	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
+	touch otelcpplib
+
+mrproper: $(SHLIB)
+	@rm -rf *.a install/lib/*.a \
+		cpp/build/exporters/otlp/*.a cpp/build/sdk/src/common/*.a \
+		cpp/build/exporters/ostream/*.a
 
 strip: $(SHLIB)
 	@if which strip >/dev/null && which uname >/dev/null && test "`uname`" = "Linux" && test "$$_R_SHLIB_STRIP_" = "true" && test -n "$$R_STRIP_SHARED_LIB"; then \
@@ -98,3 +118,5 @@ strip: $(SHLIB)
 		echo $$R_STRIP_SHARED_LIB $(SHLIB); \
 		$$R_STRIP_SHARED_LIB $(SHLIB); \
 	fi
+
+.PHONY: mrproper strip

@@ -1,5 +1,7 @@
 ^src/.*[.]o$
 ^src/.*[.]so$
+^src/.*[.]a$
+^src/.*[.]ax$
 ^src/.*[.]gcda$
 ^src/.*[.]gcno$
 ^src/cpp$
@@ -15,3 +17,4 @@
 ^[\.]?air\.toml$
 ^\.vscode$
 ^src/extra/cmake/R-4[.]./protobuf-targets[.]cmake$
+^src/otelcpplib$
