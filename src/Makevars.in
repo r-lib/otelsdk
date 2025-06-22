@@ -56,7 +56,7 @@ PKG_LIBS = \
 
 MAKEFLAGS=@MAKEFLAGS@
 
-all: $(SHLIB) strip mrproper
+all: $(SHLIB) strip @MRPROPER@
 
 # need static libs before linking
 $(SHLIB): $(OTEL_CPP_LIBS) libstdstream-exporter.a

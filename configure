@@ -81,6 +81,11 @@ else
   fi
 fi
 
+if echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck ||
+  echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
+    MRPROPER="mrproper"
+fi
+
 # Look up number of processors, if parallel build.
 if [ "$DO_PARALLEL" = "true" ]; then
   if [ -n "$NCPU" ]; then
