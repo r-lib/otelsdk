@@ -108,6 +108,14 @@
       Error in `as_span_context()`:
       ! Invalid argument: b1 must be a span context object (`otel_span_context`), but it is a data frame.
 
+# as_span_parent
+
+    Code
+      as_span_parent(b1)
+    Condition
+      Error in `as_span_parent()`:
+      ! Invalid argument: b1 must be a span (`otel_span`) or a span context (`otel_span_context`) object but it is a data frame.
+
 # as_choice
 
     Code
@@ -171,6 +179,14 @@
     Condition
       Error in `as_string()`:
       ! Invalid argument: s4 must be a string scalar, but it is NULL.
+
+# as_flag
+
+    Code
+      as_flag(b1)
+    Condition
+      Error in `as_flag()`:
+      ! Invalid argument: b1 must a flag (logical scalar), but it is an integer vector.
 
 # as_otel_attribute_value
 
@@ -440,4 +456,124 @@
     Condition
       Error in `as_count()`:
       ! Invalid argument: v6 must be a non-negative integer scalar, but it is a data frame.
+    Code
+      as_count(v7)
+    Condition
+      Error in `as_count()`:
+      ! Invalid argument: v7 must be a non-negative integer scalar, but it is a string.
+
+# as_count_env
+
+    Code
+      as_count_env("FOO")
+    Condition
+      Error in `as_count_env()`:
+      ! Invalid environment variable: FOO must be a non-negative integer.
+
+---
+
+    Code
+      as_count_env("FOO")
+    Condition
+      Error in `as_count_env()`:
+      ! Invalid environment variable: FOO must be a non-negative integer.
+
+---
+
+    Code
+      as_count_env("FOO", positive = TRUE)
+    Condition
+      Error in `as_count_env()`:
+      ! Invalid environment variable: FOO must be a positive integer.
+
+# as_http_context_headers
+
+    Code
+      v1 <- 1:10
+      as_http_context_headers(v1)
+    Condition
+      Error in `as_http_context_headers()`:
+      ! Invalid argument: v1 must be a named list, but it is a an integer vector.
+    Code
+      v2 <- list(traceparent = TRUE)
+      as_http_context_headers(v2)
+    Condition
+      Error in `as_http_context_headers()`:
+      ! Invalid argument: the 'traceparent' entry of v2 must be a string (character scalar), but it is a `TRUE`.
+    Code
+      v3 <- list(tracestate = raw(10))
+      as_http_context_headers(v3)
+    Condition
+      Error in `as_http_context_headers()`:
+      ! Invalid argument: the 'tracestate' entry of v3 must be a string (character scalar), but it is a a raw vector.
+
+# as_difftime_spec
+
+    Code
+      v1 <- as.difftime(NA_real_, units = "secs")
+      as_difftime_spec(v1)
+    Condition
+      Error in `as_difftime_spec()`:
+      ! Invalid argument: v1 must have length 1, and must not be `NA`. It is `NA`.
+    Code
+      v2 <- as.difftime(1:2, units = "secs")
+      as_difftime_spec(v2)
+    Condition
+      Error in `as_difftime_spec()`:
+      ! Invalid argument: v2 must have length 1, and must not be `NA`. It has length 2.
+    Code
+      v3 <- "foo"
+      as_difftime_spec(v3)
+    Condition
+      Error in `as_difftime_spec()`:
+      ! Invalid argument: v3 must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+    Code
+      v4 <- "0"
+      as_difftime_spec(v4)
+    Condition
+      Error in `as_difftime_spec()`:
+      ! Invalid argument: v4 must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+    Code
+      v5 <- raw(10)
+      as_difftime_spec(v5)
+    Condition
+      Error in `as_difftime_spec()`:
+      ! Invalid argument: v5 must be an integer scalar (seconds), a 'difftime' scalar, or a time interval specification. A time interval specification is apositive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours) or d (days). But it is a a raw vector.
+
+# as_difftime_env
+
+    Code
+      local({
+        withr::local_envvar(FOO = "qqq")
+        as_difftime_env("FOO")
+      })
+    Condition
+      Error in `as_difftime_env()`:
+      ! Invalid environment variable: FOO='qqq'. It must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+
+# as_bytes
+
+    Code
+      v1 <- "notgood"
+      as_bytes(v1)
+    Condition
+      Error in `as_bytes()`:
+      ! Invalid argument: could not interpret v1 as a number of bytes. It must be a number with a unit suffix: one of B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
+    Code
+      v2 <- 1:5
+      as_bytes(v2)
+    Condition
+      Error in `as_bytes()`:
+      ! Invalid argument: v2 must be an integer (bytes) or a string scalar with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB. But it is a an integer vector.
+
+# as_bytes_env
+
+    Code
+      local({
+        withr::local_envvar(FOO = "100www")
+        as_bytes_env("FOO")
+      })
+    Condition
+      Error in `as_bytes_env()`:
+      ! Invalid environment variable: FOO='100www'. It must be an integer with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
 

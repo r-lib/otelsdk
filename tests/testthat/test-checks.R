@@ -87,6 +87,23 @@ test_that("as_span_context", {
   })
 })
 
+test_that("as_span_parent", {
+  expect_null(as_span_parent(NULL, null = TRUE))
+  expect_equal(as_span_parent(NA, na = TRUE), NA)
+  span <- structure(
+    list(get_context = function() list(xptr = "this")),
+    class = "otel_span"
+  )
+  expect_equal(as_span_parent(span), "this")
+  spanctx <- structure(list(xptr = "that"), class = "otel_span_context")
+  expect_equal(as_span_parent(spanctx), "that")
+
+  b1 <- mtcars
+  expect_snapshot(error = TRUE, {
+    as_span_parent(b1)
+  })
+})
+
 test_that("as_choice", {
   expect_snapshot({
     as_choice(NULL, c(default = "foo", "bar"))
@@ -129,6 +146,15 @@ test_that("as_string", {
     as_string(s2)
     as_string(s3)
     as_string(s4, null = FALSE)
+  })
+})
+
+test_that("as_flag", {
+  expect_equal(as_flag(TRUE), TRUE)
+  expect_equal(as_flag(FALSE), FALSE)
+  b1 <- 1:10
+  expect_snapshot(error = TRUE, {
+    as_flag(b1)
   })
 })
 
@@ -294,6 +320,7 @@ test_that("as_output_file", {
 })
 
 test_that("as_log_severity", {
+  expect_null(as_log_severity(NULL))
   expect_equal(as_log_severity("warn"), c(warn = 13L))
   expect_equal(as_log_severity(10L), 10L)
   expect_equal(as_log_severity(0, spec = TRUE), 0L)
@@ -318,6 +345,7 @@ test_that("as_log_severity", {
 test_that("as_event_id", {})
 
 test_that("as_span_id", {
+  expect_null(as_span_id(NULL))
   nc <- span_id_size() * 2L
   expect_equal(as_span_id(strrep("0", nc)), strrep("0", nc))
   expect_equal(as_span_id(strrep("a", nc)), strrep("a", nc))
@@ -336,6 +364,7 @@ test_that("as_span_id", {
 })
 
 test_that("as_trace_id", {
+  expect_null(as_trace_id(NULL))
   nc <- trace_id_size() * 2L
   expect_equal(as_trace_id(strrep("0", nc)), strrep("0", nc))
   expect_equal(as_trace_id(strrep("a", nc)), strrep("a", nc))
@@ -374,6 +403,7 @@ test_that("is_count", {
 })
 
 test_that("as_count", {
+  expect_null(as_count(NULL, null = TRUE))
   expect_equal(as_count(1L), 1L)
   expect_equal(as_count(1), 1L)
   expect_equal(as_count(0L), 0L)
@@ -381,12 +411,16 @@ test_that("as_count", {
   expect_equal(as_count(20L, positive = TRUE), 20L)
   expect_equal(as_count(20, positive = TRUE), 20L)
 
+  expect_equal(as_count("20"), 20L)
+  expect_equal(as_count("0"), 0L)
+
   v1 <- 1:10
   v2 <- NA_integer_
   v3 <- NA_real_
   v4 <- -1
   v5 <- 0
   v6 <- mtcars
+  v7 <- "boo"
   expect_snapshot(error = TRUE, {
     as_count(v1)
     as_count(v2)
@@ -394,5 +428,153 @@ test_that("as_count", {
     as_count(v4)
     as_count(v5, positive = TRUE)
     as_count(v6)
+    as_count(v7)
   })
+})
+
+test_that("as_count_env", {
+  withr::local_envvar(FOO = NA_character_)
+  expect_null(as_count_env("FOO"))
+
+  withr::local_envvar(FOO = "10")
+  expect_equal(as_count_env("FOO"), 10L)
+
+  withr::local_envvar(FOO = "0")
+  expect_equal(as_count_env("FOO"), 0L)
+
+  withr::local_envvar(FOO = "oops")
+  expect_snapshot(error = TRUE, {
+    as_count_env("FOO")
+  })
+
+  withr::local_envvar(FOO = "-1")
+  expect_snapshot(error = TRUE, {
+    as_count_env("FOO")
+  })
+
+  withr::local_envvar(FOO = "0")
+  expect_snapshot(error = TRUE, {
+    as_count_env("FOO", positive = TRUE)
+  })
+})
+
+test_that("as_http_context_headers", {
+  expect_equal(
+    as_http_context_headers(list(TRACEPARENT = "tp", TRACESTATE = "ts")),
+    list(traceparent = "tp", tracestate = "ts")
+  )
+  expect_equal(
+    as_http_context_headers(list(TRACEPARENT = "tp")),
+    list(traceparent = "tp", tracestate = NULL)
+  )
+  expect_equal(
+    as_http_context_headers(list(TRACESTATE = "ts")),
+    list(traceparent = NULL, tracestate = "ts")
+  )
+  expect_equal(
+    as_http_context_headers(list()),
+    list(traceparent = NULL, tracestate = NULL)
+  )
+
+  expect_snapshot(error = TRUE, {
+    v1 <- 1:10
+    as_http_context_headers(v1)
+    v2 <- list(traceparent = TRUE)
+    as_http_context_headers(v2)
+    v3 <- list(tracestate = raw(10))
+    as_http_context_headers(v3)
+  })
+})
+
+test_that("as_difftime_spec", {
+  expect_null(as_difftime_spec(NULL))
+  expect_equal(
+    as_difftime_spec(as.difftime(1.2, units = "secs")),
+    1.2 * 1000 * 1000
+  )
+  expect_equal(as_difftime_spec(5), 5 * 1000 * 1000)
+  expect_equal(as_difftime_spec("1s"), 1 * 1000 * 1000)
+
+  expect_snapshot(error = TRUE, {
+    v1 <- as.difftime(NA_real_, units = "secs")
+    as_difftime_spec(v1)
+    v2 <- as.difftime(1:2, units = "secs")
+    as_difftime_spec(v2)
+    v3 <- "foo"
+    as_difftime_spec(v3)
+    v4 <- "0"
+    as_difftime_spec(v4)
+    v5 <- raw(10)
+    as_difftime_spec(v5)
+  })
+})
+
+test_that("as_difftime_env", {
+  withr::local_envvar(FOO = NA_character_)
+  expect_null(as_difftime_env("FOO"))
+
+  withr::local_envvar(FOO = 1.4)
+  expect_equal(as_difftime_env("FOO"), 1.4 * 1000 * 1000)
+
+  withr::local_envvar(FOO = "1m")
+  expect_equal(as_difftime_env("FOO"), 60 * 1000 * 1000)
+
+  expect_snapshot(
+    error = TRUE,
+    local({
+      withr::local_envvar(FOO = "qqq")
+      as_difftime_env("FOO")
+    })
+  )
+})
+
+test_that("parse_time_spec", {
+  expect_equal(parse_time_spec("1us"), 1)
+  expect_equal(parse_time_spec("1ms"), 1000)
+  expect_equal(parse_time_spec("2s"), 2 * 1000 * 1000)
+  expect_equal(parse_time_spec("3m"), 3 * 60 * 1000 * 1000)
+  expect_equal(parse_time_spec("4h"), 4 * 60 * 60 * 1000 * 1000)
+  expect_equal(parse_time_spec("5d"), 5 * 24 * 60 * 60 * 1000 * 1000)
+})
+
+test_that("as_bytes", {
+  expect_null(as_bytes(NULL))
+  expect_equal(as_bytes(123), 123)
+  expect_equal(as_bytes("456"), 456)
+  expect_equal(as_bytes("1kib"), 1024)
+
+  expect_snapshot(error = TRUE, {
+    v1 <- "notgood"
+    as_bytes(v1)
+    v2 <- 1:5
+    as_bytes(v2)
+  })
+})
+
+test_that("as_bytes_env", {
+  withr::local_envvar(FOO = NA_character_)
+  expect_null(as_bytes_env("FOO"))
+
+  withr::local_envvar(FOO = "100")
+  expect_equal(as_bytes_env("FOO"), 100)
+
+  withr::local_envvar(FOO = "2MB")
+  expect_equal(as_bytes_env("FOO"), 2 * 1000 * 1000)
+
+  expect_snapshot(
+    error = TRUE,
+    local({
+      withr::local_envvar(FOO = "100www")
+      as_bytes_env("FOO")
+    })
+  )
+})
+
+test_that("parse_bytes_spec", {
+  expect_equal(parse_bytes_spec("1b"), 1)
+  expect_equal(parse_bytes_spec("2kb"), 2 * 1000)
+  expect_equal(parse_bytes_spec("3mb"), 3 * 1000 * 1000)
+  expect_equal(parse_bytes_spec("4GB"), 4 * 1000 * 1000 * 1000)
+  expect_equal(parse_bytes_spec("5TB"), 5 * 1000 * 1000 * 1000 * 1000)
+  expect_equal(parse_bytes_spec("6Pb"), 6 * 1000 * 1000 * 1000 * 1000 * 1000)
 })
