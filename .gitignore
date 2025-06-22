@@ -4,6 +4,7 @@
 /src/*.ax
 /src/*.gcda
 /src/*.gcno
+/src/*.gcov
 /src/Makevars
 /src/cpp
 /src/install
