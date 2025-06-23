@@ -40,8 +40,10 @@ with_otel_record <- function(expr, provider_args = list(), what = c("traces")) {
   otel_restore_cache(tmp)
 
   # record
-  expr
+  if (is.function(value <- expr)) {
+    value <- value()
+  }
 
   # return recorded results
-  list(traces = tmp[["tracer_provider"]]$get_spans())
+  list(value = value, traces = tmp[["tracer_provider"]]$get_spans())
 }
