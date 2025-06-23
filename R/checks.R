@@ -547,8 +547,9 @@ as_count_env <- function(ev, positive = FALSE) {
 }
 
 as_http_context_headers <- function(headers, call = NULL) {
-  if (is.list(headers) && is_named(headers)) {
+  if ((is.list(headers) || is.character(headers)) && is_named(headers)) {
     names(headers) <- tolower(names(headers))
+    headers <- as.list(headers)
     traceparent <- headers[["traceparent"]]
     tracestate <- headers[["tracestate"]]
     if (
