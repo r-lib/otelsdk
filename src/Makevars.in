@@ -108,7 +108,7 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	touch otelcpplib
 
 mrproper: $(SHLIB)
-	@rm -rf otelcpplib *.a install/lib/*.a \
+	@rm -rf *.a install/lib/*.a \
 		cpp/build/exporters/otlp/*.a cpp/build/sdk/src/common/*.a \
 		cpp/build/exporters/ostream/*.a
 
