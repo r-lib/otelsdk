@@ -43,3 +43,56 @@ test_that("is_enabled", {
   trc <- trc_prv$get_tracer("mytracer")
   expect_true(trc$is_enabled())
 })
+
+test_that("start_session", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    sess <- trc$start_session("sess")
+    sess$end()
+  })[["traces"]]
+
+  expect_equal(spns[["sess"]]$name, "sess")
+})
+
+test_that("get_active_span_context", {
+  spid <- NULL
+  spns <- with_otel_record(function() {
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span("spn1")
+    ctx <- trc$get_active_span_context()
+    spid <<- ctx$get_span_id()
+  })
+
+  # a new span is active
+  expect_equal(spid, spns[["traces"]][["spn1"]]$span_id)
+})
+
+test_that("flush", {
+  trc_prv <- tracer_provider_stdstream_new()
+  trc <- trc_prv$get_tracer("mytracer")
+  expect_silent(trc$flush())
+})
+
+test_that("extract_http_context", {
+  hdrs <- NULL
+  trid <- NULL
+  spid <- NULL
+  spns <- with_otel_record(function() {
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span("spn1")
+    ctx <- trc$get_active_span_context()
+    hdrs <<- ctx$to_http_headers()
+    trid <<- ctx$get_trace_id()
+    spid <<- ctx$get_span_id()
+    spn1$end()
+  })[["traces"]]
+
+  spns2 <- with_otel_record(function() {
+    trc <- otel::get_tracer("mytracer2")
+    ctx <- trc$extract_http_context(hdrs)
+    spn2 <- trc$start_span("spn2", options = list(parent = ctx))
+  })[["traces"]]
+
+  expect_equal(spns[["spn1"]][["trace_id"]], spns2[["spn2"]][["trace_id"]])
+  expect_equal(spns[["spn1"]][["span_id"]], spns2[["spn2"]][["parent"]])
+})

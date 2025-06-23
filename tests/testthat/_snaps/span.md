@@ -93,3 +93,15 @@
       [4] "rlib_error"         "error"              "condition"         
       
 
+# span_context
+
+    Code
+      ctx$get_trace_flags()
+    Output
+      $is_sampled
+      [1] TRUE
+      
+      $is_random
+      [1] FALSE
+      
+

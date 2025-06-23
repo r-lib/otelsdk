@@ -177,3 +177,42 @@ test_that("create a root span", {
   expect_equal(spns[[1]]$parent, otel::invalid_span_id)
   expect_equal(spns[[2]]$parent, otel::invalid_span_id)
 })
+
+test_that("get_context", {
+  spid1 <- spid2 <- NULL
+  spns <- with_otel_record(function() {
+    trc <- otel::get_tracer()
+    spn <- trc$start_span("1")
+    spid1 <<- spn$get_context()$get_span_id()
+    spid2 <<- trc$get_active_span_context()$get_span_id()
+  })[["traces"]]
+
+  expect_false(is.null(spid1))
+  expect_false(is.null(spid2))
+  expect_equal(spid1, spid2)
+  expect_equal(spid1, spns[["1"]][["span_id"]])
+})
+
+test_that("is_valid", {
+  spns <- with_otel_record(function() {
+    trc <- otel::get_tracer()
+    spn <- trc$start_span("1")
+    expect_true(spn$is_valid())
+  })[["traces"]]
+})
+
+test_that("span_context", {
+  spns <- with_otel_record(function() {
+    trc <- otel::get_tracer()
+    spn <- trc$start_span("1")
+    ctx <- spn$get_context()
+    expect_true(ctx$is_valid())
+    expect_snapshot(ctx$get_trace_flags())
+    actx <- trc$get_active_span_context()
+    expect_equal(actx$get_trace_id(), ctx$get_trace_id())
+    expect_false(ctx$is_remote())
+    expect_true(ctx$is_sampled())
+  })[["traces"]]
+})
+
+test_that("span_context$to_http_headers", {})
