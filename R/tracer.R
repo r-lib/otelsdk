@@ -71,7 +71,3 @@ tracer_new <- function(
   )
   self
 }
-
-get_span_id <- function(span) {
-  span$get_context()$get_span_id()
-}

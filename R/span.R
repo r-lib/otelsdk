@@ -146,12 +146,6 @@ span_new <- function(
   self
 }
 
-with_active_span <- function(span, expr) {
-  scope <- ccall(otel_scope_start, span$xptr)
-  defer(ccall(otel_scope_end, scope))
-  expr
-}
-
 local_active_span <- function(span, session_scope = parent.frame()) {
   cscope <- ccall(otel_scope_start, span$xptr)
   defer(ccall(otel_scope_end, cscope), envir = session_scope)
