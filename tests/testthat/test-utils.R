@@ -3,6 +3,30 @@ test_that("%||%", {
   expect_equal("foo" %||% stop(), "foo")
 })
 
+test_that("is_true", {
+  expect_true(is_true(TRUE))
+  expect_true(is_true(c(foo = TRUE)))
+  expect_true(is_true(structure(TRUE, class = "ccc")))
+
+  expect_false(is_true(1))
+  expect_false(is_true(logical()))
+  expect_false(is_true(c(TRUE, TRUE)))
+  expect_false(is_true(NA))
+  expect_false(is_true(FALSE))
+})
+
+test_that("is_false", {
+  expect_true(is_false(FALSE))
+  expect_true(is_false(c(foo = FALSE)))
+  expect_true(is_false(structure(FALSE, class = "ccc")))
+
+  expect_false(is_false(1))
+  expect_false(is_false(logical()))
+  expect_false(is_false(c(FALSE, FALSE)))
+  expect_false(is_false(NA))
+  expect_false(is_false(TRUE))
+})
+
 test_that("defer", {
   x <- NULL
   do <- function() {
@@ -118,4 +142,46 @@ test_that("get_current_error, failure", {
   expect_snapshot({
     get_current_error()
   })
+})
+
+test_that("plural", {
+  expect_equal(plural(0), "s")
+  expect_equal(plural(1), "")
+  expect_equal(plural(2), "s")
+})
+
+test_that("find_tracer_name", {
+  # otel is ignored
+  fake(find_tracer_name, "topenv", asNamespace("otel"))
+  expect_equal(find_tracer_name(), "org.r-project.R")
+
+  # otelsdk is ignored
+  fake(find_tracer_name, "topenv", asNamespace("otelsdk"))
+  expect_equal(find_tracer_name(), "org.r-project.R")
+
+  # base env -> R
+  fake(find_tracer_name, "topenv", baseenv())
+  expect_equal(find_tracer_name(), "org.r-project.R")
+
+  # global env -> R
+  fake(find_tracer_name, "topenv", globalenv())
+  expect_equal(find_tracer_name(), "org.r-project.R")
+
+  # package with 'otel_tracer_name'
+  fake(find_tracer_name, "topenv", asNamespace("testthat"))
+  fake(find_tracer_name, "get0", "custom-name")
+  expect_equal(find_tracer_name(), "custom-name")
+
+  # pakage without 'otel_tracer_name'
+  fake(find_tracer_name, "topenv", asNamespace("testthat"))
+  fake(find_tracer_name, "get0", NULL)
+  expect_equal(find_tracer_name(), "r.package.testthat")
+})
+
+test_that("empty_atomic_as_null", {
+  expect_equal(empty_atomic_as_null(character()), NULL)
+  expect_equal(empty_atomic_as_null(logical()), NULL)
+  expect_equal(empty_atomic_as_null(integer()), NULL)
+  expect_equal(empty_atomic_as_null(double()), NULL)
+  expect_equal(empty_atomic_as_null(list()), list())
 })
