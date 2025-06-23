@@ -61,7 +61,7 @@ get_current_error <- function() {
 }
 
 plural <- function(x) {
-  if (x > 1) "s" else ""
+  if (x == 0 || x > 1) "s" else ""
 }
 
 find_tracer_name <- function() {
