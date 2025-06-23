@@ -1,0 +1,20 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/logger_provider_file.html</loc></url>
+<url><loc>/reference/logger_provider_http.html</loc></url>
+<url><loc>/reference/logger_provider_stdstream.html</loc></url>
+<url><loc>/reference/meter_provider_file.html</loc></url>
+<url><loc>/reference/meter_provider_http.html</loc></url>
+<url><loc>/reference/meter_provider_stdstream.html</loc></url>
+<url><loc>/reference/otelsdk-package.html</loc></url>
+<url><loc>/reference/tracer_provider_file.html</loc></url>
+<url><loc>/reference/tracer_provider_http.html</loc></url>
+<url><loc>/reference/tracer_provider_stdstream.html</loc></url>
+<url><loc>/reference/with_otel_record.html</loc></url>
+</urlset>
+
