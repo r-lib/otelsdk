@@ -9,9 +9,8 @@
 
 ![lifecycle](https://lifecycle.r-lib.org/articles/figures/lifecycle-experimental.svg)
 [![R-CMD-check](https://github.com/r-lib/otelsdk/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/otelsdk/actions/workflows/R-CMD-check.yaml)
-[![R-CMD-check](https://github.com/r-lib/opentelemetry/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/opentelemetry/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/r-lib/opentelemetry/graph/badge.svg)](https://app.codecov.io/gh/r-lib/opentelemetry)
+coverage](https://codecov.io/gh/r-lib/otelsdk/graph/badge.svg?token=GAqo3S38e7)](https://codecov.io/gh/r-lib/otelsdk)
 <!-- badges: end -->
 
 High-quality, ubiquitous, and portable telemetry to enable effective
