@@ -181,6 +181,8 @@ If you have Docker, you can start a
      -p 9411:9411 \
      jaegertracing/jaeger:2.4.0
 
+Go to `http://localhost:16686/` to view the Jaeger UI.
+
 #### [SigNoz](https://github.com/SigNoz/signoz)
 
 To run SigNoz locally with Docker, clone the repository at
@@ -192,6 +194,8 @@ and then run Docker Compose from the `deploy/docker/` subdirectory:
 
     cd deploy/docker
     docker compose up
+
+Go to `http://localhost:8080` to see the SigNoz UI.
 
 ## License
 
