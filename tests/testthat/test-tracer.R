@@ -44,10 +44,10 @@ test_that("is_enabled", {
   expect_true(trc$is_enabled())
 })
 
-test_that("start_session", {
+test_that("start_span(scope = NULL)", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    sess <- trc$start_session("sess")
+    sess <- trc$start_span("sess", scope = NULL)
     sess$end()
   })[["traces"]]
 

@@ -36,5 +36,5 @@ Suggests:
     testthat (>= 3.0.0),
     withr
 Remotes:
-    r-lib/otel
+    r-lib/otel@no-session
 Config/testthat/edition: 3
