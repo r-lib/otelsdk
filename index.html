@@ -81,21 +81,108 @@
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <ul>
-<li>Instrument your R package or project using the <a href="https://github.com/r-lib/otel" class="external-link">otel</a> package.</li>
-<li>Choose an exporter from the otelsdk package. The <code>http</code> exporter sends OpenTelemetry output through OTLP/HTTP.</li>
-<li>Set the <code>OTEL_TRACES_EXPORTER</code> environment variable to point to the exporter of your choice. E.g. for OTLP/HTTP set <code>OTEL_TRACES_EXPORTER=http</code>.</li>
-<li>Start R and your app. Telemetry data will be exported to the chosen exporter.</li>
+<li><p>Instrument your R package or project using the <a href="https://github.com/r-lib/otel" class="external-link">otel</a> package.</p></li>
+<li><p>Choose an exporter from the otelsdk package. The <code>http</code> exporter sends OpenTelemetry output through OTLP/HTTP.</p></li>
+<li><p>Set the <code>OTEL_TRACES_EXPORTER</code> environment variable to point to the exporter of your choice. E.g. for OTLP/HTTP set <code>OTEL_TRACES_EXPORTER=http</code>.</p></li>
+<li>
+<p>If you are sending telemetry data through HTTP, then you typically need to configure the URL of your OpenTelemetry collector, and you possibly also need to supply a token in an HTTP header, possibly some resource attributes. Follow the instructions of the provider of your collector. They typically don’t have instructions for R, but generic instructions about environment variables will work for the otelsdk R package. E.g. for <a href="https://grafana.com/" class="external-link">Grafana</a> you need something like</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>OTEL_EXPORTER_OTLP_PROTOCOL<span class="ot">=</span><span class="st">"http"</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>OTEL_EXPORTER_OTLP_ENDPOINT<span class="ot">=</span><span class="st">"https://otlp-gateway-prod-eu-central-0.grafana.net/otlp"</span> \</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>OTEL_RESOURCE_ATTRIBUTES<span class="ot">=</span><span class="st">"service.name=&lt;name-of-your-app&gt;,service.namespace=&lt;name-of-your-namespace&gt;,deployment.environment=test"</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>OTEL_EXPORTER_OTLP_HEADERS<span class="ot">=</span><span class="st">"Authorization=Basic%20&lt;base64-encoded-token&gt;"</span></span></code></pre></div>
+<p>See more example below.</p>
+</li>
+<li><p>Start R and your app. Telemetry data will be exported to the chosen exporter.</p></li>
 </ul>
+<div class="section level3">
+<h3 id="setup-for-remote-collectors">Setup for remote collectors<a class="anchor" aria-label="anchor" href="#setup-for-remote-collectors"></a>
+</h3>
+<p>There are a lot of services that offer an OpenTelemetry collector for tracers, logs and metrics, many of them supporting all three of them. There are also local apps that work as a collector. We tried otelsdk with the following ones:</p>
+<div class="section level4">
+<h4 id="grafana">
+<a href="https://grafana.com/" class="external-link">Grafana</a><a class="anchor" aria-label="anchor" href="#grafana"></a>
+</h4>
+<p>Follow the <a href="https://grafana.com/docs/grafana-cloud/send-data/otlp/send-data-otlp/#manual-opentelemetry-setup-for-advanced-users" class="external-link">documentation</a>. Create an API token. You’ll need to use the Grafana instrance ID as your username, and the token as the password in HTTP Basic auth. E.g. in R do this to get the base64 encoded token. <code>instance-id</code> is a (currently seven digit) number and a string with a <code>glc_</code> prefix.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">openssl</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/openssl/reference/base64_encode.html" class="external-link">base64_encode</a></span><span class="op">(</span><span class="st">"&lt;instance-id&gt;:&lt;api-token&gt;"</span><span class="op">)</span></span></code></pre></div>
+<p>Then use this encoded token to set the <code>Authorization</code> header:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>OTEL_EXPORTER_OTLP_PROTOCOL<span class="ot">=</span><span class="st">"http"</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>OTEL_EXPORTER_OTLP_ENDPOINT<span class="ot">=</span><span class="st">"https://otlp-gateway-prod-eu-central-0.grafana.net/otlp"</span> \</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>OTEL_EXPORTER_OTLP_HEADERS<span class="ot">=</span><span class="st">"Authorization=Basic%20&lt;base64-encoded-token&gt;"</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>OTEL_RESOURCE_ATTRIBUTES<span class="ot">=</span><span class="st">"service.name=&lt;name-of-your-app,service.namespace=&lt;name-of-your-namespace&gt;,deployment.environment=test"</span></span></code></pre></div>
+<p>Your endpoint URL is probably different, use the one that you see on your dashboard.</p>
+<p>If you want to export logs and/or metrics, set these environment variables, respectively:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>OTEL_LOGS_EXPORTER<span class="ot">=</span>http</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>OTEL_LOG_LEVEL<span class="ot">=</span>debug</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>OTEL_METRICS_EXPORTER<span class="ot">=</span>http</span></code></pre></div>
+<p>It also makes sense to set the desired log level.</p>
+<p>Grafana suggests running an OpenTelemetry collector on premise instead of sending telemetry data to them directly. But nevertheless you can start out without running your own collector, they call this “quick start” mode.</p>
+</div>
+<div class="section level4">
+<h4 id="pydantic-logfire">
+<a href="https://pydantic.dev/logfire" class="external-link">Pydantic Logfire</a><a class="anchor" aria-label="anchor" href="#pydantic-logfire"></a>
+</h4>
+<p>Create a project and a write token. Note that the URLs you need to use are different if you are within the EU! You probably need to replace <code>us</code> with <code>eu</code> in the URL if you are in the EU. Set these environment variables:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>OTEL_TRACES_EXPORTER<span class="ot">=</span>http</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>OTEL_EXPORTER_OTLP_ENDPOINT<span class="ot">=</span><span class="st">"https://logfire-us.pydantic.dev"</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>OTEL_EXPORTER_OTLP_HEADERS<span class="ot">=</span><span class="st">"Authorization=&lt;your-write-token&gt;"</span></span></code></pre></div>
+<p>For logs also set <code>OTEL_LOGS_EXPORTER</code> and the desired log level:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>OTEL_LOGS_EXPORTER<span class="ot">=</span>http</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>OTEL_LOG_LEVEL<span class="ot">=</span>debug</span></code></pre></div>
+<p>For exporting metrics also set</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>OTEL_METRICS_EXPORTER<span class="ot">=</span>http</span></code></pre></div>
+</div>
+</div>
+<div class="section level3">
+<h3 id="setup-for-local-collectors">Setup for local collectors<a class="anchor" aria-label="anchor" href="#setup-for-local-collectors"></a>
+</h3>
+<div class="section level4">
+<h4 id="otel-tui">
+<a href="https://github.com/ymtdzzz/otel-tui" class="external-link">otel-tui</a><a class="anchor" aria-label="anchor" href="#otel-tui"></a>
+</h4>
+<p><code>otel-tui</code> is a terminal app that supports traces, logs and metrics. It is great for development, as you can keep all your telemetry local while instrumenting your package or app. Follow the installation instructions and then run the app from a terminal:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>otel<span class="sc">-</span>tui</span></code></pre></div>
+<p>It listens on the default port, so the setup is very simple, set these environment variables (or a subset if you don’t want metrics or logs):</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>OTEL_TRACES_EXPORTER<span class="ot">=</span>http</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>OTEL_LOGS_EXPORTER<span class="ot">=</span>http</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>OTEL_LOG_LEVEL<span class="ot">=</span>debug</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>OTEL_METRICS_EXPORTER<span class="ot">=</span>http</span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="otel-desktop-viewer">
+<a href="https://github.com/CtrlSpice/otel-desktop-viewer" class="external-link">otel-desktop-viewer</a><a class="anchor" aria-label="anchor" href="#otel-desktop-viewer"></a>
+</h4>
+<p><code>otel-desktop-viewer</code> is similar to <code>otel-tui</code>, but has a web UI. Follow the installation instructions and start the app from a terminal:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>otel<span class="sc">-</span>desktop<span class="sc">-</span>viewer</span></code></pre></div>
+<p>It should start a new windows or tab in your local web browser. Set the usual environment variable for your R app:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>OTEL_TRACES_EXPORTER<span class="ot">=</span>http</span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="jaeger">
+<a href="https://www.jaegertracing.io/" class="external-link">Jaeger</a><a class="anchor" aria-label="anchor" href="#jaeger"></a>
+</h4>
 <blockquote>
-<p>[!TIP] If you have Docker, you can start a <a href="https://www.jaegertracing.io/" class="external-link">Jaeger</a> container on the default port:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>docker run <span class="sc">--</span>rm <span class="sc">--</span>name jaeger \</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">16686</span><span class="sc">:</span><span class="dv">16686</span> \</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">4317</span><span class="sc">:</span><span class="dv">4317</span> \</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">4318</span><span class="sc">:</span><span class="dv">4318</span> \</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">5778</span><span class="sc">:</span><span class="dv">5778</span> \</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">9411</span><span class="sc">:</span><span class="dv">9411</span> \</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a> jaegertracing<span class="sc">/</span>jaeger<span class="sc">:</span><span class="dv">2</span>.<span class="fl">4.0</span></span></code></pre></div>
+<p>If you have Docker, you can start a <a href="https://www.jaegertracing.io/" class="external-link">Jaeger</a> container on the default port:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>docker run <span class="sc">--</span>rm <span class="sc">--</span>name jaeger \</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">16686</span><span class="sc">:</span><span class="dv">16686</span> \</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">4317</span><span class="sc">:</span><span class="dv">4317</span> \</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">4318</span><span class="sc">:</span><span class="dv">4318</span> \</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">5778</span><span class="sc">:</span><span class="dv">5778</span> \</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">9411</span><span class="sc">:</span><span class="dv">9411</span> \</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a> jaegertracing<span class="sc">/</span>jaeger<span class="sc">:</span><span class="dv">2</span>.<span class="fl">4.0</span></span></code></pre></div>
 </blockquote>
+</div>
+<div class="section level4">
+<h4 id="signoz">
+<a href="https://github.com/SigNoz/signoz" class="external-link">SigNoz</a><a class="anchor" aria-label="anchor" href="#signoz"></a>
+</h4>
+<p>To run SigNoz locally with Docker, clone the repository at <a href="https://github.com/SigNoz/signoz" class="external-link uri">https://github.com/SigNoz/signoz</a>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>git clone <span class="sc">--</span>depth <span class="dv">1</span> https<span class="sc">:</span><span class="er">//</span>github.com<span class="sc">/</span>SigNoz<span class="sc">/</span>signoz</span></code></pre></div>
+<p>and then run Docker Compose from the <code>deploy/docker/</code> subdirectory:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>cd deploy<span class="sc">/</span>docker</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>docker compose up</span></code></pre></div>
+</div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
