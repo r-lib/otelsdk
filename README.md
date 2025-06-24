@@ -170,16 +170,16 @@ usual environment variable for your R app:
 
 #### [Jaeger](https://www.jaegertracing.io/)
 
-> If you have Docker, you can start a
-> [Jaeger](https://www.jaegertracing.io/) container on the default port:
->
->     docker run --rm --name jaeger \
->      -p 16686:16686 \
->      -p 4317:4317 \
->      -p 4318:4318 \
->      -p 5778:5778 \
->      -p 9411:9411 \
->      jaegertracing/jaeger:2.4.0
+If you have Docker, you can start a
+[Jaeger](https://www.jaegertracing.io/) container on the default port:
+
+    docker run --rm --name jaeger \
+     -p 16686:16686 \
+     -p 4317:4317 \
+     -p 4318:4318 \
+     -p 5778:5778 \
+     -p 9411:9411 \
+     jaegertracing/jaeger:2.4.0
 
 #### [SigNoz](https://github.com/SigNoz/signoz)
 
