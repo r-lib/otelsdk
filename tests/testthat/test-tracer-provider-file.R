@@ -5,7 +5,7 @@ test_that("tracer_provider_file", {
     structure(tmp, names = file_exporter_traces_file_envvar)
   )
 
-  tp <- tracer_provider_file$new()
+  tp <- tracer_provider_file_new()
   trc <- tp$get_tracer()
   sp1 <- trc$start_span("s1")
   sp1$end()

@@ -24,7 +24,6 @@ meter_provider_stdstream_new <- function(
     flush = function(timeout = NULL) {
       # TODO: check arg
       ccall(otel_meter_provider_flush, self$xptr, timeout)
-      invisible(self)
     },
     shutdown = function(timeout = NULL) {
       ccall(otel_meter_provider_shutdown, self$xptr, timeout)

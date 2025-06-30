@@ -65,8 +65,14 @@ test_that("set_attribute", {
     spn1$end()
   })[["traces"]]
 
-  expect_equal(spns[[1]]$attributes, list(key = letters[1:3]))
-  expect_equal(spns[[2]]$attributes, list(key = "updated"))
+  expect_equal(
+    spns[[1]]$attributes,
+    structure(list(key = letters[1:3]), class = "otel_attributes")
+  )
+  expect_equal(
+    spns[[2]]$attributes,
+    structure(list(key = "updated"), class = "otel_attributes")
+  )
 })
 
 test_that("add_event", {
@@ -89,7 +95,7 @@ test_that("add_event", {
   expect_equal(spns[[1]]$events[[2]]$name, "ev2")
   expect_equal(
     spns[[1]]$events[[2]]$attributes,
-    list(x = letters[1:4])
+    structure(list(x = letters[1:4]), class = "otel_attributes")
   )
 })
 

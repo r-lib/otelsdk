@@ -17,7 +17,7 @@ meter_provider_http_new <- function(
       meter_new(self, name, version, schema_url, attributes, ...)
     },
     flush = function(timeout = NULL) {
-      # noop
+      invisible(ccall(otel_meter_provider_flush, self$xptr, timeout))
     },
     shutdown = function(timeout = NULL) {
       ccall(otel_meter_provider_shutdown, self$xptr, timeout)

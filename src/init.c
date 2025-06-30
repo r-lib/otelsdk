@@ -108,6 +108,11 @@ SEXP otel_create_gauge(
 SEXP otel_gauge_record(
   SEXP gauge, SEXP value, SEXP attributes, SEXP unit);
 
+SEXP otel_parse_log_record(SEXP str);
+SEXP otel_encode_response(
+  SEXP signal_, SEXP result_, SEXP errmsg_, SEXP rejected_,
+  SEXP error_code_);
+
 SEXP rf_get_list_element(SEXP list, const char *str);
 SEXP glue_(SEXP x, SEXP f, SEXP open_arg, SEXP close_arg, SEXP cli_arg);
 SEXP trim_(SEXP x);
@@ -186,6 +191,9 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_histogram_record, 4),
   CALLDEF(otel_create_gauge, 4),
   CALLDEF(otel_gauge_record, 4),
+
+  CALLDEF(otel_parse_log_record, 1),
+  CALLDEF(otel_encode_response, 5),
 
   CALLDEF(glue_, 5),
   CALLDEF(trim_, 1),

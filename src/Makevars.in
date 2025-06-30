@@ -24,7 +24,8 @@ OTEL_CPP_LIBS =  \
 
 OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 	span.o context.o tracer.o tracer-sdk.o tracer-api.o \
-	meter.o meter-sdk.o	logger.o logger-sdk.o
+	meter.o meter-sdk.o	logger.o logger-sdk.o \
+	r-collector.o collector.o
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2
 PKG_LIBS = \
@@ -80,6 +81,9 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	rm -f otelcpplib
 	tar xzf vendor/opentelemetry-cpp.tgz --no-same-owner || \
 	    tar xzf vendor/opentelemetry-cpp.tgz
+	mkdir -p cpp/third_party/opentelemetry-proto/opentelemetry/proto/collector/common/v1
+	cp status.proto \
+		cpp/third_party/opentelemetry-proto/opentelemetry/proto/collector/common/v1/
 	patch -p0 < vendor/opentelemetry-cpp.patch
 	@mkdir -p cpp/.git
 	(cd cpp; MAKEFLAGS= CC="$(CC)" CXX="$(CXX)" AR="$(AR)" \

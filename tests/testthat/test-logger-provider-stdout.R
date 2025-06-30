@@ -8,7 +8,7 @@ test_that("logger_provider_stdstream", {
 test_that("log to file", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
-  lp <- logger_provider_stdstream$new(tmp)
+  lp <- logger_provider_stdstream_new(tmp)
   lgr <- lp$get_logger("mylogger")
 
   expect_true(lgr$is_enabled())

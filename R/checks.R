@@ -79,6 +79,9 @@ as_span_context <- function(x, null = TRUE, na = TRUE, call = NULL) {
   if (na && is_na(x)) {
     return(x)
   }
+  if (inherits(x, "otel_span")) {
+    return(x$get_context())
+  }
   if (inherits(x, "otel_span_context")) {
     return(x)
   }

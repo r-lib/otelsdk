@@ -10,3 +10,90 @@
  #endif
          OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Create directory \""
                                  << directory_name << "\" failed.errno: " << error_code
+--- cpp/third_party/opentelemetry-proto/Makefile.orig	2025-06-30 10:22:30
++++ cpp/third_party/opentelemetry-proto/Makefile	2025-06-30 10:23:02
+@@ -58,6 +58,7 @@
+ 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+ 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
+ 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/profiles/v1development/profiles_service.proto
++	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/common/v1/status.proto
+ 
+ # Generate gRPC/Protobuf implementation for C#.
+ .PHONY: gen-csharp
+--- cpp/cmake/opentelemetry-proto.cmake	2025-06-18 17:34:53
++++ cpp/cmake/opentelemetry-proto.cmake.new	2025-06-30 10:48:19
+@@ -90,6 +90,9 @@
+ set(METRICS_SERVICE_PROTO
+     "${PROTO_PATH}/opentelemetry/proto/collector/metrics/v1/metrics_service.proto"
+ )
++set(COMMON_SERVICE_PROTO
++    "${PROTO_PATH}/opentelemetry/proto/collector/common/v1/status.proto"
++)
+ 
+ set(PROFILES_SERVICE_PROTO
+     "${PROTO_PATH}/opentelemetry/proto/collector/profiles/v1development/profiles_service.proto"
+@@ -127,6 +130,12 @@
+ set(TRACE_SERVICE_PB_H_FILE
+     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+ )
++set(COMMON_SERVICE_PB_CPP_FILE
++    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/common/v1/status.pb.cc"
++)
++set(COMMON_SERVICE_PB_H_FILE
++    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/common/v1/status.pb.h"
++)
+ 
+ #
+ # Notes about the PROFILES signal: - *.proto files added in opentelemetry-proto
+@@ -145,6 +154,12 @@
+ )
+ set(PROFILES_SERVICE_PB_CPP_FILE
+     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1development/profiles_service.pb.cc"
++)
++set(COMMON_SERVICE_PB_H_FILE
++    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/common/v1/status.pb.h"
++)
++set(COMMON_SERVICE_PB_CPP_FILE
++    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/common/v1/status.pb.cc"
+ )
+ 
+ if(WITH_OTLP_GRPC)
+@@ -241,7 +256,9 @@
+     ${METRICS_SERVICE_PB_H_FILE}
+     ${METRICS_SERVICE_PB_CPP_FILE}
+     ${PROFILES_SERVICE_PB_H_FILE}
+-    ${PROFILES_SERVICE_PB_CPP_FILE})
++    ${PROFILES_SERVICE_PB_CPP_FILE}
++    ${COMMON_SERVICE_PB_H_FILE}
++    ${COMMON_SERVICE_PB_CPP_FILE})
+ 
+ if(WITH_OTLP_GRPC)
+   list(APPEND PROTOBUF_COMMON_FLAGS
+@@ -275,7 +292,8 @@
+   ${TRACE_SERVICE_PROTO}
+   ${LOGS_SERVICE_PROTO}
+   ${METRICS_SERVICE_PROTO}
+-  ${PROFILES_SERVICE_PROTO})
++  ${PROFILES_SERVICE_PROTO}
++  ${COMMON_SERVICE_PROTO})
+   set(PROTOBUF_RUN_PROTOC_COMMAND
+       "${PROTOBUF_RUN_PROTOC_COMMAND} \"${PROTOBUF_RUN_PROTOC_ARG}\"")
+ endforeach()
+@@ -287,6 +305,7 @@
+     ${PROTOBUF_INCLUDE_FLAGS} ${COMMON_PROTO} ${RESOURCE_PROTO} ${TRACE_PROTO}
+     ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
+     ${METRICS_SERVICE_PROTO} ${PROFILES_PROTO} ${PROFILES_SERVICE_PROTO}
++    ${COMMON_SERVICE_PROTO}
+   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}"
+   DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
+ 
+@@ -310,7 +329,8 @@
+   ${METRICS_PB_CPP_FILE}
+   ${TRACE_SERVICE_PB_CPP_FILE}
+   ${LOGS_SERVICE_PB_CPP_FILE}
+-  ${METRICS_SERVICE_PB_CPP_FILE})
++  ${METRICS_SERVICE_PB_CPP_FILE}
++  ${COMMON_SERVICE_PB_CPP_FILE})
+ set_target_version(opentelemetry_proto)
+ 
+ target_include_directories(

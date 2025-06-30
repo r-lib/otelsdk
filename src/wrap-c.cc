@@ -57,12 +57,16 @@ int cc2c_otel_string(
 
 int cc2c_otel_string(const std::string &str, struct otel_string &s) {
   const auto sz = str.size();
-  s.s = (char*) malloc(sz);
-  if (!s.s) {
-    return 1;
+  if (sz == 0) {
+    s.s = nullptr;
+  } else {
+    s.s = (char*) malloc(sz);
+    if (!s.s) {
+      return 1;
+    }
+    memcpy(s.s, str.c_str(), sz);
   }
   s.size = sz;
-  memcpy(s.s, str.c_str(), sz);
   return 0;
 }
 

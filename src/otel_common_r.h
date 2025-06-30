@@ -39,4 +39,11 @@ SEXP c2r_otel_scope_metrics(struct otel_scope_metrics *sm);
 SEXP c2r_otel_resource_metrics(struct otel_resource_metrics *rm);
 SEXP c2r_otel_metrics_data(const struct otel_metrics_data *data);
 
+SEXP c2r_otel_collector_log_record(const struct otel_collector_log_record *lr);
+SEXP c2r_otel_collector_scope_log(const struct otel_collector_scope_log *sl);
+SEXP c2r_otel_collector_resource_log(
+  const struct otel_collector_resource_log *rl);
+SEXP c2r_otel_collector_resource_logs(
+  const struct otel_collector_resource_logs *rl);
+
 #endif

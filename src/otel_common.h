@@ -354,6 +354,47 @@ struct otel_metrics_data {
 
 void otel_metrics_data_free(struct otel_metrics_data *cdata);
 
+struct otel_collector_log_record {
+  struct otel_attributes attr;
+  struct otel_string severity_text;
+  struct otel_string event_name;
+  struct otel_string trace_id;
+  struct otel_string span_id;
+  double time_stamp;
+  double observed_time_stamp;
+  int has_body;
+  struct otel_string body;
+  int dropped_attributes_count;
+};
+
+void otel_collector_log_record_free(struct otel_collector_log_record *lr);
+
+struct otel_collector_scope_log {
+  struct otel_string schema_url;
+  int has_scope;
+  // instrumentationscope
+  struct otel_collector_log_record *log_records;
+  size_t count;
+};
+
+void otel_collector_scope_log_free(struct otel_collector_scope_log *sl);
+
+struct otel_collector_resource_log {
+  struct otel_string schema_url;
+  // TODO: resource
+  struct otel_collector_scope_log *scope_logs;
+  size_t count;
+};
+
+void otel_collector_resource_log_free(struct otel_collector_resource_log *rls);
+
+struct otel_collector_resource_logs {
+  struct otel_collector_resource_log *resource_logs;
+  size_t count;
+};
+
+void otel_collector_resource_logs_free(struct otel_collector_resource_logs *rl);
+
 extern const char *otel_http_request_content_type_str[];
 
 void otel_tracer_provider_finally_(void *tracer_provider);
@@ -494,6 +535,12 @@ void *otel_create_gauge_(
   void *meter_, const char *name, const char *description, const char *unit);
 void otel_gauge_record_(
   void *gauge_, double cvalue, struct otel_attributes *attributes_);
+
+int otel_decode_log_record_(
+  const char *str_, size_t len, struct otel_collector_resource_logs *rl_);
+int otel_encode_response_(
+    int signal, int result, const char *errmsg, int rejected,
+    int error_code, struct otel_string *str);
 
 #ifdef __cplusplus
 }

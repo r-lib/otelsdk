@@ -1,4 +1,6 @@
 #' !/usr/bin/env sh
 
-rm -f src/Makevars src/extra/cmake/R-4.4/protobuf-targets.cmake \
-   src/extra/cmake/R-4.3/protobuf-targets.cmake src/otelcpplib
+rm -f src/Makevars src/statuc.pb.* \
+   src/extra/cmake/R-4.4/protobuf-targets.cmake \
+   src/extra/cmake/R-4.3/protobuf-targets.cmake \
+   src/otelcpplib

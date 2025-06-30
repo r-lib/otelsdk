@@ -2,7 +2,7 @@ meter_provider_memory_new <- function(
   export_interval = 1000L,
   export_timeout = 500L,
   buffer_size = 100,
-  temporality = c("unspecified", "delta", "cumulative")
+  temporality = c("unspecified", "delta", "cumulative")[1]
 ) {
   self <- new_object(
     c("otel_meter_provider_memory", "otel_meter_provider"),
@@ -15,8 +15,8 @@ meter_provider_memory_new <- function(
     ) {
       meter_new(self, name, version, schema_url, attributes, ...)
     },
-    flush = function() {
-      # noop currently
+    flush = function(timeout = NULL) {
+      invisible(ccall(otel_meter_provider_flush, self$xptr, timeout))
     },
     shutdown = function(timeout = NULL) {
       ccall(otel_meter_provider_shutdown, self$xptr, timeout)

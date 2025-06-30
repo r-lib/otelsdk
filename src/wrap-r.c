@@ -18,7 +18,11 @@ void otel_string_free(struct otel_string *s) {
 
 SEXP c2r_otel_string(const struct otel_string *s) {
   SEXP res = PROTECT(Rf_allocVector(STRSXP, 1));
-  SET_STRING_ELT(res, 0, Rf_mkCharLenCE(s->s, s->size, CE_UTF8));
+  if (s->size > 0) {
+    SET_STRING_ELT(res, 0, Rf_mkCharLenCE(s->s, s->size, CE_UTF8));
+  } else {
+    SET_STRING_ELT(res, 0, Rf_mkCharCE("", CE_UTF8));
+  }
   UNPROTECT(1);
   return res;
 }
@@ -104,6 +108,9 @@ SEXP c2r_otel_trace_flags(const struct otel_trace_flags *flags) {
   SEXP res = Rf_mkNamed(LGLSXP, nms);
   LOGICAL(res)[0] = flags->is_sampled;
   LOGICAL(res)[1] = flags->is_random;
+  SEXP cls = PROTECT(Rf_mkString("otel_trace_flags"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
+  UNPROTECT(1);
   return res;
 }
 
@@ -360,8 +367,10 @@ SEXP c2r_otel_attributes(const struct otel_attributes *attrs) {
     SET_STRING_ELT(nms, i, Rf_mkCharCE(attrs->a[i].name, CE_UTF8));
   }
   Rf_setAttrib(res, R_NamesSymbol, nms);
+  SEXP cls = PROTECT(Rf_mkString("otel_attributes"));
+  Rf_setAttrib(res, R_ClassSymbol, cls);
 
-  UNPROTECT(2);
+  UNPROTECT(3);
   return res;
 }
 
@@ -820,5 +829,125 @@ SEXP c2r_otel_metrics_data(const struct otel_metrics_data *data) {
   SEXP cls = PROTECT(Rf_mkString("otel_metrics_data"));
   Rf_setAttrib(res, R_ClassSymbol, cls);
   UNPROTECT(2);
+  return res;
+}
+
+void otel_collector_log_record_free(struct otel_collector_log_record *lr) {
+  if (!lr) return;
+  otel_attributes_free(&lr->attr);
+  otel_string_free(&lr->severity_text);
+  otel_string_free(&lr->trace_id);
+  otel_string_free(&lr->span_id);
+  otel_string_free(&lr->event_name);
+  otel_string_free(&lr->body);
+}
+
+SEXP c2r_otel_collector_log_record(const struct otel_collector_log_record *lr) {
+  const char *nms[] = {
+    "severity_text",               // 0
+    "trace_id",                    // 1
+    "span_id",                     // 2
+    "time_stamp",                  // 3
+    "observed_time_stamp",         // 4
+    "has_body",                    // 5
+    "body",                        // 6
+    "attributes",                  // 7
+    "event_name",                  // 8
+    "dropped_attributes_count",    // 9
+    ""
+  };
+  SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&lr->severity_text));
+  SET_VECTOR_ELT(res, 1, c2r_otel_string(&lr->trace_id));
+  SET_VECTOR_ELT(res, 2, c2r_otel_string(&lr->span_id));
+  SET_VECTOR_ELT(res, 3, Rf_ScalarReal(lr->time_stamp));
+  SET_VECTOR_ELT(res, 4, Rf_ScalarReal(lr->observed_time_stamp));
+  SET_VECTOR_ELT(res, 5, Rf_ScalarLogical(lr->has_body));
+  SET_VECTOR_ELT(res, 6, c2r_otel_string(&lr->body));
+  // TODO: attributes
+  SET_VECTOR_ELT(res, 8, c2r_otel_string(&lr->event_name));
+  SET_VECTOR_ELT(res, 9, Rf_ScalarInteger(lr->dropped_attributes_count));
+  Rf_unprotect(1);
+  return res;
+}
+
+void otel_collector_scope_log_free(struct otel_collector_scope_log *sl) {
+  if (!sl) return;
+  otel_string_free(&sl->schema_url);
+  if (sl->log_records) {
+    for (size_t i = 0; i < sl->count; i++) {
+      otel_collector_log_record_free(&sl->log_records[i]);
+    }
+    free(sl->log_records);
+    sl->log_records = NULL;
+  }
+  sl->count = 0;
+}
+
+SEXP c2r_otel_collector_scope_log(const struct otel_collector_scope_log *sl) {
+  const char *nms[] = { "schema_url", "log_records", "" };
+  SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&sl->schema_url));
+  SET_VECTOR_ELT(res, 1, Rf_allocVector(VECSXP, sl->count));
+  for (size_t i = 0; i < sl->count; i++) {
+    SET_VECTOR_ELT(
+      VECTOR_ELT(res, 1), i,
+      c2r_otel_collector_log_record(&sl->log_records[i])
+    );
+  }
+  Rf_unprotect(1);
+  return res;
+}
+
+void otel_collector_resource_log_free(struct otel_collector_resource_log *rl) {
+  if (!rl) return;
+  otel_string_free(&rl->schema_url);
+  if (rl->scope_logs) {
+    for (size_t i = 0; i < rl->count; i++) {
+      otel_collector_scope_log_free(&rl->scope_logs[i]);
+    }
+    free(rl->scope_logs);
+    rl->scope_logs = NULL;
+  }
+  rl->count = 0;
+}
+
+SEXP c2r_otel_collector_resource_log(
+    const struct otel_collector_resource_log *rl) {
+  const char *nms[] = { "schema_url", "scope_logs", "" };
+  SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&rl->schema_url));
+  SET_VECTOR_ELT(res, 1, Rf_allocVector(VECSXP, rl->count));
+  for (size_t i = 0; i < rl->count; i++) {
+    SET_VECTOR_ELT(
+      VECTOR_ELT(res, 1), i,
+      c2r_otel_collector_scope_log(&rl->scope_logs[i])
+    );
+  }
+  Rf_unprotect(1);
+  return res;
+}
+
+void otel_collector_resource_logs_free(
+    struct otel_collector_resource_logs *rls) {
+  if (!rls) return;
+  if (rls->resource_logs) {
+    for (size_t i = 0; i < rls->count; i++) {
+      otel_collector_resource_log_free(&rls->resource_logs[i]);
+    }
+    free(rls->resource_logs);
+    rls->resource_logs = NULL;
+  }
+  rls->count =0;
+}
+
+SEXP c2r_otel_collector_resource_logs(
+    const struct otel_collector_resource_logs *rls) {
+  SEXP res = Rf_protect(Rf_allocVector(VECSXP, rls->count));
+  for (size_t i = 0; i < rls->count; i++) {
+    SET_VECTOR_ELT(
+      res, i, c2r_otel_collector_resource_log(&rls->resource_logs[i]));
+  }
+  Rf_unprotect(1);
   return res;
 }

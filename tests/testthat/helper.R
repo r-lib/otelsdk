@@ -65,6 +65,46 @@ transform_srcref <- function(x) {
   x
 }
 
+subm <- function(x, id, regex, replacement) {
+  w <- grep(id, x)[1]
+  if (is.na(w)) {
+    return(x)
+  }
+  x[w] <- sub(regex, replacement, x[w])
+  x
+}
+
+transform_span_data <- function(x) {
+  x <- subm(x, "trace_id\\s*:", "[0-9a-f]{32}", "<trace-id>")
+  x <- subm(x, "span_id\\s*:", "[0-9a-f]{16}", "<span-id>")
+  x <- subm(x, "os[.]type\\s*:", ": [a-z0-9]+", ": <os-type>")
+  x <- subm(x, "process[.]pid\\s*:", ": [0-9]+", ": <process-pid>")
+  x <- subm(
+    x,
+    "process[.]runtime[.]description\\s*:",
+    ": R.*$",
+    ": <r-version-string>"
+  )
+  x <- subm(
+    x,
+    "telemetry[.]sdk[.]version\\s*:",
+    ": [.0-9]+",
+    ": <otel-version>"
+  )
+  x <- subm(x, "process[.]runtime[.]version\\s*:", ": [.0-9]+", ": <r-version>")
+  x <- subm(x, "process[.]owner\\s*:", ": [a-z0-9]+$", ": <username>")
+  x <- subm(x, "start_time\\s*:", ": .*$", ": <timestamp>")
+  x <- subm(x, "duration\\s*:", ": [.0-9]*(e-[0-9]+)?$", ": <duration>")
+  x
+}
+
+transform_metric_data <- function(x) {
+  x <- subm(x, "start_time\\s*:", ": .*$", "<timestamp>")
+  x <- subm(x, "end_time\\s*:", ": .*$", "<timestamp>")
+  x <- subm(x, "sample_ts\\s*:", ": .*$", "<timestamp>")
+  x
+}
+
 sort_named_list <- function(x) {
   if (!is_named(x) || length(x) < 1) {
     structure(x, names = character())

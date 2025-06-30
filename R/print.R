@@ -3,7 +3,34 @@ generic_print <- function(x, ...) {
   invisible(x)
 }
 
-format_trace_flags <- function(x) {
+generic_format <- function(x, ...) {
+  cls <- class(x)[1]
+  x <- data.frame(row.names = names(x), key = names(x), value = I(unclass(x)))
+  x$label <- paste0(format(x$key), " : ")
+  x$fmt <- lapply(x$value, format, ...)
+  c(
+    paste0("<", cls, ">"),
+    unlist(mapply(x$label, x$fmt, FUN = function(l, v) {
+      if (length(v) == 0) {
+        l
+      } else if (length(v) == 1) {
+        paste0(l, v)
+      } else {
+        c(l, paste0("    ", v))
+      }
+    }))
+  )
+}
+
+with_width <- function(expr, width = getOption("width") - 4L) {
+  opt <- options(width = width)
+  on.exit(options(opt), add = TRUE)
+  expr
+}
+
+#' @export
+
+format.otel_trace_flags <- function(x, ...) {
   paste(
     collapse = " ",
     c(
@@ -15,69 +42,22 @@ format_trace_flags <- function(x) {
   )
 }
 
-format_instrumentation_scope <- function(x) {
-  x <- data.frame(row.names = names(x), key = names(x), value = I(unclass(x)))
-  x$label <- paste0(format(x$key), " : ")
-  x$fmt <- format1(x$value)
-  if ("attributes" %in% x$key) {
-    x["attributes", ]$fmt <- format_attributes(x["attributes", ]$value[[1]])
-  }
-  lns <- paste0("    ", x$label, x$fmt)
-  paste0(c("", lns), collapse = "\n")
-}
+#' @export
 
-format_attributes <- function(x) {
-  opt <- options(width = getOption("width") - 9)
-  on.exit(options(opt), add = TRUE)
-  paste(
-    collapse = "\n",
-    c(
-      "",
-      unlist(mapply(names(x), x, FUN = function(n, x) {
-        if (is_string(x)) {
-          paste0("    ", format(n, width = 23), ": ", encodeString(x))
-        } else {
-          fmt <- utils::capture.output(print(x))
-          c(
-            paste0("    ", n, ":"),
-            paste0("        ", fmt)
-          )
-        }
-      }))
-    )
-  )
-}
-
-format1 <- function(x, ...) {
-  vapply(lapply(x, format, ...), paste0, character(1), collapse = "\n")
+format.otel_attributes <- function(x, ...) {
+  nms <- paste0(format(names(x)), " : ")
+  as.character(unlist(mapply(nms, x, FUN = function(n, x) {
+    if (is.atomic(x) && length(x) == 1) {
+      paste0(n, encodeString(as.character(x)))
+    } else {
+      c(n, paste0("    ", with_width(utils::capture.output(print(x)))))
+    }
+  })))
 }
 
 #' @export
 
-format.otel_span_data <- function(x, ...) {
-  x <- data.frame(row.names = names(x), key = names(x), value = I(unclass(x)))
-  x$label <- paste0(format(x$key), " : ")
-  x$fmt <- format1(x$value)
-  if ("flags" %in% x$key) {
-    x["flags", ]$fmt <- format_trace_flags(x["flags", ]$value[[1]])
-  }
-  if ("instrumentation_scope" %in% x$key) {
-    x["instrumentation_scope", ]$fmt <-
-      format_instrumentation_scope(x["instrumentation_scope", ]$value[[1]])
-  }
-  if ("attributes" %in% x$key) {
-    x["attributes", ]$fmt <-
-      format_attributes(x["attributes", ]$value[[1]])
-  }
-  if ("resource_attributes" %in% x$key) {
-    x["resource_attributes", ]$fmt <-
-      format_attributes(x["resource_attributes", ]$value[[1]])
-  }
-  c(
-    "<otel_span_data>",
-    paste0(x$label, x$fmt)
-  )
-}
+format.otel_span_data <- generic_format
 
 #' @export
 
@@ -85,14 +65,7 @@ print.otel_span_data <- generic_print
 
 #' @export
 
-format.otel_instrumentation_scope_data <- function(x, ...) {
-  c(
-    "<otel_instrumentation_scope_data>",
-    paste0("name:       ", x$name),
-    paste0("version:    ", x$version),
-    paste0("schema_url: ", x$schema_url)
-  )
-}
+format.otel_instrumentation_scope_data <- generic_format
 
 #' @export
 
@@ -167,14 +140,7 @@ print.otel_drop_point_data <- generic_print
 
 #' @export
 
-format.otel_point_data_attributes <- function(x, ...) {
-  c(
-    "<otel_point_data_attributes>",
-    paste0("attributes: ", format_attributes(x[["attributes"]])),
-    paste0("point_type: ", x[["point_type"]]),
-    format(x[["value"]])
-  )
-}
+format.otel_point_data_attributes <- generic_format
 
 #' @export
 
@@ -223,7 +189,7 @@ print.otel_scope_metrics <- generic_print
 format.otel_resource_metrics <- function(x, ...) {
   c(
     "<otel_resouce_metrics>",
-    paste0("attributes:", format_attributes(x[["attributes"]])),
+    paste0("attributes:", format(x[["attributes"]])),
     paste0("scope_metric_data [", length(x[["scope_metric_data"]]), "]:"),
     paste0("    ", unlist(lapply(x[["scope_metric_data"]], format)))
   )
@@ -232,3 +198,16 @@ format.otel_resource_metrics <- function(x, ...) {
 #' @export
 
 print.otel_resource_metrics <- generic_print
+
+#' @export
+
+format.otel_metrics_data <- function(x, ...) {
+  c(
+    "<otel_metrics_data>",
+    unlist(lapply(x, format, ...))
+  )
+}
+
+#' @export
+
+print.otel_metrics_data <- generic_print

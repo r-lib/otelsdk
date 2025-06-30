@@ -63,6 +63,8 @@ void otel_logger_provider_flush_(void *logger_provider_) {
   if (lps->stream.is_open()) {
     lps->stream.flush();
   }
+  logs_sdk::LoggerProvider &logger_provider = *(lps->ptr);
+  logger_provider.ForceFlush();
 }
 
 int otel_get_minimum_log_severity_(void *logger_) {
