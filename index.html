@@ -161,7 +161,6 @@
 <h4 id="jaeger">
 <a href="https://www.jaegertracing.io/" class="external-link">Jaeger</a><a class="anchor" aria-label="anchor" href="#jaeger"></a>
 </h4>
-<blockquote>
 <p>If you have Docker, you can start a <a href="https://www.jaegertracing.io/" class="external-link">Jaeger</a> container on the default port:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>docker run <span class="sc">--</span>rm <span class="sc">--</span>name jaeger \</span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">16686</span><span class="sc">:</span><span class="dv">16686</span> \</span>
@@ -170,7 +169,7 @@
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">5778</span><span class="sc">:</span><span class="dv">5778</span> \</span>
 <span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a> <span class="sc">-</span>p <span class="dv">9411</span><span class="sc">:</span><span class="dv">9411</span> \</span>
 <span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a> jaegertracing<span class="sc">/</span>jaeger<span class="sc">:</span><span class="dv">2</span>.<span class="fl">4.0</span></span></code></pre></div>
-</blockquote>
+<p>Go to <code>http://localhost:16686/</code> to view the Jaeger UI.</p>
 </div>
 <div class="section level4">
 <h4 id="signoz">
@@ -181,6 +180,7 @@
 <p>and then run Docker Compose from the <code>deploy/docker/</code> subdirectory:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>cd deploy<span class="sc">/</span>docker</span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>docker compose up</span></code></pre></div>
+<p>Go to <code>http://localhost:8080</code> to see the SigNoz UI.</p>
 </div>
 </div>
 </div>
