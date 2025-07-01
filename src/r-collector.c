@@ -19,6 +19,19 @@ SEXP otel_parse_log_record(SEXP str) {
   return res;
 }
 
+SEXP otel_parse_metrics_record(SEXP str) {
+  const char *str_ = (const char*) RAW(str);
+  size_t len = Rf_length(str);
+  struct otel_collector_resource_metrics rm = { 0 };
+  if (otel_decode_metrics_record_(str_, len, &rm)) {
+    R_THROW_ERROR("Failed to parse Protobuf metrics message");
+  }
+  SEXP res = c2r_otel_collector_resource_metrics(&rm);
+  // TODO: cleancall
+  otel_collector_resource_metrics_free(&rm);
+  return res;
+}
+
 SEXP otel_encode_response(
     SEXP signal_, SEXP result_, SEXP errmsg_, SEXP rejected_,
     SEXP error_code_) {

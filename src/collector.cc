@@ -37,16 +37,16 @@ int otel_decode_log_record_(
     if (!rls_->resource_logs) throw std::runtime_error("Out of memory");
     rls_->count = rl_size;
     for (size_t rli = 0; rli < rl_size; rli++) {
-      const logs::ResourceLogs &rls = elsr.resource_logs(rli);
+      const logs::ResourceLogs &rl = elsr.resource_logs(rli);
       struct otel_collector_resource_log *rl_ = &rls_->resource_logs[rli];
-      cc2c_otel_string(rls.schema_url(), rl_->schema_url);
-      size_t sl_size = rls.scope_logs_size();
+      cc2c_otel_string(rl.schema_url(), rl_->schema_url);
+      size_t sl_size = rl.scope_logs_size();
       rl_->scope_logs = (struct otel_collector_scope_log*)
         calloc(sl_size, sizeof(struct otel_collector_scope_log));
       if (!rl_->scope_logs) throw std::runtime_error("Out of memory");
       rl_->count = sl_size;
       for (size_t sli = 0; sli < sl_size; sli++) {
-        const logs::ScopeLogs &sl = rls.scope_logs(sli);
+        const logs::ScopeLogs &sl = rl.scope_logs(sli);
         struct otel_collector_scope_log *sl_ = &rl_->scope_logs[sli];
         cc2c_otel_string(sl.schema_url(), sl_->schema_url);
         size_t lr_size = sl.log_records_size();
@@ -83,6 +83,56 @@ int otel_decode_log_record_(
     return 1;
   }
 }
+
+int otel_decode_metrics_record_(
+  const char *str_, size_t len,
+  struct otel_collector_resource_metrics *rms_
+) {
+  try {
+    clmetrics::ExportMetricsServiceRequest emsr;
+    std::string str(str_, len);
+    if (!emsr.ParseFromString(str)) {
+      return 1;
+    }
+    size_t rm_size = emsr.resource_metrics_size();
+    rms_->resource_metrics = (struct otel_collector_resource_metric*)
+      calloc(rm_size, sizeof(struct otel_collector_resource_metric));
+    rms_->count = rm_size;
+    for (size_t rmi = 0; rmi < rm_size; rmi++) {
+      const metrics::ResourceMetrics &rm = emsr.resource_metrics(rmi);
+      struct otel_collector_resource_metric *rm_ = &rms_->resource_metrics[rmi];
+      cc2c_otel_string(rm.schema_url(), rm_->schema_url);
+      size_t sm_size = rm.scope_metrics_size();
+      rm_->scope_metrics = (struct otel_collector_scope_metric*)
+        calloc(sm_size, sizeof(struct otel_collector_scope_metric));
+      if (!rm_->scope_metrics) throw std::runtime_error("Out of memory");
+      rm_->count = sm_size;
+      for (size_t smi = 0; smi < sm_size; smi++) {
+        const metrics::ScopeMetrics &sm = rm.scope_metrics(smi);
+        struct otel_collector_scope_metric *sm_ = &rm_->scope_metrics[smi];
+        cc2c_otel_string(sm.schema_url(), sm_->schema_url);
+        size_t m_size = sm.metrics_size();
+        sm_->metrics = (struct otel_collector_metric*)
+          calloc(m_size, sizeof(struct otel_collector_metric));
+        if (!sm_->metrics) throw std::runtime_error("Out of memory");
+        sm_->count = m_size;
+        for (size_t mi = 0; mi < m_size; mi++) {
+          const metrics::Metric &m = sm.metrics(mi);
+          struct otel_collector_metric *m_ = &sm_->metrics[mi];
+          cc2c_otel_string(m.name(), m_->name);
+          cc2c_otel_string(m.description(), m_->description);
+          cc2c_otel_string(m.unit(), m_->unit);
+        }
+      }
+    }
+
+    return 0;
+  } catch(...) {
+    otel_collector_resource_metrics_free(rms_);
+    return 1;
+  }
+}
+
 
 #define OTLP_SIGNAL_TRACES 0
 #define OTLP_SIGNAL_METRICS 1

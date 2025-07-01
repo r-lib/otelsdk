@@ -386,14 +386,63 @@ struct otel_collector_resource_log {
   size_t count;
 };
 
-void otel_collector_resource_log_free(struct otel_collector_resource_log *rls);
+void otel_collector_resource_log_free(struct otel_collector_resource_log *rl);
 
 struct otel_collector_resource_logs {
   struct otel_collector_resource_log *resource_logs;
   size_t count;
 };
 
-void otel_collector_resource_logs_free(struct otel_collector_resource_logs *rl);
+void otel_collector_resource_logs_free(struct otel_collector_resource_logs *rls);
+
+// ---
+
+struct otel_collector_metric {
+  // TODO: metadata
+  struct otel_string name;
+  struct otel_string description;
+  struct otel_string unit;
+  // TODO: gauge field
+  // TODO: sum field
+  // TODO: histogram field
+  // TODO: exponential histogram field
+  // TODO: summary field
+};
+
+void otel_collector_metric_free(struct otel_collector_metric *cm);
+
+// ---
+
+struct otel_collector_scope_metric {
+  struct otel_string schema_url;
+  int has_scope;
+  struct otel_collector_metric *metrics;
+  size_t count;
+};
+
+void otel_collector_scope_metric_free(struct otel_collector_scope_metric *sl);
+
+// ---
+
+struct otel_collector_resource_metric {
+  struct otel_string schema_url;
+  // TODO: resource
+  struct otel_collector_scope_metric *scope_metrics;
+  size_t count;
+};
+
+void otel_collector_resource_metric_free(
+  struct otel_collector_resource_metric *rm);
+
+// ---
+
+struct otel_collector_resource_metrics {
+  struct otel_collector_resource_metric *resource_metrics;
+  size_t count;
+};
+
+void otel_collector_resource_metrics_free(
+  struct otel_collector_resource_metrics *rm);
 
 extern const char *otel_http_request_content_type_str[];
 
@@ -538,6 +587,8 @@ void otel_gauge_record_(
 
 int otel_decode_log_record_(
   const char *str_, size_t len, struct otel_collector_resource_logs *rl_);
+int otel_decode_metrics_record_(
+  const char *str_, size_t len, struct otel_collector_resource_metrics *rl_);
 int otel_encode_response_(
     int signal, int result, const char *errmsg, int rejected,
     int error_code, struct otel_string *str);

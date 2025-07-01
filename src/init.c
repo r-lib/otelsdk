@@ -109,6 +109,7 @@ SEXP otel_gauge_record(
   SEXP gauge, SEXP value, SEXP attributes, SEXP unit);
 
 SEXP otel_parse_log_record(SEXP str);
+SEXP otel_parse_metrics_record(SEXP str);
 SEXP otel_encode_response(
   SEXP signal_, SEXP result_, SEXP errmsg_, SEXP rejected_,
   SEXP error_code_);
@@ -193,6 +194,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_gauge_record, 4),
 
   CALLDEF(otel_parse_log_record, 1),
+  CALLDEF(otel_parse_metrics_record, 1),
   CALLDEF(otel_encode_response, 5),
 
   CALLDEF(glue_, 5),

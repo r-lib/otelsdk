@@ -105,6 +105,12 @@ transform_metric_data <- function(x) {
   x
 }
 
+transform_meter_provider_file <- function(x) {
+  x <- subm(x, "start time", ": .*$", ": <timestamp>")
+  x <- subm(x, "end time", ": .*$", ": <timestamp>")
+  x
+}
+
 sort_named_list <- function(x) {
   if (!is_named(x) || length(x) < 1) {
     structure(x, names = character())

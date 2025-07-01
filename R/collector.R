@@ -27,8 +27,13 @@ collector_app <- function() {
     # TODO
   })
   app$post("/v1/metrics", function(req, res) {
-    # TODO
+    record <- ccall(otel_parse_metrics_record, req$.body)
+    app$locals$metrics <- c(app$locals$metrics, list(record))
+    bd <- encode_response("metrics")
+    res$set_status(200)
+    res$send(bd)
   })
+
   app$post("/v1/logs", function(req, res) {
     record <- ccall(otel_parse_log_record, req$.body)
     app$locals$logs <- c(app$locals$logs, list(record))
@@ -36,6 +41,7 @@ collector_app <- function() {
     res$set_status(200)
     res$send(bd)
   })
+
   app$get("/logs", function(req, res) {
     if (length(app$locals$logs) == 0) {
       res$set_status(404)
@@ -46,9 +52,18 @@ collector_app <- function() {
     res$send_json(app$locals$logs, auto_unbox = TRUE)
     app$locals$logs <- list()
   })
+
   app$get("/metrics", function(req, res) {
-    # TODO
+    if (length(app$locals$metrics) == 0) {
+      res$set_status(404)
+      res$send("No metrics available")
+      return()
+    }
+    res$set_status(200)
+    res$send_json(app$locals$metrics, auto_unbox = TRUE)
+    app$locals$metrics <- list()
   })
+
   app$get("/traces", function(req, res) {
     # TODO
   })

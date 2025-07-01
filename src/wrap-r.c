@@ -951,3 +951,110 @@ SEXP c2r_otel_collector_resource_logs(
   Rf_unprotect(1);
   return res;
 }
+
+void otel_collector_metric_free(struct otel_collector_metric *cm) {
+  if (!cm) return;
+  otel_string_free(&cm->name);
+  otel_string_free(&cm->description);
+  otel_string_free(&cm->unit);
+}
+
+SEXP c2r_otel_collector_metric(const struct otel_collector_metric *cm) {
+  const char *nms[] = { "name", "description", "unit", "" };
+  SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&cm->name));
+  SET_VECTOR_ELT(res, 1, c2r_otel_string(&cm->description));
+  SET_VECTOR_ELT(res, 2, c2r_otel_string(&cm->unit));
+  Rf_unprotect(1);
+  return res;
+}
+
+void otel_collector_scope_metric_free(
+  struct otel_collector_scope_metric *sl
+) {
+  if (!sl) return;
+  otel_string_free(&sl->schema_url);
+  if (sl->metrics) {
+    for (size_t i = 0; i < sl->count; i++) {
+      otel_collector_metric_free(&sl->metrics[i]);
+    }
+    sl->metrics = NULL;
+  }
+  sl->count = 0;
+}
+
+SEXP c2r_otel_collector_scope_metric(
+  const struct otel_collector_scope_metric *sl
+) {
+  const char *nms[] = { "schema_url", "metrics", "" };
+  SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&sl->schema_url));
+  SET_VECTOR_ELT(res, 1, Rf_allocVector(VECSXP, sl->count));
+  SEXP metrics = VECTOR_ELT(res, 1);
+  for (size_t i = 0; i < sl->count; i++) {
+    SET_VECTOR_ELT(metrics, i, c2r_otel_collector_metric(&sl->metrics[i]));
+  }
+
+  Rf_unprotect(1);
+  return res;
+}
+
+void otel_collector_resource_metric_free(
+    struct otel_collector_resource_metric *rm
+) {
+  if (!rm) return;
+  otel_string_free(&rm->schema_url);
+  if (rm->scope_metrics) {
+    for (size_t i = 0; i < rm->count; i++) {
+      otel_collector_scope_metric_free(&rm->scope_metrics[i]);
+    }
+    rm->scope_metrics = NULL;
+  }
+  rm->count = 0;
+}
+
+SEXP c2r_otel_collector_resource_metric(
+  const struct otel_collector_resource_metric *rm
+) {
+  const char *nms[] = { "schema_url", "scope_metrics", "" };
+  SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&rm->schema_url));
+  SET_VECTOR_ELT(res, 1, Rf_allocVector(VECSXP, rm->count));
+  SEXP scope_metrics = VECTOR_ELT(res, 1);
+  for (size_t i = 0; i < rm->count; i++) {
+    SET_VECTOR_ELT(
+      scope_metrics, i,
+      c2r_otel_collector_scope_metric(&rm->scope_metrics[i])
+    );
+  }
+
+  Rf_unprotect(1);
+  return res;
+}
+
+void otel_collector_resource_metrics_free(
+  struct otel_collector_resource_metrics *rm
+) {
+  if (!rm) return;
+  if (rm->resource_metrics) {
+    for (size_t i = 0; i < rm->count; i++) {
+      otel_collector_resource_metric_free(&rm->resource_metrics[i]);
+    }
+    rm->resource_metrics = NULL;
+  }
+  rm->count = 0;
+}
+
+SEXP c2r_otel_collector_resource_metrics(
+  const struct otel_collector_resource_metrics *rms
+) {
+  SEXP res = Rf_protect(Rf_allocVector(VECSXP, rms->count));
+  for (size_t i = 0; i < rms->count; i++) {
+    SET_VECTOR_ELT(
+      res, i,
+      c2r_otel_collector_resource_metric(&rms->resource_metrics[i])
+    );
+  }
+  Rf_unprotect(1);
+  return res;
+}

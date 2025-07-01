@@ -1,5 +1,6 @@
 src/cpp
 src/install
 R/collapse.R
+R/collector.R
 R/friendly-type.R
 R/otelsdk-package.R
