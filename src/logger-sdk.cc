@@ -50,7 +50,7 @@ void *otel_create_logger_provider_file_(
   auto exporter  = otlp::OtlpFileLogRecordExporterFactory::Create(opts);
   auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
 
-  struct otel_logger_provider *lps = new otel_logger_provider;
+  struct otel_logger_provider *lps = new otel_logger_provider();
   lps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
 
   return (void*) lps;

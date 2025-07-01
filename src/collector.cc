@@ -23,8 +23,9 @@ namespace common    = opentelemetry::proto::common::v1;
 
 // TODO: attributes
 int otel_decode_log_record_(
-    const char *str_, size_t len, struct otel_collector_resource_logs *rls_) {
-
+  const char *str_, size_t len,
+  struct otel_collector_resource_logs *rls_
+) {
   try {
     cllogs::ExportLogsServiceRequest elsr;
     std::string str(str_, len);
@@ -143,8 +144,9 @@ int otel_decode_metrics_record_(
 #define OTLP_FAILURE 2
 
 int otel_encode_response_(
-    int signal, int result, const char *errmsg_, int rejected,
-    int error_code, struct otel_string *str_) {
+  int signal, int result, const char *errmsg_, int rejected,
+  int error_code, struct otel_string *str_
+) {
   try {
     std::string str;
     if (result == OTLP_FAILURE) {

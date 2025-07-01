@@ -69,7 +69,7 @@ void *otel_create_tracer_provider_http_(struct otel_attributes *resource_attribu
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
   RKeyValueIterable attributes_(*resource_attributes);
-  struct otel_tracer_provider *tps = new otel_tracer_provider;
+  struct otel_tracer_provider *tps = new otel_tracer_provider();
   tps->ptr = trace_sdk::TracerProviderFactory::Create(
     std::move(processor), resource::Resource::Create(&attributes_));
 
@@ -79,7 +79,7 @@ void *otel_create_tracer_provider_http_(struct otel_attributes *resource_attribu
 void *otel_create_tracer_provider_memory_(
     int buffer_size, struct otel_attributes *resource_attributes) {
   RKeyValueIterable attributes_(*resource_attributes);
-  struct otel_tracer_provider *tps = new otel_tracer_provider;
+  struct otel_tracer_provider *tps = new otel_tracer_provider();
   tps->spandata.reset(new memory::InMemorySpanData(buffer_size));
   auto exporter  = memory::InMemorySpanExporterFactory::Create(tps->spandata);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
@@ -94,7 +94,7 @@ void *otel_create_tracer_provider_file_(
     const struct otel_file_exporter_options *options,
     struct otel_attributes *resource_attributes) {
   RKeyValueIterable attributes_(*resource_attributes);
-  struct otel_tracer_provider *tps = new otel_tracer_provider;
+  struct otel_tracer_provider *tps = new otel_tracer_provider();
 
   otlp::OtlpFileExporterOptions opts;
   otlp::OtlpFileClientFileSystemOptions backend_opts =

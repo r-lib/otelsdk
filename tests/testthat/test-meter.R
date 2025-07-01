@@ -1,5 +1,6 @@
 test_that("meter, counter", {
   mp <- meter_provider_memory_new()
+  on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()
   ctr <- mtr$create_counter("ctr")
   ctr$add(1)
@@ -16,6 +17,7 @@ test_that("meter, counter", {
 
 test_that("meter, up_down_counter", {
   mp <- meter_provider_memory_new()
+  on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()
   udc <- mtr$create_up_down_counter("udctr")
   udc$add(1)
@@ -32,6 +34,7 @@ test_that("meter, up_down_counter", {
 
 test_that("meter, histogram", {
   mp <- meter_provider_memory_new()
+  on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()
   hst <- mtr$create_histogram("hst")
   hst$record(1)
@@ -51,6 +54,7 @@ test_that("meter, histogram", {
 
 test_that("meter, gauge", {
   mp <- meter_provider_memory_new()
+  on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()
   udc <- mtr$create_gauge("gge")
   udc$record(1)

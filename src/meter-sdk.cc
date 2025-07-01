@@ -70,7 +70,7 @@ void otel_gauge_finally_(void *gauge_) {
 
 void *otel_create_meter_provider_http_(
     int export_interval, int export_timeout) {
-  struct otel_meter_provider *mps = new otel_meter_provider;
+  struct otel_meter_provider *mps = new otel_meter_provider();
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -97,7 +97,7 @@ void *otel_create_meter_provider_http_(
 void *otel_create_meter_provider_file_(
     int export_interval, int export_timeout,
     struct otel_file_exporter_options *options) {
-  struct otel_meter_provider *mps = new otel_meter_provider;
+  struct otel_meter_provider *mps = new otel_meter_provider();
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -130,7 +130,7 @@ void *otel_create_meter_provider_file_(
 void *otel_create_meter_provider_memory_(
     int export_interval, int export_timeout, int buffer_size,
     int temporality) {
-  struct otel_meter_provider *mps = new otel_meter_provider;
+  struct otel_meter_provider *mps = new otel_meter_provider();
   mps->metricdata.reset(new memory::CircularBufferInMemoryMetricData(buffer_size));
 
   std::string version{"1.2.0"};
@@ -330,12 +330,14 @@ void otel_meter_provider_flush_(void *meter_provider_, int timeout) {
 void otel_meter_provider_shutdown_(void *meter_provider_, int timeout) {
   struct otel_meter_provider *mps =
     (struct otel_meter_provider *) meter_provider_;
+  if (mps->shutdown_called) return;
   metrics_sdk::MeterProvider &meter_provider = *(mps->ptr);
   if (timeout < 0) {
     meter_provider.Shutdown();
   } else {
     meter_provider.Shutdown((std::chrono::microseconds) timeout);
   }
+  mps->shutdown_called = true;
   if (mps->stream.is_open()) {
     mps->stream.flush();
   }

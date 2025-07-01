@@ -3,6 +3,7 @@ test_that("meter_provider_file", {
   tmp2 <- paste0(tmp, "-a")
   on.exit(unlink(c(tmp, tmp2)), add = TRUE)
   mp <- meter_provider_file_new(file_pattern = tmp, alias_pattern = tmp2)
+  on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()
   ctr <- mtr$create_counter("ctr")
   ctr$add(1)

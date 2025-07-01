@@ -54,7 +54,7 @@ void *otel_create_tracer_provider_stdstream_(
   const char *stream, struct otel_attributes *resource_attributes) {
   int sout = !strcmp(stream, "stdout");
   int serr = !strcmp(stream, "stderr");
-  struct otel_tracer_provider *tps = new otel_tracer_provider;
+  struct otel_tracer_provider *tps = new otel_tracer_provider();
   RKeyValueIterable attributes_(*resource_attributes);
 
   if (sout || serr) {
@@ -81,7 +81,7 @@ void *otel_create_meter_provider_stdstream_(
     const char *stream, int export_interval, int export_timeout) {
   int sout = !strcmp(stream, "stdout");
   int serr = !strcmp(stream, "stderr");
-  struct otel_meter_provider *mps = new otel_meter_provider;
+  struct otel_meter_provider *mps = new otel_meter_provider();
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -126,7 +126,7 @@ void *otel_create_meter_provider_stdstream_(
 void *otel_create_logger_provider_stdstream_(const char *stream) {
   int sout = !strcmp(stream, "stdout");
   int serr = !strcmp(stream, "stderr");
-  struct otel_logger_provider *tps = new otel_logger_provider;
+  struct otel_logger_provider *tps = new otel_logger_provider();
 
   if (sout || serr) {
     std::ostream &out = sout ? std::cout : std::cerr;
@@ -150,7 +150,7 @@ void *otel_create_logger_provider_http_(void) {
   auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create();
   auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
 
-  struct otel_logger_provider *lps = new otel_logger_provider;
+  struct otel_logger_provider *lps = new otel_logger_provider();
   lps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
 
   return (void*) lps;

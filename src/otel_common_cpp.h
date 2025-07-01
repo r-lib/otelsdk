@@ -32,6 +32,7 @@ struct otel_tracer_provider {
   std::unique_ptr<trace_sdk::TracerProvider> ptr;
   std::fstream stream;
   std::shared_ptr<memory::InMemorySpanData> spandata;
+  bool shutdown_called;
 };
 
 struct otel_tracer {
@@ -41,6 +42,7 @@ struct otel_tracer {
 struct otel_logger_provider {
   std::unique_ptr<logs_sdk::LoggerProvider> ptr;
   std::fstream stream;
+  bool shutdown_called;
 };
 
 struct otel_logger {
@@ -52,6 +54,7 @@ struct otel_meter_provider {
   std::unique_ptr<metrics_sdk::MeterProvider> ptr;
   std::fstream stream;
   std::shared_ptr<memory::CircularBufferInMemoryMetricData> metricdata;
+  bool shutdown_called;
 };
 
 struct otel_meter {
