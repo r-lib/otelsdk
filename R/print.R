@@ -45,6 +45,7 @@ format.otel_trace_flags <- function(x, ...) {
 #' @export
 
 format.otel_attributes <- function(x, ...) {
+  x <- x[order(names(x))]
   nms <- paste0(format(names(x)), " : ")
   as.character(unlist(mapply(nms, x, FUN = function(n, x) {
     if (is.atomic(x) && length(x) == 1) {
@@ -189,7 +190,8 @@ print.otel_scope_metrics <- generic_print
 format.otel_resource_metrics <- function(x, ...) {
   c(
     "<otel_resouce_metrics>",
-    paste0("attributes:", format(x[["attributes"]])),
+    "attributes:",
+    paste0("    ", format(x[["attributes"]])),
     paste0("scope_metric_data [", length(x[["scope_metric_data"]]), "]:"),
     paste0("    ", unlist(lapply(x[["scope_metric_data"]], format)))
   )

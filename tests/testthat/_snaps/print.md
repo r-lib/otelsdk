@@ -78,15 +78,15 @@
       description           : 
       resource_attributes   : 
           os.type                     : <os-type>
+          process.owner               : <username>
           process.pid                 : <process-pid>
           process.runtime.description : <r-version-string>
           process.runtime.name        : R
-          telemetry.sdk.version       : <otel-version>
           process.runtime.version     : <r-version>
-          telemetry.sdk.name          : opentelemetry
-          process.owner               : <username>
-          telemetry.sdk.language      : R
           service.name                : unknown_service
+          telemetry.sdk.language      : R
+          telemetry.sdk.name          : opentelemetry
+          telemetry.sdk.version       : <otel-version>
       schema_url            : 
       instrumentation_scope : 
           <otel_instrumentation_scope_data>
@@ -134,17 +134,19 @@
     Output
       <otel_metrics_data>
       <otel_resouce_metrics>
-      attributes:telemetry.sdk.version  : 1.21.0
-      attributes:telemetry.sdk.name     : opentelemetry
-      attributes:telemetry.sdk.language : cpp
-      attributes:service.name           : unknown_service
+      attributes:
+          service.name           : unknown_service
+          telemetry.sdk.language : cpp
+          telemetry.sdk.name     : opentelemetry
+          telemetry.sdk.version  : 1.21.0
       scope_metric_data [0]:
           
       <otel_resouce_metrics>
-      attributes:telemetry.sdk.version  : 1.21.0
-      attributes:telemetry.sdk.name     : opentelemetry
-      attributes:telemetry.sdk.language : cpp
-      attributes:service.name           : unknown_service
+      attributes:
+          service.name           : unknown_service
+          telemetry.sdk.language : cpp
+          telemetry.sdk.name     : opentelemetry
+          telemetry.sdk.version  : 1.21.0
       scope_metric_data [1]:
           <otel_scope_metrics>
           instrumentation_scope:
@@ -180,17 +182,19 @@
     Output
       <otel_metrics_data>
       <otel_resouce_metrics>
-      attributes:telemetry.sdk.version  : 1.21.0
-      attributes:telemetry.sdk.name     : opentelemetry
-      attributes:telemetry.sdk.language : cpp
-      attributes:service.name           : unknown_service
+      attributes:
+          service.name           : unknown_service
+          telemetry.sdk.language : cpp
+          telemetry.sdk.name     : opentelemetry
+          telemetry.sdk.version  : 1.21.0
       scope_metric_data [0]:
           
       <otel_resouce_metrics>
-      attributes:telemetry.sdk.version  : 1.21.0
-      attributes:telemetry.sdk.name     : opentelemetry
-      attributes:telemetry.sdk.language : cpp
-      attributes:service.name           : unknown_service
+      attributes:
+          service.name           : unknown_service
+          telemetry.sdk.language : cpp
+          telemetry.sdk.name     : opentelemetry
+          telemetry.sdk.version  : 1.21.0
       scope_metric_data [1]:
           <otel_scope_metrics>
           instrumentation_scope:
@@ -234,17 +238,19 @@
     Output
       <otel_metrics_data>
       <otel_resouce_metrics>
-      attributes:telemetry.sdk.version  : 1.21.0
-      attributes:telemetry.sdk.name     : opentelemetry
-      attributes:telemetry.sdk.language : cpp
-      attributes:service.name           : unknown_service
+      attributes:
+          service.name           : unknown_service
+          telemetry.sdk.language : cpp
+          telemetry.sdk.name     : opentelemetry
+          telemetry.sdk.version  : 1.21.0
       scope_metric_data [0]:
           
       <otel_resouce_metrics>
-      attributes:telemetry.sdk.version  : 1.21.0
-      attributes:telemetry.sdk.name     : opentelemetry
-      attributes:telemetry.sdk.language : cpp
-      attributes:service.name           : unknown_service
+      attributes:
+          service.name           : unknown_service
+          telemetry.sdk.language : cpp
+          telemetry.sdk.name     : opentelemetry
+          telemetry.sdk.version  : 1.21.0
       scope_metric_data [1]:
           <otel_scope_metrics>
           instrumentation_scope:
