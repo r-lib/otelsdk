@@ -1,24 +1,24 @@
-# meter_provider_strout
+# meter_provider_stdout
 
     Code
-      lns
+      writeLines(lns)
     Output
-       [1] "{"                                       
-       [2] "  scope name\t: org.r-project.R"         
-       [3] "  schema url\t: "                        
-       [4] "  version\t: "                           
-       [5] "  start time\t: <timestamp>
-       [6] "  end time\t: <timestamp>
-       [7] "  instrument name\t: ctr"                
-       [8] "  description\t: "                       
-       [9] "  unit\t\t: "                            
-      [10] "  type\t\t: SumPointData"                
-      [11] "  value\t\t: 11"                         
-      [12] "  attributes\t\t: "                      
-      [13] "  resources\t:"                          
-      [14] "\tservice.name: unknown_service"         
-      [15] "\ttelemetry.sdk.language: cpp"           
-      [16] "\ttelemetry.sdk.name: opentelemetry"     
-      [17] "\ttelemetry.sdk.version: 1.21.0"         
-      [18] "}"                                       
+      {
+        scope name	: org.r-project.R
+        schema url	: 
+        version	: 
+        start time	: <timestamp>
+        end time	: <timestamp>
+        instrument name	: ctr
+        description	: 
+        unit		: 
+        type		: SumPointData
+        value		: 11
+        attributes		: 
+        resources	:
+      	service.name: unknown_service
+      	telemetry.sdk.language: cpp
+      	telemetry.sdk.name: opentelemetry
+      	telemetry.sdk.version: 1.21.0
+      }
 

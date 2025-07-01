@@ -1,4 +1,4 @@
-test_that("meter_provider_strout", {
+test_that("meter_provider_stdout", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   mp <- meter_provider_stdstream_new(tmp)
@@ -10,7 +10,7 @@ test_that("meter_provider_strout", {
   mp$flush()
   lns <- readLines(tmp)
   expect_snapshot(
-    lns,
+    writeLines(lns),
     transform = transform_meter_provider_file
   )
 })
