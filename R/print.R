@@ -46,7 +46,7 @@ format.otel_trace_flags <- function(x, ...) {
 
 format.otel_attributes <- function(x, ...) {
   x <- x[order(names(x))]
-  nms <- paste0(format(names(x)), " : ")
+  nms <- paste0(format(names(x)), if (length(x)) " : " else character())
   as.character(unlist(mapply(nms, x, FUN = function(n, x) {
     if (is.atomic(x) && length(x) == 1) {
       paste0(n, encodeString(as.character(x)))
