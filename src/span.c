@@ -5,15 +5,23 @@
 #include <Rinternals.h>
 
 #include "otel_common.h"
+#include "otel_common_r.h"
 
 void r2c_attribute(
   const char *name, SEXP value, struct otel_attribute *attr);
 void r2c_attributes(SEXP r, struct otel_attributes *c);
 
-SEXP rf_get_list_element(SEXP list, const char *str);
-
-// in init.c
-void otel_span_context_finally(SEXP x);
+void otel_span_context_finally(SEXP x) {
+  if (TYPEOF(x) != EXTPTRSXP) {
+    Rf_warningcall(R_NilValue, "OpenTelemetry: invalid span context pointer.");
+    return;
+  }
+  void *span_context_ = R_ExternalPtrAddr(x);
+  if (span_context_) {
+    otel_span_context_finally_(span_context_);
+    R_ClearExternalPtr(x);
+  }
+}
 
 void otel_span_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {

@@ -24,7 +24,7 @@ SEXP resize(SEXP out, R_xlen_t n) {
 }
 
 // This is almost like the original glue parser, except that
-// - no comment_arg (always empty string)
+// - no comment_char (always empty string)
 // - no literal_arg
 // - If cli_arg is FALSE, then literal = 1, always
 // - If cli_arg is TRUE, then we use literal = 1, except in {}
@@ -128,12 +128,14 @@ SEXP glue_(SEXP x, SEXP f, SEXP open_arg, SEXP close_arg, SEXP cli_arg) {
       }
       break;
     }
+    // # nocov start LCOV_EXCL_START
     case comment: {
       if (xx[i] == '\n') {
         state = delim;
       }
       break;
     }
+    // # nocov end LCOV_EXCL_STOP
     case delim: {
       if (!delim_equal && strncmp(&xx[i], open, open_len) == 0) {
         ++delim_level;
@@ -147,9 +149,11 @@ SEXP glue_(SEXP x, SEXP f, SEXP open_arg, SEXP close_arg, SEXP cli_arg) {
         --delim_level;
         i += close_len - 1;
       } else {
+        // # nocov start LCOV_EXCL_START
         if (!literal && xx[i] == comment_char) {
           state = comment;
         } else {
+        // # nocov end LCOV_EXCL_STOP
           switch (xx[i]) {
           case '\'':
             if (!literal) {
@@ -217,8 +221,10 @@ SEXP glue_(SEXP x, SEXP f, SEXP open_arg, SEXP close_arg, SEXP cli_arg) {
     free(str);
     Rf_error("Unterminated quote (`)");
   } else if (state == comment) {
+    // # nocov start LCOV_EXCL_START
     free(str);
     Rf_error("Unterminated comment");
+    // # nocov end LCOV_EXCL_STOP
   }
 
   free(str);

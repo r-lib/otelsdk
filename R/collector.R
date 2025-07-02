@@ -27,10 +27,12 @@ collector_app <- function() {
     # TODO
   })
   app$post("/v1/metrics", function(req, res) {
+    req <<- req
     record <- ccall(otel_parse_metrics_record, req$.body)
     app$locals$metrics <- c(app$locals$metrics, list(record))
     bd <- encode_response("metrics")
     res$set_status(200)
+    res$set_type("application/x-protobuf")
     res$send(bd)
   })
 
@@ -39,6 +41,7 @@ collector_app <- function() {
     app$locals$logs <- c(app$locals$logs, list(record))
     bd <- encode_response("logs")
     res$set_status(200)
+    res$set_type("application/x-protobuf")
     res$send(bd)
   })
 

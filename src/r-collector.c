@@ -43,8 +43,10 @@ SEXP otel_encode_response(
   struct otel_string msg = { 0 };
   if (otel_encode_response_(
       signal, result, errmsg, rejected, error_code, &msg)) {
+  // # nocov start LCOV_EXCL_START
     R_THROW_ERROR("Failed to encode Protobuf response");
   };
+  // # nocov end LCOV_EXCL_STOP
   SEXP res = Rf_protect(Rf_allocVector(RAWSXP, msg.size));
   memcpy(RAW(res), msg.s, msg.size);
   // TODO: cleancall

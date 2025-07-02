@@ -9,11 +9,13 @@ void r2c_attributes(SEXP r, struct otel_attributes *c);
 
 void otel_meter_provider_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
+    // # nocov start LCOV_EXCL_START
     Rf_warningcall(
       R_NilValue,
       "OpenTelemetry: invalid meter provider pointer."
     );
     return;
+    // # nocov end LCOV_EXCL_STOP
   }
   void *meter_provider_ = R_ExternalPtrAddr(x);
   if (meter_provider_) {
@@ -24,8 +26,10 @@ void otel_meter_provider_finally(SEXP x) {
 
 void otel_meter_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
+    // # nocov start LCOV_EXCL_START
     Rf_warningcall(R_NilValue, "OpenTelemetry: invalid meter pointer.");
     return;
+    // # nocov end LCOV_EXCL_STOP
   }
   void *meter_ = R_ExternalPtrAddr(x);
   if (meter_) {
@@ -100,11 +104,13 @@ SEXP otel_meter_provider_memory_get_metrics(SEXP provider) {
   }
 
   struct otel_metrics_data data = { 0 };
+  // # nocov start LCOV_EXCL_START
   if (otel_meter_provider_memory_get_metrics_(meter_provider_, &data)) {
     R_THROW_MAYBE_SYSTEM_ERROR(
       "Cannot retrieve recorded OpenTelemetry metrics"
     );
   }
+  // # nocov end LCOV_EXCL_STOP
 
   SEXP res = c2r_otel_metrics_data(&data);
 
@@ -178,8 +184,10 @@ SEXP otel_meter_provider_shutdown(SEXP provider, SEXP timeout) {
 
 void otel_counter_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
+    // # nocov start LCOV_EXCL_START
     Rf_warningcall(R_NilValue, "OpenTelemetry: invalid counter pointer.");
     return;
+    // # nocov end LCOV_EXCL_STOP
   }
   void *counter_ = R_ExternalPtrAddr(x);
   if (counter_) {
@@ -190,11 +198,13 @@ void otel_counter_finally(SEXP x) {
 
 void otel_up_down_counter_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
+    // # nocov start LCOV_EXCL_START
     Rf_warningcall(
       R_NilValue,
       "OpenTelemetry: invalid up-down counter pointer."
     );
     return;
+    // # nocov end LCOV_EXCL_STOP
   }
   void *up_down_counter_ = R_ExternalPtrAddr(x);
   if (up_down_counter_) {
@@ -205,8 +215,10 @@ void otel_up_down_counter_finally(SEXP x) {
 
 void otel_histogram_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
+    // # nocov start LCOV_EXCL_START
     Rf_warningcall(R_NilValue, "OpenTelemetry: invalid histogram pointer.");
     return;
+    // # nocov end LCOV_EXCL_STOP
   }
   void *histogram_ = R_ExternalPtrAddr(x);
   if (histogram_) {
@@ -217,8 +229,10 @@ void otel_histogram_finally(SEXP x) {
 
 void otel_gauge_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
+    // # nocov start LCOV_EXCL_START
     Rf_warningcall(R_NilValue, "OpenTelemetry: invalid gauge pointer.");
     return;
+    // # nocov end LCOV_EXCL_STOP
   }
   void *gauge_ = R_ExternalPtrAddr(x);
   if (gauge_) {

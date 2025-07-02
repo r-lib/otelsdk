@@ -69,6 +69,28 @@ test_that("logger_provider_stdstream", {
   expect_true(any(grepl("severity_text.*DEBUG", lns)))
 })
 
+test_that("log levels", {
+  coll <- webfakes::local_app_process(collector_app())
+  withr::local_envvar(OTEL_EXPORTER_OTLP_ENDPOINT = coll$url())
+  lp <- logger_provider_http_new()
+  lgr <- lp$get_logger("mylogger")
+  lgr$set_minimum_severity("trace")
+  for (lv in names(otel::log_severity_levels)) {
+    lgr$log(lv, severity = lv)
+  }
+  lp$flush()
+
+  cl_resp <- curl::curl_fetch_memory(coll$url("/logs"))
+  logs <- jsonlite::fromJSON(rawToChar(cl_resp$content), simplifyVector = FALSE)
+  expect_equal(length(logs), length(otel::log_severity_levels))
+  for (i in seq_along(logs)) {
+    expect_equal(
+      logs[[i]][[1]]$scope_logs[[1]]$log_records[[1]]$severity_text,
+      toupper(names(otel::log_severity_levels)[i])
+    )
+  }
+})
+
 test_that("span_context", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
@@ -112,4 +134,84 @@ test_that("span_context", {
 
 test_that("log_severity_levels_spec", {
   expect_snapshot(log_severity_levels_spec())
+})
+
+test_that("otel_logger_provider_flush", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_logger_provider_flush, 1L)
+    ccall(otel_logger_provider_flush, x)
+  })
+})
+
+test_that("otel_get_logger", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_get_logger, 1L, "foo", 1L, NULL, NULL, NULL)
+    ccall(otel_get_logger, x, "foo", 1L, NULL, NULL, NULL)
+  })
+})
+
+test_that("otel_get_minimum_log_severity", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_get_minimum_log_severity, 1L)
+    ccall(otel_get_minimum_log_severity, x)
+  })
+})
+
+test_that("otel_set_minimum_log_severity", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_set_minimum_log_severity, 1L, 1L)
+    ccall(otel_set_minimum_log_severity, x, 1L)
+  })
+})
+
+test_that("otel_logger_get_name", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_logger_get_name, 1L)
+    ccall(otel_logger_get_name, x)
+  })
+})
+
+test_that("otel_logger_is_enabled", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_logger_is_enabled, 1L, 1L, NULL)
+    ccall(otel_logger_is_enabled, x, 1L, NULL)
+  })
+})
+
+test_that("otel_log", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(
+      otel_log,
+      1L,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL
+    )
+    ccall(
+      otel_log,
+      x,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL
+    )
+  })
 })

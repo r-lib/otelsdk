@@ -28,6 +28,8 @@ OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 	r-collector.o collector.o
 
 PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2
+PKG_CFLAGS += @PKG_CFLAGS@
+PKG_CXXFLAGS += @PKG_CXXFLAGS@
 PKG_LIBS = \
 	-Linstall/lib libstdstream-exporter.a \
 	-lopentelemetry_exporter_ostream_span \
@@ -53,6 +55,7 @@ PKG_LIBS = \
 	-lopentelemetry_proto \
 	@PROTOBUF_LIBS@ \
 	@LIBCURL_LIBS@ \
+	@PKG_LDFLAGS@ \
 	libstdstream-exporter.a
 
 MAKEFLAGS=@MAKEFLAGS@

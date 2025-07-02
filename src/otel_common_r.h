@@ -8,6 +8,8 @@ extern SEXP otel_span_status_codes;
 
 SEXP rf_get_list_element(SEXP list, const char *str);
 
+void otel_span_context_finally(SEXP x);
+
 void r2c_attribute(
   const char *name, SEXP value, struct otel_attribute *attr);
 void r2c_attributes(SEXP r, struct otel_attributes *c);

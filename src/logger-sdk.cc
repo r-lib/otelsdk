@@ -133,7 +133,7 @@ logs_api::Severity to_severity(int x) {
     case 23: return logs_api::Severity::kFatal3;
     case 24: return logs_api::Severity::kFatal4;
 
-    default: return logs_api::Severity::kInvalid;
+    default: return logs_api::Severity::kInvalid; // # nocov LCOV_EXCL_LINE
   }
 }
 
@@ -146,12 +146,14 @@ static char hexchar(char c) {
   if(c >= '0' && c <= '9') {
     return c - '0';
   } else if (c >= 'A' && c <= 'F') {
+    // # nocov start LCOV_EXCL_START
     return 10 + (c - 'A');
+    // # nocov end LCOV_EXCL_STOP
   } else if (c >= 'a' && c <= 'f') {
     return 10 + (c - 'a');
   } else {
     // does not happen
-    return 0;
+    return 0; // # nocov LCOV_EXCL_LINE
   }
 }
 

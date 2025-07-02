@@ -79,10 +79,12 @@ int otel_decode_log_record_(
     }
     return 0;
 
+  // # nocov start LCOV_EXCL_START
   } catch(...) {
     otel_collector_resource_logs_free(rls_);
     return 1;
   }
+  // # nocov end LCOV_EXCL_STOP
 }
 
 int otel_decode_metrics_record_(
@@ -128,10 +130,12 @@ int otel_decode_metrics_record_(
     }
 
     return 0;
+  // # nocov start LCOV_EXCL_START
   } catch(...) {
     otel_collector_resource_metrics_free(rms_);
     return 1;
   }
+  // # nocov end LCOV_EXCL_STOP
 }
 
 
@@ -158,45 +162,51 @@ int otel_encode_response_(
       pbmsg.set_code(error_code);
       pbmsg.SerializeToString(&str);
     } else if (signal == OTLP_SIGNAL_TRACES) {
+      cltrace::ExportTraceServiceResponse pbmsg;
       if (result == OTLP_SUCCESS) {
-        cltrace::ExportTraceServiceResponse pbmsg;
+        pbmsg.clear_partial_success();
         pbmsg.SerializeToString(&str);
 
       } else {
-        cltrace::ExportTracePartialSuccess pbmsg;
+        cltrace::ExportTracePartialSuccess *partial =
+          pbmsg.mutable_partial_success();
         if (errmsg_) {
           std::string errmsg(errmsg_);
-          pbmsg.set_error_message(errmsg);
+          partial->set_error_message(errmsg);
         }
-        pbmsg.set_rejected_spans(rejected);
+        partial->set_rejected_spans(rejected);
         pbmsg.SerializeToString(&str);
       }
     } else if (signal == OTLP_SIGNAL_LOGS) {
+      cllogs::ExportLogsServiceResponse pbmsg;
       if (result == OTLP_SUCCESS) {
-        cllogs::ExportLogsServiceResponse pbmsg;
+        pbmsg.clear_partial_success();
         pbmsg.SerializeToString(&str);
 
       } else {
-        cllogs::ExportLogsPartialSuccess pbmsg;
+        cllogs::ExportLogsPartialSuccess *partial =
+          pbmsg.mutable_partial_success();
         if (errmsg_) {
           std::string errmsg(errmsg_);
-          pbmsg.set_error_message(errmsg);
+          partial->set_error_message(errmsg);
         }
-        pbmsg.set_rejected_log_records(rejected);
+        partial->set_rejected_log_records(rejected);
         pbmsg.SerializeToString(&str);
       }
     } else if (signal == OTLP_SIGNAL_METRICS) {
+      clmetrics::ExportMetricsServiceResponse pbmsg;
       if (result == OTLP_SUCCESS) {
-        clmetrics::ExportMetricsServiceResponse pbmsg;
+        pbmsg.clear_partial_success();
         pbmsg.SerializeToString(&str);
 
       } else {
-        clmetrics::ExportMetricsPartialSuccess pbmsg;
+        clmetrics::ExportMetricsPartialSuccess *partial =
+          pbmsg.mutable_partial_success();
         if (errmsg_) {
           std::string errmsg(errmsg_);
-          pbmsg.set_error_message(errmsg);
+          partial->set_error_message(errmsg);
         }
-        pbmsg.set_rejected_data_points(rejected);
+        partial->set_rejected_data_points(rejected);
         pbmsg.SerializeToString(&str);
       }
     }
@@ -204,7 +214,9 @@ int otel_encode_response_(
     cc2c_otel_string(str, *str_);
     return 0;
 
+  // # nocov start LCOV_EXCL_START
   } catch(...) {
     return 1;
   }
+  // # nocov end LCOV_EXCL_STOP
 }

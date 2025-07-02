@@ -4,6 +4,7 @@
 ^src/.*[.]ax$
 ^src/.*[.]gcda$
 ^src/.*[.]gcno$
+^src/.*[.]gcov$
 ^src/cpp$
 ^src/install$
 ^src/Makevars$

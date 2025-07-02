@@ -30,7 +30,11 @@ test_that("logger_provider_file", {
     "WARN"
   )
 
-  lgr$error("error! {x}", attributes = list(a = letters[1:3]))
+  lgr$error(
+    "error! {x}",
+    observed_timestamp = Sys.time(),
+    attributes = list(a = letters[1:3])
+  )
   lp$flush()
   lns <- readLines(tmp)
   obj <- jsonlite::fromJSON(lns[[2]], simplifyVector = FALSE)

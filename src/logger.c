@@ -8,11 +8,13 @@ void r2c_attributes(SEXP r, struct otel_attributes *c);
 
 void otel_logger_provider_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
+    // # nocov start LCOV_EXCL_START
     Rf_warningcall(
       R_NilValue,
       "OpenTelemetry: invalid logger provider pointer."
     );
     return;
+    // # nocov end LCOV_EXCL_STOP
   }
   void *logger_provider_ = R_ExternalPtrAddr(x);
   if (logger_provider_) {
@@ -23,8 +25,10 @@ void otel_logger_provider_finally(SEXP x) {
 
 void otel_logger_finally(SEXP x) {
   if (TYPEOF(x) != EXTPTRSXP) {
+    // # nocov start LCOV_EXCL_START
     Rf_warningcall(R_NilValue, "OpenTelemetry: invalid logger pointer.");
     return;
+    // # nocov end LCOV_EXCL_STOP
   }
   void *logger_ = R_ExternalPtrAddr(x);
   if (logger_) {
@@ -141,7 +145,9 @@ SEXP otel_logger_get_name(SEXP logger) {
 
   struct otel_string cname = { 0 };
   if (otel_logger_get_name_(logger_, &cname)) {
+    // # nocov start LCOV_EXCL_START
     Rf_error("Out of memory when allocating OpenTelemetry logger name");
+    // # nocov end LCOV_EXCL_STOP
   }
   SEXP name = Rf_ScalarString(Rf_mkCharLen(cname.s, cname.size));
   // TODO: use cleancall
@@ -149,10 +155,12 @@ SEXP otel_logger_get_name(SEXP logger) {
   return name;
 }
 
+// # nocov start LCOV_EXCL_START
 SEXP otel_emit_log_record(SEXP logger, SEXP log_record) {
   // TODO
   return R_NilValue;
 }
+// # nocov end LCOV_EXCL_STOP
 
 SEXP otel_logger_is_enabled(SEXP logger, SEXP severity, SEXP event_id) {
   if (TYPEOF(logger) != EXTPTRSXP) {

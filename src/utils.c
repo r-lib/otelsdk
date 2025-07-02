@@ -18,3 +18,24 @@ SEXP rf_get_list_element(SEXP list, const char *str) {
   UNPROTECT(1);
   return elmt;
 }
+
+SEXP otel_fail(void) {
+  Rf_error("from C");
+  return R_NilValue;
+}
+
+SEXP otel_span_kinds = NULL;
+SEXP otel_span_status_codes = NULL;
+
+SEXP otel_init_constants(SEXP env) {
+  R_PreserveObject(env);
+  otel_span_kinds = Rf_findVarInFrame(env, Rf_install("span_kinds"));
+  otel_span_status_codes =
+    Rf_findVarInFrame(env, Rf_install("span_status_codes"));
+  return R_NilValue;
+}
+
+SEXP create_empty_xptr(void ) {
+  SEXP xptr = R_MakeExternalPtr(NULL, R_NilValue, R_NilValue);
+  return xptr;
+}

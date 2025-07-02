@@ -114,6 +114,13 @@ if [ "$DO_PARALLEL" = "true" ]; then
   fi
 fi
 
+if [ -n "$CODE_COVERAGE" ]; then
+  echo '**'" compiling for test coverage"
+  PKG_CFLAGS="-O0 --coverage -DGCOV_COMPILE"
+  PKG_CXXFLAGS="-O0 --coverage -DGCOV_COMPILE"
+  PKG_LDFLAGS="--coverage"
+fi
+
 cat src/Makevars.in |
   sed "s|@UNAME@|${UNAME}|" |
   sed "s|@CXX_STANDARD@|${CXX_STANDARD}|" |
@@ -126,4 +133,7 @@ cat src/Makevars.in |
   sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |
   sed "s|@MRPROPER@|${MRPROPER}|" |
   sed "s|@MAKEFLAGS@|${MAKEFLAGS}|" |
+  sed "s|@PKG_CFLAGS@|${PKG_CFLAGS}|" |
+  sed "s|@PKG_CXXFLAGS@|${PKG_CXXFLAGS}|" |
+  sed "s|@PKG_LDFLAGS@|${PKG_LDFLAGS}|" |
   cat > src/Makevars
