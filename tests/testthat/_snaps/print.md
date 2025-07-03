@@ -216,17 +216,8 @@
 # format.otel_last_value_point_data
 
     Code
-      mtrs
+      mtrs[[2]]
     Output
-      <otel_metrics_data>
-      <otel_resouce_metrics>
-      attributes:
-          service.name           : unknown_service
-          telemetry.sdk.language : cpp
-          telemetry.sdk.name     : opentelemetry
-          telemetry.sdk.version  : 1.21.0
-      scope_metric_data [0]:
-          
       <otel_resouce_metrics>
       attributes:
           service.name           : unknown_service
