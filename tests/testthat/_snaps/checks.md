@@ -538,7 +538,7 @@
       as_difftime_spec(v5)
     Condition
       Error in `as_difftime_spec()`:
-      ! Invalid argument: v5 must be an integer scalar (seconds), a 'difftime' scalar, or a time interval specification. A time interval specification is apositive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours) or d (days). But it is a a raw vector.
+      ! Invalid argument: v5 must be an integer scalar (milliseconds), a 'difftime' scalar, or a time interval specification. A time interval specification is apositive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours) or d (days). But it is a a raw vector.
 
 # as_difftime_env
 

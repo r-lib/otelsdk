@@ -65,13 +65,23 @@ SEXP otel_create_meter_provider_file(
     SEXP export_interval, SEXP export_timeout, SEXP options) {
   int cexport_interval = INTEGER(export_interval)[0];
   int cexport_timeout = INTEGER(export_timeout)[0];
-  struct otel_file_exporter_options options_;
+  struct otel_file_exporter_options options_ = { 0 };
   r2c_otel_file_exporter_options(options, &options_);
   void *meter_provider_ = otel_create_meter_provider_file_(
     cexport_interval, cexport_timeout, &options_);
+  otel_file_exporter_options_free(&options_);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_meter_provider_finally, (Rboolean) 1);
   return xptr;
+}
+
+SEXP otel_meter_provider_file_options_defaults(void) {
+  struct otel_file_exporter_options options_ = { 0 };
+  otel_meter_provider_file_options_defaults_(&options_);
+  SEXP res = Rf_protect(c2r_otel_file_exporter_options(&options_));
+  otel_file_exporter_options_free(&options_);
+  Rf_unprotect(1);
+  return res;
 }
 
 SEXP otel_create_meter_provider_memory(

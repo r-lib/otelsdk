@@ -37,7 +37,7 @@ logger_provider_file <- list(
   new = logger_provider_file_new,
   options = function() {
     utils::modifyList(
-      as_logger_provider_file_options(list()),
+      as_logger_provider_file_options(NULL),
       ccall(otel_logger_provider_file_options_defaults)
     )
   }

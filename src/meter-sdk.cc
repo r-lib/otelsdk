@@ -127,6 +127,16 @@ void *otel_create_meter_provider_file_(
   return (void*) mps;
 }
 
+void otel_meter_provider_file_options_defaults_(
+  struct otel_file_exporter_options *options
+) {
+  opentelemetry::exporter::otlp::OtlpFileMetricExporterOptions opts;
+  otlp::OtlpFileClientFileSystemOptions backend_opts =
+    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
+
+  cc2c_file_exporter_options(backend_opts, *options);
+}
+
 void *otel_create_meter_provider_memory_(
     int export_interval, int export_timeout, int buffer_size,
     int temporality) {

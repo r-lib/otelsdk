@@ -592,7 +592,7 @@ as_difftime_spec <- function(x, null = TRUE, call = NULL) {
     return(as.double(x, units = "secs") * 1000 * 1000)
   }
   if (is_count(x, positive = TRUE)) {
-    return(as.double(x) * 1000 * 1000)
+    return(as.double(x) * 1000)
   }
   if (is_string(x)) {
     us <- parse_time_spec(x)
@@ -618,7 +618,7 @@ as_difftime_spec <- function(x, null = TRUE, call = NULL) {
   } else {
     stop(glue(c(
       "Invalid argument: {format(call[[2]])} must be an integer scalar ",
-      "(seconds), a 'difftime' scalar, or a time interval specification. ",
+      "(milliseconds), a 'difftime' scalar, or a time interval specification. ",
       "A time interval specification is apositive number with a time unit ",
       "suffix: us (microseconds), ms (milliseconds), s (seconds), ",
       "m (minutes), h (hours) or d (days). But it is a {typename(x)}."
@@ -633,7 +633,7 @@ as_difftime_env <- function(ev) {
   }
   xv <- suppressWarnings(as.double(val))
   if (!is.na(xv)) {
-    return(xv * 1000 * 1000)
+    return(xv * 1000)
   }
   us <- parse_time_spec(val)
   if (!is.na(us)) {
@@ -805,64 +805,132 @@ parse_bytes_spec <- function(x) {
   as.double(x) * unname(bytes_spec_units$mult[wh])
 }
 
-as_logger_provider_file_options <- function(opts, call = NULL) {
-  if (!is_named(opts)) {
-    call <- call %||% match.call()
+as_named_list <- function(x, call = NULL) {
+  if ((is.null(x) || is.list(x)) && is_named(x)) {
+    return(x)
+  }
+
+  call <- call %||% match.call()
+  if (!is_named(x)) {
     stop(glue(
       "Invalid argument: {format(call[[2]])} must be a named list,
         but it is not named."
     ))
-  }
-  if ((!is.list(opts) && !is.null(opts))) {
-    call <- call %||% match.call()
+  } else {
     stop(glue(
       "Invalid argument: {format(call[[2]])} must be a named list,
       but it is {typename(opts)}."
     ))
   }
+}
 
+as_file_exporter_options <- function(opts, evs, call = NULL) {
   call <- call %||% match.call()
+  opts <- as_named_list(opts, call = call)
+
   call_as <- substitute(as_string(x), list(x = call[[2]]))
   call_ds <- substitute(as_difftime_spec(x), list(x = call[[2]]))
   call_ac <- substitute(as_count(x), list(x = call[[2]]))
   call_ab <- substitute(as_bytes(x), list(x = call[[2]]))
 
-  orig <- opts
-
-  opts$file_pattern <-
+  opts["file_pattern"] <- list(
     as_string(opts$file_pattern, call = call_as) %||%
-    get_env(file_exporter_logs_file_envvar) %||%
-    get_env(file_exporter_file_envvar)
-  opts$alias_pattern <-
+      get_env(evs[["file_pattern"]]) %||%
+      get_env(file_exporter_file_envvar)
+  )
+  opts["alias_pattern"] <- list(
     as_string(opts$alias_pattern, call = call_as) %||%
-    get_env(file_exporter_logs_alias_envvar) %||%
-    get_env(file_exporter_alias_envvar) %||%
-    empty_atomic_as_null(sub("%N", "latest", opts$file_pattern))
-  opts$flush_interval <-
+      get_env(evs[["alias_pattern"]]) %||%
+      get_env(file_exporter_alias_envvar) %||%
+      empty_atomic_as_null(sub("%N", "latest", opts$file_pattern))
+  )
+  opts["flush_interval"] <- list(
     as_difftime_spec(opts$flush_interval, call = call_ds) %||%
-    as_difftime_env(file_exporter_logs_flush_interval_envvar) %||%
-    as_difftime_env(file_exporter_flush_interval_envvar)
-  opts$flush_count <-
+      as_difftime_env(evs[["flush_interval"]]) %||%
+      as_difftime_env(file_exporter_flush_interval_envvar)
+  )
+  opts["flush_count"] <- list(
     as_count(opts$flush_count, null = TRUE, call = call_ac) %||%
-    as_count_env(file_exporter_logs_flush_count_envvar, positive = TRUE) %||%
-    as_count_env(file_exporter_flush_count_envvar, positive = TRUE)
-  opts$file_size <-
+      as_count_env(evs[["flush_count"]], positive = TRUE) %||%
+      as_count_env(file_exporter_flush_count_envvar, positive = TRUE)
+  )
+  opts["file_size"] <- list(
     as_bytes(opts$file_size, call = call_ab) %||%
-    as_bytes_env(file_exporter_logs_file_size_envvar) %||%
-    as_bytes_env(file_exporter_file_size_envvar)
-  opts$rotate_size <-
+      as_bytes_env(evs[["file_size"]]) %||%
+      as_bytes_env(file_exporter_file_size_envvar)
+  )
+  opts["rotate_size"] <- list(
     as_bytes(opts$rotate_size, call = call_ab) %||%
-    as_count_env(file_exporter_logs_rotate_size_envvar) %||%
-    as_count_env(file_exporter_rotate_size_envvar)
+      as_count_env(evs[["rotate_size"]]) %||%
+      as_count_env(file_exporter_rotate_size_envvar)
+  )
 
-  bad <- setdiff(names(orig), names(opts))
+  opts
+}
+
+as_known_options <- function(x, nms, call = NULL) {
+  bad <- setdiff(names(x), nms)
   if (length(bad) > 0) {
+    call <- call %||% match.call()
     s <- plural(length(bad))
     badstr <- paste(bad, collapse = ", ")
     stop(glue(
       "Invalid argument: {format(call[[2]])} has unknown option{s}: {badstr}."
     ))
   }
+  x
+}
+
+as_logger_provider_file_options <- function(opts, call = NULL) {
+  evs = c(
+    file_pattern = file_exporter_logs_file_envvar,
+    alias_pattern = file_exporter_logs_alias_envvar,
+    flush_interval = file_exporter_logs_flush_interval_envvar,
+    flush_count = file_exporter_logs_flush_count_envvar,
+    file_size = file_exporter_logs_file_size_envvar,
+    rotate_size = file_exporter_logs_rotate_size_envvar
+  )
+
+  call <- call %||% match.call()
+  opts1 <- as_file_exporter_options(opts, evs = evs, call = call)
+  as_known_options(opts, names(opts1), call = call)
+
+  opts1
+}
+
+as_metric_reader_options <- function(opts, call = NULL) {
+  call <- call %||% match.call()
+  opts <- as_named_list(opts, call = call)
+
+  call_ds <- substitute(as_difftime_spec(x), list(x = call[[2]]))
+
+  opts["export_interval"] <- list(
+    as_difftime_spec(opts$export_interval, call = call_ds) %||%
+      as_difftime_env(metric_export_interval_envvar) %||%
+      60000L
+  )
+  opts["export_timeout"] <- list(
+    as_difftime_spec(opts$export_timeout, call = call_ds) %||%
+      as_difftime_env(metric_export_timeout_envvar) %||%
+      30000L
+  )
 
   opts
+}
+
+as_meter_provider_file_options <- function(opts, call = NULL) {
+  evs = c(
+    file_pattern = file_exporter_metrics_file_envvar,
+    alias_pattern = file_exporter_metrics_alias_envvar,
+    flush_interval = file_exporter_metrics_flush_interval_envvar,
+    flush_count = file_exporter_metrics_flush_count_envvar,
+    file_size = file_exporter_metrics_file_size_envvar,
+    rotate_size = file_exporter_metrics_rotate_size_envvar
+  )
+  call <- call %||% match.call()
+  opts1 <- as_metric_reader_options(opts, call = call)
+  opts2 <- as_file_exporter_options(opts, evs = evs, call = call)
+  as_known_options(opts, c(names(opts1), names(opts2)), call = call)
+
+  c(opts1, opts2)
 }

@@ -492,7 +492,7 @@ test_that("as_difftime_spec", {
     as_difftime_spec(as.difftime(1.2, units = "secs")),
     1.2 * 1000 * 1000
   )
-  expect_equal(as_difftime_spec(5), 5 * 1000 * 1000)
+  expect_equal(as_difftime_spec(5), 5 * 1000)
   expect_equal(as_difftime_spec("1s"), 1 * 1000 * 1000)
 
   expect_snapshot(error = TRUE, {
@@ -514,7 +514,7 @@ test_that("as_difftime_env", {
   expect_null(as_difftime_env("FOO"))
 
   withr::local_envvar(FOO = 1.4)
-  expect_equal(as_difftime_env("FOO"), 1.4 * 1000 * 1000)
+  expect_equal(as_difftime_env("FOO"), 1.4 * 1000)
 
   withr::local_envvar(FOO = "1m")
   expect_equal(as_difftime_env("FOO"), 60 * 1000 * 1000)

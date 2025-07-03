@@ -53,15 +53,16 @@ SEXP otel_create_logger_provider_http(void) {
 }
 
 SEXP otel_create_logger_provider_file(SEXP options) {
-  struct otel_file_exporter_options options_;
+  struct otel_file_exporter_options options_ = { 0 };
   r2c_otel_file_exporter_options(options, &options_);
   void *logger_provider_ = otel_create_logger_provider_file_(&options_);
+  otel_file_exporter_options_free(&options_);
   SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
   return xptr;
 }
 SEXP otel_logger_provider_file_options_defaults(void) {
-  struct otel_file_exporter_options options_;
+  struct otel_file_exporter_options options_ = { 0 };
   otel_logger_provider_file_options_defaults_(&options_);
   SEXP res = Rf_protect(c2r_otel_file_exporter_options(&options_));
   otel_file_exporter_options_free(&options_);

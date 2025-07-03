@@ -561,6 +561,8 @@ void *otel_create_meter_provider_http_(
 void *otel_create_meter_provider_file_(
   int export_interval, int export_timeout,
   struct otel_file_exporter_options *options);
+void otel_meter_provider_file_options_defaults_(
+  struct otel_file_exporter_options *options);
 void *otel_create_meter_provider_memory_(
     int export_interval, int export_timeout, int cbuffer_size,
     int ctemporality);
