@@ -111,6 +111,16 @@ void *otel_create_tracer_provider_file_(
   return (void*) tps;
 }
 
+void otel_tracer_provider_file_options_defaults_(
+  struct otel_file_exporter_options *options
+) {
+  otlp::OtlpFileExporterOptions opts;
+  otlp::OtlpFileClientFileSystemOptions backend_opts =
+    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
+
+  cc2c_file_exporter_options(backend_opts, *options);
+}
+
 #define BAIL() throw std::runtime_error("");
 
 int otel_tracer_provider_memory_get_spans_(

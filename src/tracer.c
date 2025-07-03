@@ -77,6 +77,16 @@ SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes) {
   return xptr;
 }
 
+SEXP otel_tracer_provider_file_options_defaults(void) {
+  struct otel_file_exporter_options options_ = { 0 };
+  otel_tracer_provider_file_options_defaults_(&options_);
+  SEXP res = Rf_protect(c2r_otel_file_exporter_options(&options_));
+  otel_file_exporter_options_free(&options_);
+  Rf_unprotect(1);
+  return res;
+}
+
+
 SEXP otel_tracer_provider_flush(SEXP provider) {
   if (TYPEOF(provider) != EXTPTRSXP) {
     Rf_warningcall(

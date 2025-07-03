@@ -934,3 +934,20 @@ as_meter_provider_file_options <- function(opts, call = NULL) {
 
   c(opts1, opts2)
 }
+
+as_tracer_provider_file_options <- function(opts, call = NULL) {
+  evs = c(
+    file_pattern = file_exporter_traces_file_envvar,
+    alias_pattern = file_exporter_traces_alias_envvar,
+    flush_interval = file_exporter_traces_flush_interval_envvar,
+    flush_count = file_exporter_traces_flush_count_envvar,
+    file_size = file_exporter_traces_file_size_envvar,
+    rotate_size = file_exporter_traces_rotate_size_envvar
+  )
+
+  call <- call %||% match.call()
+  opts1 <- as_file_exporter_options(opts, evs = evs, call = call)
+  as_known_options(opts, names(opts1), call = call)
+
+  opts1
+}

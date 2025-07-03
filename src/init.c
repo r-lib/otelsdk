@@ -17,6 +17,7 @@ SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes);
 SEXP otel_create_tracer_provider_http(SEXP attributes);
 SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes);
 SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes);
+SEXP otel_tracer_provider_file_options_defaults(void);
 SEXP otel_tracer_provider_memory_get_spans(SEXP provider);
 SEXP otel_tracer_provider_flush(SEXP provider);
 SEXP otel_get_tracer(
@@ -152,6 +153,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_tracer_provider_http, 1),
   CALLDEF(otel_create_tracer_provider_memory, 2),
   CALLDEF(otel_create_tracer_provider_file, 2),
+  CALLDEF(otel_tracer_provider_file_options_defaults, 0),
   CALLDEF(otel_tracer_provider_memory_get_spans, 1),
   CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 5),

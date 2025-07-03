@@ -475,6 +475,8 @@ void *otel_create_tracer_provider_memory_(
 void *otel_create_tracer_provider_file_(
   const struct otel_file_exporter_options *options,
   struct otel_attributes *resource_attributes);
+void otel_tracer_provider_file_options_defaults_(
+  struct otel_file_exporter_options *options);
 int otel_tracer_provider_memory_get_spans_(
   void *tracer_provider, struct otel_span_data *cdata);
 int otel_tracer_provider_flush_(void *tracer_provider);

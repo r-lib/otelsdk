@@ -61,6 +61,7 @@ SEXP otel_create_logger_provider_file(SEXP options) {
   R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
   return xptr;
 }
+
 SEXP otel_logger_provider_file_options_defaults(void) {
   struct otel_file_exporter_options options_ = { 0 };
   otel_logger_provider_file_options_defaults_(&options_);
