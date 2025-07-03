@@ -66,7 +66,7 @@ SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes) {
 
 SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes) {
   struct otel_file_exporter_options options_;
-  r2c_file_exporter_options(options, &options_);
+  r2c_otel_file_exporter_options(options, &options_);
   struct otel_attributes attributes_;
   r2c_attributes(attributes, &attributes_);
 

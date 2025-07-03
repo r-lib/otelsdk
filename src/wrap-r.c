@@ -16,6 +16,17 @@ void otel_string_free(struct otel_string *s) {
   s->size = 0;
 }
 
+void r2c_otel_string(SEXP s, struct otel_string *cs) {
+  const char *s_ = CHAR(STRING_ELT(s, 0));
+  size_t n = strlen(s_);
+  cs->s = malloc(n + 1);
+  if (!cs->s) {
+    R_THROW_SYSTEM_ERROR("Cannot allocate memory for string");
+  }
+  cs->size = n + 1;
+  memcpy(cs->s, s_, n + 1);
+}
+
 SEXP c2r_otel_string(const struct otel_string *s) {
   SEXP res = PROTECT(Rf_allocVector(STRSXP, 1));
   if (s->size > 0) {
@@ -278,23 +289,75 @@ void r2c_attributes(SEXP r, struct otel_attributes *c) {
   }
 }
 
-void r2c_file_exporter_options(
-    SEXP options, struct otel_file_exporter_options *coptions) {
+void r2c_otel_file_exporter_options(
+  SEXP options, struct otel_file_exporter_options *coptions
+) {
   SEXP file_pattern = rf_get_list_element(options, "file_pattern");
-  coptions->file_pattern =
-    Rf_isNull(file_pattern) ? NULL : CHAR(STRING_ELT(file_pattern, 0));
+  coptions->has_file_pattern = !Rf_isNull(file_pattern);
+  if (coptions->has_file_pattern) {
+    r2c_otel_string(file_pattern, &coptions->file_pattern);
+  }
   SEXP alias_pattern = rf_get_list_element(options, "alias_pattern");
-  coptions->alias_pattern =
-    Rf_isNull(alias_pattern) ? NULL : CHAR(STRING_ELT(alias_pattern, 0));
+  coptions->has_alias_pattern = !Rf_isNull(alias_pattern);
+  if (coptions->has_alias_pattern) {
+    r2c_otel_string(alias_pattern, &coptions->alias_pattern);
+  }
   SEXP flush_interval = rf_get_list_element(options, "flush_interval");
-  coptions->flush_interval =
-    Rf_isNull(flush_interval) ? NULL : REAL(flush_interval);
+  coptions->has_flush_interval = !Rf_isNull(flush_interval);
+  if (coptions->has_flush_interval) {
+    coptions->flush_interval = REAL(flush_interval)[0];
+  }
   SEXP flush_count = rf_get_list_element(options, "flush_count");
-  coptions->flush_count = Rf_isNull(flush_count) ? NULL : INTEGER(flush_count);
+  coptions->has_flush_count = !Rf_isNull(flush_count);
+  if (coptions->has_flush_count) {
+    coptions->flush_count = INTEGER(flush_count)[0];
+  }
   SEXP file_size = rf_get_list_element(options, "file_size");
-  coptions->file_size = Rf_isNull(file_size) ? NULL : REAL(file_size);
+  coptions->has_file_size = !Rf_isNull(file_size);
+  if (coptions->has_file_size) {
+    coptions->file_size = REAL(file_size)[0];
+  }
   SEXP rotate_size = rf_get_list_element(options, "rotate_size");
-  coptions->rotate_size = Rf_isNull(rotate_size) ? NULL : INTEGER(rotate_size);
+  coptions->has_rotate_size = !Rf_isNull(rotate_size);
+  if (coptions->has_rotate_size) {
+    coptions->rotate_size = INTEGER(rotate_size)[0];
+  }
+}
+
+void otel_file_exporter_options_free(struct otel_file_exporter_options *o) {
+  if (!o) return;
+  otel_string_free(&o->file_pattern);
+  otel_string_free(&o->alias_pattern);
+}
+
+SEXP c2r_otel_file_exporter_options(
+  const struct otel_file_exporter_options *o
+) {
+  const char *nms[] = {
+    "file_pattern", "alias_pattern", "flush_interval", "flush_count",
+    "file_size", "rotate_size", ""
+  };
+  SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));
+  if (o->has_file_pattern) {
+    SET_VECTOR_ELT(res, 0, c2r_otel_string(&o->file_pattern));
+  }
+  if (o->has_alias_pattern) {
+    SET_VECTOR_ELT(res, 1, c2r_otel_string(&o->alias_pattern));
+  }
+  if (o->has_flush_interval) {
+    SET_VECTOR_ELT(res, 2, Rf_ScalarReal(o->flush_interval));
+  }
+  if (o->has_flush_count) {
+    SET_VECTOR_ELT(res, 3, Rf_ScalarInteger(o->flush_count));
+  }
+  if (o->has_file_size) {
+    SET_VECTOR_ELT(res, 4, Rf_ScalarReal(o->file_size));
+  }
+  if (o->has_rotate_size) {
+    SET_VECTOR_ELT(res, 5, Rf_ScalarInteger(o->rotate_size));
+  }
+  Rf_unprotect(1);
+  return res;
 }
 
 SEXP c2r_otel_attribute(const struct otel_attribute *attr) {

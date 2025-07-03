@@ -10,11 +10,11 @@ SEXP rf_get_list_element(SEXP list, const char *str);
 
 void otel_span_context_finally(SEXP x);
 
+void r2c_otel_string(SEXP s, struct otel_string *cs);
+
 void r2c_attribute(
   const char *name, SEXP value, struct otel_attribute *attr);
 void r2c_attributes(SEXP r, struct otel_attributes *c);
-void r2c_file_exporter_options(
-  SEXP options, struct otel_file_exporter_options *coptions);
 
 SEXP c2r_otel_string(const struct otel_string *s);
 SEXP c2r_otel_strings(const struct otel_strings *s);
@@ -54,5 +54,10 @@ SEXP c2r_otel_collector_resource_metric(
   const struct otel_collector_resource_metric *rm);
 SEXP c2r_otel_collector_resource_metrics(
   const struct otel_collector_resource_metrics *rl);
+
+void r2c_otel_file_exporter_options(
+  SEXP options, struct otel_file_exporter_options *coptions);
+SEXP c2r_otel_file_exporter_options(
+  const struct otel_file_exporter_options *o);
 
 #endif

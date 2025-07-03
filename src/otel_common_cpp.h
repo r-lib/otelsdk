@@ -165,5 +165,8 @@ int cc2c_otel_links(
 void c2cc_file_exporter_options(
   const struct otel_file_exporter_options &options,
   otlp::OtlpFileClientFileSystemOptions &backeend_opts);
+void cc2c_file_exporter_options(
+    const otlp::OtlpFileClientFileSystemOptions &backend_opts,
+    struct otel_file_exporter_options &options);
 
 #endif

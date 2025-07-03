@@ -56,6 +56,15 @@ void *otel_create_logger_provider_file_(
   return (void*) lps;
 }
 
+void otel_logger_provider_file_options_defaults_(
+  struct otel_file_exporter_options *options
+) {
+  opentelemetry::exporter::otlp::OtlpFileLogRecordExporterOptions opts;
+  otlp::OtlpFileClientFileSystemOptions backend_opts =
+    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
+
+  cc2c_file_exporter_options(backend_opts, *options);
+}
 
 void otel_logger_provider_flush_(void *logger_provider_) {
   struct otel_logger_provider *lps =

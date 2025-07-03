@@ -7,30 +7,6 @@
 namespace common_sdk = opentelemetry::sdk::common;
 namespace otlp       = opentelemetry::exporter::otlp;
 
-void c2cc_file_exporter_options(
-    const struct otel_file_exporter_options &options,
-    otlp::OtlpFileClientFileSystemOptions &backend_opts) {
-  if (options.file_pattern) {
-    backend_opts.file_pattern = options.file_pattern;
-  }
-  if (options.alias_pattern) {
-    backend_opts.alias_pattern = options.alias_pattern;
-  }
-  if (options.flush_interval) {
-    backend_opts.flush_interval =
-      std::chrono::microseconds((int64_t) *options.flush_interval);
-  }
-  if (options.flush_count) {
-    backend_opts.flush_count = *options.flush_count;
-  }
-  if (options.file_size) {
-    backend_opts.file_size = *options.file_size;
-  }
-  if (options.rotate_size) {
-    backend_opts.rotate_size = *options.rotate_size;
-  }
-}
-
 int cc2c_otel_string(
     const trace_api::TraceId &trace_id, struct otel_string &s) {
   const auto sz = trace_api::TraceId::kSize;
@@ -394,4 +370,47 @@ int cc2c_otel_links(
   }
 
   return 0;
+}
+
+void c2cc_file_exporter_options(
+    const struct otel_file_exporter_options &options,
+    otlp::OtlpFileClientFileSystemOptions &backend_opts) {
+  if (options.has_file_pattern) {
+    backend_opts.file_pattern = options.file_pattern.s;
+  }
+  if (options.has_alias_pattern) {
+    backend_opts.alias_pattern = options.alias_pattern.s;
+  }
+  if (options.has_flush_interval) {
+    backend_opts.flush_interval =
+      std::chrono::microseconds((int64_t) options.flush_interval);
+  }
+  if (options.has_flush_count) {
+    backend_opts.flush_count = options.flush_count;
+  }
+  if (options.has_file_size) {
+    backend_opts.file_size = options.file_size;
+  }
+  if (options.has_rotate_size) {
+    backend_opts.rotate_size = options.rotate_size;
+  }
+}
+
+void cc2c_file_exporter_options(
+    const otlp::OtlpFileClientFileSystemOptions &backend_opts,
+    struct otel_file_exporter_options &options
+) {
+  options.has_file_pattern = 1;
+  cc2c_otel_string(backend_opts.file_pattern, options.file_pattern);
+  options.has_alias_pattern = 1;
+  cc2c_otel_string(backend_opts.alias_pattern, options.alias_pattern);
+  options.has_flush_interval = 1;
+  options.flush_interval =
+    std::chrono::duration<double>(backend_opts.flush_interval).count();
+  options.has_flush_count = 1;
+  options.flush_count = backend_opts.flush_count;
+  options.has_file_size = 1;
+  options.file_size = backend_opts.file_size;
+  options.has_rotate_size = 1;
+  options.rotate_size = backend_opts.rotate_size;
 }

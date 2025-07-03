@@ -66,7 +66,7 @@ SEXP otel_create_meter_provider_file(
   int cexport_interval = INTEGER(export_interval)[0];
   int cexport_timeout = INTEGER(export_timeout)[0];
   struct otel_file_exporter_options options_;
-  r2c_file_exporter_options(options, &options_);
+  r2c_otel_file_exporter_options(options, &options_);
   void *meter_provider_ = otel_create_meter_provider_file_(
     cexport_interval, cexport_timeout, &options_);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);

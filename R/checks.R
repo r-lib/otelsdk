@@ -804,3 +804,65 @@ parse_bytes_spec <- function(x) {
   x <- substr(x, 1, nchar(x) - nchar(bytes_spec_units$unit[wh]))
   as.double(x) * unname(bytes_spec_units$mult[wh])
 }
+
+as_logger_provider_file_options <- function(opts, call = NULL) {
+  if (!is_named(opts)) {
+    call <- call %||% match.call()
+    stop(glue(
+      "Invalid argument: {format(call[[2]])} must be a named list,
+        but it is not named."
+    ))
+  }
+  if ((!is.list(opts) && !is.null(opts))) {
+    call <- call %||% match.call()
+    stop(glue(
+      "Invalid argument: {format(call[[2]])} must be a named list,
+      but it is {typename(opts)}."
+    ))
+  }
+
+  call <- call %||% match.call()
+  call_as <- substitute(as_string(x), list(x = call[[2]]))
+  call_ds <- substitute(as_difftime_spec(x), list(x = call[[2]]))
+  call_ac <- substitute(as_count(x), list(x = call[[2]]))
+  call_ab <- substitute(as_bytes(x), list(x = call[[2]]))
+
+  orig <- opts
+
+  opts$file_pattern <-
+    as_string(opts$file_pattern, call = call_as) %||%
+    get_env(file_exporter_logs_file_envvar) %||%
+    get_env(file_exporter_file_envvar)
+  opts$alias_pattern <-
+    as_string(opts$alias_pattern, call = call_as) %||%
+    get_env(file_exporter_logs_alias_envvar) %||%
+    get_env(file_exporter_alias_envvar) %||%
+    empty_atomic_as_null(sub("%N", "latest", opts$file_pattern))
+  opts$flush_interval <-
+    as_difftime_spec(opts$flush_interval, call = call_ds) %||%
+    as_difftime_env(file_exporter_logs_flush_interval_envvar) %||%
+    as_difftime_env(file_exporter_flush_interval_envvar)
+  opts$flush_count <-
+    as_count(opts$flush_count, null = TRUE, call = call_ac) %||%
+    as_count_env(file_exporter_logs_flush_count_envvar, positive = TRUE) %||%
+    as_count_env(file_exporter_flush_count_envvar, positive = TRUE)
+  opts$file_size <-
+    as_bytes(opts$file_size, call = call_ab) %||%
+    as_bytes_env(file_exporter_logs_file_size_envvar) %||%
+    as_bytes_env(file_exporter_file_size_envvar)
+  opts$rotate_size <-
+    as_bytes(opts$rotate_size, call = call_ab) %||%
+    as_count_env(file_exporter_logs_rotate_size_envvar) %||%
+    as_count_env(file_exporter_rotate_size_envvar)
+
+  bad <- setdiff(names(orig), names(opts))
+  if (length(bad) > 0) {
+    s <- plural(length(bad))
+    badstr <- paste(bad, collapse = ", ")
+    stop(glue(
+      "Invalid argument: {format(call[[2]])} has unknown option{s}: {badstr}."
+    ))
+  }
+
+  opts
+}

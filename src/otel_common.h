@@ -105,13 +105,21 @@ struct otel_links {
 };
 
 struct otel_file_exporter_options {
-  const char *file_pattern;
-  const char *alias_pattern;
-  double *flush_interval;
-  int *flush_count;
-  double *file_size;
-  int *rotate_size;
+  int has_file_pattern;
+  struct otel_string file_pattern;
+  int has_alias_pattern;
+  struct otel_string alias_pattern;
+  int has_flush_interval;
+  double flush_interval;
+  int has_flush_count;
+  int flush_count;
+  int has_file_size;
+  double file_size;
+  int has_rotate_size;
+  int rotate_size;
 };
+
+void otel_file_exporter_options_free(struct otel_file_exporter_options *o);
 
 struct otel_tracer_provider_http_options {
   struct otel_string url;
@@ -528,6 +536,8 @@ void otel_logger_provider_finally_(void *logger_provider);
 void *otel_create_logger_provider_stdstream_(const char *stream);
 void *otel_create_logger_provider_http_(void);
 void *otel_create_logger_provider_file_(
+  struct otel_file_exporter_options *options);
+void otel_logger_provider_file_options_defaults_(
   struct otel_file_exporter_options *options);
 void otel_logger_provider_flush_(void *tracer_provider);
 int otel_get_minimum_log_severity_(void *logger);

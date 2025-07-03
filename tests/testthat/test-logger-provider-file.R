@@ -1,7 +1,7 @@
 test_that("logger_provider_file", {
   tmp <- tempfile(fileext = ".jsonl")
   on.exit(unlink(tmp), add = TRUE)
-  lp <- logger_provider_file_new(tmp)
+  lp <- logger_provider_file_new(list(file_pattern = tmp))
   lgr <- lp$get_logger("org.r-lib.otel")
   expect_true(lgr$is_enabled())
   expect_equal(lgr$get_minimum_severity(), otel::log_severity_levels["info"])
