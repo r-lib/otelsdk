@@ -1350,7 +1350,7 @@ as_http_headers <- function(
     return(x)
   }
 
-  if (is.character(x) && !is.named(x)) {
+  if (is.character(x) && !is_named(x)) {
     stop(cnd(
       call = call,
       "Invalid argument: all entries in {arg} must be a named."
