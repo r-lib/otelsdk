@@ -20,35 +20,35 @@
 ---
 
     Code
-      as_timestamp(b1)
+      helper(b1)
     Condition
-      Error in `as_timestamp()`:
-      ! Invalid argument: b1 must be a time stamp (`POSIXt` scalar or numeric scalar), but it is a data frame.
+      Error in `helper()`:
+      ! Invalid argument: `ts` must be a time stamp (`POSIXt` scalar or numeric scalar), but it is a data frame.
     Code
-      as_timestamp(b2)
+      helper(b2)
     Condition
-      Error in `as_timestamp()`:
-      ! Invalid argument: b2 must be a time stamp (`POSIXt` scalar or numeric scalar), but it is a <Date> object.
+      Error in `helper()`:
+      ! Invalid argument: `ts` must be a time stamp (`POSIXt` scalar or numeric scalar), but it is a <Date> object.
     Code
-      as_timestamp(b3)
+      helper(b3)
     Condition
-      Error in `as_timestamp()`:
-      ! Invalid argument: b3 must be a time stamp (`POSIXt` scalar or numeric scalar), but it is too long.
+      Error in `helper()`:
+      ! Invalid argument: `ts` must be a time stamp (`POSIXt` scalar or numeric scalar), but it is too long.
     Code
-      as_timestamp(b4)
+      helper(b4)
     Condition
-      Error in `as_timestamp()`:
-      ! Invalid argument: b4 must be a time stamp (`POSIXt` scalar or numeric scalar), but it is `NA`.
+      Error in `helper()`:
+      ! Invalid argument: `ts` must be a time stamp (`POSIXt` scalar or numeric scalar), but it is `NA`.
     Code
-      as_timestamp(b5)
+      helper(b5)
     Condition
-      Error in `as_timestamp()`:
-      ! Invalid argument: b5 must be a time stamp (`POSIXt` scalar or numeric scalar), but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `ts` must be a time stamp (`POSIXt` scalar or numeric scalar), but it is an integer vector.
     Code
-      as_timestamp(b6)
+      helper(b6)
     Condition
-      Error in `as_timestamp()`:
-      ! Invalid argument: b6 must be a time stamp (`POSIXt` scalar or numeric scalar), but it is an empty vector.
+      Error in `helper()`:
+      ! Invalid argument: `ts` must be a time stamp (`POSIXt` scalar or numeric scalar), but it is an empty vector.
 
 # as_span
 
@@ -74,10 +74,10 @@
 ---
 
     Code
-      as_span(b1)
+      helper(b1)
     Condition
-      Error in `as_span()`:
-      ! Invalid argument: b1 must be a span object (`otel_span`), but it is a data frame.
+      Error in `helper()`:
+      ! Invalid argument: `s` must be a span object (`otel_span`), but it is a data frame.
 
 # as_span_context
 
@@ -103,18 +103,18 @@
 ---
 
     Code
-      as_span_context(b1)
+      helper(b1)
     Condition
-      Error in `as_span_context()`:
-      ! Invalid argument: b1 must be a span context object (`otel_span_context`), but it is a data frame.
+      Error in `helper()`:
+      ! Invalid argument: `spc` must be a span context object (`otel_span_context`), but it is a data frame.
 
 # as_span_parent
 
     Code
-      as_span_parent(b1)
+      helper(b1)
     Condition
-      Error in `as_span_parent()`:
-      ! Invalid argument: b1 must be a span (`otel_span`) or a span context (`otel_span_context`) object but it is a data frame.
+      Error in `helper()`:
+      ! Invalid argument: `spp` must be a span (`otel_span`) or a span context (`otel_span_context`) object but it is a data frame.
 
 # as_choice
 
@@ -134,446 +134,454 @@
 ---
 
     Code
-      as_choice(b1, c(default = "foo", "bar"))
+      helper(b1, c(default = "foo", "bar"))
     Condition
-      Error in `as_choice()`:
-      ! Invalid argument: b1 must be one of foo, bar, but it is foobar.
+      Error in `helper()`:
+      ! Invalid argument: `ch` must be one of foo, bar, but it is foobar.
     Code
-      as_choice(b2, c(default = "foo", "bar"))
+      helper(b2, c(default = "foo", "bar"))
     Condition
-      Error in `as_choice()`:
-      ! Invalid argument: b2 must be a string scalar, one of foo, bar, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `ch` must be a string scalar, one of foo, bar, but it is an integer vector.
 
 # as_env
 
     Code
-      as_env(e1)
+      helper(e1)
     Condition
-      Error in `as_env()`:
-      ! Invalid argument: e1 must be an environment, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `e` must be an environment, but it is an integer vector.
     Code
-      as_env(e2, null = FALSE)
+      helper(e2, null = FALSE)
     Condition
-      Error in `as_env()`:
-      ! Invalid argument: e2 must be an environment, but it is NULL.
+      Error in `helper()`:
+      ! Invalid argument: `e` must be an environment, but it is NULL.
 
 # as_string
 
     Code
-      as_string(s1)
+      helper(s1)
     Condition
-      Error in `as_string()`:
-      ! Invalid argument: s1 must be a string scalar, but it is a number.
+      Error in `helper()`:
+      ! Invalid argument: `s` must be a string scalar but it is a number.
     Code
-      as_string(s2)
+      helper(s2)
     Condition
-      Error in `as_string()`:
-      ! Invalid argument: s2 must be a string scalar, but it is an empty character vector.
+      Error in `helper()`:
+      ! Invalid argument: `s` must be a string scalar but it is an empty character vector.
     Code
-      as_string(s3)
+      helper(s3)
     Condition
-      Error in `as_string()`:
-      ! Invalid argument: s3 must be a string scalar, but it is a character vector.
+      Error in `helper()`:
+      ! Invalid argument: `s` must be a string scalar but it is a character vector.
     Code
-      as_string(s4, null = FALSE)
+      helper(s4, null = FALSE)
     Condition
-      Error in `as_string()`:
-      ! Invalid argument: s4 must be a string scalar, but it is NULL.
+      Error in `helper()`:
+      ! Invalid argument: `s` must be a string scalar but it is NULL.
+
+---
+
+    Code
+      helper(s)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `s` must be a string scalar but it is an integer vector.
 
 # as_flag
 
     Code
-      as_flag(b1)
+      helper(b1)
     Condition
-      Error in `as_flag()`:
-      ! Invalid argument: b1 must a flag (logical scalar), but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `f` must a flag (logical scalar), but it is an integer vector.
 
 # as_otel_attribute_value
 
     Code
-      as_otel_attribute_value(v1)
+      helper(v1)
     Condition
-      Error in `as_otel_attribute_value()`:
-      ! Invalid argument: v1 must be of type character, logical, double, or integer, but it is an empty list.
+      Error in `helper()`:
+      ! Invalid argument: `oav` must be of type character, logical, double, or integer, but it is an empty list.
     Code
-      as_otel_attribute_value(v2)
+      helper(v2)
     Condition
-      Error in `as_otel_attribute_value()`:
-      ! Invalid argument: v2 must not contain missing (`NA`) values.
+      Error in `helper()`:
+      ! Invalid argument: `oav` must not contain missing (`NA`) values.
     Code
-      as_otel_attribute_value(v3)
+      helper(v3)
     Condition
-      Error in `as_otel_attribute_value()`:
-      ! Invalid argument: v3 must not contain missing (`NA`) values.
+      Error in `helper()`:
+      ! Invalid argument: `oav` must not contain missing (`NA`) values.
     Code
-      as_otel_attribute_value(v4)
+      helper(v4)
     Condition
-      Error in `as_otel_attribute_value()`:
-      ! Invalid argument: v4 must not contain missing (`NA`) values.
+      Error in `helper()`:
+      ! Invalid argument: `oav` must not contain missing (`NA`) values.
     Code
-      as_otel_attribute_value(v5)
+      helper(v5)
     Condition
-      Error in `as_otel_attribute_value()`:
-      ! Invalid argument: v5 must not contain missing (`NA`) values.
+      Error in `helper()`:
+      ! Invalid argument: `oav` must not contain missing (`NA`) values.
 
 # as_otel_attributes
 
     Code
-      as_otel_attributes(v1)
+      helper(v1)
     Condition
-      Error in `as_otel_attributes()`:
-      ! Invalid argument: v1 must be a named list, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `att` must be a named list, but it is an integer vector.
     Code
-      as_otel_attributes(v2)
+      helper(v2)
     Condition
-      Error in `as_otel_attributes()`:
-      ! Invalid argument: v2 must be a named list, but not all of its entries are named.
+      Error in `helper()`:
+      ! Invalid argument: `att` must be a named list, but not all of its entries are named.
     Code
-      as_otel_attributes(v3)
+      helper(v3)
     Condition
-      Error in `as_otel_attributes()`:
-      ! Invalid argument: v3 can only contain types character, logical, double, and integer, but it contains list types.
+      Error in `helper()`:
+      ! Invalid argument: `att` can only contain types character, logical, double, and integer, but it contains list types.
     Code
-      as_otel_attributes(v4)
+      helper(v4)
     Condition
-      Error in `as_otel_attributes()`:
-      ! Invalid argument: the entries of v4 must not contain missing (`NA`) values.
+      Error in `helper()`:
+      ! Invalid argument: the entries of `att` must not contain missing (`NA`) values.
 
 # as_span_link
 
     Code
       link <- 1:10
-      as_span_link(link)
+      helper(link)
     Condition
-      Error in `as_span_link()`:
-      ! Invalid argument: link must be either an OpenTelemetry span (`otel_span`) object or a list with a span object as the first element and named span attributes as the rest.
+      Error in `helper()`:
+      ! Invalid argument: `spl` must be either an OpenTelemetry span (`otel_span`) object or a list with a span object as the first element and named span attributes as the rest.
     Code
       link <- list(sl, "foo", "bar")
-      as_span_link(link)
+      helper(link)
     Condition
-      Error in `as_otel_attributes()`:
-      ! Invalid argument: link[-1] must be a named list, but not all of its entries are named.
+      Error in `helper()`:
+      ! Invalid argument: `spl[-1]` must be a named list, but not all of its entries are named.
     Code
       link <- list(sl, a = "1", b = c(1, NA))
-      as_span_link(link)
+      helper(link)
     Condition
-      Error in `as_otel_attributes()`:
-      ! Invalid argument: the entries of link[-1] must not contain missing (`NA`) values.
+      Error in `helper()`:
+      ! Invalid argument: the entries of `spl[-1]` must not contain missing (`NA`) values.
 
 # as_span_links
 
     Code
       links <- 1:10
-      as_span_links(links)
+      helper(links)
     Condition
-      Error in `as_span_links()`:
-      ! Invalid argument: links must be a named list, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `spls` must be a named list, but it is an integer vector.
     Code
       links <- list(1:10)
-      as_span_links(links)
+      helper(links)
     Condition
-      Error in `as_span_link()`:
-      ! Invalid argument: links[[1L]] must be either an OpenTelemetry span (`otel_span`) object or a list with a span object as the first element and named span attributes as the rest.
+      Error in `helper()`:
+      ! Invalid argument: `spls[[1L]]` must be either an OpenTelemetry span (`otel_span`) object or a list with a span object as the first element and named span attributes as the rest.
 
 # as_span_options
 
     Code
       options <- 1:10
-      as_span_options(options)
+      helper(options)
     Condition
-      Error in `as_span_options()`:
-      ! Invalid argument: options must be a named list of OpenTelemetry span options, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `opts` must be a named list of OpenTelemetry span options, but it is an integer vector.
     Code
       options <- list("foo")
-      as_span_options(options)
+      helper(options)
     Condition
-      Error in `as_span_options()`:
-      ! Invalid argument: options must be a named list of OpenTelemetry span options, but not all of its entries are named.
+      Error in `helper()`:
+      ! Invalid argument: `opts` must be a named list of OpenTelemetry span options, but not all of its entries are named.
     Code
       options <- list(kind = "internal", foo = "notgood")
-      as_span_options(options)
+      helper(options)
     Condition
-      Error in `as_span_options()`:
-      ! Invalid argument: options contains unknown OpenTelemetry span option: foo. Known span options are: start_system_time, start_steady_time, parent, and kind.
+      Error in `helper()`:
+      ! Invalid argument: `opts` contains unknown OpenTelemetry span option: foo. Known span options are: start_system_time, start_steady_time, parent, and kind.
     Code
       options <- list(kind = 10)
-      as_span_options(options)
+      helper(options)
     Condition
-      Error in `as_choice()`:
-      ! Invalid argument: options[["kind"]] must be a string scalar, one of internal, server, client, producer, consumer, but it is a number.
+      Error in `helper()`:
+      ! Invalid argument: `opts[["kind"]]` must be a string scalar, one of internal, server, client, producer, consumer, but it is a number.
 
 # as_end_span_options
 
     Code
-      options <- 1:10
-      as_end_span_options(options)
+      o1 <- 1:10
+      helper(o1)
     Condition
-      Error in `as_end_span_options()`:
-      ! Invalid argument: options must be a named list of OpenTelemetry end span options, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `opts` must be a named list of OpenTelemetry end span options, but it is an integer vector.
     Code
-      options <- list("foo")
-      as_end_span_options(options)
+      o2 <- list("foo")
+      helper(o2)
     Condition
-      Error in `as_end_span_options()`:
-      ! Invalid argument: options must be a named list of OpenTelemetry end span options, but not of its entries are named.
+      Error in `helper()`:
+      ! Invalid argument: `opts` must be a named list of OpenTelemetry end span options, but not all of its entries are named.
     Code
-      options <- list(end_steady_time = t, foo = "notgood")
-      as_end_span_options(options)
+      o3 <- list(end_steady_time = t, foo = "notgood")
+      helper(o3)
     Condition
-      Error in `as_end_span_options()`:
-      ! Invalid argument: options contains unknown OpenTelemetry end span options: foo. Known end span options are: end_steady_time.
+      Error in `helper()`:
+      ! Invalid argument: `opts` contains unknown OpenTelemetry end span options: foo. Known end span options are: end_steady_time.
     Code
-      options <- list(end_steady_time = "bad")
-      as_end_span_options(options)
+      o4 <- list(end_steady_time = "bad")
+      helper(o4)
     Condition
-      Error in `as_timestamp()`:
-      ! Invalid argument: options[["end_steady_time"]] must be a time stamp (`POSIXt` scalar or numeric scalar), but it is a string.
+      Error in `helper()`:
+      ! Invalid argument: `opts[["end_steady_time"]]` must be a time stamp (`POSIXt` scalar or numeric scalar), but it is a string.
 
 # as_output_file
 
     Code
-      as_output_file(tmp3)
+      helper(tmp3)
     Condition
-      Error in `as_output_file()`:
+      Error in `helper()`:
       ! Directory of OpenTelemetry output file '<tempdir>/<tempfile>/output' does not exist or it is not writeable.
 
 ---
 
     Code
-      as_output_file(tmp3)
+      helper(tmp3)
     Condition
-      Error in `as_output_file()`:
+      Error in `helper()`:
       ! Cannot write to OpenTelemetry output file '<tempdir>/<tempfile>/output'.
 
 # as_log_severity
 
     Code
-      as_log_severity(v1)
+      helper(v1)
     Condition
-      Error in `as_log_severity()`:
-      ! Invalid argument: v1 must be one of trace, trace2, trace3, trace4, debug, debug2, debug3, debug4, info, info2, info3, info4, warn, warn2, warn3, warn4, error, error2, error3, error4, fatal, fatal2, fatal3, fatal4, but it is foobar.
+      Error in `helper()`:
+      ! Invalid argument: `ls` must be one of trace, trace2, trace3, trace4, debug, debug2, debug3, debug4, info, info2, info3, info4, warn, warn2, warn3, warn4, error, error2, error3, error4, fatal, fatal2, fatal3, fatal4, but it is foobar.
     Code
-      as_log_severity(v2)
+      helper(v2)
     Condition
-      Error in `as_log_severity()`:
-      ! Invalid argument: v2 must be an integer log level, between 1 and 24, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `ls` must be an integer log level, between 1 and 24, but it is an integer vector.
     Code
-      as_log_severity(v3)
+      helper(v3)
     Condition
-      Error in `as_log_severity()`:
-      ! Invalid argument: v3 must be an integer log level, between 1 and 24, but it is 200.
+      Error in `helper()`:
+      ! Invalid argument: `ls` must be an integer log level, between 1 and 24, but it is 200.
     Code
-      as_log_severity(v4, spec = TRUE)
+      helper(v4, spec = TRUE)
     Condition
-      Error in `as_log_severity()`:
-      ! Invalid argument: v4 must be an integer log level, between 0 and 24, or 255, but it is 200.
+      Error in `helper()`:
+      ! Invalid argument: `ls` must be an integer log level, between 0 and 24, or 255, but it is 200.
     Code
-      as_log_severity(v5)
+      helper(v5)
     Condition
-      Error in `as_log_severity()`:
-      ! Invalid argument: v5 must be an integer log level, between 1 and 24, but it is 0.
+      Error in `helper()`:
+      ! Invalid argument: `ls` must be an integer log level, between 1 and 24, but it is 0.
     Code
-      as_log_severity(v6)
+      helper(v6)
     Condition
-      Error in `as_log_severity()`:
-      ! Invalid argument: v6 must be an integer log level, between 1 and 24, but it is 255.
+      Error in `helper()`:
+      ! Invalid argument: `ls` must be an integer log level, between 1 and 24, but it is 255.
 
 # as_span_id
 
     Code
-      as_span_id(v1)
+      helper(v1)
     Condition
-      Error in `as_span_id()`:
-      ! Invalid argument: v1 must be a span id, a string scalar containing 16 hexadecimal digits, but it is 'badcafebadcafeb'.
+      Error in `helper()`:
+      ! Invalid argument: `sid` must be a span id, a string scalar containing 16 hexadecimal digits, but it is 'badcafebadcafeb'.
     Code
-      as_span_id(v2)
+      helper(v2)
     Condition
-      Error in `as_span_id()`:
-      ! Invalid argument: v2 must be a span id, a string scalar containing 16 hexadecimal digits, but it is `NA`.
+      Error in `helper()`:
+      ! Invalid argument: `sid` must be a span id, a string scalar containing 16 hexadecimal digits, but it is `NA`.
     Code
-      as_span_id(v3)
+      helper(v3)
     Condition
-      Error in `as_span_id()`:
-      ! Invalid argument: v3 must be a span id, a string scalar containing 16 hexadecimal digits, but it is 'XXXXXXXXXXXXXXXX'.
+      Error in `helper()`:
+      ! Invalid argument: `sid` must be a span id, a string scalar containing 16 hexadecimal digits, but it is 'XXXXXXXXXXXXXXXX'.
     Code
-      as_span_id(v4)
+      helper(v4)
     Condition
-      Error in `as_span_id()`:
-      ! Invalid argument: v4 must be a span id, a string scalar containing 16 hexadecimal digits, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `sid` must be a span id, a string scalar containing 16 hexadecimal digits, but it is an integer vector.
 
 # as_trace_id
 
     Code
-      as_trace_id(v1)
+      helper(v1)
     Condition
-      Error in `as_trace_id()`:
-      ! Invalid argument: v1 must be a trace id, a string scalar containing 32 hexadecimal digits, but it is 'badcafebadcafebadcafebadcafebad'.
+      Error in `helper()`:
+      ! Invalid argument: `tid` must be a trace id, a string scalar containing 32 hexadecimal digits, but it is 'badcafebadcafebadcafebadcafebad'.
     Code
-      as_trace_id(v2)
+      helper(v2)
     Condition
-      Error in `as_trace_id()`:
-      ! Invalid argument: v2 must be a trace id, a string scalar containing 32 hexadecimal digits, but it is `NA`.
+      Error in `helper()`:
+      ! Invalid argument: `tid` must be a trace id, a string scalar containing 32 hexadecimal digits, but it is `NA`.
     Code
-      as_trace_id(v3)
+      helper(v3)
     Condition
-      Error in `as_trace_id()`:
-      ! Invalid argument: v3 must be a trace id, a string scalar containing 32 hexadecimal digits, but it is 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'.
+      Error in `helper()`:
+      ! Invalid argument: `tid` must be a trace id, a string scalar containing 32 hexadecimal digits, but it is 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'.
     Code
-      as_trace_id(v4)
+      helper(v4)
     Condition
-      Error in `as_trace_id()`:
-      ! Invalid argument: v4 must be a trace id, a string scalar containing 32 hexadecimal digits, but it is an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `tid` must be a trace id, a string scalar containing 32 hexadecimal digits, but it is an integer vector.
 
 # as_count
 
     Code
-      as_count(v1)
+      helper(v1)
     Condition
-      Error in `as_count()`:
-      ! Invalid argument: v1 must be an integer scalar, not a vector.
+      Error in `helper()`:
+      ! Invalid argument: `c` must be an integer scalar, not a vector.
     Code
-      as_count(v2)
+      helper(v2)
     Condition
-      Error in `as_count()`:
-      ! Invalid argument: v2 must not be `NA`.
+      Error in `helper()`:
+      ! Invalid argument: `c` must not be `NA`.
     Code
-      as_count(v3)
+      helper(v3)
     Condition
-      Error in `as_count()`:
-      ! Invalid argument: v3 must not be `NA`.
+      Error in `helper()`:
+      ! Invalid argument: `c` must not be `NA`.
     Code
-      as_count(v4)
+      helper(v4)
     Condition
-      Error in `as_count()`:
-      ! Invalid argument: v4 must be non-negative.
+      Error in `helper()`:
+      ! Invalid argument: `c` must be non-negative.
     Code
-      as_count(v5, positive = TRUE)
+      helper(v5, positive = TRUE)
     Condition
-      Error in `as_count()`:
-      ! Invalid argument: v5 must be positive.
+      Error in `helper()`:
+      ! Invalid argument: `c` must be positive.
     Code
-      as_count(v6)
+      helper(v6)
     Condition
-      Error in `as_count()`:
-      ! Invalid argument: v6 must be a non-negative integer scalar, but it is a data frame.
+      Error in `helper()`:
+      ! Invalid argument: `c` must be a non-negative integer scalar, but it is a data frame.
     Code
-      as_count(v7)
+      helper(v7)
     Condition
-      Error in `as_count()`:
-      ! Invalid argument: v7 must be a non-negative integer scalar, but it is a string.
+      Error in `helper()`:
+      ! Invalid argument: `c` must be a non-negative integer scalar, but it is a string.
 
 # as_count_env
 
     Code
-      as_count_env("FOO")
+      helper("FOO")
     Condition
-      Error in `as_count_env()`:
-      ! Invalid environment variable: FOO must be a non-negative integer.
+      Error in `helper()`:
+      ! Invalid environment variable: `FOO` must be a non-negative integer. It is 'oops'.
 
 ---
 
     Code
-      as_count_env("FOO")
+      helper("FOO")
     Condition
-      Error in `as_count_env()`:
-      ! Invalid environment variable: FOO must be a non-negative integer.
+      Error in `helper()`:
+      ! Invalid environment variable: `FOO` must be a non-negative integer. It is '-1'.
 
 ---
 
     Code
-      as_count_env("FOO", positive = TRUE)
+      helper("FOO", positive = TRUE)
     Condition
-      Error in `as_count_env()`:
-      ! Invalid environment variable: FOO must be a positive integer.
+      Error in `helper()`:
+      ! unused argument (positive = TRUE)
 
 # as_http_context_headers
 
     Code
       v1 <- 1:10
-      as_http_context_headers(v1)
+      helper(v1)
     Condition
-      Error in `as_http_context_headers()`:
-      ! Invalid argument: v1 must be a named list, but it is a an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `hdr` must be a named list, but it is a an integer vector.
     Code
       v2 <- list(traceparent = TRUE)
-      as_http_context_headers(v2)
+      helper(v2)
     Condition
-      Error in `as_http_context_headers()`:
-      ! Invalid argument: the 'traceparent' entry of v2 must be a string (character scalar), but it is a `TRUE`.
+      Error in `helper()`:
+      ! Invalid argument: the 'traceparent' entry of `hdr` must be a string (character scalar), but it is a `TRUE`.
     Code
       v3 <- list(tracestate = raw(10))
-      as_http_context_headers(v3)
+      helper(v3)
     Condition
-      Error in `as_http_context_headers()`:
-      ! Invalid argument: the 'tracestate' entry of v3 must be a string (character scalar), but it is a a raw vector.
+      Error in `helper()`:
+      ! Invalid argument: the 'tracestate' entry of `hdr` must be a string (character scalar), but it is a a raw vector.
 
 # as_difftime_spec
 
     Code
       v1 <- as.difftime(NA_real_, units = "secs")
-      as_difftime_spec(v1)
+      helper(v1)
     Condition
-      Error in `as_difftime_spec()`:
-      ! Invalid argument: v1 must have length 1, and must not be `NA`. It is `NA`.
+      Error in `helper()`:
+      ! Invalid argument: `dt` must have length 1, and must not be `NA`. It is `NA`.
     Code
       v2 <- as.difftime(1:2, units = "secs")
-      as_difftime_spec(v2)
+      helper(v2)
     Condition
-      Error in `as_difftime_spec()`:
-      ! Invalid argument: v2 must have length 1, and must not be `NA`. It has length 2.
+      Error in `helper()`:
+      ! Invalid argument: `dt` must have length 1, and must not be `NA`. It has length {length(x)}.
     Code
       v3 <- "foo"
-      as_difftime_spec(v3)
+      helper(v3)
     Condition
-      Error in `as_difftime_spec()`:
-      ! Invalid argument: v3 must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+      Error in `helper()`:
+      ! Invalid argument: `dt` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
     Code
       v4 <- "0"
-      as_difftime_spec(v4)
+      helper(v4)
     Condition
-      Error in `as_difftime_spec()`:
-      ! Invalid argument: v4 must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+      Error in `helper()`:
+      ! Invalid argument: `dt` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
     Code
       v5 <- raw(10)
-      as_difftime_spec(v5)
+      helper(v5)
     Condition
-      Error in `as_difftime_spec()`:
-      ! Invalid argument: v5 must be an integer scalar (milliseconds), a 'difftime' scalar, or a time interval specification. A time interval specification is apositive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours) or d (days). But it is a a raw vector.
+      Error in `helper()`:
+      ! Invalid argument: `dt` must be an integer scalar (milliseconds), a 'difftime' scalar, or a time interval specification. A time interval specification is apositive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours) or d (days). But it is a a raw vector.
 
 # as_difftime_env
 
     Code
       local({
         withr::local_envvar(FOO = "qqq")
-        as_difftime_env("FOO")
+        helper("FOO")
       })
     Condition
-      Error in `as_difftime_env()`:
+      Error in `helper()`:
       ! Invalid environment variable: FOO='qqq'. It must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
 
 # as_bytes
 
     Code
       v1 <- "notgood"
-      as_bytes(v1)
+      helper(v1)
     Condition
-      Error in `as_bytes()`:
-      ! Invalid argument: could not interpret v1 as a number of bytes. It must be a number with a unit suffix: one of B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
+      Error in `helper()`:
+      ! Invalid argument: could not interpret `b` as a number of bytes. It must be a number with a unit suffix: one of B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
     Code
       v2 <- 1:5
-      as_bytes(v2)
+      helper(v2)
     Condition
-      Error in `as_bytes()`:
-      ! Invalid argument: v2 must be an integer (bytes) or a string scalar with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB. But it is a an integer vector.
+      Error in `helper()`:
+      ! Invalid argument: `b` must be an integer (bytes) or a string scalar with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB. But it is a an integer vector.
 
 # as_bytes_env
 
     Code
       local({
         withr::local_envvar(FOO = "100www")
-        as_bytes_env("FOO")
+        helper("FOO")
       })
     Condition
-      Error in `as_bytes_env()`:
+      Error in `helper()`:
       ! Invalid environment variable: FOO='100www'. It must be an integer with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
 

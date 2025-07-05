@@ -9,6 +9,9 @@
       $content_type
       [1] "binary"
       
+      $json_bytes_mapping
+      [1] 0
+      
       $use_json_name
       [1] FALSE
       
@@ -61,10 +64,10 @@
       [1] 5
       
       $retry_policy_initial_backoff
-      [1] 1
+      [1] 1000
       
       $retry_policy_max_backoff
-      [1] 5
+      [1] 5000
       
       $retry_policy_backoff_multiplier
       [1] 1.5

@@ -41,6 +41,7 @@ test_that("as_timestamp", {
     as_timestamp(as.integer(t))
   })
 
+  helper <- function(ts) as_timestamp(ts)
   b1 <- mtcars
   b2 <- Sys.Date()
   b3 <- c(Sys.time(), Sys.time())
@@ -48,12 +49,12 @@ test_that("as_timestamp", {
   b5 <- 1:2
   b6 <- Sys.time()[integer()]
   expect_snapshot(error = TRUE, {
-    as_timestamp(b1)
-    as_timestamp(b2)
-    as_timestamp(b3)
-    as_timestamp(b4)
-    as_timestamp(b5)
-    as_timestamp(b6)
+    helper(b1)
+    helper(b2)
+    helper(b3)
+    helper(b4)
+    helper(b5)
+    helper(b6)
   })
 })
 
@@ -66,9 +67,10 @@ test_that("as_span", {
     as_span(sp)
   })
 
+  helper <- function(s) as_span(s)
   b1 <- mtcars
   expect_snapshot(error = TRUE, {
-    as_span(b1)
+    helper(b1)
   })
 })
 
@@ -81,9 +83,10 @@ test_that("as_span_context", {
     as_span_context(spc)
   })
 
+  helper <- function(spc) as_span_context(spc)
   b1 <- mtcars
   expect_snapshot(error = TRUE, {
-    as_span_context(b1)
+    helper(b1)
   })
 })
 
@@ -98,9 +101,10 @@ test_that("as_span_parent", {
   spanctx <- structure(list(xptr = "that"), class = "otel_span_context")
   expect_equal(as_span_parent(spanctx), "that")
 
+  helper <- function(spp) as_span_parent(spp)
   b1 <- mtcars
   expect_snapshot(error = TRUE, {
-    as_span_parent(b1)
+    helper(b1)
   })
 })
 
@@ -111,11 +115,12 @@ test_that("as_choice", {
     as_choice("bar", c(default = "foo", "bar"))
   })
 
+  helper <- function(ch, choices) as_choice(ch, choices)
   b1 <- "foobar"
   b2 <- 1:10
   expect_snapshot(error = TRUE, {
-    as_choice(b1, c(default = "foo", "bar"))
-    as_choice(b2, c(default = "foo", "bar"))
+    helper(b1, c(default = "foo", "bar"))
+    helper(b2, c(default = "foo", "bar"))
   })
 })
 
@@ -124,11 +129,12 @@ test_that("as_env", {
   e <- new.env()
   expect_equal(as_env(e), e)
 
+  helper <- function(e, null = TRUE) as_env(e, null = null)
   e1 <- 1:10
   e2 <- NULL
   expect_snapshot(error = TRUE, {
-    as_env(e1)
-    as_env(e2, null = FALSE)
+    helper(e1)
+    helper(e2, null = FALSE)
   })
 })
 
@@ -137,15 +143,20 @@ test_that("as_string", {
   expect_equal(as_string("foo"), "foo")
   expect_equal(as_string(c(a = "1")), c(a = "1"))
 
+  helper <- function(s, null = TRUE) as_string(s, null = null)
   s1 <- 1
   s2 <- character()
   s3 <- letters[1:2]
   s4 <- NULL
   expect_snapshot(error = TRUE, {
-    as_string(s1)
-    as_string(s2)
-    as_string(s3)
-    as_string(s4, null = FALSE)
+    helper(s1)
+    helper(s2)
+    helper(s3)
+    helper(s4, null = FALSE)
+  })
+  s <- 1:10
+  expect_snapshot(error = TRUE, {
+    helper(s)
   })
 })
 
@@ -153,8 +164,9 @@ test_that("as_flag", {
   expect_equal(as_flag(TRUE), TRUE)
   expect_equal(as_flag(FALSE), FALSE)
   b1 <- 1:10
+  helper <- function(f) as_flag(f)
   expect_snapshot(error = TRUE, {
-    as_flag(b1)
+    helper(b1)
   })
 })
 
@@ -164,17 +176,18 @@ test_that("as_otel_attribute_value", {
   expect_equal(as_otel_attribute_value(1), 1)
   expect_equal(as_otel_attribute_value(1L), 1L)
 
+  helper <- function(oav) as_otel_attribute_value(oav)
   v1 <- list()
   v2 <- c("a", NA)
   v3 <- c(TRUE, NA)
   v4 <- c(1, NA)
   v5 <- c(1L, NA)
   expect_snapshot(error = TRUE, {
-    as_otel_attribute_value(v1)
-    as_otel_attribute_value(v2)
-    as_otel_attribute_value(v3)
-    as_otel_attribute_value(v4)
-    as_otel_attribute_value(v5)
+    helper(v1)
+    helper(v2)
+    helper(v3)
+    helper(v4)
+    helper(v5)
   })
 })
 
@@ -183,15 +196,16 @@ test_that("as_otel_attributes", {
   v <- list(a = "a", b = TRUE, c = 1, d = 1L)
   expect_equal(as_otel_attributes(v), v)
 
+  helper <- function(att) as_otel_attributes(att)
   v1 <- 1:10
   v2 <- list(1:10)
   v3 <- list(a = list())
   v4 <- list(a = c(1, NA, 2))
   expect_snapshot(error = TRUE, {
-    as_otel_attributes(v1)
-    as_otel_attributes(v2)
-    as_otel_attributes(v3)
-    as_otel_attributes(v4)
+    helper(v1)
+    helper(v2)
+    helper(v3)
+    helper(v4)
   })
 })
 
@@ -205,13 +219,14 @@ test_that("as_span_link", {
     list("ptr", attr)
   )
 
+  helper <- function(spl) as_span_link(spl)
   expect_snapshot(error = TRUE, {
     link <- 1:10
-    as_span_link(link)
+    helper(link)
     link <- list(sl, "foo", "bar")
-    as_span_link(link)
+    helper(link)
     link <- list(sl, a = "1", b = c(1, NA))
-    as_span_link(link)
+    helper(link)
   })
 })
 
@@ -226,11 +241,12 @@ test_that("as_span_links", {
     list(list("ptr", list(a = "1")))
   )
 
+  helper <- function(spls) as_span_links(spls)
   expect_snapshot(error = TRUE, {
     links <- 1:10
-    as_span_links(links)
+    helper(links)
     links <- list(1:10)
-    as_span_links(links)
+    helper(links)
   })
 })
 
@@ -255,15 +271,16 @@ test_that("as_span_options", {
     list(kind = 2L)
   )
 
+  helper <- function(opts) as_span_options(opts)
   expect_snapshot(error = TRUE, {
     options <- 1:10
-    as_span_options(options)
+    helper(options)
     options <- list("foo")
-    as_span_options(options)
+    helper(options)
     options <- list(kind = "internal", foo = "notgood")
-    as_span_options(options)
+    helper(options)
     options <- list(kind = 10)
-    as_span_options(options)
+    helper(options)
   })
 })
 
@@ -275,15 +292,16 @@ test_that("as_end_span_options", {
     list(end_steady_time = as.double(t))
   )
 
+  helper <- function(opts) as_end_span_options(opts)
   expect_snapshot(error = TRUE, {
-    options <- 1:10
-    as_end_span_options(options)
-    options <- list("foo")
-    as_end_span_options(options)
-    options <- list(end_steady_time = t, foo = "notgood")
-    as_end_span_options(options)
-    options <- list(end_steady_time = "bad")
-    as_end_span_options(options)
+    o1 <- 1:10
+    helper(o1)
+    o2 <- list("foo")
+    helper(o2)
+    o3 <- list(end_steady_time = t, foo = "notgood")
+    helper(o3)
+    o4 <- list(end_steady_time = "bad")
+    helper(o4)
   })
 })
 
@@ -296,11 +314,13 @@ test_that("as_output_file", {
   expect_equal(as_output_file(tmp), tmp)
   expect_true(file.exists(tmp))
 
+  helper <- function(f) as_output_file(f)
+
   tmp2 <- tempfile()
   on.exit(unlink(tmp2, recursive = TRUE), add = TRUE)
   tmp3 <- file.path(tmp2, "output")
   expect_snapshot(error = TRUE, transform = transform_tempdir, {
-    as_output_file(tmp3)
+    helper(tmp3)
   })
 
   # permissions do not matter if we are root
@@ -315,7 +335,7 @@ test_that("as_output_file", {
   file.create(tmp3)
   Sys.chmod(tmp3, "0100")
   expect_snapshot(error = TRUE, transform = transform_tempdir, {
-    as_output_file(tmp3)
+    helper(tmp3)
   })
 })
 
@@ -326,6 +346,7 @@ test_that("as_log_severity", {
   expect_equal(as_log_severity(0, spec = TRUE), 0L)
   expect_equal(as_log_severity(255, spec = TRUE), 255L)
 
+  helper <- function(ls, spec = FALSE) as_log_severity(ls, spec = spec)
   v1 <- "foobar"
   v2 <- 1:10
   v3 <- 200
@@ -333,12 +354,12 @@ test_that("as_log_severity", {
   v5 <- 0
   v6 <- 255L
   expect_snapshot(error = TRUE, {
-    as_log_severity(v1)
-    as_log_severity(v2)
-    as_log_severity(v3)
-    as_log_severity(v4, spec = TRUE)
-    as_log_severity(v5)
-    as_log_severity(v6)
+    helper(v1)
+    helper(v2)
+    helper(v3)
+    helper(v4, spec = TRUE)
+    helper(v5)
+    helper(v6)
   })
 })
 
@@ -351,15 +372,16 @@ test_that("as_span_id", {
   expect_equal(as_span_id(strrep("a", nc)), strrep("a", nc))
   expect_equal(as_span_id(strrep("F", nc)), strrep("f", nc))
 
+  helper <- function(sid) as_span_id(sid)
   v1 <- substr(strrep("badcafe", nc), 1, nc - 1)
   v2 <- NA_character_
   v3 <- strrep("X", nc)
   v4 <- 1:10
   expect_snapshot(error = TRUE, {
-    as_span_id(v1)
-    as_span_id(v2)
-    as_span_id(v3)
-    as_span_id(v4)
+    helper(v1)
+    helper(v2)
+    helper(v3)
+    helper(v4)
   })
 })
 
@@ -370,15 +392,16 @@ test_that("as_trace_id", {
   expect_equal(as_trace_id(strrep("a", nc)), strrep("a", nc))
   expect_equal(as_trace_id(strrep("F", nc)), strrep("f", nc))
 
+  helper <- function(tid) as_trace_id(tid)
   v1 <- substr(strrep("badcafe", nc), 1, nc - 1)
   v2 <- NA_character_
   v3 <- strrep("X", nc)
   v4 <- 1:10
   expect_snapshot(error = TRUE, {
-    as_trace_id(v1)
-    as_trace_id(v2)
-    as_trace_id(v3)
-    as_trace_id(v4)
+    helper(v1)
+    helper(v2)
+    helper(v3)
+    helper(v4)
   })
 })
 
@@ -414,6 +437,7 @@ test_that("as_count", {
   expect_equal(as_count("20"), 20L)
   expect_equal(as_count("0"), 0L)
 
+  helper <- function(c, ...) as_count(c, ...)
   v1 <- 1:10
   v2 <- NA_integer_
   v3 <- NA_real_
@@ -422,13 +446,13 @@ test_that("as_count", {
   v6 <- mtcars
   v7 <- "boo"
   expect_snapshot(error = TRUE, {
-    as_count(v1)
-    as_count(v2)
-    as_count(v3)
-    as_count(v4)
-    as_count(v5, positive = TRUE)
-    as_count(v6)
-    as_count(v7)
+    helper(v1)
+    helper(v2)
+    helper(v3)
+    helper(v4)
+    helper(v5, positive = TRUE)
+    helper(v6)
+    helper(v7)
   })
 })
 
@@ -442,19 +466,20 @@ test_that("as_count_env", {
   withr::local_envvar(FOO = "0")
   expect_equal(as_count_env("FOO"), 0L)
 
+  helper <- function(ev) as_count_env(ev)
   withr::local_envvar(FOO = "oops")
   expect_snapshot(error = TRUE, {
-    as_count_env("FOO")
+    helper("FOO")
   })
 
   withr::local_envvar(FOO = "-1")
   expect_snapshot(error = TRUE, {
-    as_count_env("FOO")
+    helper("FOO")
   })
 
   withr::local_envvar(FOO = "0")
   expect_snapshot(error = TRUE, {
-    as_count_env("FOO", positive = TRUE)
+    helper("FOO", positive = TRUE)
   })
 })
 
@@ -476,13 +501,15 @@ test_that("as_http_context_headers", {
     list(traceparent = NULL, tracestate = NULL)
   )
 
+  helper <- function(hdr) as_http_context_headers(hdr)
+  v3 <- list(tracestate = raw(10))
   expect_snapshot(error = TRUE, {
     v1 <- 1:10
-    as_http_context_headers(v1)
+    helper(v1)
     v2 <- list(traceparent = TRUE)
-    as_http_context_headers(v2)
+    helper(v2)
     v3 <- list(tracestate = raw(10))
-    as_http_context_headers(v3)
+    helper(v3)
   })
 })
 
@@ -495,17 +522,18 @@ test_that("as_difftime_spec", {
   expect_equal(as_difftime_spec(5), 5 * 1000)
   expect_equal(as_difftime_spec("1s"), 1 * 1000 * 1000)
 
+  helper <- function(dt) as_difftime_spec(dt)
   expect_snapshot(error = TRUE, {
     v1 <- as.difftime(NA_real_, units = "secs")
-    as_difftime_spec(v1)
+    helper(v1)
     v2 <- as.difftime(1:2, units = "secs")
-    as_difftime_spec(v2)
+    helper(v2)
     v3 <- "foo"
-    as_difftime_spec(v3)
+    helper(v3)
     v4 <- "0"
-    as_difftime_spec(v4)
+    helper(v4)
     v5 <- raw(10)
-    as_difftime_spec(v5)
+    helper(v5)
   })
 })
 
@@ -519,11 +547,12 @@ test_that("as_difftime_env", {
   withr::local_envvar(FOO = "1m")
   expect_equal(as_difftime_env("FOO"), 60 * 1000 * 1000)
 
+  helper <- function(ev) as_difftime_env(ev)
   expect_snapshot(
     error = TRUE,
     local({
       withr::local_envvar(FOO = "qqq")
-      as_difftime_env("FOO")
+      helper("FOO")
     })
   )
 })
@@ -543,11 +572,12 @@ test_that("as_bytes", {
   expect_equal(as_bytes("456"), 456)
   expect_equal(as_bytes("1kib"), 1024)
 
+  helper <- function(b) as_bytes(b)
   expect_snapshot(error = TRUE, {
     v1 <- "notgood"
-    as_bytes(v1)
+    helper(v1)
     v2 <- 1:5
-    as_bytes(v2)
+    helper(v2)
   })
 })
 
@@ -561,11 +591,12 @@ test_that("as_bytes_env", {
   withr::local_envvar(FOO = "2MB")
   expect_equal(as_bytes_env("FOO"), 2 * 1000 * 1000)
 
+  helper <- function(ev) as_bytes_env((ev))
   expect_snapshot(
     error = TRUE,
     local({
       withr::local_envvar(FOO = "100www")
-      as_bytes_env("FOO")
+      helper("FOO")
     })
   )
 })

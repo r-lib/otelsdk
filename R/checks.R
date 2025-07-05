@@ -19,7 +19,12 @@ is_named <- function(x) {
   length(x) == length(nms) && !anyNA(nms) && all(nms != "")
 }
 
-as_timestamp <- function(x, null = TRUE, call = NULL) {
+as_timestamp <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(x)
   }
@@ -30,31 +35,40 @@ as_timestamp <- function(x, null = TRUE, call = NULL) {
     return(as.double(x))
   }
 
-  call <- call %||% match.call()
   if (inherits(x, "POSIXt") && length(x) == 0) {
-    stop(glue(
-      "Invalid argument: {format(call[[2]])} must be a time stamp \\
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a time stamp \\
        (`POSIXt` scalar or numeric scalar), but it is an empty vector."
     ))
   } else if (inherits(x, "POSIXt") && length(x) > 1) {
-    stop(glue(
-      "Invalid argument: {format(call[[2]])} must be a time stamp \\
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a time stamp \\
        (`POSIXt` scalar or numeric scalar), but it is too long."
     ))
   } else if (inherits(x, "POSIXt") && length(x) == 1 && is.na(x)) {
-    stop(glue(
-      "Invalid argument: {format(call[[2]])} must be a time stamp \\
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a time stamp \\
        (`POSIXt` scalar or numeric scalar), but it is `NA`."
     ))
   } else {
-    stop(glue(
-      "Invalid argument: {format(call[[2]])} must be a time stamp \\
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a time stamp \\
       (`POSIXt` scalar or numeric scalar), but it is {typename(x)}."
     ))
   }
 }
 
-as_span <- function(x, null = TRUE, na = TRUE, call = NULL) {
+as_span <- function(
+  x,
+  null = TRUE,
+  na = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(x)
   }
@@ -65,14 +79,20 @@ as_span <- function(x, null = TRUE, na = TRUE, call = NULL) {
     return(x)
   }
 
-  call <- call %||% match.call()
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} must be a span object ",
-    "(`otel_span`), but it is {typename(x)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must be a span object (`otel_span`), but it \\
+     is {typename(x)}."
+  ))
 }
 
-as_span_context <- function(x, null = TRUE, na = TRUE, call = NULL) {
+as_span_context <- function(
+  x,
+  null = TRUE,
+  na = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(x)
   }
@@ -86,14 +106,20 @@ as_span_context <- function(x, null = TRUE, na = TRUE, call = NULL) {
     return(x)
   }
 
-  call <- call %||% match.call()
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} must be a span context object ",
-    "(`otel_span_context`), but it is {typename(x)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must be a span context object \\
+     (`otel_span_context`), but it is {typename(x)}."
+  ))
 }
 
-as_span_parent <- function(x, null = TRUE, na = TRUE, call = NULL) {
+as_span_parent <- function(
+  x,
+  null = TRUE,
+  na = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(x)
   }
@@ -106,14 +132,20 @@ as_span_parent <- function(x, null = TRUE, na = TRUE, call = NULL) {
     return(x$xptr)
   }
 
-  call <- call %||% match.call()
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} must be a span (`otel_span`) ",
-    "or a span context (`otel_span_context`) object but it is {typename(x)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must be a span (`otel_span`) or a span \\
+     context (`otel_span_context`) object but it is {typename(x)}."
+  ))
 }
 
-as_choice <- function(x, choices, null = TRUE, call = NULL) {
+as_choice <- function(
+  x,
+  choices,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(match("default", names(choices)) - 1L)
   }
@@ -121,22 +153,22 @@ as_choice <- function(x, choices, null = TRUE, call = NULL) {
     return(mch - 1L)
   }
 
-  call <- call %||% match.call()
   cchoices <- paste(choices, collapse = ", ")
   if (is_string(x)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be one of {cchoices}, ",
-      "but it is {x}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be one of {cchoices}, but it is {x}."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a string scalar, one ",
-      "of {cchoices}, but it is {typename(x)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a string scalar, one of \\
+       {cchoices}, but it is {typename(x)}."
+    ))
   }
 }
 
-as_env <- function(x, null = TRUE, call = NULL) {
+as_env <- function(x, null = TRUE, arg = caller_arg(x), call = caller_env()) {
   if (null && is.null(x)) {
     return(x)
   }
@@ -144,64 +176,99 @@ as_env <- function(x, null = TRUE, call = NULL) {
     return(x)
   }
 
-  call <- call %||% match.call()
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} must be an environment, ",
-    "but it is {typename(x)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must be an environment, but it is {typename(x)}."
+  ))
 }
 
-as_string <- function(x, null = TRUE, call = NULL) {
-  if (null & is.null(x)) {
+as_string <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (null && is.null(x)) {
     return(x)
   }
   if (is_string(x)) {
     return(x)
   }
 
-  call <- call %||% match.call()
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} must be a string scalar, ",
-    "but it is {typename(x)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must be a string scalar but it is \\
+     {typename(x)}."
+  ))
 }
 
-as_flag <- function(x, call = NULL) {
+as_flag <- function(x, null = FALSE, arg = caller_arg(x), call = caller_env()) {
+  if (null && is.null(x)) {
+    return(x)
+  }
   if (is_flag(x)) {
     return(x)
   }
 
-  call <- call %||% match.call()
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} must a flag (logical scalar), ",
-    "but it is {typename(x)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must a flag (logical scalar), but it is \\
+     {typename(x)}."
+  ))
+}
+
+as_flag_env <- function(ev, call = caller_env()) {
+  val <- get_env(ev)
+  if (is.null(val)) {
+    return(NULL)
+  }
+  tvals <- c("true", "t", "yes", "on", "1")
+  fvals <- c("false", "f", "no", "off", "0")
+  if (tolower(val) %in% tvals) {
+    return(TRUE)
+  } else if (tolower(val) %in% fvals) {
+    return(FALSE)
+  }
+
+  stop(cnd(
+    call = call,
+    "Invalid environment variable: '{ev}' must be 'true' or 'false' \\
+     (case insensitive). It is '{val}'."
+  ))
 }
 
 span_attr_types <- c(typeof(""), typeof(TRUE), typeof(1), typeof(1L))
 
-as_otel_attribute_value <- function(x, call = NULL) {
+as_otel_attribute_value <- function(
+  x,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (typeof(x) %in% span_attr_types && !(hna <- anyNA(x))) {
     return(x)
   }
 
-  call <- call %||% match.call()
   if (!typeof(x) %in% span_attr_types) {
     ctypes <- collapse(span_attr_types, last = ", or ")
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be of type {ctypes}, ",
-      "but it is {typename(x)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be of type {ctypes}, but it is \\
+       {typename(x)}."
+    ))
   }
   if (hna) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must not contain missing ",
-      "(`NA`) values."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must not contain missing (`NA`) values."
+    ))
   }
 }
 
-as_otel_attributes <- function(attributes, call = NULL) {
+as_otel_attributes <- function(
+  attributes,
+  arg = caller_arg(attributes),
+  call = caller_env()
+) {
   if (
     (is.list(attributes) || is.null(attributes)) &&
       is_named(attributes) &&
@@ -211,76 +278,88 @@ as_otel_attributes <- function(attributes, call = NULL) {
     return(attributes)
   }
 
-  call <- call %||% match.call()
   if (!is.list(attributes)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a named list, ",
-      "but it is {typename(attributes)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a named list, but it is \\
+       {typename(attributes)}."
+    ))
   }
 
   if (!is_named(attributes)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a named list, but not ",
-      "all of its entries are named."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a named list, but not all of its \\
+       entries are named."
+    ))
   }
 
   badtypes <- !(tps %in% span_attr_types)
   if (any(badtypes)) {
     ok <- collapse(span_attr_types)
     bd <- collapse(unique(tps[badtypes]))
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} can only contain types ",
-      "{ok}, but it contains {bd} types."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` can only contain types {ok}, but it \\
+       contains {bd} types."
+    ))
   }
 
-  stop(glue(c(
-    "Invalid argument: the entries of {format(call[[2]])} must not ",
-    "contain missing (`NA`) values."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: the entries of `{arg}` must not contain missing \\
+     (`NA`) values."
+  ))
 }
 
-as_span_link <- function(link, call = NULL) {
+as_span_link <- function(link, arg = caller_arg(link), call = caller_env()) {
   if (inherits(link, "otel_span")) {
     return(list(link$xptr, list()))
   }
-  call <- call %||% match.call()
   if (is.list(link) && inherits(link[[1]], "otel_span")) {
+    force(arg)
     link[-1] <- as_otel_attributes(
       link[-1],
-      call = substitute(as_otel_attributes(link[-1]), list(link = call[[2]]))
+      arg = as_caller_arg(substitute(x[-1], list(x = arg[[1]]))),
+      call = call
     )
     return(list(link[[1]]$xptr, link[-1]))
   }
 
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} must be either an ",
-    "OpenTelemetry span (`otel_span`) object or a list with a span ",
-    "object as the first element and named span attributes as the rest."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must be either an OpenTelemetry span \\
+     (`otel_span`) object or a list with a span object as the first \\
+     element and named span attributes as the rest."
+  ))
 }
 
-as_span_links <- function(links, call = NULL) {
+as_span_links <- function(links, arg = caller_arg(links), call = caller_env()) {
   call <- call %||% match.call()
   if (is.list(links) || is.null(links)) {
+    force(arg)
     for (i in seq_along(links)) {
       links[[i]] <- as_span_link(
         links[[i]],
-        call = as.call(substitute(as_span_link(links[[i]]), list(i = i)))
+        arg = as_caller_arg(substitute(x[[i]], list(x = arg[[1]], i = i))),
+        call = call
       )
     }
     return(links)
   }
 
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} must be a named list, ",
-    "but it is {typename(links)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must be a named list, but it is \\
+     {typename(links)}."
+  ))
 }
 
-as_span_options <- function(options, call = NULL) {
+as_span_options <- function(
+  options,
+  arg = caller_arg(options),
+  call = caller_env()
+) {
   nms <- c(
     "start_system_time",
     "start_steady_time",
@@ -292,39 +371,68 @@ as_span_options <- function(options, call = NULL) {
       is_named(options) &&
       all(names(options) %in% nms)
   ) {
-    options[["start_system_time"]] <-
-      as_timestamp(options[["start_system_time"]])
-    options[["start_steady_time"]] <-
-      as_timestamp(options[["start_steady_time"]])
-    options[["parent"]] <- as_span_parent(options[["parent"]], na = TRUE)
-    options[["kind"]] <- as_choice(options[["kind"]], the$span_kinds)
+    force(arg)
+    options[["start_system_time"]] <- as_timestamp(
+      options[["start_system_time"]],
+      arg = as_caller_arg(substitute(
+        x[["start_system_time"]],
+        list(x = arg[[1]])
+      )),
+      call = call
+    )
+    options[["start_steady_time"]] <- as_timestamp(
+      options[["start_steady_time"]],
+      arg = as_caller_arg(substitute(
+        x[["start_steady_time"]],
+        list(x = arg[[1]])
+      )),
+      call = call
+    )
+    options[["parent"]] <- as_span_parent(
+      options[["parent"]],
+      na = TRUE,
+      arg = as_caller_arg(substitute(x[["parent"]], list(x = arg[[1]]))),
+      call = call
+    )
+    options[["kind"]] <- as_choice(
+      options[["kind"]],
+      the$span_kinds,
+      arg = as_caller_arg(substitute(x[["kind"]], list(x = arg[[1]]))),
+      call = call
+    )
     return(options)
   }
 
-  call <- call %||% match.call()
   if (!is.list(options) && !is.null(options)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a named list of ",
-      "OpenTelemetry span options, but it is {typename(options)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a named list of OpenTelemetry \\
+       span options, but it is {typename(options)}."
+    ))
   }
 
   if (!is_named(options)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a named list of ",
-      "OpenTelemetry span options, but not all of its entries are named."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a named list of OpenTelemetry \\
+       span options, but not all of its entries are named."
+    ))
   }
 
   bad <- unique(setdiff(names(options), nms))
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} contains unknown OpenTelemetry ",
-    "span option{plural(length(bad))}: {collapse(bad)}. Known span options ",
-    "are: {collapse(nms)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` contains unknown OpenTelemetry span \\
+     option{plural(length(bad))}: {collapse(bad)}. Known span options \\
+     are: {collapse(nms)}."
+  ))
 }
 
-as_end_span_options <- function(options, call = NULL) {
+as_end_span_options <- function(
+  options,
+  arg = caller_arg(options),
+  call = caller_env()
+) {
   nms <- c(
     "end_steady_time"
   )
@@ -333,48 +441,61 @@ as_end_span_options <- function(options, call = NULL) {
       is_named(options) &&
       all(names(options) %in% nms)
   ) {
-    options[["end_steady_time"]] <-
-      as_timestamp(options[["end_steady_time"]])
+    force(arg)
+    options[["end_steady_time"]] <- as_timestamp(
+      options[["end_steady_time"]],
+      arg = as_caller_arg(substitute(
+        x[["end_steady_time"]],
+        list(x = arg[[1]])
+      )),
+      call = call
+    )
     return(as.list(options))
   }
 
-  call <- call %||% match.call()
   if (!is.list(options) && !is.null(options)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a named list of ",
-      "OpenTelemetry end span options, but it is {typename(options)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a named list of OpenTelemetry end \\
+       span options, but it is {typename(options)}."
+    ))
   }
 
   if (!is_named(options)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a named list of ",
-      "OpenTelemetry end span options, but not of its entries are named."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a named list of OpenTelemetry end \\
+       span options, but not all of its entries are named."
+    ))
   }
 
   bad <- unique(setdiff(names(options), nms))
-  stop(glue(c(
-    "Invalid argument: {format(call[[2]])} contains unknown ",
-    "OpenTelemetry end span options: {collapse(bad)}. Known end ",
-    "span options are: {collapse(nms)}."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` contains unknown OpenTelemetry end span \\
+     options: {collapse(bad)}. Known end span options are: {collapse(nms)}."
+  ))
 }
 
-as_output_file <- function(x, null = TRUE, call = NULL) {
+as_output_file <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(x)
   }
 
-  call <- call %||% match.call()
-  x <- as_string(x, call = substitute(as_string(x), list(x = call[[2]])))
+  x <- as_string(x, arg = arg, call = call)
 
   dn <- dirname(x)
   if (!file.exists(dn)) {
-    stop(glue(c(
-      "Directory of OpenTelemetry output file '{x}' ",
-      "does not exist or it is not writeable."
-    )))
+    stop(cnd(
+      call = call,
+      "Directory of OpenTelemetry output file '{x}' does not exist or it \\
+      is not writeable."
+    ))
   }
 
   # This is the closest thing to Unix `touch` that I could find.
@@ -386,13 +507,19 @@ as_output_file <- function(x, null = TRUE, call = NULL) {
   )
 
   if (!file.exists(x) || file.access(x, 2) != 0) {
-    stop(glue(c("Cannot write to OpenTelemetry output file '{x}'.")))
+    stop(cnd(call = call, "Cannot write to OpenTelemetry output file '{x}'."))
   }
 
   x
 }
 
-as_log_severity <- function(x, null = TRUE, spec = FALSE, call = NULL) {
+as_log_severity <- function(
+  x,
+  null = TRUE,
+  spec = FALSE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(x)
   }
@@ -403,31 +530,43 @@ as_log_severity <- function(x, null = TRUE, spec = FALSE, call = NULL) {
     return(as.integer(x))
   }
 
-  call <- call %||% match.call()
   if (is_string(x)) {
     cchoices <- paste(names(choices), collapse = ", ")
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be one of {cchoices}, ",
-      "but it is {x}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be one of {cchoices}, but it is {x}."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be an integer log level, ",
-      "between {min(choices)} and {max(otel::log_severity_levels)}",
-      if (spec) {
-        paste0(", or ", max(log_severity_levels_spec()))
-      },
-      ", but it is {if (is_count(x)) x else typename(x)}."
-    )))
+    specstr <- if (spec) {
+      paste0(", or ", max(log_severity_levels_spec()))
+    } else {
+      ""
+    }
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be an integer log level, between \\
+       {min(choices)} and {max(otel::log_severity_levels)}{specstr}, \\
+       but it is {if (is_count(x)) x else typename(x)}."
+    ))
   }
 }
 
 # TODO
-as_event_id <- function(x, null = TRUE, call = NULL) {
+as_event_id <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   x # nocov
 }
 
-as_span_id <- function(x, null = TRUE, call = NULL) {
+as_span_id <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(x)
   }
@@ -436,26 +575,33 @@ as_span_id <- function(x, null = TRUE, call = NULL) {
     return(tolower(x))
   }
 
-  call <- call %||% match.call()
   if (is_string(x)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a span id, a string ",
-      "scalar containing {nc} hexadecimal digits, but it is '{x}'."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a span id, a string scalar \\
+       containing {nc} hexadecimal digits, but it is '{x}'."
+    ))
   } else if (is_string(x, na = TRUE)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a span id, a string ",
-      "scalar containing {nc} hexadecimal digits, but it is `NA`."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a span id, a string scalar \\
+       containing {nc} hexadecimal digits, but it is `NA`."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a span id, a string ",
-      "scalar containing {nc} hexadecimal digits, but it is {typename(x)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a span id, a string scalar \\
+      containing {nc} hexadecimal digits, but it is {typename(x)}."
+    ))
   }
 }
 
-as_trace_id <- function(x, null = TRUE, call = NULL) {
+as_trace_id <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (null && is.null(x)) {
     return(x)
   }
@@ -464,27 +610,34 @@ as_trace_id <- function(x, null = TRUE, call = NULL) {
     return(tolower(x))
   }
 
-  call <- call %||% match.call()
   if (is_string(x)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a trace id, a string ",
-      "scalar containing {nc} hexadecimal digits, but it is '{x}'."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a trace id, a string \\
+       scalar containing {nc} hexadecimal digits, but it is '{x}'."
+    ))
   } else if (is_string(x, na = TRUE)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a trace id, a string ",
-      "scalar containing {nc} hexadecimal digits, but it is `NA`."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a trace id, a string \\
+       scalar containing {nc} hexadecimal digits, but it is `NA`."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a trace id, a string ",
-      "scalar containing {nc} hexadecimal digits, but it is {typename(x)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a trace id, a string \\
+       scalar containing {nc} hexadecimal digits, but it is {typename(x)}."
+    ))
   }
 }
 
 # TODO
-as_trace_flags <- function(x, null = TRUE, call = NULL) {
+as_trace_flags <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   x # nocov
 }
 
@@ -493,7 +646,13 @@ is_count <- function(x, positive = FALSE) {
   is.numeric(x) && length(x) == 1 && !is.na(x) && x >= limit
 }
 
-as_count <- function(x, positive = FALSE, null = FALSE, call = NULL) {
+as_count <- function(
+  x,
+  positive = FALSE,
+  null = FALSE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (is.null(x) && null) {
     return(x)
   }
@@ -508,32 +667,34 @@ as_count <- function(x, positive = FALSE, null = FALSE, call = NULL) {
     }
   }
 
-  call <- call %||% match.call()
   limit <- if (positive) 1L else 0L
   if (is.numeric(x) && length(x) != 1) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be an integer ",
-      "scalar, not a vector."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be an integer scalar, not a vector."
+    ))
   } else if (is.numeric(x) && length(x) == 1 && is.na(x)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must not be `NA`."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must not be `NA`."
+    ))
   } else if (is.numeric(x) && length(x) == 1 && !is.na(x) && x < limit) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be ",
-      if (positive) "positive." else "non-negative."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be \\
+      {if (positive) 'positive' else 'non-negative'}."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a ",
-      if (positive) "positive " else "non-negative ",
-      "integer scalar, but it is {typename(x)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a \\
+      {if (positive) 'positive' else 'non-negative'} integer scalar, \\
+      but it is {typename(x)}."
+    ))
   }
 }
 
-as_count_env <- function(ev, positive = FALSE) {
+as_count_env <- function(ev, positive = FALSE, call = caller_env()) {
   val <- get_env(ev)
   if (is.null(val)) {
     return(NULL)
@@ -542,19 +703,26 @@ as_count_env <- function(ev, positive = FALSE) {
   if (is_count(x, positive = positive)) {
     return(x)
   }
-  limit <- if (positive) 1L else 0L
   proper <- if (positive) "positive" else "non-negative"
-  stop(glue(c(
-    "Invalid environment variable: {ev} must be a {proper} integer."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid environment variable: `{ev}` must be a {proper} integer. \\
+     It is '{val}'."
+  ))
 }
 
-as_http_context_headers <- function(headers, call = NULL) {
+as_http_context_headers <- function(
+  headers,
+  arg = caller_arg(headers),
+  call = caller_env()
+) {
   if ((is.list(headers) || is.character(headers)) && is_named(headers)) {
-    names(headers) <- tolower(names(headers))
-    headers <- as.list(headers)
-    traceparent <- headers[["traceparent"]]
-    tracestate <- headers[["tracestate"]]
+    # need to make a copy, coll caller_arg() still works
+    headers_ <- headers
+    names(headers_) <- tolower(names(headers_))
+    headers_ <- as.list(headers_)
+    traceparent <- headers_[["traceparent"]]
+    tracestate <- headers_[["tracestate"]]
     if (
       (is.null(traceparent) || is_string(traceparent)) &&
         (is.null(tracestate) || is_string(tracestate))
@@ -563,28 +731,33 @@ as_http_context_headers <- function(headers, call = NULL) {
     }
   }
 
-  call <- call %||% match.call()
   if (!is.list(headers) || !is_named((headers))) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a named list, but it ",
-      "is a {typename(headers)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a named list, but it is a \\
+       {typename(headers)}."
+    ))
   } else if (!is.null(traceparent) && !is_string(traceparent)) {
-    stop(glue(c(
-      "Invalid argument: the 'traceparent' entry of {format(call[[2]])} ",
-      "must be a string (character scalar), but it is a ",
-      "{typename(traceparent)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: the 'traceparent' entry of `{arg}` must be a \\
+       string (character scalar), but it is a {typename(traceparent)}."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: the 'tracestate' entry of {format(call[[2]])} ",
-      "must be a string (character scalar), but it is a ",
-      "{typename(tracestate)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: the 'tracestate' entry of `{arg}` must be a \\
+       string (character scalar), but it is a {typename(tracestate)}."
+    ))
   }
 }
 
-as_difftime_spec <- function(x, null = TRUE, call = NULL) {
+as_difftime_spec <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   if (is.null(x) && null) {
     return(x)
   }
@@ -601,32 +774,32 @@ as_difftime_spec <- function(x, null = TRUE, call = NULL) {
     }
   }
 
-  call <- call %||% match.call()
   if (inherits(x, "difftime")) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must have length 1, and must ",
-      "not be `NA`. ",
-      if (length(x) != 1) "It has length {length(x)}." else "It is `NA`."
-    )))
+    cmt <- if (length(x) != 1) "It has length {length(x)}." else "It is `NA`."
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must have length 1, and must not be `NA`. {cmt}"
+    ))
   } else if (is_string(x)) {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be a time interval ",
-      "specification, a positive number with a time unit suffix: ",
-      "us (microseconds), ms (milliseconds), s (seconds), m (minutes), ",
-      "h (hours), or d (days)."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a time interval specification, a \\
+       positive number with a time unit suffix: us (microseconds), \\
+       ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days)."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be an integer scalar ",
-      "(milliseconds), a 'difftime' scalar, or a time interval specification. ",
-      "A time interval specification is apositive number with a time unit ",
-      "suffix: us (microseconds), ms (milliseconds), s (seconds), ",
-      "m (minutes), h (hours) or d (days). But it is a {typename(x)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be an integer scalar (milliseconds), \\
+       a 'difftime' scalar, or a time interval specification. A time \\
+       interval specification is apositive number with a time unit \\
+       suffix: us (microseconds), ms (milliseconds), s (seconds), \\
+       m (minutes), h (hours) or d (days). But it is a {typename(x)}."
+    ))
   }
 }
 
-as_difftime_env <- function(ev) {
+as_difftime_env <- function(ev, call = caller_env()) {
   val <- get_env(ev)
   if (is.null(val)) {
     return(NULL)
@@ -639,12 +812,13 @@ as_difftime_env <- function(ev) {
   if (!is.na(us)) {
     return(us)
   }
-  stop(glue(c(
-    "Invalid environment variable: {ev}='{val}'. It must be a time interval ",
-    "specification, a positive number with a time unit suffix: ",
-    "us (microseconds), ms (milliseconds), s (seconds), m (minutes), ",
-    "h (hours), or d (days)."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid environment variable: {ev}='{val}'. It must be a time interval \\
+     specification, a positive number with a time unit suffix: \\
+     us (microseconds), ms (milliseconds), s (seconds), m (minutes), \\
+     h (hours), or d (days)."
+  ))
 }
 
 # x must be a sting (scalar character), only light argument checking
@@ -698,7 +872,7 @@ parse_time_spec <- function(x) {
   as.double(x) * unname(time_spec_units$mult[wh])
 }
 
-as_bytes <- function(x, null = TRUE, call = NULL) {
+as_bytes <- function(x, null = TRUE, arg = caller_arg(x), call = caller_env()) {
   if (is.null(x) && null) {
     return(x)
   }
@@ -716,23 +890,24 @@ as_bytes <- function(x, null = TRUE, call = NULL) {
     }
   }
 
-  call <- call %||% match.call()
   if (is_string(x)) {
-    stop(glue(c(
-      "Invalid argument: could not interpret {format(call[[2]])} as a ",
-      "number of bytes. It must be a number with a unit suffix: one of ",
-      "B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: could not interpret `{arg}` as a number of bytes. \\
+       It must be a number with a unit suffix: one of \\
+       B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB."
+    ))
   } else {
-    stop(glue(c(
-      "Invalid argument: {format(call[[2]])} must be an integer (bytes) ",
-      "or a string scalar with a unit suffix. Known units are B, KB, KiB, ",
-      "MB, MiB, GB, GiB, TB, TiB, PB, PiB. But it is a {typename(x)}."
-    )))
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be an integer (bytes) or a string \\
+       scalar with a unit suffix. Known units are B, KB, KiB, MB, MiB, \\
+       GB, GiB, TB, TiB, PB, PiB. But it is a {typename(x)}."
+    ))
   }
 }
 
-as_bytes_env <- function(ev) {
+as_bytes_env <- function(ev, call = caller_env()) {
   val <- get_env(ev)
   if (is.null(val)) {
     return(NULL)
@@ -745,11 +920,12 @@ as_bytes_env <- function(ev) {
   if (!is.na(bts)) {
     return(bts)
   }
-  stop(glue(c(
-    "Invalid environment variable: {ev}='{val}'. It must be an integer ",
-    "with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, ",
-    "TB, TiB, PB, PiB."
-  )))
+  stop(cnd(
+    call = call,
+    "Invalid environment variable: {ev}='{val}'. It must be an integer \\
+     with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, \\
+     TB, TiB, PB, PiB."
+  ))
 }
 
 bytes_spec_units <- rbind.data.frame(
@@ -805,83 +981,105 @@ parse_bytes_spec <- function(x) {
   as.double(x) * unname(bytes_spec_units$mult[wh])
 }
 
-as_named_list <- function(x, call = NULL) {
+as_named_list <- function(x, arg = caller_arg(x), call = caller_env()) {
   if ((is.null(x) || is.list(x)) && is_named(x)) {
     return(x)
   }
 
-  call <- call %||% match.call()
   if (!is_named(x)) {
-    stop(glue(
-      "Invalid argument: {format(call[[2]])} must be a named list,
-        but it is not named."
+    stop(cnd(
+      call = call,
+      "Invalid argument: {arg} must be a named list, but it is not named."
     ))
   } else {
-    stop(glue(
-      "Invalid argument: {format(call[[2]])} must be a named list,
-      but it is {typename(opts)}."
+    stop(cnd(
+      call = call,
+      "Invalid argument: {arg} must be a named list, but it is \\
+       {typename(opts)}."
     ))
   }
 }
 
-as_file_exporter_options <- function(opts, evs, call = NULL) {
-  call <- call %||% match.call()
-  opts <- as_named_list(opts, call = call)
+as_file_exporter_options <- function(
+  opts,
+  evs,
+  arg = caller_arg(opts),
+  call = NULL
+) {
+  opts <- as_named_list(opts, arg = arg, call = call)
 
-  call_as <- substitute(as_string(x), list(x = call[[2]]))
-  call_ds <- substitute(as_difftime_spec(x), list(x = call[[2]]))
-  call_ac <- substitute(as_count(x), list(x = call[[2]]))
-  call_ab <- substitute(as_bytes(x), list(x = call[[2]]))
+  ma <- function(nm) {
+    as_caller_arg(substitute(x[[nm]], list(x = arg, nm = nm)))
+  }
 
-  opts["file_pattern"] <- list(
-    as_string(opts$file_pattern, call = call_as) %||%
-      get_env(evs[["file_pattern"]]) %||%
-      get_env(file_exporter_file_envvar)
-  )
-  opts["alias_pattern"] <- list(
-    as_string(opts$alias_pattern, call = call_as) %||%
-      get_env(evs[["alias_pattern"]]) %||%
-      get_env(file_exporter_alias_envvar) %||%
-      empty_atomic_as_null(sub("%N", "latest", opts$file_pattern))
-  )
-  opts["flush_interval"] <- list(
-    as_difftime_spec(opts$flush_interval, call = call_ds) %||%
-      as_difftime_env(evs[["flush_interval"]]) %||%
-      as_difftime_env(file_exporter_flush_interval_envvar)
-  )
-  opts["flush_count"] <- list(
-    as_count(opts$flush_count, null = TRUE, call = call_ac) %||%
-      as_count_env(evs[["flush_count"]], positive = TRUE) %||%
-      as_count_env(file_exporter_flush_count_envvar, positive = TRUE)
-  )
-  opts["file_size"] <- list(
-    as_bytes(opts$file_size, call = call_ab) %||%
-      as_bytes_env(evs[["file_size"]]) %||%
-      as_bytes_env(file_exporter_file_size_envvar)
-  )
-  opts["rotate_size"] <- list(
-    as_bytes(opts$rotate_size, call = call_ab) %||%
-      as_count_env(evs[["rotate_size"]]) %||%
-      as_count_env(file_exporter_rotate_size_envvar)
-  )
+  file_pattern <-
+    as_string(opts$file_pattern, arg = ma("file_pattern"), call = call) %||%
+    get_env(evs[["file_pattern"]]) %||%
+    get_env(file_exporter_file_envvar)
+  alias_pattern <-
+    as_string(opts$alias_pattern, arg = ma("alias_pattern"), call = call) %||%
+    get_env(evs[["alias_pattern"]]) %||%
+    get_env(file_exporter_alias_envvar) %||%
+    empty_atomic_as_null(sub("%N", "latest", file_pattern))
+  flush_interval <-
+    as_difftime_spec(
+      opts$flush_interval,
+      arg = ma("flush_interval"),
+      call = call
+    ) %||%
+    as_difftime_env(evs[["flush_interval"]], call = call) %||%
+    as_difftime_env(file_exporter_flush_interval_envvar, call = call)
+  flush_count <-
+    as_count(
+      opts$flush_count,
+      null = TRUE,
+      arg = ma("flush_count"),
+      call = call
+    ) %||%
+    as_count_env(evs[["flush_count"]], positive = TRUE, call = call) %||%
+    as_count_env(file_exporter_flush_count_envvar, positive = TRUE, call = call)
+  file_size <-
+    as_bytes(opts$file_size, arg = ma("file_size"), call = call) %||%
+    as_bytes_env(evs[["file_size"]], call = call) %||%
+    as_bytes_env(file_exporter_file_size_envvar, call = call)
+  rotate_size <-
+    as_bytes(opts$rotate_size, arg = ma("rotate_size"), call = call) %||%
+    as_count_env(evs[["rotate_size"]], call = call) %||%
+    as_count_env(file_exporter_rotate_size_envvar, call = call)
 
-  opts
+  list(
+    file_pattern = file_pattern,
+    alias_pattern = alias_pattern,
+    flush_interval = flush_interval,
+    flush_count = flush_count,
+    file_size = file_size,
+    rotate_size = rotate_size
+  )
 }
 
-as_known_options <- function(x, nms, call = NULL) {
+check_known_options <- function(
+  x,
+  nms,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
   bad <- setdiff(names(x), nms)
   if (length(bad) > 0) {
-    call <- call %||% match.call()
     s <- plural(length(bad))
     badstr <- paste(bad, collapse = ", ")
-    stop(glue(
-      "Invalid argument: {format(call[[2]])} has unknown option{s}: {badstr}."
+    stop(cnd(
+      call = call,
+      "Invalid argument: {arg} has unknown option{s}: {badstr}."
     ))
   }
   x
 }
 
-as_logger_provider_file_options <- function(opts, call = NULL) {
+as_logger_provider_file_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
   evs = c(
     file_pattern = file_exporter_logs_file_envvar,
     alias_pattern = file_exporter_logs_alias_envvar,
@@ -891,34 +1089,51 @@ as_logger_provider_file_options <- function(opts, call = NULL) {
     rotate_size = file_exporter_logs_rotate_size_envvar
   )
 
-  call <- call %||% match.call()
   opts1 <- as_file_exporter_options(opts, evs = evs, call = call)
-  as_known_options(opts, names(opts1), call = call)
+  check_known_options(opts, names(opts1), arg = arg, call = call)
 
   opts1
 }
 
-as_metric_reader_options <- function(opts, call = NULL) {
-  call <- call %||% match.call()
-  opts <- as_named_list(opts, call = call)
+as_metric_reader_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  opts <- as_named_list(opts, arg = arg, call = call)
 
-  call_ds <- substitute(as_difftime_spec(x), list(x = call[[2]]))
+  ma <- function(nm) {
+    as_caller_arg(substitute(x[[nm]], list(x = arg, nm = nm)))
+  }
 
-  opts["export_interval"] <- list(
-    as_difftime_spec(opts$export_interval, call = call_ds) %||%
-      as_difftime_env(metric_export_interval_envvar) %||%
-      60000L
+  export_interval <-
+    as_difftime_spec(
+      opts$export_interval,
+      arg = ma("export_interval"),
+      call = call
+    ) %||%
+    as_difftime_env(metric_export_interval_envvar, call = call) %||%
+    60000L
+  export_timeout <-
+    as_difftime_spec(
+      opts$export_timeout,
+      arg = ma("export_timeout"),
+      call = call
+    ) %||%
+    as_difftime_env(metric_export_timeout_envvar, call = call) %||%
+    30000L
+
+  list(
+    export_interval = export_interval,
+    export_timeout = export_timeout
   )
-  opts["export_timeout"] <- list(
-    as_difftime_spec(opts$export_timeout, call = call_ds) %||%
-      as_difftime_env(metric_export_timeout_envvar) %||%
-      30000L
-  )
-
-  opts
 }
 
-as_meter_provider_file_options <- function(opts, call = NULL) {
+as_meter_provider_file_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
   evs = c(
     file_pattern = file_exporter_metrics_file_envvar,
     alias_pattern = file_exporter_metrics_alias_envvar,
@@ -927,15 +1142,23 @@ as_meter_provider_file_options <- function(opts, call = NULL) {
     file_size = file_exporter_metrics_file_size_envvar,
     rotate_size = file_exporter_metrics_rotate_size_envvar
   )
-  call <- call %||% match.call()
-  opts1 <- as_metric_reader_options(opts, call = call)
-  opts2 <- as_file_exporter_options(opts, evs = evs, call = call)
-  as_known_options(opts, c(names(opts1), names(opts2)), call = call)
+  opts1 <- as_metric_reader_options(opts, arg = arg, call = call)
+  opts2 <- as_file_exporter_options(opts, evs = evs, arg = arg, call = call)
+  check_known_options(
+    opts,
+    c(names(opts1), names(opts2)),
+    arg = arg,
+    call = call
+  )
 
   c(opts1, opts2)
 }
 
-as_tracer_provider_file_options <- function(opts, call = NULL) {
+as_tracer_provider_file_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
   evs = c(
     file_pattern = file_exporter_traces_file_envvar,
     alias_pattern = file_exporter_traces_alias_envvar,
@@ -945,9 +1168,495 @@ as_tracer_provider_file_options <- function(opts, call = NULL) {
     rotate_size = file_exporter_traces_rotate_size_envvar
   )
 
-  call <- call %||% match.call()
-  opts1 <- as_file_exporter_options(opts, evs = evs, call = call)
-  as_known_options(opts, names(opts1), call = call)
+  opts1 <- as_file_exporter_options(opts, evs = evs, arg = arg, call = call)
+  check_known_options(opts, names(opts1), arg = arg, call = call)
+
+  opts1
+}
+
+otlp_content_type_values <- c(
+  "json" = 0L,
+  "application/json" = 0L,
+  "binary" = 1L,
+  "application/x-protobuf" = 1L
+)
+
+as_otlp_content_type <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (null && is.null(x)) {
+    return(NULL)
+  }
+  if (is_string(x) && tolower(x) %in% otlp_content_type_values) {
+    return(otlp_content_type_values[tolower(x)])
+  }
+
+  vls <- paste0("'", names(otlp_content_type_values), "'", collapse = ", ")
+  if (is_string(x)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be one of {vls}, but it is {x}."
+    ))
+  } else {
+    stop(cnd(
+      call = call,
+      "Invalid argument: {arg} must a string, one of {vls}, but it is \\
+       a {typename(x)}."
+    ))
+  }
+}
+
+as_otlp_content_type_env <- function(ev, call = caller_env()) {
+  val <- get_env(ev)
+  if (is.null(val)) {
+    return(NULL)
+  }
+  if (tolower(val) %in% otlp_content_type_values) {
+    return(otlp_content_type_values[tolower(val)])
+  }
+
+  vls <- paste("'", names(otlp_content_type_values), "'", collapse = ", ")
+  stop(cnd(
+    call = call,
+    "Invalid environment variable: {ev} must be one of {vls}, but it \\
+     is '{val}'."
+  ))
+}
+
+otlp_json_byte_mapping_choices <- c(default = "hexid", "base64", "hex")
+
+as_otlp_json_bytes_mapping <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  as_choice(
+    x,
+    otlp_json_byte_mapping_choices,
+    null = null,
+    arg = arg,
+    call = call
+  )
+}
+
+as_otlp_json_bytes_mapping_env <- function(ev, call = caller_env()) {
+  val <- get_env(ev)
+  if (is.null(val)) {
+    return(NULL)
+  }
+
+  w <- match(tolower(val), otlp_json_byte_mapping_choices)
+  if (!is.na(w)) {
+    return(w - 1L)
+  }
+
+  choices <- paste(otlp_json_byte_mapping_choices, collapse = ", ")
+  stop(cnd(
+    "Invalid environment variable: '{ev}' must be one of {choices} \\
+     (case insensitive), but it is '{val}'."
+  ))
+}
+
+otlp_compression_choices <- c(default = "none", "gzip")
+
+as_otlp_compression <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  as_choice(x, otlp_compression_choices, null = null, arg = arg, call = call)
+}
+
+is_number <- function(x, positive = FALSE) {
+  is.numeric(x) && length(x) == 1 && !is.na(x) && (!positive || x > 0)
+}
+
+as_number <- function(
+  x,
+  positive = FALSE,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (null && is.null(x)) {
+    return(NULL)
+  }
+  if (is_number(x, positive = positive)) {
+    return(x)
+  }
+  if (is_string(x)) {
+    xd <- suppressWarnings(as.double(x))
+    if (is_number(xd, positive = positive)) {
+      return(xd)
+    }
+  }
+
+  pos <- if (positive) "positive " else ""
+  if (is.numeric(x) && length(x) != 1) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a numeric scalar, not a vector."
+    ))
+  } else if (is.numeric(x) && length(x) == 1 && is.na(x)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must not be `NA`."
+    ))
+  } else if (positive && is_number(x, positive = FALSE)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be positive."
+    ))
+  } else {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a {pos}number, but it is \\
+       {typename(x)}."
+    ))
+  }
+}
+
+as_number_env <- function(ev, positive = FALSE, call = caller_env()) {
+  val <- get_env(ev)
+  if (is.null(val)) {
+    return(NULL)
+  }
+  x <- suppressWarnings(as.double(val))
+  if (is_number(x, positive = positive)) {
+    return(x)
+  }
+  pos <- if (positive) "positive " else ""
+  stop(cnd(
+    call = call,
+    "Invalid environment variable: '{ev}' must be a {pos}number. It is '{val}'."
+  ))
+}
+
+as_http_headers <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (null && is.null(x)) {
+    return(NULL)
+  }
+  if (is.character(x) && is_named(x) && !anyNA(x)) {
+    return(x)
+  }
+
+  if (is.character(x) && !is.named(x)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: all entries in {arg} must be a named."
+    ))
+  } else if (is.character(x)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: {arg} must not contain `NA` values."
+    ))
+  } else {
+    stop(cnd(
+      call = call,
+      "Invalid argument: {arg} must be a named character vector without \\
+       `NA` values, but it is {typename(x)}."
+    ))
+  }
+}
+
+as_http_exporter_options <- function(
+  opts,
+  evs,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  opts <- as_named_list(opts, arg = arg, call = call)
+
+  ma <- function(nm) {
+    as_caller_arg(substitute(x[[nm]], list(x = arg, nm = nm)))
+  }
+
+  # - Options in spec: we let the CPP handle these, i.e. leave at NULL
+  #   if unset in argument
+  # - Options not in spec, but with CPP support: we override these with
+  #   R specific env vars, pass them to CPP explicitly. So we need to
+  #   set defaults for them here, to avoid looking up CPP specific enc vars.
+  # - Options not in spec and no CPP env vars: we introduce R
+  #   specific env vars for these. No need to pass them to CPP, but we
+  #   might as well, in case CPP introduces env vars for them.
+
+  # in spec
+  url <- as_string(opts$url, arg = ma("url"), call = call)
+
+  # no support
+  content_type <- as_otlp_content_type(
+    opts$content_type,
+    arg = ma("content_type"),
+    call = call
+  ) %||%
+    as_otlp_content_type_env(evs["content_type"], call = call) %||%
+    as_otlp_content_type_env(otlp_content_type_envvar, call = call) %||%
+    otlp_content_type_default
+
+  # no support
+  json_bytes_mapping <-
+    as_otlp_json_bytes_mapping(
+      opts$json_bytes_mapping,
+      arg = ma("json_bytes_mapping"),
+      call = call
+    ) %||%
+    as_otlp_json_bytes_mapping_env(
+      evs[["json_bytes_mapping"]],
+      call = call
+    ) %||%
+    as_otlp_json_bytes_mapping_env(
+      otlp_json_bytes_mapping_envvar,
+      call = call
+    ) %||%
+    otlp_json_bytes_mapping_default
+
+  # no support
+  use_json_name <- as_flag(
+    opts$use_json_name,
+    null = TRUE,
+    arg = ma("use_json_name"),
+    call = call
+  ) %||%
+    as_flag_env(evs[["use_json_name"]], call = call) %||%
+    as_flag_env(otlp_use_json_name_envvar, call = call) %||%
+    otlp_use_json_name_default
+
+  # no support
+  console_debug <- as_flag(
+    opts$console_debug,
+    null = TRUE,
+    arg = ma("console_debug"),
+    call = call
+  ) %||%
+    as_flag_env(evs[["console_debug"]], call = call) %||%
+    as_flag_env(otlp_console_debug_envvar, call = call) %||%
+    otlp_console_debug_default
+
+  # in spec
+  timeout <- as_difftime_spec(opts$timeout, arg = ma("timeout"), call = call)
+
+  # in spec
+  http_headers <- as_http_headers(
+    opts$http_headers,
+    arg = ma("http_headers"),
+    call = call
+  )
+
+  # no support
+  ssl_insecure_skip_verify <- as_flag(
+    opts$ssl_insecure_skip_verify,
+    null = TRUE,
+    arg = ma("ssl_insecure_skip_verify"),
+    call = call
+  ) %||%
+    as_flag_env(evs[["ssl_insecure_skip_verify"]], call = call) %||%
+    as_flag_env(otlp_ssl_insecure_skip_verify_envvar, call = call) %||%
+    otlp_ssl_insecure_skip_verify_default
+
+  # in spec
+  ssl_ca_cert_path <- as_string(
+    opts$ssl_ca_cert_path,
+    arg = ma("ssl_ca_cert_path"),
+    call = call
+  )
+
+  # in spec
+  ssl_ca_cert_string <- as_string(
+    opts$ssl_ca_cert_string,
+    arg = ma("ssl_ca_cert_string"),
+    call = call
+  )
+
+  # in spec
+  ssl_client_key_path <- as_string(
+    opts$ssl_client_key_path,
+    arg = ma("ssl_client_key_path"),
+    call = call
+  )
+
+  # in spec
+  ssl_client_key_string <- as_string(
+    opts$ssl_client_key_string,
+    arg = ma("ssl_client_key_string"),
+    call = call
+  )
+
+  # in spec
+  ssl_client_cert_path <- as_string(
+    opts$ssl_client_cert_path,
+    arg = ma("ssl_client_cert_path"),
+    call = call
+  )
+
+  # in spec
+  ssl_client_cert_string <- as_string(
+    opts$ssl_client_cert_string,
+    arg = ma("ssl_client_cert_string"),
+    call = call
+  )
+
+  # cpp support
+  ssl_min_tls <- as_string(
+    opts$ssl_min_tls,
+    arg = ma("ssl_min_tls"),
+    call = call
+  ) %||%
+    get_env(evs[["ssl_min_tls"]]) %||%
+    get_env(otlp_ssl_min_tls_envvar) %||%
+    otlp_ssl_min_tls_default
+
+  # cpp support
+  ssl_max_tls <- as_string(
+    opts$ssl_max_tls,
+    arg = ma("ssl_max_tls"),
+    call = call
+  ) %||%
+    get_env(evs[["ssl_max_tls"]]) %||%
+    get_env(otlp_ssl_max_tls_envvar) %||%
+    otlp_ssl_max_tls_default
+
+  # cpp support
+  ssl_cipher <- as_string(
+    opts$ssl_cipher,
+    arg = ma("ssl_cipher"),
+    call = call
+  ) %||%
+    get_env(evs[["ssl_cipher"]]) %||%
+    get_env(otlp_ssl_cipher_envvar) %||%
+    otlp_ssl_cipher_default
+
+  # cpp support
+  ssl_cipher_suite <- as_string(
+    opts$ssl_cipher_suite,
+    arg = ma("ssl_cipher_suite"),
+    call = call
+  ) %||%
+    get_env(evs[["ssl_cipher_suite"]]) %||%
+    get_env(otlp_ssl_cipher_suite_envvar) %||%
+    otlp_ssl_cipher_suite_default
+
+  # in spec
+  compression <- as_otlp_compression(
+    opts$compression,
+    arg = ma("compression"),
+    call = call
+  )
+
+  # cpp support
+  retry_policy_max_attempts <- as_count(
+    opts$retry_policy_max_attempts,
+    null = TRUE,
+    positive = TRUE,
+    arg = ma("retry_policy_max_attempts"),
+    call = call
+  ) %||%
+    as_count_env(
+      evs[["retry_policy_max_attempts"]],
+      positive = TRUE,
+      call = call
+    ) %||%
+    as_count_env(
+      otlp_retry_policy_max_attempts_envvar,
+      positive = TRUE,
+      call = call
+    ) %||%
+    otlp_retry_policy_max_attempts_default
+
+  # cpp support
+  retry_policy_initial_backoff <- as_difftime_spec(
+    opts$retry_policy_initial_backoff,
+    arg = ma("retry_policy_initial_backoff"),
+    call = call
+  ) %||%
+    as_difftime_env(evs[["retry_policy_initial_backoff"]], call = call) %||%
+    as_difftime_env(otlp_retry_policy_initial_backoff_envvar, call = call) %||%
+    otlp_retry_policy_initial_backoff_default
+
+  # cpp support
+  retry_policy_max_backoff <- as_difftime_spec(
+    opts$retry_policy_max_backoff,
+    arg = ma("retry_policy_max_backoff"),
+    call = call
+  ) %||%
+    as_difftime_env(evs[["retry_policy_max_backoff"]], call = call) %||%
+    as_difftime_env(otlp_retry_policy_max_backoff_envvar, call = call) %||%
+    otlp_retry_policy_max_backoff_default
+
+  # cpp support
+  retry_policy_backoff_multiplier <- as_number(
+    opts$retry_policy_backoff_multiplier,
+    null = TRUE,
+    positive = TRUE,
+    arg = ma("retry_policy_backoff_multiplier"),
+    call = call
+  ) %||%
+    as_number_env(evs[["retry_policy_backoff_multiplier"]], call = call) %||%
+    as_number_env(
+      otlp_retry_policy_backoff_multiplier_envvar,
+      call = call
+    ) %||%
+    otlp_retry_policy_backoff_multiplier_default
+
+  list(
+    url = url,
+    content_type = content_type,
+    json_bytes_mapping = json_bytes_mapping,
+    use_json_name = use_json_name,
+    console_debug = console_debug,
+    timeout = timeout,
+    http_headers = http_headers,
+    ssl_insecure_skip_verify = ssl_insecure_skip_verify,
+    ssl_ca_cert_path = ssl_ca_cert_path,
+    ssl_ca_cert_string = ssl_ca_cert_string,
+    ssl_client_key_path = ssl_client_key_path,
+    ssl_client_key_string = ssl_client_key_string,
+    ssl_client_cert_path = ssl_client_cert_path,
+    ssl_client_cert_string = ssl_client_cert_string,
+    ssl_min_tls = ssl_min_tls,
+    ssl_max_tls = ssl_max_tls,
+    ssl_cipher = ssl_cipher,
+    ssl_cipher_suite = ssl_cipher_suite,
+    compression = compression,
+    retry_policy_max_attempts = retry_policy_max_attempts,
+    retry_policy_initial_backoff = retry_policy_initial_backoff,
+    retry_policy_max_backoff = retry_policy_max_backoff,
+    retry_policy_backoff_multiplier = retry_policy_backoff_multiplier
+  )
+}
+
+as_tracer_provider_http_options <- function(
+  opts,
+  arg = caller_arg(arg),
+  call = caller_env()
+) {
+  evs <- list(
+    content_type = otlp_traces_content_type_envvar,
+    json_bytes_mapping = otlp_traces_json_bytes_mapping_envvar,
+    use_json_name = otlp_traces_use_json_name_envvar,
+    console_debug = otlp_traces_console_debug_envvar,
+    ssl_insecure_skip_verify = otlp_traces_ssl_insecure_skip_verify_envvar,
+    ssl_min_tls = otlp_traces_ssl_min_tls_envvar,
+    ssl_max_tls = otlp_traces_ssl_max_tls_envvar,
+    ssl_cipher = otlp_traces_ssl_cipher_envvar,
+    ssl_cipher_suite = otlp_traces_ssl_cipher_suite_envvar,
+    retry_policy_max_attempts = otlp_traces_retry_policy_max_attempts_envvar,
+    retry_policy_initial_backoff = otlp_traces_retry_policy_initial_backoff_envvar,
+    retry_policy_max_backoff = otlp_traces_retry_policy_max_backoff_envvar,
+    retry_policy_backoff_multiplier = otlp_traces_retry_policy_backoff_multiplier_envvar
+  )
+
+  opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
+  check_known_options(opts, names(opts1), arg = arg, call = call)
 
   opts1
 }

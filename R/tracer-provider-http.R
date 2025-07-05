@@ -1,4 +1,5 @@
-tracer_provider_http_new <- function() {
+tracer_provider_http_new <- function(opts = NULL) {
+  opts <- as_tracer_provider_http_options(opts)
   self <- new_object(
     c("otel_tracer_provider_http", "otel_tracer_provider"),
     get_tracer = function(
@@ -16,12 +17,29 @@ tracer_provider_http_new <- function() {
   )
 
   attributes <- as_otel_attributes(the$default_resource_attributes)
+  # TODO: opts
   self$xptr <- ccall(otel_create_tracer_provider_http, attributes)
   self
 }
 
 tracer_provider_http_options <- function() {
-  ccall(otel_tracer_provider_http_options)
+  ropts <- as_tracer_provider_http_options(NULL)
+  copts <- ccall(otel_tracer_provider_http_options)
+  # override the ones that are in the spec
+  spec <- c(
+    "url",
+    "timeout",
+    "http_headers",
+    "ssl_ca_cert_path",
+    "ssl_ca_cert_string",
+    "ssl_client_key_path",
+    "ssl_client_key_string",
+    "ssl_client_cert_path",
+    "ssl_client_cert_string",
+    "compression"
+  )
+  ropts[spec] <- copts[spec]
+  ropts
 }
 
 #' Tracer provider to export over HTTP

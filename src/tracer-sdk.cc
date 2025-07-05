@@ -246,10 +246,4 @@ int otel_tracer_provider_http_default_options_(
   return 0;
 }
 
-void otel_tracer_provider_http_default_options_del_(void *opts_) {
-  otlp::OtlpHttpExporterOptions *opts =
-    (otlp::OtlpHttpExporterOptions*) opts_;
-  delete opts;
-}
-
 }
