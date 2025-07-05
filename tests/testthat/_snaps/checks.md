@@ -99,6 +99,10 @@
       list()
       attr(,"class")
       [1] "otel_span_context"
+    Code
+      as_span_context(sp)
+    Output
+      [1] "context"
 
 ---
 
@@ -137,12 +141,12 @@
       helper(b1, c(default = "foo", "bar"))
     Condition
       Error in `helper()`:
-      ! Invalid argument: `ch` must be one of foo, bar, but it is foobar.
+      ! Invalid argument: `ch` must be one of 'foo', 'bar', but it is 'foobar'.
     Code
       helper(b2, c(default = "foo", "bar"))
     Condition
       Error in `helper()`:
-      ! Invalid argument: `ch` must be a string scalar, one of foo, bar, but it is an integer vector.
+      ! Invalid argument: `ch` must be a string scalar, one of 'foo', 'bar', but it is an integer vector.
 
 # as_env
 
@@ -195,6 +199,14 @@
     Condition
       Error in `helper()`:
       ! Invalid argument: `f` must a flag (logical scalar), but it is an integer vector.
+
+# as_flag_env
+
+    Code
+      helper("FOO")
+    Condition
+      Error in `helper()`:
+      ! Invalid environment variable: 'FOO' must be 'true' or 'false' (case insensitive). It is 'notgood'.
 
 # as_otel_attribute_value
 
@@ -308,7 +320,7 @@
       helper(options)
     Condition
       Error in `helper()`:
-      ! Invalid argument: `opts[["kind"]]` must be a string scalar, one of internal, server, client, producer, consumer, but it is a number.
+      ! Invalid argument: `opts[["kind"]]` must be a string scalar, one of 'internal', 'server', 'client', 'producer', 'consumer', but it is a number.
 
 # as_end_span_options
 
@@ -359,7 +371,7 @@
       helper(v1)
     Condition
       Error in `helper()`:
-      ! Invalid argument: `ls` must be one of trace, trace2, trace3, trace4, debug, debug2, debug3, debug4, info, info2, info3, info4, warn, warn2, warn3, warn4, error, error2, error3, error4, fatal, fatal2, fatal3, fatal4, but it is foobar.
+      ! Invalid argument: `ls` must be one of 'trace', 'trace2', 'trace3', 'trace4', 'debug', 'debug2', 'debug3', 'debug4', 'info', 'info2', 'info3', 'info4', 'warn', 'warn2', 'warn3', 'warn4', 'error', 'error2', 'error3', 'error4', 'fatal', 'fatal2', 'fatal3', 'fatal4', but it is 'foobar'.
     Code
       helper(v2)
     Condition
@@ -584,4 +596,388 @@
     Condition
       Error in `helper()`:
       ! Invalid environment variable: FOO='100www'. It must be an integer with a unit suffix. Known units are B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
+
+# as_named_list
+
+    Code
+      v1 <- list(a = 1, 2)
+      helper(v1)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `nl` must be a named list, but it is not named.
+    Code
+      v2 <- 1:10
+      helper(v2)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `nl` must be a named list, but it is an integer vector.
+
+# check_known_options
+
+    Code
+      helper(opts, c("a"))
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o` has unknown option: 'b'.
+    Code
+      helper(opts, character())
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o` has unknown options: 'a', 'b'.
+
+# as_logger_provider_file_options
+
+    Code
+      v <- list(file_pattern = 1L)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["file_pattern"]]` must be a string scalar but it is an integer.
+    Code
+      v[["file_pattern"]] <- "foo"
+      v[["alias_pattern"]] <- 1L
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["alias_pattern"]]` must be a string scalar but it is an integer.
+    Code
+      v[["alias_pattern"]] <- "foo"
+      v[["flush_interval"]] <- mtcars
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["flush_interval"]]` must be an integer scalar (milliseconds), a 'difftime' scalar, or a time interval specification. A time interval specification is apositive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours) or d (days). But it is a a data frame.
+    Code
+      v[["flush_interval"]] <- 1L
+      v[["flush_count"]] <- "notgood"
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["flush_count"]]` must be a non-negative integer scalar, but it is a string.
+    Code
+      v[["flush_count"]] <- 5L
+      v[["file_size"]] <- "bad"
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: could not interpret `o[["file_size"]]` as a number of bytes. It must be a number with a unit suffix: one of B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
+    Code
+      v[["file_size"]] <- "10MB"
+      v[["rotate_size"]] <- "oops"
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: could not interpret `o[["rotate_size"]]` as a number of bytes. It must be a number with a unit suffix: one of B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
+    Code
+      v[["rotate_size"]] <- "1MB"
+      v[["bad_option"]] <- 1:10
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o` has unknown option: 'bad_option'.
+
+# as_metric_reader_options
+
+    Code
+      v <- list(export_interval = "bad")
+      helper(v)
+    Condition
+      Warning in `parse_time_spec()`:
+      NAs introduced by coercion
+      Error in `helper()`:
+      ! Invalid argument: `o[["export_interval"]]` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+    Code
+      v <- list(export_interval = "100s", export_timeout = "no")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["export_timeout"]]` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+
+# as_meter_provider_file_options
+
+    Code
+      v <- list(file_pattern = 1:10)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["file_pattern"]]` must be a string scalar but it is an integer vector.
+    Code
+      v <- list(bad = 100)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o` has unknown option: 'bad'.
+
+# as_tracer_provider_file_options
+
+    Code
+      v <- list(file_pattern = 1:10)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["file_pattern"]]` must be a string scalar but it is an integer vector.
+    Code
+      v <- list(bad = 100)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o` has unknown option: 'bad'.
+
+# as_otlp_content_type
+
+    Code
+      otlp_content_type_values
+    Output
+                        json       application/json                 binary 
+                           0                      0                      1 
+      application/x-protobuf 
+                           1 
+
+---
+
+    Code
+      v <- "foo"
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `ct` must be one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is 'foo'.
+    Code
+      v2 <- 1:10
+      helper(v2)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: ct must a string, one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is an integer vector.
+
+# as_otlp_content_type_env
+
+    Code
+      helper("FOO")
+    Condition
+      Error in `helper()`:
+      ! Invalid environment variable: 'FOO' must be one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is 'invalid'.
+
+# as_otlp_json_bytes_mapping
+
+    Code
+      as_otlp_json_bytes_mapping("hexid")
+    Output
+      [1] 0
+    Code
+      as_otlp_json_bytes_mapping("BASE64")
+    Output
+      [1] 1
+    Code
+      as_otlp_json_bytes_mapping("hex")
+    Output
+      [1] 2
+
+---
+
+    Code
+      val <- "notthis"
+      helper(val)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `v` must be one of 'hexid', 'base64', 'hex', but it is 'notthis'.
+
+# as_otlp_json_bytes_mapping_env
+
+    Code
+      as_otlp_json_bytes_mapping_env("FOO")
+    Output
+      [1] 2
+
+---
+
+    Code
+      helper("FOO")
+    Condition
+      Error in `as_otlp_json_bytes_mapping_env()`:
+      ! Invalid environment variable: 'FOO' must be one of hexid, base64, hex (case insensitive), but it is 'bad'.
+
+# as_otlp_compression
+
+    Code
+      as_otlp_compression("none")
+    Output
+      [1] 0
+    Code
+      as_otlp_compression("gzip")
+    Output
+      [1] 1
+
+---
+
+    Code
+      v <- "uncomp"
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `c` must be one of 'none', 'gzip', but it is 'uncomp'.
+
+# as_number
+
+    Code
+      v1 <- 1:4 / 2
+      helper(v1)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `n` must be a numeric scalar, not a vector.
+    Code
+      v2 <- NA_real_
+      helper(v2)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `n` must not be `NA`.
+    Code
+      v3 <- 0
+      helper(v3, positive = TRUE)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `n` must be positive.
+    Code
+      v4 <- mtcars
+      helper(v4)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `n` must be a number, but it is a data frame.
+
+# as_number_env
+
+    Code
+      helper("FOO")
+    Condition
+      Error in `helper()`:
+      ! Invalid environment variable: 'FOO' must be a number. It is 'notanumber'.
+
+---
+
+    Code
+      helper("FOO", positive = TRUE)
+    Condition
+      Error in `helper()`:
+      ! Invalid environment variable: 'FOO' must be a positive number. It is '0'.
+
+# as_http_headers
+
+    Code
+      v1 <- c("foo", x = "bar")
+      helper(v1)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: all entries in `h` must be a named.
+    Code
+      v2 <- c(a = "x", b = NA_character_)
+      helper(v2)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `h` must not contain `NA` values.
+    Code
+      v3 <- 1:10
+      helper(v3)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `h` must be a named character vector without `NA` values, but it is an integer vector.
+
+# as_tracer_provider_http_options
+
+    Code
+      as_tracer_provider_http_options(NULL)
+    Output
+      $url
+      NULL
+      
+      $content_type
+      [1] "binary"
+      
+      $json_bytes_mapping
+      [1] 0
+      
+      $use_json_name
+      [1] FALSE
+      
+      $console_debug
+      [1] FALSE
+      
+      $timeout
+      NULL
+      
+      $http_headers
+      NULL
+      
+      $ssl_insecure_skip_verify
+      [1] FALSE
+      
+      $ssl_ca_cert_path
+      NULL
+      
+      $ssl_ca_cert_string
+      NULL
+      
+      $ssl_client_key_path
+      NULL
+      
+      $ssl_client_key_string
+      NULL
+      
+      $ssl_client_cert_path
+      NULL
+      
+      $ssl_client_cert_string
+      NULL
+      
+      $ssl_min_tls
+      [1] ""
+      
+      $ssl_max_tls
+      [1] ""
+      
+      $ssl_cipher
+      [1] ""
+      
+      $ssl_cipher_suite
+      [1] ""
+      
+      $compression
+      [1] 0
+      
+      $retry_policy_max_attempts
+      [1] 5
+      
+      $retry_policy_initial_backoff
+      [1] 1000
+      
+      $retry_policy_max_backoff
+      [1] 5000
+      
+      $retry_policy_backoff_multiplier
+      [1] 1.5
+      
+
+---
+
+    Code
+      v <- list(url = 1)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["url"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(content_type = "bad")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["content_type"]]` must be one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is 'bad'.
+    Code
+      v <- list(json_bytes_mapping = "no")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["json_bytes_mapping"]]` must be one of 'hexid', 'base64', 'hex', but it is 'no'.
+    Code
+      v <- list(use_json_name = "no")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["use_json_name"]]` must a flag (logical scalar), but it is a string.
 

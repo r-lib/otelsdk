@@ -76,11 +76,13 @@ test_that("as_span", {
 
 test_that("as_span_context", {
   spc <- structure(list(), class = "otel_span_context")
+  sp <- structure(list(get_context = function() "context"), class = "otel_span")
   expect_snapshot({
     as_span_context(NULL)
     as_span_context(NA)
     as_span_context(NA_character_)
     as_span_context(spc)
+    as_span_context(sp)
   })
 
   helper <- function(spc) as_span_context(spc)
@@ -161,12 +163,36 @@ test_that("as_string", {
 })
 
 test_that("as_flag", {
+  expect_null(as_flag(NULL, null = TRUE))
   expect_equal(as_flag(TRUE), TRUE)
   expect_equal(as_flag(FALSE), FALSE)
   b1 <- 1:10
   helper <- function(f) as_flag(f)
   expect_snapshot(error = TRUE, {
     helper(b1)
+  })
+})
+
+test_that("as_flag_env", {
+  withr::local_envvar(FOO = NA_character_)
+  expect_null(as_flag_env("FOO"))
+
+  true <- c("true", "TRue", "t", "yes", "on", "1")
+  for (v in true) {
+    withr::local_envvar(FOO = v)
+    expect_true(as_flag_env("FOO"))
+  }
+
+  false <- c("false", "False", "F", "no", "off", "0")
+  for (v in false) {
+    withr::local_envvar(FOO = v)
+    expect_false(as_flag_env("FOO"))
+  }
+
+  helper <- function(ev) as_flag_env(ev)
+  withr::local_envvar(FOO = "notgood")
+  expect_snapshot(error = TRUE, {
+    helper("FOO")
   })
 })
 
@@ -517,10 +543,10 @@ test_that("as_difftime_spec", {
   expect_null(as_difftime_spec(NULL))
   expect_equal(
     as_difftime_spec(as.difftime(1.2, units = "secs")),
-    1.2 * 1000 * 1000
+    1.2 * 1000
   )
-  expect_equal(as_difftime_spec(5), 5 * 1000)
-  expect_equal(as_difftime_spec("1s"), 1 * 1000 * 1000)
+  expect_equal(as_difftime_spec(5), 5)
+  expect_equal(as_difftime_spec("1s"), 1 * 1000)
 
   helper <- function(dt) as_difftime_spec(dt)
   expect_snapshot(error = TRUE, {
@@ -542,10 +568,10 @@ test_that("as_difftime_env", {
   expect_null(as_difftime_env("FOO"))
 
   withr::local_envvar(FOO = 1.4)
-  expect_equal(as_difftime_env("FOO"), 1.4 * 1000)
+  expect_equal(as_difftime_env("FOO"), 1.4)
 
   withr::local_envvar(FOO = "1m")
-  expect_equal(as_difftime_env("FOO"), 60 * 1000 * 1000)
+  expect_equal(as_difftime_env("FOO"), 60 * 1000)
 
   helper <- function(ev) as_difftime_env(ev)
   expect_snapshot(
@@ -558,12 +584,12 @@ test_that("as_difftime_env", {
 })
 
 test_that("parse_time_spec", {
-  expect_equal(parse_time_spec("1us"), 1)
-  expect_equal(parse_time_spec("1ms"), 1000)
-  expect_equal(parse_time_spec("2s"), 2 * 1000 * 1000)
-  expect_equal(parse_time_spec("3m"), 3 * 60 * 1000 * 1000)
-  expect_equal(parse_time_spec("4h"), 4 * 60 * 60 * 1000 * 1000)
-  expect_equal(parse_time_spec("5d"), 5 * 24 * 60 * 60 * 1000 * 1000)
+  expect_equal(parse_time_spec("1us"), 1 / 1000)
+  expect_equal(parse_time_spec("1ms"), 1)
+  expect_equal(parse_time_spec("2s"), 2 * 1000)
+  expect_equal(parse_time_spec("3m"), 3 * 60 * 1000)
+  expect_equal(parse_time_spec("4h"), 4 * 60 * 60 * 1000)
+  expect_equal(parse_time_spec("5d"), 5 * 24 * 60 * 60 * 1000)
 })
 
 test_that("as_bytes", {
@@ -608,4 +634,272 @@ test_that("parse_bytes_spec", {
   expect_equal(parse_bytes_spec("4GB"), 4 * 1000 * 1000 * 1000)
   expect_equal(parse_bytes_spec("5TB"), 5 * 1000 * 1000 * 1000 * 1000)
   expect_equal(parse_bytes_spec("6Pb"), 6 * 1000 * 1000 * 1000 * 1000 * 1000)
+})
+
+test_that("as_named_list", {
+  expect_equal(as_named_list(NULL), NULL)
+  expect_equal(as_named_list(list()), list())
+  expect_equal(as_named_list(list(a = 1)), list(a = 1))
+
+  helper <- function(nl) as_named_list(nl)
+  expect_snapshot(error = TRUE, {
+    v1 <- list(a = 1, 2)
+    helper(v1)
+    v2 <- 1:10
+    helper(v2)
+  })
+})
+
+test_that("as_file_exporter_options", {
+  # tested via upstream
+  expect_true(TRUE)
+})
+
+test_that("check_known_options", {
+  opts <- list(a = 1, b = 2)
+  expect_equal(check_known_options(opts, c("a", "b", "c")), opts)
+
+  helper <- function(o, ...) check_known_options(o, ...)
+  expect_snapshot(error = TRUE, {
+    helper(opts, c("a"))
+    helper(opts, character())
+  })
+})
+
+test_that("as_logger_provider_file_options", {
+  opts <- as_logger_provider_file_options(NULL)
+  opts1 <- list(file_pattern = "foo-%N")
+  expect_equal(
+    as_logger_provider_file_options(opts1),
+    modifyList(opts, c(opts1, list(alias_pattern = "foo-latest")))
+  )
+
+  helper <- function(o) as_logger_provider_file_options(o)
+  expect_snapshot(error = TRUE, {
+    v <- list(file_pattern = 1L)
+    helper(v)
+    v[["file_pattern"]] <- "foo"
+    v[["alias_pattern"]] <- 1L
+    helper(v)
+    v[["alias_pattern"]] <- "foo"
+    v[["flush_interval"]] <- mtcars
+    helper(v)
+    v[["flush_interval"]] <- 1L
+    v[["flush_count"]] <- "notgood"
+    helper(v)
+    v[["flush_count"]] <- 5L
+    v[["file_size"]] <- "bad"
+    helper(v)
+    v[["file_size"]] <- "10MB"
+    v[["rotate_size"]] <- "oops"
+    helper(v)
+    v[["rotate_size"]] <- "1MB"
+    v[["bad_option"]] <- 1:10
+    helper(v)
+  })
+})
+
+test_that("as_metric_reader_options", {
+  opts <- list(
+    export_interval = 500,
+    export_timeout = 200
+  )
+  expect_equal(as_metric_reader_options(opts), opts)
+
+  helper <- function(o) as_metric_reader_options(o)
+  expect_snapshot(error = TRUE, {
+    v <- list(export_interval = "bad")
+    helper(v)
+    v <- list(export_interval = "100s", export_timeout = "no")
+    helper(v)
+  })
+})
+
+test_that("as_meter_provider_file_options", {
+  opts <- as_meter_provider_file_options(NULL)
+  opts1 <- list(flush_interval = "1m")
+  expect_equal(
+    as_meter_provider_file_options(opts1),
+    modifyList(opts, list(flush_interval = 1 * 60 * 1000))
+  )
+
+  helper <- function(o) as_meter_provider_file_options(o)
+  expect_snapshot(error = TRUE, {
+    v <- list(file_pattern = 1:10)
+    helper(v)
+    v <- list(bad = 100)
+    helper(v)
+  })
+})
+
+test_that("as_tracer_provider_file_options", {
+  opts <- as_tracer_provider_file_options(NULL)
+  opts1 <- list(flush_interval = "1m")
+  expect_equal(
+    as_tracer_provider_file_options(opts1),
+    modifyList(opts, list(flush_interval = 1 * 60 * 1000))
+  )
+
+  helper <- function(o) as_tracer_provider_file_options(o)
+  expect_snapshot(error = TRUE, {
+    v <- list(file_pattern = 1:10)
+    helper(v)
+    v <- list(bad = 100)
+    helper(v)
+  })
+})
+
+test_that("as_otlp_content_type", {
+  expect_snapshot(otlp_content_type_values)
+  expect_equal(as_otlp_content_type("json"), c(json = 0L))
+  expect_equal(as_otlp_content_type("binary"), c(binary = 1L))
+
+  helper <- function(ct) as_otlp_content_type(ct)
+  expect_snapshot(error = TRUE, {
+    v <- "foo"
+    helper(v)
+    v2 <- 1:10
+    helper(v2)
+  })
+})
+
+test_that("as_otlp_content_type_env", {
+  withr::local_envvar(FOO = NA_character_)
+  expect_null(as_otlp_content_type_env("FOO"))
+
+  withr::local_envvar(FOO = "application/json")
+  expect_equal(as_otlp_content_type_env("FOO"), c("application/json" = 0L))
+
+  withr::local_envvar(FOO = "invalid")
+  helper <- function(ev) as_otlp_content_type_env(ev)
+  expect_snapshot(error = TRUE, {
+    helper("FOO")
+  })
+})
+
+test_that("as_otlp_json_bytes_mapping", {
+  expect_snapshot({
+    as_otlp_json_bytes_mapping("hexid")
+    as_otlp_json_bytes_mapping("BASE64")
+    as_otlp_json_bytes_mapping("hex")
+  })
+  helper <- function(v) as_otlp_json_bytes_mapping(v)
+  expect_snapshot(error = TRUE, {
+    val <- "notthis"
+    helper(val)
+  })
+})
+
+test_that("as_otlp_json_bytes_mapping_env", {
+  withr::local_envvar(FOO = NA_character_)
+  expect_null(as_otlp_json_bytes_mapping_env("FOO"))
+
+  withr::local_envvar(FOO = "hex")
+  expect_snapshot(as_otlp_json_bytes_mapping_env("FOO"))
+
+  helper <- function(ev) as_otlp_json_bytes_mapping_env(ev)
+  withr::local_envvar(FOO = "bad")
+  expect_snapshot(error = TRUE, {
+    helper("FOO")
+  })
+})
+
+test_that("as_otlp_compression", {
+  expect_snapshot({
+    as_otlp_compression("none")
+    as_otlp_compression("gzip")
+  })
+  helper <- function(c) as_otlp_compression(c)
+  expect_snapshot(error = TRUE, {
+    v <- "uncomp"
+    helper(v)
+  })
+})
+
+test_that("is_number", {
+  expect_true(is_number(1))
+  expect_true(is_number(1L))
+  expect_true(is_number(1 / 1000, positive = TRUE))
+
+  expect_false(is_number(1:10 / 2))
+  expect_false(is_number(numeric()))
+  expect_false(is_number(NA_real_))
+  expect_false(is_number(0, positive = TRUE))
+  expect_false(is_number(-1, positive = TRUE))
+})
+
+test_that("as_number", {
+  expect_equal(as_number(1L), 1L)
+  expect_equal(as_number("2"), 2)
+
+  helper <- function(n, ...) as_number(n, ...)
+  expect_snapshot(error = TRUE, {
+    v1 <- 1:4 / 2
+    helper(v1)
+    v2 <- NA_real_
+    helper(v2)
+    v3 <- 0
+    helper(v3, positive = TRUE)
+    v4 <- mtcars
+    helper(v4)
+  })
+})
+
+test_that("as_number_env", {
+  withr::local_envvar(FOO = NA_character_)
+  expect_null(as_number_env("FOO"))
+
+  withr::local_envvar(FOO = "1")
+  expect_equal(as_number_env("FOO"), 1)
+
+  withr::local_envvar(FOO = "100")
+  expect_equal(as_number_env("FOO", positive = TRUE), 100)
+
+  helper <- function(ev, ...) as_number_env(ev, ...)
+  withr::local_envvar(FOO = "notanumber")
+  expect_snapshot(error = TRUE, {
+    helper("FOO")
+  })
+
+  withr::local_envvar(FOO = "0")
+  expect_snapshot(error = TRUE, {
+    helper("FOO", positive = TRUE)
+  })
+})
+
+test_that("as_http_headers", {
+  expect_null(as_http_headers(NULL))
+  h <- c(foo = "bar", bar = "baz")
+  expect_equal(as_http_headers(h), h)
+
+  helper <- function(h) as_http_headers(h)
+  expect_snapshot(error = TRUE, {
+    v1 <- c("foo", x = "bar")
+    helper(v1)
+    v2 <- c(a = "x", b = NA_character_)
+    helper(v2)
+    v3 <- 1:10
+    helper(v3)
+  })
+})
+
+test_that("as_http_exporter_options", {
+  # tested upstream
+  expect_true(TRUE)
+})
+
+test_that("as_tracer_provider_http_options", {
+  expect_snapshot(as_tracer_provider_http_options(NULL))
+
+  helper <- function(o) as_tracer_provider_http_options(o)
+  expect_snapshot(error = TRUE, {
+    v <- list(url = 1)
+    helper(v)
+    v <- list(content_type = "bad")
+    helper(v)
+    v <- list(json_bytes_mapping = "no")
+    helper(v)
+    v <- list(use_json_name = "no")
+    helper(v)
+  })
 })

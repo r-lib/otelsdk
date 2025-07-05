@@ -153,11 +153,11 @@ as_choice <- function(
     return(mch - 1L)
   }
 
-  cchoices <- paste(choices, collapse = ", ")
+  cchoices <- paste0("'", choices, "'", collapse = ", ")
   if (is_string(x)) {
     stop(cnd(
       call = call,
-      "Invalid argument: `{arg}` must be one of {cchoices}, but it is {x}."
+      "Invalid argument: `{arg}` must be one of {cchoices}, but it is '{x}'."
     ))
   } else {
     stop(cnd(
@@ -317,7 +317,6 @@ as_span_link <- function(link, arg = caller_arg(link), call = caller_env()) {
     return(list(link$xptr, list()))
   }
   if (is.list(link) && inherits(link[[1]], "otel_span")) {
-    force(arg)
     link[-1] <- as_otel_attributes(
       link[-1],
       arg = as_caller_arg(substitute(x[-1], list(x = arg[[1]]))),
@@ -337,7 +336,6 @@ as_span_link <- function(link, arg = caller_arg(link), call = caller_env()) {
 as_span_links <- function(links, arg = caller_arg(links), call = caller_env()) {
   call <- call %||% match.call()
   if (is.list(links) || is.null(links)) {
-    force(arg)
     for (i in seq_along(links)) {
       links[[i]] <- as_span_link(
         links[[i]],
@@ -531,10 +529,10 @@ as_log_severity <- function(
   }
 
   if (is_string(x)) {
-    cchoices <- paste(names(choices), collapse = ", ")
+    cchoices <- paste0("'", names(choices), "'", collapse = ", ")
     stop(cnd(
       call = call,
-      "Invalid argument: `{arg}` must be one of {cchoices}, but it is {x}."
+      "Invalid argument: `{arg}` must be one of {cchoices}, but it is '{x}'."
     ))
   } else {
     specstr <- if (spec) {
@@ -752,6 +750,7 @@ as_http_context_headers <- function(
   }
 }
 
+# returns milliseconds
 as_difftime_spec <- function(
   x,
   null = TRUE,
@@ -762,10 +761,10 @@ as_difftime_spec <- function(
     return(x)
   }
   if (inherits(x, "difftime") && length(x) == 1 && !is.na(x)) {
-    return(as.double(x, units = "secs") * 1000 * 1000)
+    return(as.double(x, units = "secs") * 1000)
   }
   if (is_count(x, positive = TRUE)) {
-    return(as.double(x) * 1000)
+    return(as.double(x))
   }
   if (is_string(x)) {
     us <- parse_time_spec(x)
@@ -806,7 +805,7 @@ as_difftime_env <- function(ev, call = caller_env()) {
   }
   xv <- suppressWarnings(as.double(val))
   if (!is.na(xv)) {
-    return(xv * 1000)
+    return(xv)
   }
   us <- parse_time_spec(val)
   if (!is.na(us)) {
@@ -825,34 +824,34 @@ as_difftime_env <- function(ev, call = caller_env()) {
 # Units: us / ms / s / m / h / d
 
 time_spec_units <- rbind.data.frame(
-  list(unit = "us", mult = 1),
-  list(unit = "micros", mult = 1),
-  list(unit = "microsec", mult = 1),
-  list(unit = "microsecs", mult = 1),
-  list(unit = "microsecond", mult = 1),
-  list(unit = "microseconds", mult = 1),
-  list(unit = "ms", mult = 1000),
-  list(unit = "millis", mult = 1000),
-  list(unit = "millisec", mult = 1000),
-  list(unit = "millisecs", mult = 1000),
-  list(unit = "millisecond", mult = 1000),
-  list(unit = "milliseconds", mult = 1000),
-  list(unit = "s", mult = 1000 * 1000),
-  list(unit = "sec", mult = 1000 * 1000),
-  list(unit = "secs", mult = 1000 * 1000),
-  list(unit = "second", mult = 1000 * 1000),
-  list(unit = "seconds", mult = 1000 * 1000),
-  list(unit = "m", mult = 60 * 1000 * 1000),
-  list(unit = "min", mult = 60 * 1000 * 1000),
-  list(unit = "mins", mult = 60 * 1000 * 1000),
-  list(unit = "minute", mult = 60 * 1000 * 1000),
-  list(unit = "minutes", mult = 60 * 1000 * 1000),
-  list(unit = "h", mult = 60 * 60 * 1000 * 1000),
-  list(unit = "hour", mult = 60 * 60 * 1000 * 1000),
-  list(unit = "hours", mult = 60 * 60 * 1000 * 1000),
-  list(unit = "d", mult = 24 * 60 * 60 * 1000 * 1000),
-  list(unit = "day", mult = 24 * 60 * 60 * 1000 * 1000),
-  list(unit = "days", mult = 24 * 60 * 60 * 1000 * 1000)
+  list(unit = "us", mult = 1 / 1000),
+  list(unit = "micros", mult = 1 / 1000),
+  list(unit = "microsec", mult = 1 / 1000),
+  list(unit = "microsecs", mult = 1 / 1000),
+  list(unit = "microsecond", mult = 1 / 1000),
+  list(unit = "microseconds", mult = 1 / 1000),
+  list(unit = "ms", mult = 1),
+  list(unit = "millis", mult = 1),
+  list(unit = "millisec", mult = 1),
+  list(unit = "millisecs", mult = 1),
+  list(unit = "millisecond", mult = 1),
+  list(unit = "milliseconds", mult = 1),
+  list(unit = "s", mult = 1000),
+  list(unit = "sec", mult = 1000),
+  list(unit = "secs", mult = 1000),
+  list(unit = "second", mult = 1000),
+  list(unit = "seconds", mult = 1000),
+  list(unit = "m", mult = 60 * 1000),
+  list(unit = "min", mult = 60 * 1000),
+  list(unit = "mins", mult = 60 * 1000),
+  list(unit = "minute", mult = 60 * 1000),
+  list(unit = "minutes", mult = 60 * 1000),
+  list(unit = "h", mult = 60 * 60 * 1000),
+  list(unit = "hour", mult = 60 * 60 * 1000),
+  list(unit = "hours", mult = 60 * 60 * 1000),
+  list(unit = "d", mult = 24 * 60 * 60 * 1000),
+  list(unit = "day", mult = 24 * 60 * 60 * 1000),
+  list(unit = "days", mult = 24 * 60 * 60 * 1000)
 )
 
 
@@ -986,16 +985,16 @@ as_named_list <- function(x, arg = caller_arg(x), call = caller_env()) {
     return(x)
   }
 
-  if (!is_named(x)) {
+  if (is.list(x) && !is_named(x)) {
     stop(cnd(
       call = call,
-      "Invalid argument: {arg} must be a named list, but it is not named."
+      "Invalid argument: `{arg}` must be a named list, but it is not named."
     ))
   } else {
     stop(cnd(
       call = call,
-      "Invalid argument: {arg} must be a named list, but it is \\
-       {typename(opts)}."
+      "Invalid argument: `{arg}` must be a named list, but it is \\
+       {typename(x)}."
     ))
   }
 }
@@ -1009,18 +1008,20 @@ as_file_exporter_options <- function(
   opts <- as_named_list(opts, arg = arg, call = call)
 
   ma <- function(nm) {
-    as_caller_arg(substitute(x[[nm]], list(x = arg, nm = nm)))
+    as_caller_arg(substitute(x[[n]], list(x = arg[[1]], n = nm)))
   }
 
   file_pattern <-
     as_string(opts$file_pattern, arg = ma("file_pattern"), call = call) %||%
     get_env(evs[["file_pattern"]]) %||%
     get_env(file_exporter_file_envvar)
+
   alias_pattern <-
     as_string(opts$alias_pattern, arg = ma("alias_pattern"), call = call) %||%
     get_env(evs[["alias_pattern"]]) %||%
     get_env(file_exporter_alias_envvar) %||%
     empty_atomic_as_null(sub("%N", "latest", file_pattern))
+
   flush_interval <-
     as_difftime_spec(
       opts$flush_interval,
@@ -1029,6 +1030,7 @@ as_file_exporter_options <- function(
     ) %||%
     as_difftime_env(evs[["flush_interval"]], call = call) %||%
     as_difftime_env(file_exporter_flush_interval_envvar, call = call)
+
   flush_count <-
     as_count(
       opts$flush_count,
@@ -1038,10 +1040,12 @@ as_file_exporter_options <- function(
     ) %||%
     as_count_env(evs[["flush_count"]], positive = TRUE, call = call) %||%
     as_count_env(file_exporter_flush_count_envvar, positive = TRUE, call = call)
+
   file_size <-
     as_bytes(opts$file_size, arg = ma("file_size"), call = call) %||%
     as_bytes_env(evs[["file_size"]], call = call) %||%
     as_bytes_env(file_exporter_file_size_envvar, call = call)
+
   rotate_size <-
     as_bytes(opts$rotate_size, arg = ma("rotate_size"), call = call) %||%
     as_count_env(evs[["rotate_size"]], call = call) %||%
@@ -1066,10 +1070,10 @@ check_known_options <- function(
   bad <- setdiff(names(x), nms)
   if (length(bad) > 0) {
     s <- plural(length(bad))
-    badstr <- paste(bad, collapse = ", ")
+    badstr <- paste0("'", bad, "'", collapse = ", ")
     stop(cnd(
       call = call,
-      "Invalid argument: {arg} has unknown option{s}: {badstr}."
+      "Invalid argument: `{arg}` has unknown option{s}: {badstr}."
     ))
   }
   x
@@ -1089,7 +1093,7 @@ as_logger_provider_file_options <- function(
     rotate_size = file_exporter_logs_rotate_size_envvar
   )
 
-  opts1 <- as_file_exporter_options(opts, evs = evs, call = call)
+  opts1 <- as_file_exporter_options(opts, evs = evs, arg = arg, call = call)
   check_known_options(opts, names(opts1), arg = arg, call = call)
 
   opts1
@@ -1100,10 +1104,11 @@ as_metric_reader_options <- function(
   arg = caller_arg(opts),
   call = caller_env()
 ) {
+  force(arg)
   opts <- as_named_list(opts, arg = arg, call = call)
 
   ma <- function(nm) {
-    as_caller_arg(substitute(x[[nm]], list(x = arg, nm = nm)))
+    as_caller_arg(substitute(x[[nm]], list(x = arg[[1]], nm = nm)))
   }
 
   export_interval <-
@@ -1190,7 +1195,7 @@ as_otlp_content_type <- function(
   if (null && is.null(x)) {
     return(NULL)
   }
-  if (is_string(x) && tolower(x) %in% otlp_content_type_values) {
+  if (is_string(x) && tolower(x) %in% names(otlp_content_type_values)) {
     return(otlp_content_type_values[tolower(x)])
   }
 
@@ -1198,13 +1203,13 @@ as_otlp_content_type <- function(
   if (is_string(x)) {
     stop(cnd(
       call = call,
-      "Invalid argument: `{arg}` must be one of {vls}, but it is {x}."
+      "Invalid argument: `{arg}` must be one of {vls}, but it is '{x}'."
     ))
   } else {
     stop(cnd(
       call = call,
       "Invalid argument: {arg} must a string, one of {vls}, but it is \\
-       a {typename(x)}."
+       {typename(x)}."
     ))
   }
 }
@@ -1214,14 +1219,14 @@ as_otlp_content_type_env <- function(ev, call = caller_env()) {
   if (is.null(val)) {
     return(NULL)
   }
-  if (tolower(val) %in% otlp_content_type_values) {
+  if (tolower(val) %in% names(otlp_content_type_values)) {
     return(otlp_content_type_values[tolower(val)])
   }
 
-  vls <- paste("'", names(otlp_content_type_values), "'", collapse = ", ")
+  vls <- paste0("'", names(otlp_content_type_values), "'", collapse = ", ")
   stop(cnd(
     call = call,
-    "Invalid environment variable: {ev} must be one of {vls}, but it \\
+    "Invalid environment variable: '{ev}' must be one of {vls}, but it \\
      is '{val}'."
   ))
 }
@@ -1287,7 +1292,7 @@ as_number <- function(
     return(NULL)
   }
   if (is_number(x, positive = positive)) {
-    return(x)
+    return(as.double(x))
   }
   if (is_string(x)) {
     xd <- suppressWarnings(as.double(x))
@@ -1353,17 +1358,17 @@ as_http_headers <- function(
   if (is.character(x) && !is_named(x)) {
     stop(cnd(
       call = call,
-      "Invalid argument: all entries in {arg} must be a named."
+      "Invalid argument: all entries in `{arg}` must be a named."
     ))
   } else if (is.character(x)) {
     stop(cnd(
       call = call,
-      "Invalid argument: {arg} must not contain `NA` values."
+      "Invalid argument: `{arg}` must not contain `NA` values."
     ))
   } else {
     stop(cnd(
       call = call,
-      "Invalid argument: {arg} must be a named character vector without \\
+      "Invalid argument: `{arg}` must be a named character vector without \\
        `NA` values, but it is {typename(x)}."
     ))
   }
@@ -1378,7 +1383,7 @@ as_http_exporter_options <- function(
   opts <- as_named_list(opts, arg = arg, call = call)
 
   ma <- function(nm) {
-    as_caller_arg(substitute(x[[nm]], list(x = arg, nm = nm)))
+    as_caller_arg(substitute(x[[nm]], list(x = arg[[1]], nm = nm)))
   }
 
   # - Options in spec: we let the CPP handle these, i.e. leave at NULL
@@ -1636,7 +1641,7 @@ as_http_exporter_options <- function(
 
 as_tracer_provider_http_options <- function(
   opts,
-  arg = caller_arg(arg),
+  arg = caller_arg(opts),
   call = caller_env()
 ) {
   evs <- list(
