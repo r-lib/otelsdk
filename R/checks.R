@@ -777,7 +777,8 @@ as_difftime_spec <- function(
     cmt <- if (length(x) != 1) "It has length {length(x)}." else "It is `NA`."
     stop(cnd(
       call = call,
-      "Invalid argument: `{arg}` must have length 1, and must not be `NA`. {cmt}"
+      "Invalid argument: `{arg}` must have length 1, and must not be \\
+       `NA`. {cmt}"
     ))
   } else if (is_string(x)) {
     stop(cnd(
@@ -868,7 +869,7 @@ parse_time_spec <- function(x) {
     return(NA_real_)
   }
   x <- substr(x, 1, nchar(x) - nchar(time_spec_units$unit[wh]))
-  as.double(x) * unname(time_spec_units$mult[wh])
+  suppressWarnings(as.double(x)) * unname(time_spec_units$mult[wh])
 }
 
 as_bytes <- function(x, null = TRUE, arg = caller_arg(x), call = caller_env()) {

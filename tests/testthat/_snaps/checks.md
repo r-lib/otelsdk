@@ -682,8 +682,6 @@
       v <- list(export_interval = "bad")
       helper(v)
     Condition
-      Warning in `parse_time_spec()`:
-      NAs introduced by coercion
       Error in `helper()`:
       ! Invalid argument: `o[["export_interval"]]` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
     Code
@@ -980,4 +978,118 @@
     Condition
       Error in `helper()`:
       ! Invalid argument: `o[["use_json_name"]]` must a flag (logical scalar), but it is a string.
+    Code
+      v <- list(console_debug = "yes")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["console_debug"]]` must a flag (logical scalar), but it is a string.
+    Code
+      v <- list(timeout = "xxx")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["timeout"]]` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+    Code
+      v <- list(http_headers = c("notgood"))
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: all entries in `o[["http_headers"]]` must be a named.
+    Code
+      v <- list(ssl_insecure_skip_verify = "notaflag")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_insecure_skip_verify"]]` must a flag (logical scalar), but it is a string.
+    Code
+      v <- list(ssl_ca_cert_path = 111)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_ca_cert_path"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_ca_cert_string = 222)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_ca_cert_string"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_client_key_path = 333)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_client_key_path"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_client_key_string = 444)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_client_key_string"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_client_cert_path = 555)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_client_cert_path"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_client_cert_string = 666)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_client_cert_string"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_min_tls = 777)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_min_tls"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_max_tls = 888)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_max_tls"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_cipher = 999)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_cipher"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(ssl_cipher_suite = 0)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["ssl_cipher"]]` must be a string scalar but it is a number.
+    Code
+      v <- list(compression = "pleaseno")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["compression"]]` must be one of 'none', 'gzip', but it is 'pleaseno'.
+    Code
+      v <- list(retry_policy_max_attempts = "notcount")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["retry_policy_max_attempts"]]` must be a positive integer scalar, but it is a string.
+    Code
+      v <- list(retry_policy_initial_backoff = "bad")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["retry_policy_initial_backoff"]]` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+    Code
+      v <- list(retry_policy_max_backoff = "stillbad")
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["retry_policy_max_backoff"]]` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+    Code
+      v <- list(retry_policy_backoff_multiplier = NA_real_)
+      helper(v)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `o[["retry_policy_backoff_multiplier"]]` must not be `NA`.
 
