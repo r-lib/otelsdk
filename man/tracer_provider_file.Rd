@@ -5,7 +5,7 @@
 \alias{tracer_provider_file}
 \title{Tracer provider to write traces into a JSONL file}
 \format{
-An object of class \code{list} of length 1.
+An object of class \code{list} of length 2.
 }
 \usage{
 tracer_provider_file

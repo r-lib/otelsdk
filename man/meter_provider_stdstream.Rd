@@ -6,7 +6,7 @@
 \title{Meter provider to write to the standard output or standard error or
 to a file}
 \format{
-An object of class \code{list} of length 1.
+An object of class \code{list} of length 2.
 }
 \usage{
 meter_provider_stdstream

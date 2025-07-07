@@ -1,4 +1,5 @@
-tracer_provider_memory_new <- function(buffer_size = 100) {
+tracer_provider_memory_new <- function(opts = NULL) {
+  opts <- as_tracer_provider_memory_options(opts)
   self <- new_object(
     c("otel_tracer_provider_memory", "otel_tracer_provider"),
     get_tracer = function(
@@ -20,16 +21,18 @@ tracer_provider_memory_new <- function(buffer_size = 100) {
     }
   )
 
-  buffer_size <- as_count(buffer_size, positive = TRUE)
   attributes <- as_otel_attributes(the$default_resource_attributes)
-  self$xptr <- ccall(
-    otel_create_tracer_provider_memory,
-    buffer_size,
-    attributes
-  )
+  self$xptr <- ccall(otel_create_tracer_provider_memory, opts, attributes)
   self
 }
 
+tracer_provider_memory_options <- function() {
+  as_tracer_provider_memory_options(NULL)
+}
+
+#' @export
+
 tracer_provider_memory <- list(
-  new = tracer_provider_memory_new
+  new = tracer_provider_memory_new,
+  options = tracer_provider_memory_options
 )

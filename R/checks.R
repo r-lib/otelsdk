@@ -1872,3 +1872,43 @@ as_tracer_provider_stdstream_options <- function(
 
   opts1
 }
+
+as_memory_exporter_options <- function(
+  opts,
+  evs,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  opts <- as_named_list(opts, arg = arg, call = call)
+
+  ma <- function(nm) {
+    as_caller_arg(substitute(x[[nm]], list(x = arg[[1]], nm = nm)))
+  }
+
+  buffer_size <- as_count(
+    opts$buffer_size,
+    null = TRUE,
+    positive = TRUE,
+    arg = ma("buffer_size"),
+    call = call
+  ) %||%
+    as_count_env(evs[["buffer_size"]], positive = TRUE, call = call) %||%
+    as_count_env(memory_buffer_size_envvar, positive = TRUE, call = call) %||%
+    memory_buffer_size_default
+
+  list(buffer_size = buffer_size)
+}
+
+as_tracer_provider_memory_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- list(
+    buffer_size = memory_traces_buffer_size_envvar
+  )
+  opts1 <- as_memory_exporter_options(opts, evs, arg = arg, call = call)
+  check_known_options(opts, names(opts1), arg = arg, call = call)
+
+  opts1
+}

@@ -5,7 +5,7 @@
 \alias{meter_provider_http}
 \title{Meter provider to send collected metrics over HTTP}
 \format{
-An object of class \code{list} of length 1.
+An object of class \code{list} of length 2.
 }
 \usage{
 meter_provider_http

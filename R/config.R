@@ -183,3 +183,13 @@ otlp_logs_retry_policy_backoff_multiplier_envvar <-
 otlp_aggregation_temporality_envvar <-
   "OTEL_R_EXPORTER_OTLP_AGGREGATION_TEMPORALITY"
 otlp_aggregation_temporality_default <- "cumulative"
+
+memory_buffer_size_envvar <-
+  "OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE"
+memory_traces_buffer_size_envvar <-
+  "OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE"
+memory_metrics_buffer_size_envvar <-
+  "OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE"
+memory_logs_buffer_size_envvar <-
+  "OTEL_R_EXPORTER_MEMORY_LOGS_BUFFER_SIZE"
+memory_buffer_size_default <- 100L

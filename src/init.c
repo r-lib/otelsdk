@@ -16,7 +16,7 @@ SEXP otel_init_constants(SEXP env);
 SEXP otel_create_tracer_provider_stdstream(SEXP options, SEXP attributes);
 SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes);
 SEXP otel_tracer_provider_http_options(void);
-SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes);
+SEXP otel_create_tracer_provider_memory(SEXP options, SEXP attributes);
 SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes);
 SEXP otel_tracer_provider_file_options_defaults(void);
 SEXP otel_tracer_provider_memory_get_spans(SEXP provider);

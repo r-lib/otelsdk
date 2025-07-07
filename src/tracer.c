@@ -57,7 +57,8 @@ SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes) {
   return xptr;
 }
 
-SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes) {
+SEXP otel_create_tracer_provider_memory(SEXP options, SEXP attributes) {
+  SEXP buffer_size = rf_get_list_element(options, "buffer_size");
   int cbuffer_size = INTEGER(buffer_size)[0];
   struct otel_attributes attributes_;
   r2c_attributes(attributes, &attributes_);

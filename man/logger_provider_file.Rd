@@ -5,7 +5,7 @@
 \alias{logger_provider_file}
 \title{Logger provider to write log messages into a JSONL file.}
 \format{
-An object of class \code{list} of length 1.
+An object of class \code{list} of length 2.
 }
 \usage{
 logger_provider_file
