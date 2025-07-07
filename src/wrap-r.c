@@ -17,7 +17,7 @@ void otel_string_free(struct otel_string *s) {
 }
 
 void r2c_otel_string(SEXP s, struct otel_string *cs) {
-  const char *s_ = CHAR(STRING_ELT(s, 0));
+  const char *s_ = TYPEOF(s) == CHARSXP ? CHAR(s) : CHAR(STRING_ELT(s, 0));
   size_t n = strlen(s_);
   cs->s = malloc(n + 1);
   if (!cs->s) {
@@ -36,6 +36,16 @@ SEXP c2r_otel_string(const struct otel_string *s) {
   }
   UNPROTECT(1);
   return res;
+}
+
+void otel_strings_free(struct otel_strings *s) {
+  if (!s) return;
+  for (size_t i = 0; i < s->count; i++) {
+    otel_string_free(&s->a[i]);
+  }
+  free(s->a);
+  s->a = NULL;
+  s->count = 0;
 }
 
 SEXP c2r_otel_strings(const struct otel_strings *s) {
@@ -61,6 +71,35 @@ SEXP c2r_otel_named_strings(const struct otel_strings *s) {
   Rf_setAttrib(res, R_NamesSymbol, nms);
   UNPROTECT(2);
   return res;
+}
+
+void otel_http_header_free(struct otel_http_header *h) {
+  if (!h) return;
+  otel_string_free(&h->name);
+  otel_string_free(&h->value);
+}
+
+void otel_http_headers_free(struct otel_http_headers *h) {
+  if (!h) return;
+  for (size_t i = 0; i < h->count; h++) {
+    otel_http_header_free(&h->a[i]);
+  }
+  free(h->a);
+  h->a = NULL;
+  h->count = 0;
+}
+
+void r2c_otel_http_headers(SEXP h, struct otel_http_headers *ch) {
+  SEXP nms = Rf_getAttrib(h, R_NamesSymbol);
+  R_xlen_t l = Rf_xlength(h);
+  if (Rf_xlength(nms) != l) {
+    R_THROW_ERROR("Name length mismatch for HTTP header vector");
+  }
+  // TODO: cleancall!
+  for (R_xlen_t i = 0; i < l; i++) {
+    r2c_otel_string(STRING_ELT(nms, i), &ch->a[i].name);
+    r2c_otel_string(STRING_ELT(h, i), &ch->a[i].value);
+  }
 }
 
 void otel_instrumentation_scope_free(
@@ -358,6 +397,143 @@ SEXP c2r_otel_file_exporter_options(
   }
   Rf_unprotect(1);
   return res;
+}
+
+void otel_http_exporter_options_free(struct otel_http_exporter_options *o) {
+  if (!o) return;
+  otel_string_free(&o->url);
+  otel_http_headers_free(&o->http_headers);
+  otel_string_free(&o->ssl_ca_cert_path);
+  otel_string_free(&o->ssl_ca_cert_string);
+  otel_string_free(&o->ssl_client_key_path);
+  otel_string_free(&o->ssl_client_key_string);
+  otel_string_free(&o->ssl_client_cert_path);
+  otel_string_free(&o->ssl_client_cert_string);
+  otel_string_free(&o->ssl_min_tls);
+  otel_string_free(&o->ssl_max_tls);
+  otel_string_free(&o->ssl_cipher);
+  otel_string_free(&o->ssl_cipher_suite);
+}
+
+void r2c_otel_http_exporter_options(
+  SEXP options, struct otel_http_exporter_options *coptions
+) {
+  memset(&coptions->isset, 0, sizeof(coptions->isset));
+  SEXP url = rf_get_list_element(options, "url");
+  if ((coptions->isset.url = !Rf_isNull(url))) {
+    r2c_otel_string(url, &coptions->url);
+  }
+  SEXP content_type = rf_get_list_element(options, "content_type");
+  if ((coptions->isset.content_type = !Rf_isNull(content_type))) {
+    coptions->content_type = INTEGER(content_type)[0];
+  }
+  SEXP json_bytes_mapping = rf_get_list_element(options, "json_bytes_mapping");
+  if ((coptions->isset.json_bytes_mapping = !Rf_isNull(json_bytes_mapping))) {
+    coptions->json_bytes_mapping = INTEGER(json_bytes_mapping)[0];
+  }
+  SEXP use_json_name = rf_get_list_element(options, "use_json_name");
+  if ((coptions->isset.use_json_name = !Rf_isNull(use_json_name))) {
+    coptions->use_json_name = LOGICAL(use_json_name)[0];
+  }
+  SEXP console_debug = rf_get_list_element(options, "console_debug");
+  if ((coptions->isset.console_debug = !Rf_isNull(console_debug))) {
+    coptions->console_debug = LOGICAL(console_debug)[0];
+  }
+  SEXP timeout = rf_get_list_element(options, "timeout");
+  if ((coptions->isset.timeout = !Rf_isNull(timeout))) {
+    coptions->timeout = REAL(timeout)[0];
+  }
+  SEXP http_headers = rf_get_list_element(options, "http_headers");
+  if ((coptions->isset.http_headers = !Rf_isNull(http_headers))) {
+    r2c_otel_http_headers(http_headers, &coptions->http_headers);
+  }
+  SEXP ssl_insecure_skip_verify = rf_get_list_element(
+    options, "ssl_insecure_skip_verify");
+  if ((coptions->isset.ssl_insecure_skip_verify =
+      !Rf_isNull(ssl_insecure_skip_verify))) {
+    coptions->ssl_insecure_skip_verify = LOGICAL(ssl_insecure_skip_verify)[0];
+  }
+  SEXP ssl_ca_cert_path = rf_get_list_element(options, "ssl_ca_cert_path");
+  if ((coptions->isset.ssl_ca_cert_path = !Rf_isNull(ssl_ca_cert_path))) {
+    r2c_otel_string(ssl_ca_cert_path, &coptions->ssl_ca_cert_path);
+  }
+  SEXP ssl_ca_cert_string = rf_get_list_element(options, "ssl_ca_cert_string");
+  if ((coptions->isset.ssl_ca_cert_string = !Rf_isNull(ssl_ca_cert_string))) {
+    r2c_otel_string(ssl_ca_cert_string, &coptions->ssl_ca_cert_string);
+  }
+  SEXP ssl_client_key_path =
+    rf_get_list_element(options, "ssl_client_key_path");
+  if ((coptions->isset.ssl_client_key_path =
+       !Rf_isNull(ssl_client_key_path))) {
+    r2c_otel_string(ssl_client_key_path, &coptions->ssl_client_key_path);
+  }
+  SEXP ssl_client_key_string =
+    rf_get_list_element(options, "ssl_client_key_string");
+  if ((coptions->isset.ssl_client_key_string =
+       !Rf_isNull(ssl_client_key_string))) {
+    r2c_otel_string(ssl_client_key_string, &coptions->ssl_client_key_string);
+  }
+  SEXP ssl_client_cert_path =
+    rf_get_list_element(options, "ssl_client_cert_path");
+  if ((coptions->isset.ssl_client_cert_path =
+       !Rf_isNull(ssl_client_cert_path))) {
+    r2c_otel_string(ssl_client_cert_path, &coptions->ssl_client_cert_path);
+  }
+  SEXP ssl_client_cert_string =
+    rf_get_list_element(options, "ssl_client_cert_string");
+  if ((coptions->isset.ssl_client_cert_string =
+       !Rf_isNull(ssl_client_cert_string))) {
+    r2c_otel_string(
+      ssl_client_cert_string, &coptions->ssl_client_cert_string);
+  }
+  SEXP ssl_min_tls = rf_get_list_element(options, "ssl_min_tls");
+  if ((coptions->isset.ssl_min_tls = !Rf_isNull(ssl_min_tls))) {
+    r2c_otel_string(ssl_min_tls, &coptions->ssl_min_tls);
+  }
+  SEXP ssl_max_tls = rf_get_list_element(options, "ssl_max_tls");
+  if ((coptions->isset.ssl_max_tls = !Rf_isNull(ssl_max_tls))) {
+    r2c_otel_string(ssl_max_tls, &coptions->ssl_max_tls);
+  }
+  SEXP ssl_cipher = rf_get_list_element(options, "ssl_cipher");
+  if ((coptions->isset.ssl_cipher = !Rf_isNull(ssl_cipher))) {
+    r2c_otel_string(ssl_cipher, &coptions->ssl_cipher);
+  }
+  SEXP ssl_cipher_suite = rf_get_list_element(options, "ssl_cipher_suite");
+  if ((coptions->isset.ssl_cipher_suite = !Rf_isNull(ssl_cipher_suite))) {
+    r2c_otel_string(ssl_cipher_suite, &coptions->ssl_cipher_suite);
+  }
+  SEXP compression = rf_get_list_element(options, "compression");
+  if ((coptions->isset.compression = !Rf_isNull(compression))) {
+    coptions->compression = INTEGER(compression)[0];
+  }
+  SEXP retry_policy_max_attempts = rf_get_list_element(
+    options, "retry_policy_max_attempts");
+  if ((coptions->isset.retry_policy_max_attempts =
+      !Rf_isNull(retry_policy_max_attempts))) {
+    coptions->retry_policy_max_attempts =
+      INTEGER(retry_policy_max_attempts)[0];
+  }
+  SEXP retry_policy_initial_backoff = rf_get_list_element(
+    options, "retry_policy_initial_backoff");
+  if ((coptions->isset.retry_policy_initial_backoff =
+      !Rf_isNull(retry_policy_initial_backoff))) {
+    coptions->retry_policy_initial_backoff =
+      REAL(retry_policy_initial_backoff)[0];
+  }
+  SEXP retry_policy_max_backoff = rf_get_list_element(
+    options, "retry_policy_max_backoff");
+  if ((coptions->isset.retry_policy_max_backoff =
+      !Rf_isNull(retry_policy_max_backoff))) {
+    coptions->retry_policy_max_backoff =
+      REAL(retry_policy_max_backoff)[0];
+  }
+  SEXP retry_policy_backoff_multiplier = rf_get_list_element(
+    options, "retry_policy_backoff_multiplier");
+  if ((coptions->isset.retry_policy_backoff_multiplier =
+      !Rf_isNull(retry_policy_backoff_multiplier))) {
+    coptions->retry_policy_backoff_multiplier =
+      REAL(retry_policy_backoff_multiplier)[0];
+  }
 }
 
 SEXP c2r_otel_attribute(const struct otel_attribute *attr) {

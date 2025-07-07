@@ -70,7 +70,9 @@
         "valarray": "cpp",
         "variant": "cpp",
         "vector": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "csignal": "cpp",
+        "set": "cpp"
     },
     "C_Cpp.default.includePath": [
         "/Library/Frameworks/R.framework/Versions/Current/Headers/**",

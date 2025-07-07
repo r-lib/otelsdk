@@ -17,8 +17,7 @@ tracer_provider_http_new <- function(opts = NULL) {
   )
 
   attributes <- as_otel_attributes(the$default_resource_attributes)
-  # TODO: opts
-  self$xptr <- ccall(otel_create_tracer_provider_http, attributes)
+  self$xptr <- ccall(otel_create_tracer_provider_http, opts, attributes)
   self
 }
 

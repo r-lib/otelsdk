@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 
 namespace common_sdk = opentelemetry::sdk::common;
 namespace otlp       = opentelemetry::exporter::otlp;
@@ -56,6 +57,10 @@ int cc2c_otel_string(
   s.size = sz;
   memcpy(s.s, sv.data(), sz);
   return 0;
+}
+
+std::string c2cc_otel_string(const struct otel_string& s) {
+  return std::string(s.s, s.size);
 }
 
 int cc2c_otel_trace_flags(
@@ -413,4 +418,104 @@ void cc2c_file_exporter_options(
   options.file_size = backend_opts.file_size;
   options.has_rotate_size = 1;
   options.rotate_size = backend_opts.rotate_size;
+}
+
+void c2cc_otel_http_headers(
+  const struct otel_http_headers &cheaders,
+  otlp::OtlpHeaders &headers
+) {
+  headers.clear();
+  size_t n = cheaders.count;
+  for (size_t i = 0; i < n; i++) {
+    std::string name = c2cc_otel_string(cheaders.a[i].name);
+    std::string value = c2cc_otel_string(cheaders.a[i].value);
+    headers.insert(std::pair{ std::move(name), std::move(value) });
+  }
+}
+
+static const char *otel_otlp_compression_names[] = { "none", "gzip" };
+
+void c2cc_otel_http_exporter_options(
+  const struct otel_http_exporter_options &coptions,
+  otlp::OtlpHttpExporterOptions &options
+) {
+  if (coptions.isset.url) {
+    options.url = c2cc_otel_string(coptions.url);
+  }
+  if (coptions.isset.content_type) {
+    options.content_type =
+      static_cast<otlp::HttpRequestContentType>(coptions.content_type);
+  }
+  if (coptions.isset.json_bytes_mapping) {
+    options.json_bytes_mapping =
+      static_cast<otlp::JsonBytesMappingKind>(coptions.json_bytes_mapping);
+  }
+  if (coptions.isset.use_json_name) {
+    options.use_json_name = coptions.use_json_name;
+  }
+  if (coptions.isset.console_debug) {
+    options.console_debug = coptions.console_debug;
+  }
+  if (coptions.isset.timeout) {
+    options.timeout = std::chrono::milliseconds((int64_t)coptions.timeout);
+  }
+  if (coptions.isset.http_headers) {
+    c2cc_otel_http_headers(coptions.http_headers, options.http_headers);
+  }
+  if (coptions.isset.ssl_insecure_skip_verify) {
+    options.ssl_insecure_skip_verify = coptions.ssl_insecure_skip_verify;
+  }
+  if (coptions.isset.ssl_ca_cert_path) {
+    options.ssl_ca_cert_path = c2cc_otel_string(coptions.ssl_ca_cert_path);
+  }
+  if (coptions.isset.ssl_ca_cert_string) {
+    options.ssl_ca_cert_string =
+      c2cc_otel_string(coptions.ssl_ca_cert_string);
+  }
+  if (coptions.isset.ssl_client_key_path) {
+    options.ssl_ca_cert_string =
+      c2cc_otel_string(coptions.ssl_client_key_path);
+  }
+  if (coptions.isset.ssl_client_key_string) {
+    options.ssl_client_key_string =
+      c2cc_otel_string(coptions.ssl_client_key_string);
+  }
+  if (coptions.isset.ssl_client_cert_path) {
+    options.ssl_client_cert_path =
+      c2cc_otel_string(coptions.ssl_client_cert_path);
+  }
+  if (coptions.isset.ssl_client_cert_string) {
+    options.ssl_client_cert_string =
+      c2cc_otel_string(coptions.ssl_client_cert_string);
+  }
+  if (coptions.isset.ssl_min_tls) {
+    options.ssl_min_tls = c2cc_otel_string(coptions.ssl_min_tls);
+  }
+  if (coptions.isset.ssl_max_tls) {
+    options.ssl_max_tls = c2cc_otel_string(coptions.ssl_max_tls);
+  }
+  if (coptions.isset.ssl_cipher) {
+    options.ssl_cipher = c2cc_otel_string(coptions.ssl_cipher);
+  }
+  if (coptions.isset.ssl_cipher_suite) {
+    options.ssl_cipher_suite = c2cc_otel_string(coptions.ssl_cipher_suite);
+  }
+  if (coptions.isset.compression) {
+    options.compression = otel_otlp_compression_names[coptions.compression];
+  }
+  if (coptions.isset.retry_policy_max_attempts) {
+    options.retry_policy_max_attempts = coptions.retry_policy_max_attempts;
+  }
+  if (coptions.isset.retry_policy_initial_backoff) {
+    options.retry_policy_initial_backoff =
+      std::chrono::milliseconds((int64_t) coptions.retry_policy_initial_backoff);
+  }
+  if (coptions.isset.retry_policy_max_backoff) {
+    options.retry_policy_max_backoff =
+      std::chrono::milliseconds((int64_t) coptions.retry_policy_max_backoff);
+  }
+  if (coptions.isset.retry_policy_backoff_multiplier) {
+    options.retry_policy_backoff_multiplier =
+      coptions.retry_policy_backoff_multiplier;
+  }
 }

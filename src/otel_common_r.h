@@ -60,4 +60,7 @@ void r2c_otel_file_exporter_options(
 SEXP c2r_otel_file_exporter_options(
   const struct otel_file_exporter_options *o);
 
+void r2c_otel_http_exporter_options(
+  SEXP options, struct otel_http_exporter_options *coptions);
+
 #endif

@@ -12,6 +12,7 @@
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/exporters/memory/in_memory_metric_data.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
@@ -83,6 +84,8 @@ int cc2c_otel_string(
   const trace_api::TraceId &trace_id, struct otel_string &s);
 int cc2c_otel_string(
   const trace_api::SpanId &span_id, struct otel_string &s);
+
+std::string c2cc_otel_string(const struct otel_string& s);
 
 template<class Compare>
 int cc2c_otel_strings(
@@ -168,5 +171,13 @@ void c2cc_file_exporter_options(
 void cc2c_file_exporter_options(
     const otlp::OtlpFileClientFileSystemOptions &backend_opts,
     struct otel_file_exporter_options &options);
+
+void c2cc_otel_http_exporter_options(
+  const struct otel_http_exporter_options &coptions,
+  otlp::OtlpHttpExporterOptions &options);
+
+void c2cc_otel_http_headers(
+  const struct otel_http_headers &cheaders,
+  otlp::OtlpHeaders &headers);
 
 #endif

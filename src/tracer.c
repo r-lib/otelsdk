@@ -44,10 +44,13 @@ SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes) {
   return xptr;
 }
 
-SEXP otel_create_tracer_provider_http(SEXP attributes) {
+SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes) {
+  struct otel_http_exporter_options options_;
   struct otel_attributes attributes_;
+  r2c_otel_http_exporter_options(options, &options_);
   r2c_attributes(attributes, &attributes_);
-  void *tracer_provider_ = otel_create_tracer_provider_http_(&attributes_);
+  void *tracer_provider_ =
+    otel_create_tracer_provider_http_(&options_, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
   return xptr;

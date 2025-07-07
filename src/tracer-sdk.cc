@@ -64,8 +64,13 @@ void otel_span_context_finally_(void *span_context_) {
   delete span_context;
 }
 
-void *otel_create_tracer_provider_http_(struct otel_attributes *resource_attributes) {
-  auto exporter  = otlp::OtlpHttpExporterFactory::Create();
+void *otel_create_tracer_provider_http_(
+  struct otel_http_exporter_options *options_,
+  struct otel_attributes *resource_attributes
+) {
+  otlp::OtlpHttpExporterOptions options;
+  c2cc_otel_http_exporter_options(*options_, options);
+  auto exporter  = otlp::OtlpHttpExporterFactory::Create(options);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
   RKeyValueIterable attributes_(*resource_attributes);

@@ -1407,7 +1407,7 @@ as_http_exporter_options <- function(
   ) %||%
     as_otlp_content_type_env(evs["content_type"], call = call) %||%
     as_otlp_content_type_env(otlp_content_type_envvar, call = call) %||%
-    otlp_content_type_default
+    as_otlp_content_type(otlp_content_type_default)
 
   # no support
   json_bytes_mapping <-

@@ -29,6 +29,20 @@ struct otel_strings {
 
 void otel_strings_free(struct otel_strings *s);
 
+struct otel_http_header {
+  struct otel_string name;
+  struct otel_string value;
+};
+
+void otel_http_header_free(struct otel_http_header *h);
+
+struct otel_http_headers {
+  struct otel_http_header *a;
+  size_t count;
+};
+
+void otel_http_headers_free(struct otel_http_headers *h);
+
 enum otel_attribute_type {
   k_string,
   k_boolean,
@@ -452,6 +466,63 @@ struct otel_collector_resource_metrics {
 void otel_collector_resource_metrics_free(
   struct otel_collector_resource_metrics *rm);
 
+// ---
+
+struct otel_http_exporter_options {
+  struct {
+    bool url;
+    bool content_type;
+    bool json_bytes_mapping;
+    bool use_json_name;
+    bool console_debug;
+    bool timeout;
+    bool http_headers;
+    bool ssl_insecure_skip_verify;
+    bool ssl_ca_cert_path;
+    bool ssl_ca_cert_string;
+    bool ssl_client_key_path;
+    bool ssl_client_key_string;
+    bool ssl_client_cert_path;
+    bool ssl_client_cert_string;
+    bool ssl_min_tls;
+    bool ssl_max_tls;
+    bool ssl_cipher;
+    bool ssl_cipher_suite;
+    bool compression;
+    bool retry_policy_max_attempts;
+    bool retry_policy_initial_backoff;
+    bool retry_policy_max_backoff;
+    bool retry_policy_backoff_multiplier;
+  } isset;
+  struct otel_string url;
+  int content_type;
+  int json_bytes_mapping;
+  int use_json_name;                          // bool
+  int console_debug;                          // bool
+  double timeout;
+  struct otel_http_headers http_headers;
+  int ssl_insecure_skip_verify;               // bool
+  struct otel_string ssl_ca_cert_path;
+  struct otel_string ssl_ca_cert_string;
+  struct otel_string ssl_client_key_path;
+  struct otel_string ssl_client_key_string;
+  struct otel_string ssl_client_cert_path;
+  struct otel_string ssl_client_cert_string;
+  struct otel_string ssl_min_tls;
+  struct otel_string ssl_max_tls;
+  struct otel_string ssl_cipher;
+  struct otel_string ssl_cipher_suite;
+  int compression;
+  int retry_policy_max_attempts;
+  double retry_policy_initial_backoff;
+  double retry_policy_max_backoff;
+  double retry_policy_backoff_multiplier;
+};
+
+void otel_http_exporter_options_free(struct otel_http_exporter_options *o);
+
+// ---
+
 extern const char *otel_http_request_content_type_str[];
 
 void otel_tracer_provider_finally_(void *tracer_provider);
@@ -469,6 +540,7 @@ void otel_gauge_finally_(void *gauge);
 void *otel_create_tracer_provider_stdstream_(
   const char *stream, struct otel_attributes *resource_attributes);
 void *otel_create_tracer_provider_http_(
+  struct otel_http_exporter_options *options,
   struct otel_attributes *resource_attributes);
 void *otel_create_tracer_provider_memory_(
   int buffer_size, struct otel_attributes *resource_attributes);

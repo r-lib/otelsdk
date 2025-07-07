@@ -7,7 +7,8 @@
       [1] "http://localhost:4318/v1/traces"
       
       $content_type
-      [1] "binary"
+      binary 
+           1 
       
       $json_bytes_mapping
       [1] 0
