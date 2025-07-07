@@ -1,7 +1,7 @@
 test_that("meter_provider_stdout", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
-  mp <- meter_provider_stdstream_new(tmp)
+  mp <- meter_provider_stdstream_new(list(output = tmp))
   on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()
   ctr <- mtr$create_counter("ctr")

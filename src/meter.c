@@ -38,11 +38,15 @@ void otel_meter_finally(SEXP x) {
   }
 }
 
-SEXP otel_create_meter_provider_stdstream(
-    SEXP stream, SEXP export_interval, SEXP export_timeout) {
+SEXP otel_create_meter_provider_stdstream(SEXP options, SEXP attributes) {
+  struct otel_attributes attributes_;
+  SEXP stream = rf_get_list_element(options, "output");
+  r2c_attributes(attributes, &attributes_);
   const char *cstream = CHAR(STRING_ELT(stream, 0));
-  int cexport_interval = INTEGER(export_interval)[0];
-  int cexport_timeout = INTEGER(export_timeout)[0];
+  int cexport_interval =
+    INTEGER(rf_get_list_element(options, "export_interval"))[0];
+  int cexport_timeout =
+    INTEGER(rf_get_list_element(options, "export_timeout"))[0];
   void *meter_provider_ = otel_create_meter_provider_stdstream_(
     cstream, cexport_interval, cexport_timeout);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);

@@ -1831,10 +1831,30 @@ as_logger_provider_stdstream_options <- function(
   call = caller_env()
 ) {
   evs <- list(
-    output = logger_provider_stdstream_output
+    output = logger_provider_stdstream_output_envvar
   )
   opts1 <- as_stdstream_exporter_options(opts, evs, arg = arg, call = call)
   check_known_options(opts, names(opts1), arg = arg, call = call)
 
   opts1
+}
+
+as_meter_provider_stdstream_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- list(
+    output = meter_provider_stdstream_output_envvar
+  )
+  opts1 <- as_stdstream_exporter_options(opts, evs, arg = arg, call = call)
+  opts2 <- as_metric_reader_options(opts, arg = arg, call = call)
+  check_known_options(
+    opts,
+    c(names(opts1), names(opts2)),
+    arg = arg,
+    call = call
+  )
+
+  c(opts1, opts2)
 }

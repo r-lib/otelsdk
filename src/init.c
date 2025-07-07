@@ -75,8 +75,7 @@ SEXP otel_log(
   SEXP trace_id, SEXP trace_flags, SEXP timestamp, SEXP observed_timestamp,
   SEXP attributes);
 
-SEXP otel_create_meter_provider_stdstream(
-  SEXP stream, SEXP export_interval, SEXP export_timeout);
+SEXP otel_create_meter_provider_stdstream(SEXP options, SEXP attributes);
 SEXP otel_create_meter_provider_http(SEXP options, SEXP attributes);
 SEXP otel_meter_provider_http_options(void);
 SEXP otel_create_meter_provider_file(
@@ -199,7 +198,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_logger_is_enabled, 3),
   CALLDEF(otel_log, 10),
 
-  CALLDEF(otel_create_meter_provider_stdstream, 3),
+  CALLDEF(otel_create_meter_provider_stdstream, 2),
   CALLDEF(otel_create_meter_provider_http, 2),
   CALLDEF(otel_meter_provider_http_options, 0),
   CALLDEF(otel_create_meter_provider_file, 3),

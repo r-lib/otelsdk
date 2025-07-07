@@ -1,6 +1,6 @@
 tracer_provider_stdstream_new <- function(stream = NULL) {
   stream <- as_string(stream) %||%
-    Sys.getenv(tracer_provider_stdstream_output, "stdout")
+    Sys.getenv(tracer_provider_stdstream_output_envvar, "stdout")
   if (stream != "stdout" && stream != "stderr") {
     stream <- as_output_file(stream, null = FALSE)
   }
