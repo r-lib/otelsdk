@@ -231,4 +231,11 @@ void otel_log_(
   logger.EmitLogRecord(std::move(lr));
 }
 
+int otel_logger_provider_http_default_options_(
+  struct otel_tracer_provider_http_options *copts) {
+
+  return otel_provider_http_default_options__<
+    otlp::OtlpHttpLogRecordExporterOptions>(*copts);
+}
+
 } // extern "C"

@@ -1391,7 +1391,7 @@ as_http_exporter_options <- function(
   #   if unset in argument
   # - Options not in spec, but with CPP support: we override these with
   #   R specific env vars, pass them to CPP explicitly. So we need to
-  #   set defaults for them here, to avoid looking up CPP specific enc vars.
+  #   set defaults for them here, to avoid looking up CPP specific env vars.
   # - Options not in spec and no CPP env vars: we introduce R
   #   specific env vars for these. No need to pass them to CPP, but we
   #   might as well, in case CPP introduces env vars for them.
@@ -1659,6 +1659,33 @@ as_tracer_provider_http_options <- function(
     retry_policy_initial_backoff = otlp_traces_retry_policy_initial_backoff_envvar,
     retry_policy_max_backoff = otlp_traces_retry_policy_max_backoff_envvar,
     retry_policy_backoff_multiplier = otlp_traces_retry_policy_backoff_multiplier_envvar
+  )
+
+  opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
+  check_known_options(opts, names(opts1), arg = arg, call = call)
+
+  opts1
+}
+
+as_logger_provider_http_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- list(
+    content_type = otlp_logs_content_type_envvar,
+    json_bytes_mapping = otlp_logs_json_bytes_mapping_envvar,
+    use_json_name = otlp_logs_use_json_name_envvar,
+    console_debug = otlp_logs_console_debug_envvar,
+    ssl_insecure_skip_verify = otlp_logs_ssl_insecure_skip_verify_envvar,
+    ssl_min_tls = otlp_logs_ssl_min_tls_envvar,
+    ssl_max_tls = otlp_logs_ssl_max_tls_envvar,
+    ssl_cipher = otlp_logs_ssl_cipher_envvar,
+    ssl_cipher_suite = otlp_logs_ssl_cipher_suite_envvar,
+    retry_policy_max_attempts = otlp_logs_retry_policy_max_attempts_envvar,
+    retry_policy_initial_backoff = otlp_logs_retry_policy_initial_backoff_envvar,
+    retry_policy_max_backoff = otlp_logs_retry_policy_max_backoff_envvar,
+    retry_policy_backoff_multiplier = otlp_logs_retry_policy_backoff_multiplier_envvar
   )
 
   opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)

@@ -470,29 +470,29 @@ void otel_collector_resource_metrics_free(
 
 struct otel_http_exporter_options {
   struct {
-    bool url;
-    bool content_type;
-    bool json_bytes_mapping;
-    bool use_json_name;
-    bool console_debug;
-    bool timeout;
-    bool http_headers;
-    bool ssl_insecure_skip_verify;
-    bool ssl_ca_cert_path;
-    bool ssl_ca_cert_string;
-    bool ssl_client_key_path;
-    bool ssl_client_key_string;
-    bool ssl_client_cert_path;
-    bool ssl_client_cert_string;
-    bool ssl_min_tls;
-    bool ssl_max_tls;
-    bool ssl_cipher;
-    bool ssl_cipher_suite;
-    bool compression;
-    bool retry_policy_max_attempts;
-    bool retry_policy_initial_backoff;
-    bool retry_policy_max_backoff;
-    bool retry_policy_backoff_multiplier;
+    char url;
+    char content_type;
+    char json_bytes_mapping;
+    char use_json_name;
+    char console_debug;
+    char timeout;
+    char http_headers;
+    char ssl_insecure_skip_verify;
+    char ssl_ca_cert_path;
+    char ssl_ca_cert_string;
+    char ssl_client_key_path;
+    char ssl_client_key_string;
+    char ssl_client_cert_path;
+    char ssl_client_cert_string;
+    char ssl_min_tls;
+    char ssl_max_tls;
+    char ssl_cipher;
+    char ssl_cipher_suite;
+    char compression;
+    char retry_policy_max_attempts;
+    char retry_policy_initial_backoff;
+    char retry_policy_max_backoff;
+    char retry_policy_backoff_multiplier;
   } isset;
   struct otel_string url;
   int content_type;
@@ -542,6 +542,8 @@ void *otel_create_tracer_provider_stdstream_(
 void *otel_create_tracer_provider_http_(
   struct otel_http_exporter_options *options,
   struct otel_attributes *resource_attributes);
+int otel_tracer_provider_http_default_options_(
+  struct otel_tracer_provider_http_options *opts);
 void *otel_create_tracer_provider_memory_(
   int buffer_size, struct otel_attributes *resource_attributes);
 void *otel_create_tracer_provider_file_(
@@ -603,12 +605,13 @@ void otel_span_context_to_headers_(
 void *otel_extract_http_context_(
   const char *traceparent, const char *tracestate);
 
-int otel_tracer_provider_http_default_options_(
-  struct otel_tracer_provider_http_options *opts);
-
 void otel_logger_provider_finally_(void *logger_provider);
 void *otel_create_logger_provider_stdstream_(const char *stream);
-void *otel_create_logger_provider_http_(void);
+void *otel_create_logger_provider_http_(
+  struct otel_http_exporter_options *options,
+  struct otel_attributes *resource_attributes);
+int otel_logger_provider_http_default_options_(
+  struct otel_tracer_provider_http_options *opts);
 void *otel_create_logger_provider_file_(
   struct otel_file_exporter_options *options);
 void otel_logger_provider_file_options_defaults_(

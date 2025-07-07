@@ -15,6 +15,7 @@ SEXP otel_init_constants(SEXP env);
 
 SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes);
 SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes);
+SEXP otel_tracer_provider_http_options(void);
 SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes);
 SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes);
 SEXP otel_tracer_provider_file_options_defaults(void);
@@ -54,10 +55,9 @@ SEXP otel_span_context_is_sampled(SEXP span_context);
 SEXP otel_span_context_to_headers(SEXP span_context);
 SEXP otel_extract_http_context(SEXP headers);
 
-SEXP otel_tracer_provider_http_options(void);
-
 SEXP otel_create_logger_provider_stdstream(SEXP stream);
-SEXP otel_create_logger_provider_http(void);
+SEXP otel_create_logger_provider_http(SEXP options, SEXP attributes);
+SEXP otel_logger_provider_http_options(void);
 SEXP otel_create_logger_provider_file(SEXP options);
 SEXP otel_logger_provider_file_options_defaults(void);
 SEXP otel_get_logger(
@@ -151,6 +151,7 @@ static const R_CallMethodDef callMethods[]  = {
 
   CALLDEF(otel_create_tracer_provider_stdstream, 2),
   CALLDEF(otel_create_tracer_provider_http, 2),
+  CALLDEF(otel_tracer_provider_http_options, 0),
   CALLDEF(otel_create_tracer_provider_memory, 2),
   CALLDEF(otel_create_tracer_provider_file, 2),
   CALLDEF(otel_tracer_provider_file_options_defaults, 0),
@@ -184,10 +185,9 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_context_to_headers, 1),
   CALLDEF(otel_extract_http_context, 1),
 
-  CALLDEF(otel_tracer_provider_http_options, 0),
-
   CALLDEF(otel_create_logger_provider_stdstream, 1),
-  CALLDEF(otel_create_logger_provider_http, 0),
+  CALLDEF(otel_create_logger_provider_http, 2),
+  CALLDEF(otel_logger_provider_http_options, 0),
   CALLDEF(otel_create_logger_provider_file, 1),
   CALLDEF(otel_logger_provider_file_options_defaults, 0),
   CALLDEF(otel_get_minimum_log_severity, 1),

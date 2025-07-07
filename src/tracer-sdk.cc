@@ -69,7 +69,7 @@ void *otel_create_tracer_provider_http_(
   struct otel_attributes *resource_attributes
 ) {
   otlp::OtlpHttpExporterOptions options;
-  c2cc_otel_http_exporter_options(*options_, options);
+  c2cc_otel_http_exporter_options<otlp::OtlpHttpExporterOptions>(*options_, options);
   auto exporter  = otlp::OtlpHttpExporterFactory::Create(options);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
@@ -213,42 +213,8 @@ void *otel_get_tracer_(
 int otel_tracer_provider_http_default_options_(
   struct otel_tracer_provider_http_options *copts) {
 
-  otlp::OtlpHttpExporterOptions *opts =
-    new otlp::OtlpHttpExporterOptions();
-
-  cc2c_otel_string(opts->url, copts->url);
-  switch(opts->content_type) {
-    case otlp::HttpRequestContentType::kJson:
-      copts->content_type = k_json;
-      break;
-    case otlp::HttpRequestContentType::kBinary:
-      copts->content_type = k_binary;
-      break;
-    default:
-      throw std::runtime_error("Internal error, unknown HTTP request content type");
-      break;
-  }
-  copts->use_json_name = opts->use_json_name;
-  copts->console_debug = opts->console_debug;
-  copts->timeout = std::chrono::duration<double>(opts->timeout).count();
-  cc2c_otel_strings(opts->http_headers, copts->http_headers);
-  copts->ssl_insecure_skip_verify = opts->ssl_insecure_skip_verify;
-  cc2c_otel_string(opts->ssl_ca_cert_path, copts->ssl_ca_cert_path);
-  cc2c_otel_string(opts->ssl_ca_cert_string, copts->ssl_ca_cert_string);
-  cc2c_otel_string(opts->ssl_client_key_path, copts->ssl_client_key_path);
-  cc2c_otel_string(opts->ssl_client_key_string, copts->ssl_client_key_string);
-  cc2c_otel_string(opts->ssl_client_cert_path, copts->ssl_client_cert_path);
-  cc2c_otel_string(opts->ssl_client_cert_string, copts->ssl_client_cert_string);
-  cc2c_otel_string(opts->ssl_min_tls, copts->ssl_min_tls);
-  cc2c_otel_string(opts->ssl_max_tls, copts->ssl_max_tls);
-  cc2c_otel_string(opts->ssl_cipher, copts->ssl_cipher);
-  cc2c_otel_string(opts->ssl_cipher_suite, copts->ssl_cipher_suite);
-  cc2c_otel_string(opts->compression, copts->compression);
-  copts->retry_policy_max_attempts = opts->retry_policy_max_attempts;
-  copts->retry_policy_initial_backoff = opts->retry_policy_initial_backoff.count();
-  copts->retry_policy_max_backoff = opts->retry_policy_max_backoff.count();
-  copts->retry_policy_backoff_multiplier = opts->retry_policy_backoff_multiplier;
-  return 0;
+  return otel_provider_http_default_options__<
+    otlp::OtlpHttpExporterOptions>(*copts);
 }
 
-}
+} // extern "C"

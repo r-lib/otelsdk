@@ -172,12 +172,142 @@ void cc2c_file_exporter_options(
     const otlp::OtlpFileClientFileSystemOptions &backend_opts,
     struct otel_file_exporter_options &options);
 
+template<typename T>
 void c2cc_otel_http_exporter_options(
   const struct otel_http_exporter_options &coptions,
-  otlp::OtlpHttpExporterOptions &options);
+  T &options);
 
 void c2cc_otel_http_headers(
   const struct otel_http_headers &cheaders,
   otlp::OtlpHeaders &headers);
+
+extern const char *otel_otlp_compression_names[];
+
+template<typename T>
+void c2cc_otel_http_exporter_options(
+  const struct otel_http_exporter_options &coptions,
+  T &options
+) {
+  if (coptions.isset.url) {
+    options.url = c2cc_otel_string(coptions.url);
+  }
+  if (coptions.isset.content_type) {
+    options.content_type =
+      static_cast<otlp::HttpRequestContentType>(coptions.content_type);
+  }
+  if (coptions.isset.json_bytes_mapping) {
+    options.json_bytes_mapping =
+      static_cast<otlp::JsonBytesMappingKind>(coptions.json_bytes_mapping);
+  }
+  if (coptions.isset.use_json_name) {
+    options.use_json_name = coptions.use_json_name;
+  }
+  if (coptions.isset.console_debug) {
+    options.console_debug = coptions.console_debug;
+  }
+  if (coptions.isset.timeout) {
+    options.timeout = std::chrono::milliseconds((int64_t)coptions.timeout);
+  }
+  if (coptions.isset.http_headers) {
+    c2cc_otel_http_headers(coptions.http_headers, options.http_headers);
+  }
+  if (coptions.isset.ssl_insecure_skip_verify) {
+    options.ssl_insecure_skip_verify = coptions.ssl_insecure_skip_verify;
+  }
+  if (coptions.isset.ssl_ca_cert_path) {
+    options.ssl_ca_cert_path = c2cc_otel_string(coptions.ssl_ca_cert_path);
+  }
+  if (coptions.isset.ssl_ca_cert_string) {
+    options.ssl_ca_cert_string =
+      c2cc_otel_string(coptions.ssl_ca_cert_string);
+  }
+  if (coptions.isset.ssl_client_key_path) {
+    options.ssl_ca_cert_string =
+      c2cc_otel_string(coptions.ssl_client_key_path);
+  }
+  if (coptions.isset.ssl_client_key_string) {
+    options.ssl_client_key_string =
+      c2cc_otel_string(coptions.ssl_client_key_string);
+  }
+  if (coptions.isset.ssl_client_cert_path) {
+    options.ssl_client_cert_path =
+      c2cc_otel_string(coptions.ssl_client_cert_path);
+  }
+  if (coptions.isset.ssl_client_cert_string) {
+    options.ssl_client_cert_string =
+      c2cc_otel_string(coptions.ssl_client_cert_string);
+  }
+  if (coptions.isset.ssl_min_tls) {
+    options.ssl_min_tls = c2cc_otel_string(coptions.ssl_min_tls);
+  }
+  if (coptions.isset.ssl_max_tls) {
+    options.ssl_max_tls = c2cc_otel_string(coptions.ssl_max_tls);
+  }
+  if (coptions.isset.ssl_cipher) {
+    options.ssl_cipher = c2cc_otel_string(coptions.ssl_cipher);
+  }
+  if (coptions.isset.ssl_cipher_suite) {
+    options.ssl_cipher_suite = c2cc_otel_string(coptions.ssl_cipher_suite);
+  }
+  if (coptions.isset.compression) {
+    options.compression = otel_otlp_compression_names[coptions.compression];
+  }
+  if (coptions.isset.retry_policy_max_attempts) {
+    options.retry_policy_max_attempts = coptions.retry_policy_max_attempts;
+  }
+  if (coptions.isset.retry_policy_initial_backoff) {
+    options.retry_policy_initial_backoff =
+      std::chrono::milliseconds((int64_t) coptions.retry_policy_initial_backoff);
+  }
+  if (coptions.isset.retry_policy_max_backoff) {
+    options.retry_policy_max_backoff =
+      std::chrono::milliseconds((int64_t) coptions.retry_policy_max_backoff);
+  }
+  if (coptions.isset.retry_policy_backoff_multiplier) {
+    options.retry_policy_backoff_multiplier =
+      coptions.retry_policy_backoff_multiplier;
+  }
+}
+
+template <typename T>
+int otel_provider_http_default_options__(
+  struct otel_tracer_provider_http_options &copts) {
+
+  T opts;
+
+  cc2c_otel_string(opts.url, copts.url);
+  switch(opts.content_type) {
+    case otlp::HttpRequestContentType::kJson:
+      copts.content_type = k_json;
+      break;
+    case otlp::HttpRequestContentType::kBinary:
+      copts.content_type = k_binary;
+      break;
+    default:
+      throw std::runtime_error("Internal error, unknown HTTP request content type");
+      break;
+  }
+  copts.use_json_name = opts.use_json_name;
+  copts.console_debug = opts.console_debug;
+  copts.timeout = std::chrono::duration<double>(opts.timeout).count();
+  cc2c_otel_strings(opts.http_headers, copts.http_headers);
+  copts.ssl_insecure_skip_verify = opts.ssl_insecure_skip_verify;
+  cc2c_otel_string(opts.ssl_ca_cert_path, copts.ssl_ca_cert_path);
+  cc2c_otel_string(opts.ssl_ca_cert_string, copts.ssl_ca_cert_string);
+  cc2c_otel_string(opts.ssl_client_key_path, copts.ssl_client_key_path);
+  cc2c_otel_string(opts.ssl_client_key_string, copts.ssl_client_key_string);
+  cc2c_otel_string(opts.ssl_client_cert_path, copts.ssl_client_cert_path);
+  cc2c_otel_string(opts.ssl_client_cert_string, copts.ssl_client_cert_string);
+  cc2c_otel_string(opts.ssl_min_tls, copts.ssl_min_tls);
+  cc2c_otel_string(opts.ssl_max_tls, copts.ssl_max_tls);
+  cc2c_otel_string(opts.ssl_cipher, copts.ssl_cipher);
+  cc2c_otel_string(opts.ssl_cipher_suite, copts.ssl_cipher_suite);
+  cc2c_otel_string(opts.compression, copts.compression);
+  copts.retry_policy_max_attempts = opts.retry_policy_max_attempts;
+  copts.retry_policy_initial_backoff = opts.retry_policy_initial_backoff.count();
+  copts.retry_policy_max_backoff = opts.retry_policy_max_backoff.count();
+  copts.retry_policy_backoff_multiplier = opts.retry_policy_backoff_multiplier;
+  return 0;
+}
 
 #endif

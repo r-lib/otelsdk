@@ -146,12 +146,21 @@ void *otel_create_logger_provider_stdstream_(const char *stream) {
   }
 }
 
-void *otel_create_logger_provider_http_(void) {
-  auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create();
+void *otel_create_logger_provider_http_(
+  struct otel_http_exporter_options *options_,
+  struct otel_attributes *resource_attributes
+) {
+  otlp::OtlpHttpLogRecordExporterOptions options;
+  c2cc_otel_http_exporter_options<otlp::OtlpHttpLogRecordExporterOptions>(*options_, options);
+  auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create(options);
   auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
 
+  RKeyValueIterable attributes_(*resource_attributes);
   struct otel_logger_provider *lps = new otel_logger_provider();
-  lps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
+  lps->ptr = logs_sdk::LoggerProviderFactory::Create(
+    std::move(processor),
+    resource::Resource::Create(&attributes_)
+  );
 
   return (void*) lps;
 }
