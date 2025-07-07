@@ -7,7 +7,7 @@ test_that("tracer_provider_stdstream", {
 test_that("writing to a file", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
-  tp <- tracer_provider_stdstream_new(tmp)
+  tp <- tracer_provider_stdstream_new(list(output = tmp))
   trc <- tp$get_tracer()
   sp1 <- trc$start_span("testspan")
   sp1$end()

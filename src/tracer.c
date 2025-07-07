@@ -33,7 +33,8 @@ void otel_tracer_finally(SEXP x) {
   }
 }
 
-SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes) {
+SEXP otel_create_tracer_provider_stdstream(SEXP options, SEXP attributes) {
+  SEXP stream = rf_get_list_element(options, "output");
   const char *cstream = CHAR(STRING_ELT(stream, 0));
   struct otel_attributes attributes_;
   r2c_attributes(attributes, &attributes_);

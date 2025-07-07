@@ -13,7 +13,7 @@ SEXP otel_fail(void);
 SEXP otel_error_object(void);
 SEXP otel_init_constants(SEXP env);
 
-SEXP otel_create_tracer_provider_stdstream(SEXP stream, SEXP attributes);
+SEXP otel_create_tracer_provider_stdstream(SEXP options, SEXP attributes);
 SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes);
 SEXP otel_tracer_provider_http_options(void);
 SEXP otel_create_tracer_provider_memory(SEXP buffer_size, SEXP attributes);

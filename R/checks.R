@@ -1858,3 +1858,17 @@ as_meter_provider_stdstream_options <- function(
 
   c(opts1, opts2)
 }
+
+as_tracer_provider_stdstream_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- list(
+    output = tracer_provider_stdstream_output_envvar
+  )
+  opts1 <- as_stdstream_exporter_options(opts, evs, arg = arg, call = call)
+  check_known_options(opts, names(opts1), arg = arg, call = call)
+
+  opts1
+}
