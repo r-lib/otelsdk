@@ -50,12 +50,20 @@ SEXP otel_create_meter_provider_stdstream(
   return xptr;
 }
 
-SEXP otel_create_meter_provider_http(
-    SEXP export_interval, SEXP export_timeout) {
-  int cexport_interval = INTEGER(export_interval)[0];
-  int cexport_timeout = INTEGER(export_timeout)[0];
+SEXP otel_create_meter_provider_http(SEXP options, SEXP attributes) {
+  struct otel_http_exporter_options options_;
+  struct otel_attributes attributes_;
+  r2c_otel_http_exporter_options(options, &options_);
+  r2c_attributes(attributes, &attributes_);
+  int cexport_interval =
+    INTEGER(rf_get_list_element(options, "export_interval"))[0];
+  int cexport_timeout =
+    INTEGER(rf_get_list_element(options, "export_timeout"))[0];
+  int aggregation_temporality =
+    INTEGER(rf_get_list_element(options, "aggregation_temporality"))[0];
   void *meter_provider_ = otel_create_meter_provider_http_(
-    cexport_interval, cexport_timeout);
+    &options_, &attributes_, cexport_interval, cexport_timeout,
+    aggregation_temporality);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_meter_provider_finally, (Rboolean) 1);
   return xptr;
@@ -407,4 +415,65 @@ SEXP otel_gauge_record(
   // TODO: context
   otel_gauge_record_(gauge_, cvalue, &attributes_);
   return R_NilValue;
+}
+
+SEXP otel_meter_provider_http_options(void) {
+  struct otel_provider_http_options opts = { 0 };
+  if (otel_meter_provider_http_default_options_(&opts)) {
+    R_THROW_SYSTEM_ERROR("Failed to query OpenTelemetry HTTP options");
+  }
+
+  const char *nms[] = {
+    "url",
+    "content_type",
+    "use_json_name",
+    "console_debug",
+    "timeout",
+    "http_headers",
+    "ssl_insecure_skip_verify",
+    "ssl_ca_cert_path",
+    "ssl_ca_cert_string",
+    "ssl_client_key_path",
+    "ssl_client_key_string",
+    "ssl_client_cert_path",
+    "ssl_client_cert_string",
+    "ssl_min_tls",
+    "ssl_max_tls",
+    "ssl_cipher",
+    "ssl_cipher_suite",
+    "compression",
+    "retry_policy_max_attempts",
+    "retry_policy_initial_backoff",
+    "retry_policy_max_backoff",
+    "retry_policy_backoff_multiplier",
+    ""
+  };
+  SEXP res = PROTECT(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, c2r_otel_string(&opts.url));
+  SET_VECTOR_ELT(res, 1,
+    Rf_mkString(otel_http_request_content_type_str[opts.content_type])
+  );
+  SET_VECTOR_ELT(res, 2, Rf_ScalarLogical(opts.use_json_name));
+  SET_VECTOR_ELT(res, 3, Rf_ScalarLogical(opts.console_debug));
+  SET_VECTOR_ELT(res, 4, Rf_ScalarReal(opts.timeout));
+  SET_VECTOR_ELT(res, 5, c2r_otel_named_strings(&opts.http_headers));
+  SET_VECTOR_ELT(res, 6, Rf_ScalarLogical(opts.ssl_insecure_skip_verify));
+  SET_VECTOR_ELT(res, 7, c2r_otel_string(&opts.ssl_ca_cert_path));
+  SET_VECTOR_ELT(res, 8, c2r_otel_string(&opts.ssl_ca_cert_string));
+  SET_VECTOR_ELT(res, 9, c2r_otel_string(&opts.ssl_client_key_path));
+  SET_VECTOR_ELT(res, 10, c2r_otel_string(&opts.ssl_client_key_string));
+  SET_VECTOR_ELT(res, 11, c2r_otel_string(&opts.ssl_client_cert_path));
+  SET_VECTOR_ELT(res, 12, c2r_otel_string(&opts.ssl_client_cert_string));
+  SET_VECTOR_ELT(res, 13, c2r_otel_string(&opts.ssl_min_tls));
+  SET_VECTOR_ELT(res, 14, c2r_otel_string(&opts.ssl_max_tls));
+  SET_VECTOR_ELT(res, 15, c2r_otel_string(&opts.ssl_cipher));
+  SET_VECTOR_ELT(res, 16, c2r_otel_string(&opts.ssl_cipher_suite));
+  SET_VECTOR_ELT(res, 17, c2r_otel_string(&opts.compression));
+  SET_VECTOR_ELT(res, 18, Rf_ScalarInteger(opts.retry_policy_max_attempts));
+  SET_VECTOR_ELT(res, 19, Rf_ScalarReal(opts.retry_policy_initial_backoff));
+  SET_VECTOR_ELT(res, 20, Rf_ScalarReal(opts.retry_policy_max_backoff));
+  SET_VECTOR_ELT(res, 21, Rf_ScalarReal(opts.retry_policy_backoff_multiplier));
+
+  UNPROTECT(1);
+  return res;
 }

@@ -232,10 +232,10 @@ void otel_log_(
 }
 
 int otel_logger_provider_http_default_options_(
-  struct otel_tracer_provider_http_options *copts) {
-
-  return otel_provider_http_default_options__<
-    otlp::OtlpHttpLogRecordExporterOptions>(*copts);
+  struct otel_provider_http_options *copts
+) {
+  otlp::OtlpHttpLogRecordExporterOptions opts;
+  return otel_provider_http_default_options__(*copts, opts);
 }
 
 } // extern "C"

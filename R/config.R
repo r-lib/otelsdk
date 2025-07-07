@@ -176,3 +176,7 @@ otlp_metrics_retry_policy_backoff_multiplier_envvar <-
   "OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_BACKOFF_MULTIPLIER"
 otlp_logs_retry_policy_backoff_multiplier_envvar <-
   "OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_BACKOFF_MULTIPLIER"
+
+otlp_aggregation_temporality_envvar <-
+  "OTEL_R_EXPORTER_OTLP_AGGREGATION_TEMPORALITY"
+otlp_aggregation_temporality_default <- "cumulative"

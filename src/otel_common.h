@@ -135,7 +135,8 @@ struct otel_file_exporter_options {
 
 void otel_file_exporter_options_free(struct otel_file_exporter_options *o);
 
-struct otel_tracer_provider_http_options {
+// TODO: use otel_exporter_http_options for this as well
+struct otel_provider_http_options {
   struct otel_string url;
   enum otel_http_request_content_type content_type;
   int use_json_name;
@@ -158,6 +159,7 @@ struct otel_tracer_provider_http_options {
   double retry_policy_initial_backoff;
   double retry_policy_max_backoff;
   double retry_policy_backoff_multiplier;
+  int aggregation_temporality;
 };
 
 struct otel_trace_flags {
@@ -543,7 +545,7 @@ void *otel_create_tracer_provider_http_(
   struct otel_http_exporter_options *options,
   struct otel_attributes *resource_attributes);
 int otel_tracer_provider_http_default_options_(
-  struct otel_tracer_provider_http_options *opts);
+  struct otel_provider_http_options *opts);
 void *otel_create_tracer_provider_memory_(
   int buffer_size, struct otel_attributes *resource_attributes);
 void *otel_create_tracer_provider_file_(
@@ -611,7 +613,7 @@ void *otel_create_logger_provider_http_(
   struct otel_http_exporter_options *options,
   struct otel_attributes *resource_attributes);
 int otel_logger_provider_http_default_options_(
-  struct otel_tracer_provider_http_options *opts);
+  struct otel_provider_http_options *opts);
 void *otel_create_logger_provider_file_(
   struct otel_file_exporter_options *options);
 void otel_logger_provider_file_options_defaults_(
@@ -634,7 +636,12 @@ void otel_meter_provider_finally_(void *logger_provider);
 void *otel_create_meter_provider_stdstream_(
   const char *stream, int export_interval, int export_timeout);
 void *otel_create_meter_provider_http_(
-  int export_interval, int export_timeout);
+  struct otel_http_exporter_options *options,
+  struct otel_attributes *resource_attributes,
+  int export_interval, int export_timeout,
+  int aggregation_temporality_);
+int otel_meter_provider_http_default_options_(
+  struct otel_provider_http_options *opts);
 void *otel_create_meter_provider_file_(
   int export_interval, int export_timeout,
   struct otel_file_exporter_options *options);

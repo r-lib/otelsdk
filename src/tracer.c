@@ -165,7 +165,7 @@ const char *otel_http_request_content_type_str[] = {
 };
 
 SEXP otel_tracer_provider_http_options(void) {
-  struct otel_tracer_provider_http_options opts = { 0 };
+  struct otel_provider_http_options opts = { 0 };
   if (otel_tracer_provider_http_default_options_(&opts)) {
     R_THROW_SYSTEM_ERROR("Failed to query OpenTelemetry HTTP options");
   }

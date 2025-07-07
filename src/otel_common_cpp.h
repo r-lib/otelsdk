@@ -271,9 +271,7 @@ void c2cc_otel_http_exporter_options(
 
 template <typename T>
 int otel_provider_http_default_options__(
-  struct otel_tracer_provider_http_options &copts) {
-
-  T opts;
+  struct otel_provider_http_options &copts, T& opts) {
 
   cc2c_otel_string(opts.url, copts.url);
   switch(opts.content_type) {

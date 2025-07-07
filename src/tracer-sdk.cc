@@ -211,10 +211,10 @@ void *otel_get_tracer_(
 }
 
 int otel_tracer_provider_http_default_options_(
-  struct otel_tracer_provider_http_options *copts) {
-
-  return otel_provider_http_default_options__<
-    otlp::OtlpHttpExporterOptions>(*copts);
+  struct otel_provider_http_options *copts
+) {
+  otlp::OtlpHttpExporterOptions opts;
+  return otel_provider_http_default_options__(*copts, opts);
 }
 
 } // extern "C"

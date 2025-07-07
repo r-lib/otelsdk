@@ -1694,3 +1694,111 @@ as_logger_provider_http_options <- function(
 
   opts1
 }
+
+otlp_aggregation_temporality_choices <- c(
+  "unspecified",
+  "delta",
+  default = "cumulative",
+  "lowmemory"
+)
+
+as_aggregation_temporality <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  ret <- as_choice(
+    x,
+    otlp_aggregation_temporality_choices,
+    null = null,
+    arg = arg,
+    call = call
+  )
+
+  if (!is.null(ret)) {
+    structure(ret, names = otlp_aggregation_temporality_choices[ret + 1])
+  } else {
+    NULL
+  }
+}
+
+as_aggregation_temporality_env <- function(ev, call = caller_env()) {
+  val <- get_env(ev)
+  if (is.null(val)) {
+    return(NULL)
+  }
+
+  w <- match(tolower(val), otlp_aggregation_temporality_choices)
+  if (!is.na(w)) {
+    return(structure(w - 1L, names = tolower(val)))
+  }
+
+  choices <- paste0(
+    "'",
+    otlp_aggregation_temporality_choices,
+    "'",
+    collapse = ", "
+  )
+  stop(cnd(
+    call = call,
+    "Invalid environment variable: '{ev}' must be one of {choices} \\
+     (case insensitive), bit it is '{val}'."
+  ))
+}
+
+as_http_metric_exporter_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  opts <- as_named_list(opts, arg = arg, call = call)
+
+  ma <- function(nm) {
+    as_caller_arg(substitute(x[[n]], list(x = arg[[1]], n = nm)))
+  }
+
+  aggregation_temporality <- as_aggregation_temporality(
+    opts$aggregation_temporality,
+    arg = ma("aggregation_temporality"),
+    call = call
+  ) %||%
+    as_aggregation_temporality_env(otlp_aggregation_temporality_envvar) %||%
+    as_aggregation_temporality(otlp_aggregation_temporality_default)
+
+  list(aggregation_temporality = aggregation_temporality)
+}
+
+as_meter_provider_http_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- list(
+    content_type = otlp_metrics_content_type_envvar,
+    json_bytes_mapping = otlp_metrics_json_bytes_mapping_envvar,
+    use_json_name = otlp_metrics_use_json_name_envvar,
+    console_debug = otlp_metrics_console_debug_envvar,
+    ssl_insecure_skip_verify = otlp_metrics_ssl_insecure_skip_verify_envvar,
+    ssl_min_tls = otlp_metrics_ssl_min_tls_envvar,
+    ssl_max_tls = otlp_metrics_ssl_max_tls_envvar,
+    ssl_cipher = otlp_metrics_ssl_cipher_envvar,
+    ssl_cipher_suite = otlp_metrics_ssl_cipher_suite_envvar,
+    retry_policy_max_attempts = otlp_metrics_retry_policy_max_attempts_envvar,
+    retry_policy_initial_backoff = otlp_metrics_retry_policy_initial_backoff_envvar,
+    retry_policy_max_backoff = otlp_metrics_retry_policy_max_backoff_envvar,
+    retry_policy_backoff_multiplier = otlp_metrics_retry_policy_backoff_multiplier_envvar
+  )
+
+  opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
+  opts2 <- as_metric_reader_options(opts, arg = arg, call = call)
+  opts3 <- as_http_metric_exporter_options(opts, arg = arg, call = call)
+  check_known_options(
+    opts,
+    c(names(opts1), names(opts2), names(opts3)),
+    arg = arg,
+    call = call
+  )
+
+  c(opts1, opts2, opts3)
+}

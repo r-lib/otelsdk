@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
@@ -29,6 +30,7 @@ namespace metrics_exporter = opentelemetry::exporter::metrics;
 namespace metrics_api      = opentelemetry::metrics;
 namespace otlp             = opentelemetry::exporter::otlp;
 namespace memory           = opentelemetry::exporter::memory;
+namespace resource         = opentelemetry::sdk::resource;
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
@@ -69,7 +71,18 @@ void otel_gauge_finally_(void *gauge_) {
 }
 
 void *otel_create_meter_provider_http_(
-    int export_interval, int export_timeout) {
+  struct otel_http_exporter_options *options_,
+  struct otel_attributes *resource_attributes,
+  int export_interval, int export_timeout,
+  int aggregation_temporality_
+) {
+
+  otlp::OtlpHttpMetricExporterOptions options;
+  c2cc_otel_http_exporter_options<otlp::OtlpHttpMetricExporterOptions>(
+    *options_, options);
+  options.aggregation_temporality = static_cast<
+    otlp::PreferredAggregationTemporality>(aggregation_temporality_);
+
   struct otel_meter_provider *mps = new otel_meter_provider();
 
   std::string version{"1.2.0"};
@@ -82,12 +95,15 @@ void *otel_create_meter_provider_http_(
   reader_options.export_timeout_millis  =
     std::chrono::milliseconds(export_timeout);
 
-  auto exporter = otlp::OtlpHttpMetricExporterFactory::Create();
+  auto exporter = otlp::OtlpHttpMetricExporterFactory::Create(options);
   auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(
     std::move(exporter),
     reader_options
   );
-  auto context = metrics_sdk::MeterContextFactory::Create();
+  auto views = metrics_sdk::ViewRegistryFactory::Create();
+  RKeyValueIterable attributes_(*resource_attributes);
+  auto context = metrics_sdk::MeterContextFactory::Create(
+    std::move(views),resource::Resource::Create(&attributes_));
   context->AddMetricReader(std::move(reader));
 
   mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
@@ -448,6 +464,14 @@ void otel_gauge_record_(
   metrics_api::Gauge<double> &gauge = *(cs->ptr);
   RKeyValueIterable attributes(*attributes_);
   gauge.Record(cvalue, attributes);
+}
+
+int otel_meter_provider_http_default_options_(
+  struct otel_provider_http_options *copts
+) {
+  otlp::OtlpHttpMetricExporterOptions opts;
+  copts->aggregation_temporality = (int) opts.aggregation_temporality;
+  return otel_provider_http_default_options__(*copts, opts);
 }
 
 } // extern "C"
