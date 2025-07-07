@@ -790,7 +790,7 @@
     Code
       helper("FOO")
     Condition
-      Error in `as_otlp_json_bytes_mapping_env()`:
+      Error in `helper()`:
       ! Invalid environment variable: 'FOO' must be one of hexid, base64, hex (case insensitive), but it is 'bad'.
 
 # as_otlp_compression

@@ -1262,6 +1262,7 @@ as_otlp_json_bytes_mapping_env <- function(ev, call = caller_env()) {
 
   choices <- paste(otlp_json_byte_mapping_choices, collapse = ", ")
   stop(cnd(
+    call = call,
     "Invalid environment variable: '{ev}' must be one of {choices} \\
      (case insensitive), but it is '{val}'."
   ))
