@@ -650,7 +650,7 @@ void otel_meter_provider_file_options_defaults_(
   struct otel_file_exporter_options *options);
 void *otel_create_meter_provider_memory_(
     int export_interval, int export_timeout, int cbuffer_size,
-    int ctemporality);
+    int ctemporality, struct otel_attributes *resource_attributes);
 int otel_meter_provider_memory_get_metrics_(
   void *meter_provider_, struct otel_metrics_data *data);
 void otel_meter_provider_flush_(void *tracer_provider, int timeout);

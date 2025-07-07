@@ -1,9 +1,5 @@
-meter_provider_memory_new <- function(
-  export_interval = 1000L,
-  export_timeout = 500L,
-  buffer_size = 100,
-  temporality = c("unspecified", "delta", "cumulative")[1]
-) {
+meter_provider_memory_new <- function(opts = NULL) {
+  opts <- as_meter_provider_memory_options(opts)
   self <- new_object(
     c("otel_meter_provider_memory", "otel_meter_provider"),
     get_meter = function(
@@ -27,22 +23,19 @@ meter_provider_memory_new <- function(
     }
   )
 
-  export_interval <- as_count(export_interval, positive = TRUE)
-  export_timeout <- as_count(export_timeout, positive = TRUE)
-  buffer_size <- as_count(buffer_size, positive = TRUE)
-  temporality <- as_choice(temporality, temporality_types, null = FALSE)
-  self$xptr <- ccall(
-    otel_create_meter_provider_memory,
-    export_interval,
-    export_timeout,
-    buffer_size,
-    temporality
-  )
+  attributes <- as_otel_attributes(the$default_resource_attributes)
+  self$xptr <- ccall(otel_create_meter_provider_memory, opts, attributes)
   self
 }
 
-meter_provider_memory <- list(
-  new = meter_provider_memory_new
-)
+meter_provider_memory_options <- function() {
+  as_meter_provider_memory_options(NULL)
+}
 
-temporality_types <- c(default = "unspecified", "delta", "cumulative")
+#' In-memory meter provider for debugging
+#' @export
+
+meter_provider_memory <- list(
+  new = meter_provider_memory_new,
+  options = meter_provider_memory_options
+)

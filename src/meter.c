@@ -96,15 +96,21 @@ SEXP otel_meter_provider_file_options_defaults(void) {
   return res;
 }
 
-SEXP otel_create_meter_provider_memory(
-    SEXP export_interval, SEXP export_timeout, SEXP buffer_size,
-    SEXP temporality) {
+SEXP otel_create_meter_provider_memory(SEXP options, SEXP attributes) {
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  SEXP export_interval = rf_get_list_element(options, "export_interval");
+  SEXP export_timeout = rf_get_list_element(options, "export_timeout");
+  SEXP buffer_size = rf_get_list_element(options, "buffer_size");
+  SEXP aggregation_temporality = rf_get_list_element(
+    options, "aggregation_temporality");
   int cexport_interval = INTEGER(export_interval)[0];
   int cexport_timeout = INTEGER(export_timeout)[0];
   int cbuffer_size = INTEGER(buffer_size)[0];
-  int ctemporality = INTEGER(temporality)[0];
+  int ctemporality = INTEGER(aggregation_temporality)[0];
   void *meter_provider_ = otel_create_meter_provider_memory_(
-    cexport_interval, cexport_timeout, cbuffer_size, ctemporality);
+    cexport_interval, cexport_timeout, cbuffer_size, ctemporality,
+    &attributes_);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_meter_provider_finally, (Rboolean) 1);
   return xptr;

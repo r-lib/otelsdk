@@ -103,7 +103,9 @@ void *otel_create_meter_provider_http_(
   auto views = metrics_sdk::ViewRegistryFactory::Create();
   RKeyValueIterable attributes_(*resource_attributes);
   auto context = metrics_sdk::MeterContextFactory::Create(
-    std::move(views),resource::Resource::Create(&attributes_));
+    std::move(views),
+    resource::Resource::Create(&attributes_)
+  );
   context->AddMetricReader(std::move(reader));
 
   mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));
@@ -154,8 +156,9 @@ void otel_meter_provider_file_options_defaults_(
 }
 
 void *otel_create_meter_provider_memory_(
-    int export_interval, int export_timeout, int buffer_size,
-    int temporality) {
+  int export_interval, int export_timeout, int buffer_size,
+  int temporality, struct otel_attributes *resource_attributes
+) {
   struct otel_meter_provider *mps = new otel_meter_provider();
   mps->metricdata.reset(new memory::CircularBufferInMemoryMetricData(buffer_size));
 
@@ -174,7 +177,12 @@ void *otel_create_meter_provider_memory_(
     std::move(exporter),
     reader_options
   );
-  auto context = metrics_sdk::MeterContextFactory::Create();
+  auto views = metrics_sdk::ViewRegistryFactory::Create();
+  RKeyValueIterable attributes_(*resource_attributes);
+  auto context = metrics_sdk::MeterContextFactory::Create(
+    std::move(views),
+    resource::Resource::Create(&attributes_)
+  );
   context->AddMetricReader(std::move(reader));
 
   mps->ptr = metrics_sdk::MeterProviderFactory::Create(std::move(context));

@@ -81,9 +81,7 @@ SEXP otel_meter_provider_http_options(void);
 SEXP otel_create_meter_provider_file(
   SEXP export_interval, SEXP export_timeout, SEXP options);
 SEXP otel_meter_provider_file_options_defaults(void);
-SEXP otel_create_meter_provider_memory(
-  SEXP export_interval, SEXP export_timeout, SEXP buffer_size,
-  SEXP temporality);
+SEXP otel_create_meter_provider_memory(SEXP options, SEXP attributes);
 SEXP otel_meter_provider_memory_get_metrics(SEXP provider);
 SEXP otel_get_meter(SEXP provider, SEXP name, SEXP version,
   SEXP schema_url, SEXP attributes);
@@ -203,7 +201,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_meter_provider_http_options, 0),
   CALLDEF(otel_create_meter_provider_file, 3),
   CALLDEF(otel_meter_provider_file_options_defaults, 0),
-  CALLDEF(otel_create_meter_provider_memory, 4),
+  CALLDEF(otel_create_meter_provider_memory, 2),
   CALLDEF(otel_meter_provider_memory_get_metrics, 1),
   CALLDEF(otel_get_meter, 5),
   CALLDEF(otel_meter_provider_flush, 2),

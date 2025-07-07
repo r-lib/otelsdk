@@ -1747,7 +1747,7 @@ as_aggregation_temporality_env <- function(ev, call = caller_env()) {
   ))
 }
 
-as_http_metric_exporter_options <- function(
+as_metric_exporter_options <- function(
   opts,
   arg = caller_arg(opts),
   call = caller_env()
@@ -1792,7 +1792,7 @@ as_meter_provider_http_options <- function(
 
   opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
   opts2 <- as_metric_reader_options(opts, arg = arg, call = call)
-  opts3 <- as_http_metric_exporter_options(opts, arg = arg, call = call)
+  opts3 <- as_metric_exporter_options(opts, arg = arg, call = call)
   check_known_options(
     opts,
     c(names(opts1), names(opts2), names(opts3)),
@@ -1911,4 +1911,25 @@ as_tracer_provider_memory_options <- function(
   check_known_options(opts, names(opts1), arg = arg, call = call)
 
   opts1
+}
+
+as_meter_provider_memory_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- list(
+    buffer_size = memory_metrics_buffer_size_envvar
+  )
+  opts1 <- as_memory_exporter_options(opts, evs, arg = arg, call = call)
+  opts2 <- as_metric_reader_options(opts, arg = arg, call = call)
+  opts3 <- as_metric_exporter_options(opts, arg = arg, call = call)
+  check_known_options(
+    opts,
+    c(names(opts1), names(opts2), names(opts3)),
+    arg = arg,
+    call = call
+  )
+
+  c(opts1, opts2, opts3)
 }

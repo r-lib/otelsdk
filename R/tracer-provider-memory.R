@@ -30,6 +30,7 @@ tracer_provider_memory_options <- function() {
   as_tracer_provider_memory_options(NULL)
 }
 
+#' In-memory tracer provider for debugging
 #' @export
 
 tracer_provider_memory <- list(

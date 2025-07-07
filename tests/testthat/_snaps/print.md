@@ -134,10 +134,16 @@
     Output
       <otel_resouce_metrics>
       attributes:
-          service.name           : unknown_service
-          telemetry.sdk.language : cpp
-          telemetry.sdk.name     : opentelemetry
-          telemetry.sdk.version  : 1.21.0
+          os.type                     : darwin
+          process.owner               : gaborcsardi
+          process.pid                 : 58775
+          process.runtime.description : R version 4.5.1 (2025-06-13)
+          process.runtime.name        : R
+          process.runtime.version     : 4.5.1
+          service.name                : unknown_service
+          telemetry.sdk.language      : R
+          telemetry.sdk.name          : opentelemetry
+          telemetry.sdk.version       : 0.0.0.9000
       scope_metric_data [1]:
           <otel_scope_metrics>
           instrumentation_scope:
@@ -173,10 +179,16 @@
     Output
       <otel_resouce_metrics>
       attributes:
-          service.name           : unknown_service
-          telemetry.sdk.language : cpp
-          telemetry.sdk.name     : opentelemetry
-          telemetry.sdk.version  : 1.21.0
+          os.type                     : darwin
+          process.owner               : gaborcsardi
+          process.pid                 : 58775
+          process.runtime.description : R version 4.5.1 (2025-06-13)
+          process.runtime.name        : R
+          process.runtime.version     : 4.5.1
+          service.name                : unknown_service
+          telemetry.sdk.language      : R
+          telemetry.sdk.name          : opentelemetry
+          telemetry.sdk.version       : 0.0.0.9000
       scope_metric_data [1]:
           <otel_scope_metrics>
           instrumentation_scope:
@@ -220,10 +232,16 @@
     Output
       <otel_resouce_metrics>
       attributes:
-          service.name           : unknown_service
-          telemetry.sdk.language : cpp
-          telemetry.sdk.name     : opentelemetry
-          telemetry.sdk.version  : 1.21.0
+          os.type                     : darwin
+          process.owner               : gaborcsardi
+          process.pid                 : 58775
+          process.runtime.description : R version 4.5.1 (2025-06-13)
+          process.runtime.name        : R
+          process.runtime.version     : 4.5.1
+          service.name                : unknown_service
+          telemetry.sdk.language      : R
+          telemetry.sdk.name          : opentelemetry
+          telemetry.sdk.version       : 0.0.0.9000
       scope_metric_data [1]:
           <otel_scope_metrics>
           instrumentation_scope:
