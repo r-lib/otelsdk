@@ -608,7 +608,8 @@ void *otel_extract_http_context_(
   const char *traceparent, const char *tracestate);
 
 void otel_logger_provider_finally_(void *logger_provider);
-void *otel_create_logger_provider_stdstream_(const char *stream);
+void *otel_create_logger_provider_stdstream_(
+  const char *stream, struct otel_attributes *resource_attributes);
 void *otel_create_logger_provider_http_(
   struct otel_http_exporter_options *options,
   struct otel_attributes *resource_attributes);

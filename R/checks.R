@@ -1802,3 +1802,39 @@ as_meter_provider_http_options <- function(
 
   c(opts1, opts2, opts3)
 }
+
+as_stdstream_exporter_options <- function(
+  opts,
+  evs,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  opts <- as_named_list(opts, arg = arg, call = call)
+
+  ma <- function(nm) {
+    as_caller_arg(substitute(x[[nm]], list(x = arg[[1]], nm = nm)))
+  }
+
+  output <- as_string(opts$output, arg = ma("output"), call = call) %||%
+    get_env(evs[["output"]]) %||%
+    "stdout"
+  if (output != "stdout" && output != "stderr") {
+    output <- as_output_file(output, arg = ma("output"), call = call)
+  }
+
+  list(output = output)
+}
+
+as_logger_provider_stdstream_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- list(
+    output = logger_provider_stdstream_output
+  )
+  opts1 <- as_stdstream_exporter_options(opts, evs, arg = arg, call = call)
+  check_known_options(opts, names(opts1), arg = arg, call = call)
+
+  opts1
+}

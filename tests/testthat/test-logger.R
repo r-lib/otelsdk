@@ -22,7 +22,7 @@ test_that("get_default_log_severity", {
 test_that("logger_provider_stdstream", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
-  lp <- logger_provider_stdstream_new(tmp)
+  lp <- logger_provider_stdstream_new(list(output = tmp))
   lgr <- lp$get_logger("mylogger")
   expect_equal(lgr$get_name(), "mylogger")
   expect_true(lgr$is_enabled("info"))
@@ -94,7 +94,7 @@ test_that("log levels", {
 test_that("span_context", {
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
-  lp <- logger_provider_stdstream_new(tmp)
+  lp <- logger_provider_stdstream_new(list(output = tmp))
   lgr <- lp$get_logger("org.r-lib.otel")
   tp <- tracer_provider_memory_new()
   trc <- tp$get_tracer("org.r-lib.otel")

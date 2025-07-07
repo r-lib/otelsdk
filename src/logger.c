@@ -38,9 +38,13 @@ void otel_logger_finally(SEXP x) {
   }
 }
 
-SEXP otel_create_logger_provider_stdstream(SEXP stream) {
+SEXP otel_create_logger_provider_stdstream(SEXP options, SEXP attributes) {
+  SEXP stream = rf_get_list_element(options, "output");
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
   const char *cstream = CHAR(STRING_ELT(stream, 0));
-  void *logger_provider_ = otel_create_logger_provider_stdstream_(cstream);
+  void *logger_provider_ = otel_create_logger_provider_stdstream_(
+    cstream, &attributes_);
   SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
   return xptr;

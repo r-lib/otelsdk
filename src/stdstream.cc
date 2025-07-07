@@ -123,16 +123,23 @@ void *otel_create_meter_provider_stdstream_(
   }
 }
 
-void *otel_create_logger_provider_stdstream_(const char *stream) {
+void *otel_create_logger_provider_stdstream_(
+  const char *stream,
+  struct otel_attributes *resource_attributes
+) {
   int sout = !strcmp(stream, "stdout");
   int serr = !strcmp(stream, "stderr");
   struct otel_logger_provider *tps = new otel_logger_provider();
+  RKeyValueIterable attributes_(*resource_attributes);
 
   if (sout || serr) {
     std::ostream &out = sout ? std::cout : std::cerr;
     auto exporter  = logs_exporter::OStreamLogRecordExporterFactory::Create(out);
     auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
-    tps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
+    tps->ptr = logs_sdk::LoggerProviderFactory::Create(
+      std::move(processor),
+      resource::Resource::Create(&attributes_)
+    );
     return (void*) tps;
 
   } else {
@@ -141,7 +148,10 @@ void *otel_create_logger_provider_stdstream_(const char *stream) {
     tps->stream.rdbuf()->pubsetbuf(0,0);
     auto exporter  = logs_exporter::OStreamLogRecordExporterFactory::Create(tps->stream);
     auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
-    tps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
+    tps->ptr = logs_sdk::LoggerProviderFactory::Create(
+      std::move(processor),
+      resource::Resource::Create(&attributes_)
+    );
     return tps;
   }
 }

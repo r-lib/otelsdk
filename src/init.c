@@ -55,7 +55,7 @@ SEXP otel_span_context_is_sampled(SEXP span_context);
 SEXP otel_span_context_to_headers(SEXP span_context);
 SEXP otel_extract_http_context(SEXP headers);
 
-SEXP otel_create_logger_provider_stdstream(SEXP stream);
+SEXP otel_create_logger_provider_stdstream(SEXP options, SEXP attributes);
 SEXP otel_create_logger_provider_http(SEXP options, SEXP attributes);
 SEXP otel_logger_provider_http_options(void);
 SEXP otel_create_logger_provider_file(SEXP options);
@@ -185,7 +185,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_context_to_headers, 1),
   CALLDEF(otel_extract_http_context, 1),
 
-  CALLDEF(otel_create_logger_provider_stdstream, 1),
+  CALLDEF(otel_create_logger_provider_stdstream, 2),
   CALLDEF(otel_create_logger_provider_http, 2),
   CALLDEF(otel_logger_provider_http_options, 0),
   CALLDEF(otel_create_logger_provider_file, 1),

@@ -1,6 +1,6 @@
-tracer_provider_stdstream_output <- "OTEL_EXPORTER_STDSTREAM_TRACES_OUTPUT"
-logger_provider_stdstream_output <- "OTEL_EXPORTER_STDSTREAM_LOGS_OUTPUT"
-meter_provider_stdstream_output <- "OTEL_EXPORTER_STDSTREAM_METRICS_OUTPUT"
+tracer_provider_stdstream_output <- "OTEL_R_EXPORTER_STDSTREAM_TRACES_OUTPUT"
+logger_provider_stdstream_output <- "OTEL_R_EXPORTER_STDSTREAM_LOGS_OUTPUT"
+meter_provider_stdstream_output <- "OTEL_R_EXPORTER_STDSTREAM_METRICS_OUTPUT"
 
 file_exporter_file_envvar <-
   "OTEL_EXPORTER_OTLP_FILE"

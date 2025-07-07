@@ -1,9 +1,6 @@
-logger_provider_stdstream_new <- function(stream = NULL) {
-  stream <- as_string(stream) %||%
-    Sys.getenv(logger_provider_stdstream_output, "stdout")
-  if (stream != "stdout" && stream != "stderr") {
-    stream <- as_output_file(stream, null = FALSE)
-  }
+logger_provider_stdstream_new <- function(opts = NULL) {
+  opts <- as_logger_provider_stdstream_options(opts)
+
   self <- new_object(
     c("otel_logger_provider_stdstream", "otel_logger_provider"),
     get_logger = function(
@@ -29,8 +26,13 @@ logger_provider_stdstream_new <- function(stream = NULL) {
     }
   )
 
-  self$xptr <- ccall(otel_create_logger_provider_stdstream, stream)
+  attributes <- as_otel_attributes(the$default_resource_attributes)
+  self$xptr <- ccall(otel_create_logger_provider_stdstream, opts, attributes)
   self
+}
+
+logger_provider_stdstream_options <- function() {
+  as_logger_provider_stdstream_options(NULL)
 }
 
 #' Logger provider to write to the standard output or standard error or
@@ -38,5 +40,6 @@ logger_provider_stdstream_new <- function(stream = NULL) {
 #' @export
 
 logger_provider_stdstream <- list(
-  new = logger_provider_stdstream_new
+  new = logger_provider_stdstream_new,
+  options = logger_provider_stdstream_options
 )
