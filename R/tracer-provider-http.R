@@ -38,6 +38,11 @@ tracer_provider_http_options <- function() {
     "compression"
   )
   ropts[spec] <- copts[spec]
+
+  # batch processor options are handled by CPP and are in the spec
+  bspopts <- ccall(otel_bsp_defaults)
+  ropts <- utils::modifyList(ropts, bspopts)
+
   ropts
 }
 

@@ -1641,6 +1641,46 @@ as_http_exporter_options <- function(
   )
 }
 
+as_batch_processor_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  opts <- as_named_list(opts, arg = arg, call = call)
+
+  ma <- function(nm) {
+    as_caller_arg(substitute(x[[nm]], list(x = arg[[1]], nm = nm)))
+  }
+
+  max_queue_size <- as_count(
+    opts$max_queue_size,
+    positive = TRUE,
+    null = TRUE,
+    arg = ma("max_queue_size"),
+    call = call
+  )
+
+  max_export_batch_size <- as_count(
+    opts$max_export_batch_size,
+    positive = TRUE,
+    null = TRUE,
+    arg = ma("max_export_batch_size"),
+    call = call
+  )
+
+  schedule_delay <- as_difftime_spec(
+    opts$schedule_delay,
+    arg = ma("schedule_delay"),
+    call = call
+  )
+
+  list(
+    max_queue_size = max_queue_size,
+    max_export_batch_size = max_export_batch_size,
+    schedule_delay = schedule_delay
+  )
+}
+
 as_tracer_provider_http_options <- function(
   opts,
   arg = caller_arg(opts),
@@ -1663,9 +1703,15 @@ as_tracer_provider_http_options <- function(
   )
 
   opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
-  check_known_options(opts, names(opts1), arg = arg, call = call)
+  opts2 <- as_batch_processor_options(opts, arg = arg, call = call)
+  check_known_options(
+    opts,
+    c(names(opts1), names(opts2)),
+    arg = arg,
+    call = call
+  )
 
-  opts1
+  c(opts1, opts2)
 }
 
 as_logger_provider_http_options <- function(

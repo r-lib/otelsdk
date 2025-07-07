@@ -525,6 +525,23 @@ void otel_http_exporter_options_free(struct otel_http_exporter_options *o);
 
 // ---
 
+struct otel_bsp_options {
+  struct {
+    char max_queue_size;
+    char schedule_delay;
+    char max_export_batch_size;
+  } isset;
+  double max_queue_size;
+  double schedule_delay;
+  double max_export_batch_size;
+};
+
+void otel_bsp_options_free(struct otel_bsp_options *o);
+
+int otel_bsp_defaults_(struct otel_bsp_options *options);
+
+// ---
+
 extern const char *otel_http_request_content_type_str[];
 
 void otel_tracer_provider_finally_(void *tracer_provider);
@@ -543,7 +560,8 @@ void *otel_create_tracer_provider_stdstream_(
   const char *stream, struct otel_attributes *resource_attributes);
 void *otel_create_tracer_provider_http_(
   struct otel_http_exporter_options *options,
-  struct otel_attributes *resource_attributes);
+  struct otel_attributes *resource_attributes,
+  struct otel_bsp_options *bsp_options);
 int otel_tracer_provider_http_default_options_(
   struct otel_provider_http_options *opts);
 void *otel_create_tracer_provider_memory_(

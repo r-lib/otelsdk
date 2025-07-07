@@ -429,7 +429,8 @@ void c2cc_otel_http_headers(
   for (size_t i = 0; i < n; i++) {
     std::string name = c2cc_otel_string(cheaders.a[i].name);
     std::string value = c2cc_otel_string(cheaders.a[i].value);
-    headers.insert(std::pair{ std::move(name), std::move(value) });
+    headers.insert(std::pair<std::string, std::string>
+      { std::move(name), std::move(value) });
   }
 }
 

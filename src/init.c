@@ -41,6 +41,8 @@ SEXP otel_span_set_status(SEXP span, SEXP status_code, SEXP description);
 SEXP otel_span_update_name(SEXP span, SEXP name);
 SEXP otel_span_end(SEXP span, SEXP options, SEXP status_code);
 
+SEXP otel_bsp_defaults(void);
+
 SEXP otel_scope_start(SEXP span);
 SEXP otel_scope_end(SEXP scope);
 
@@ -167,6 +169,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_set_status, 3),
   CALLDEF(otel_span_update_name, 2),
   CALLDEF(otel_span_end, 3),
+  CALLDEF(otel_bsp_defaults, 0),
 
   CALLDEF(otel_scope_start, 1),
   CALLDEF(otel_scope_end, 1),

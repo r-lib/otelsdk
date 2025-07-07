@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <string.h>
 
 #define R_USE_C99_IN_CXX 1
 #include <Rinternals.h>
@@ -50,8 +51,23 @@ SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes) {
   struct otel_attributes attributes_;
   r2c_otel_http_exporter_options(options, &options_);
   r2c_attributes(attributes, &attributes_);
+  struct otel_bsp_options bsp_options;
+  memset(&bsp_options.isset, 0, sizeof(bsp_options.isset));
+  SEXP max_queue_size = rf_get_list_element(options, "max_queue_size");
+  if (!Rf_isNull(max_queue_size)) {
+    bsp_options.max_queue_size = REAL(max_queue_size)[0];
+  }
+  SEXP schedule_delay = rf_get_list_element(options, "schedule_delay");
+  if (!Rf_isNull(schedule_delay)) {
+    bsp_options.schedule_delay = REAL(schedule_delay)[0];
+  }
+  SEXP max_export_batch_size =
+    rf_get_list_element(options, "max_export_batch_size");
+  if (!Rf_isNull(max_export_batch_size)) {
+    bsp_options.max_export_batch_size = REAL(max_export_batch_size)[0];
+  }
   void *tracer_provider_ =
-    otel_create_tracer_provider_http_(&options_, &attributes_);
+    otel_create_tracer_provider_http_(&options_, &attributes_, &bsp_options);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
   return xptr;
@@ -287,5 +303,26 @@ SEXP otel_tracer_provider_memory_get_spans(SEXP provider) {
   }
   otel_span_data_free(&data);
   UNPROTECT(2);
+  return res;
+}
+
+SEXP otel_bsp_defaults(void) {
+  struct otel_bsp_options opts;
+  if (otel_bsp_defaults_(&opts)) {
+    otel_bsp_options_free(&opts);
+    R_THROW_ERROR(
+      "Cannot query default OpenTelemetry batch span processor options"
+    );
+  }
+  const char *nms[] = {
+    "max_queue_size", "schedule_delay", "max_export_batch_size", "" };
+  SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));
+  SET_VECTOR_ELT(res, 0, Rf_ScalarReal(opts.max_queue_size));
+  SET_VECTOR_ELT(res, 1, Rf_ScalarReal(opts.schedule_delay));
+  SET_VECTOR_ELT(res, 2, Rf_ScalarReal(opts.max_export_batch_size));
+
+  // TODO: cleancall
+  otel_bsp_options_free(&opts);
+  Rf_unprotect(1);
   return res;
 }

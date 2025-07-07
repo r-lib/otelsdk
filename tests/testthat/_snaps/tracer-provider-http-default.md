@@ -73,4 +73,13 @@
       $retry_policy_backoff_multiplier
       [1] 1.5
       
+      $max_queue_size
+      [1] 2048
+      
+      $max_export_batch_size
+      [1] 512
+      
+      $schedule_delay
+      [1] 5000
+      
 

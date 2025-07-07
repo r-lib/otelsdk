@@ -1297,3 +1297,7 @@ SEXP c2r_otel_collector_resource_metrics(
   Rf_unprotect(1);
   return res;
 }
+
+void otel_bsp_options_free(struct otel_bsp_options *o) {
+  // nothing to do
+}

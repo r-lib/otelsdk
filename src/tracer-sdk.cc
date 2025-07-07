@@ -21,6 +21,9 @@
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
@@ -66,12 +69,25 @@ void otel_span_context_finally_(void *span_context_) {
 
 void *otel_create_tracer_provider_http_(
   struct otel_http_exporter_options *options_,
-  struct otel_attributes *resource_attributes
+  struct otel_attributes *resource_attributes,
+  struct otel_bsp_options *bsp_options_
 ) {
   otlp::OtlpHttpExporterOptions options;
   c2cc_otel_http_exporter_options<otlp::OtlpHttpExporterOptions>(*options_, options);
   auto exporter  = otlp::OtlpHttpExporterFactory::Create(options);
-  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+
+  trace_sdk::BatchSpanProcessorOptions bsp_options{};
+  if (bsp_options_->isset.max_queue_size) {
+    bsp_options.max_queue_size = bsp_options_->max_queue_size;
+  }
+  if (bsp_options_->isset.schedule_delay) {
+    bsp_options.schedule_delay_millis =
+      std::chrono::milliseconds((int64_t) bsp_options_->schedule_delay);
+  }
+  if (bsp_options_->isset.max_export_batch_size) {
+    bsp_options.max_export_batch_size = bsp_options_->max_export_batch_size;
+  }
+  auto processor = trace_sdk::BatchSpanProcessorFactory::Create(std::move(exporter), bsp_options);
 
   RKeyValueIterable attributes_(*resource_attributes);
   struct otel_tracer_provider *tps = new otel_tracer_provider();
@@ -215,6 +231,14 @@ int otel_tracer_provider_http_default_options_(
 ) {
   otlp::OtlpHttpExporterOptions opts;
   return otel_provider_http_default_options__(*copts, opts);
+}
+
+int otel_bsp_defaults_(struct otel_bsp_options *coptions) {
+  trace_sdk::BatchSpanProcessorOptions options;
+  coptions->max_queue_size = options.max_queue_size;
+  coptions->schedule_delay = options.schedule_delay_millis.count();
+  coptions->max_export_batch_size = options.max_export_batch_size;
+  return 0;
 }
 
 } // extern "C"
