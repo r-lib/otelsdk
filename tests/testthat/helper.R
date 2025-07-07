@@ -102,6 +102,22 @@ transform_metric_data <- function(x) {
   x <- subm(x, "start_time\\s*:", ": .*$", "<timestamp>")
   x <- subm(x, "end_time\\s*:", ": .*$", "<timestamp>")
   x <- subm(x, "sample_ts\\s*:", ": .*$", "<timestamp>")
+  x <- subm(x, "os[.]type\\s*:", ": [a-z0-9]+", ": <os-type>")
+  x <- subm(x, "process[.]pid\\s*:", ": [0-9]+", ": <process-pid>")
+  x <- subm(
+    x,
+    "process[.]runtime[.]description\\s*:",
+    ": R.*$",
+    ": <r-version-string>"
+  )
+  x <- subm(
+    x,
+    "telemetry[.]sdk[.]version\\s*:",
+    ": [.0-9]+",
+    ": <otel-version>"
+  )
+  x <- subm(x, "process[.]runtime[.]version\\s*:", ": [.0-9]+", ": <r-version>")
+  x <- subm(x, "process[.]owner\\s*:", ": [a-z0-9]+$", ": <username>")
   x
 }
 
