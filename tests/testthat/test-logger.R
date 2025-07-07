@@ -70,9 +70,10 @@ test_that("logger_provider_stdstream", {
 })
 
 test_that("log levels", {
+  skip_on_cran()
   coll <- webfakes::local_app_process(collector_app())
   withr::local_envvar(OTEL_EXPORTER_OTLP_ENDPOINT = coll$url())
-  lp <- logger_provider_http_new()
+  lp <- logger_provider_http_new(opts = list(schedule_delay = 1))
   lgr <- lp$get_logger("mylogger")
   lgr$set_minimum_severity("trace")
   for (lv in names(otel::log_severity_levels)) {
@@ -80,12 +81,26 @@ test_that("log levels", {
   }
   lp$flush()
 
+  # TODO: handle batches logs better, make multiple queries to /logs
+  Sys.sleep(0.2)
   cl_resp <- curl::curl_fetch_memory(coll$url("/logs"))
-  logs <- jsonlite::fromJSON(rawToChar(cl_resp$content), simplifyVector = FALSE)
+  logs0 <- jsonlite::fromJSON(
+    rawToChar(cl_resp$content),
+    simplifyVector = FALSE
+  )
+  logs <- unlist(
+    recursive = FALSE,
+    lapply(
+      unlist(logs0, recursive = FALSE),
+      function(x) {
+        unlist(recursive = FALSE, lapply(x$scope_logs, "[[", "log_records"))
+      }
+    )
+  )
   expect_equal(length(logs), length(otel::log_severity_levels))
   for (i in seq_along(logs)) {
     expect_equal(
-      logs[[i]][[1]]$scope_logs[[1]]$log_records[[1]]$severity_text,
+      logs[[i]]$severity_text,
       toupper(names(otel::log_severity_levels)[i])
     )
   }

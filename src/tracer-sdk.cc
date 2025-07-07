@@ -87,7 +87,10 @@ void *otel_create_tracer_provider_http_(
   if (bsp_options_->isset.max_export_batch_size) {
     bsp_options.max_export_batch_size = bsp_options_->max_export_batch_size;
   }
-  auto processor = trace_sdk::BatchSpanProcessorFactory::Create(std::move(exporter), bsp_options);
+  auto processor = trace_sdk::BatchSpanProcessorFactory::Create(
+    std::move(exporter),
+    bsp_options
+  );
 
   RKeyValueIterable attributes_(*resource_attributes);
   struct otel_tracer_provider *tps = new otel_tracer_provider();

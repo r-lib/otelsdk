@@ -47,6 +47,11 @@ logger_provider_http_options <- function() {
     "compression"
   )
   ropts[spec] <- copts[spec]
+
+  # batch processor options are handled by CPP and are in the spec
+  blpropts <- ccall(otel_blrp_defaults)
+  ropts <- utils::modifyList(ropts, blpropts)
+
   ropts
 }
 

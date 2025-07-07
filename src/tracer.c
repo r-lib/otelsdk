@@ -54,16 +54,17 @@ SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes) {
   struct otel_bsp_options bsp_options;
   memset(&bsp_options.isset, 0, sizeof(bsp_options.isset));
   SEXP max_queue_size = rf_get_list_element(options, "max_queue_size");
-  if (!Rf_isNull(max_queue_size)) {
+  if ((bsp_options.isset.max_queue_size = !Rf_isNull(max_queue_size))) {
     bsp_options.max_queue_size = REAL(max_queue_size)[0];
   }
   SEXP schedule_delay = rf_get_list_element(options, "schedule_delay");
-  if (!Rf_isNull(schedule_delay)) {
+  if ((bsp_options.isset.schedule_delay = !Rf_isNull(schedule_delay))) {
     bsp_options.schedule_delay = REAL(schedule_delay)[0];
   }
   SEXP max_export_batch_size =
     rf_get_list_element(options, "max_export_batch_size");
-  if (!Rf_isNull(max_export_batch_size)) {
+  if ((bsp_options.isset.max_export_batch_size =
+       !Rf_isNull(max_export_batch_size))) {
     bsp_options.max_export_batch_size = REAL(max_export_batch_size)[0];
   }
   void *tracer_provider_ =

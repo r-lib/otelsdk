@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 
 namespace logs_api       = opentelemetry::logs;
 namespace logs_sdk       = opentelemetry::sdk::logs;
@@ -236,6 +237,14 @@ int otel_logger_provider_http_default_options_(
 ) {
   otlp::OtlpHttpLogRecordExporterOptions opts;
   return otel_provider_http_default_options__(*copts, opts);
+}
+
+int otel_blrp_defaults_(struct otel_bsp_options *coptions) {
+  logs_sdk::BatchLogRecordProcessorOptions options;
+  coptions->max_queue_size = options.max_queue_size;
+  coptions->schedule_delay = options.schedule_delay_millis.count();
+  coptions->max_export_batch_size = options.max_export_batch_size;
+  return 0;
 }
 
 } // extern "C"

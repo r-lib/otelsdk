@@ -33,6 +33,7 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 
 #include "opentelemetry/sdk/resource/resource.h"
 
@@ -158,12 +159,28 @@ void *otel_create_logger_provider_stdstream_(
 
 void *otel_create_logger_provider_http_(
   struct otel_http_exporter_options *options_,
-  struct otel_attributes *resource_attributes
+  struct otel_attributes *resource_attributes,
+  struct otel_bsp_options *blrp_options_
 ) {
   otlp::OtlpHttpLogRecordExporterOptions options;
   c2cc_otel_http_exporter_options<otlp::OtlpHttpLogRecordExporterOptions>(*options_, options);
   auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create(options);
-  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
+
+  logs_sdk::BatchLogRecordProcessorOptions blrp_options;
+  if (blrp_options_->isset.max_queue_size) {
+    blrp_options.max_queue_size = blrp_options_->max_queue_size;
+  }
+  if (blrp_options_->isset.schedule_delay) {
+    blrp_options.schedule_delay_millis =
+      std::chrono::milliseconds((int64_t) blrp_options_->schedule_delay);
+  }
+  if (blrp_options_->isset.max_export_batch_size) {
+    blrp_options.max_export_batch_size = blrp_options_->max_export_batch_size;
+  }
+  auto processor = logs_sdk::BatchLogRecordProcessorFactory::Create(
+    std::move(exporter),
+    blrp_options
+  );
 
   RKeyValueIterable attributes_(*resource_attributes);
   struct otel_logger_provider *lps = new otel_logger_provider();

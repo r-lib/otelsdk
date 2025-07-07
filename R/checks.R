@@ -1736,9 +1736,15 @@ as_logger_provider_http_options <- function(
   )
 
   opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
-  check_known_options(opts, names(opts1), arg = arg, call = call)
+  opts2 <- as_batch_processor_options(opts, arg = arg, call = call)
+  check_known_options(
+    opts,
+    c(names(opts1), names(opts2)),
+    arg = arg,
+    call = call
+  )
 
-  opts1
+  c(opts1, opts2)
 }
 
 otlp_aggregation_temporality_choices <- c(

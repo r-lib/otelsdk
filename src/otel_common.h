@@ -539,6 +539,7 @@ struct otel_bsp_options {
 void otel_bsp_options_free(struct otel_bsp_options *o);
 
 int otel_bsp_defaults_(struct otel_bsp_options *options);
+int otel_blrp_defaults_(struct otel_bsp_options *options);
 
 // ---
 
@@ -630,7 +631,8 @@ void *otel_create_logger_provider_stdstream_(
   const char *stream, struct otel_attributes *resource_attributes);
 void *otel_create_logger_provider_http_(
   struct otel_http_exporter_options *options,
-  struct otel_attributes *resource_attributes);
+  struct otel_attributes *resource_attributes,
+  struct otel_bsp_options *blrp_options);
 int otel_logger_provider_http_default_options_(
   struct otel_provider_http_options *opts);
 void *otel_create_logger_provider_file_(

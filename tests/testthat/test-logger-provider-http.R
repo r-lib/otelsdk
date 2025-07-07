@@ -1,10 +1,15 @@
 test_that("logger_provider_http", {
+  skip_on_cran()
   coll <- webfakes::local_app_process(collector_app())
   withr::local_envvar(OTEL_EXPORTER_OTLP_ENDPOINT = coll$url())
-  lp <- logger_provider_http_new()
+  lp <- logger_provider_http_new(opts = list(schedule_delay = 1))
+  # on.exit(lp$shutdown(), add = TRUE)
   lgr <- lp$get_logger()
   lgr$log("Test!")
+  lp$flush()
 
+  # TODO: handle batched logs better, query /logs multiple times
+  Sys.sleep(0.2)
   cl_resp <- curl::curl_fetch_memory(coll$url("/logs"))
   expect_equal(cl_resp$status_code, 200L)
   cl_logs <- jsonlite::fromJSON(
