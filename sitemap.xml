@@ -10,10 +10,12 @@
 <url><loc>/reference/logger_provider_stdstream.html</loc></url>
 <url><loc>/reference/meter_provider_file.html</loc></url>
 <url><loc>/reference/meter_provider_http.html</loc></url>
+<url><loc>/reference/meter_provider_memory.html</loc></url>
 <url><loc>/reference/meter_provider_stdstream.html</loc></url>
 <url><loc>/reference/otelsdk-package.html</loc></url>
 <url><loc>/reference/tracer_provider_file.html</loc></url>
 <url><loc>/reference/tracer_provider_http.html</loc></url>
+<url><loc>/reference/tracer_provider_memory.html</loc></url>
 <url><loc>/reference/tracer_provider_stdstream.html</loc></url>
 <url><loc>/reference/with_otel_record.html</loc></url>
 </urlset>
