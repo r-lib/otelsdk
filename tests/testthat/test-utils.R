@@ -150,9 +150,13 @@ test_that("plural", {
   expect_equal(plural(2), "s")
 })
 
-test_that("find_tracer_name", {
-  fake(find_tracer_name, "otel::default_tracer_name", list(name = "good"))
-  expect_equal(find_tracer_name(), "good")
+test_that("find_instrumentation_scope", {
+  fake(
+    find_instrumentation_scope,
+    "otel::default_tracer_name",
+    list(name = "good")
+  )
+  expect_equal(find_instrumentation_scope()[["name"]], "good")
 })
 
 test_that("empty_atomic_as_null", {

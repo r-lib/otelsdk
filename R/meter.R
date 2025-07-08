@@ -6,6 +6,13 @@ meter_new <- function(
   attributes = NULL,
   ...
 ) {
+  name <- as_string(name, null = TRUE)
+  inst_scope <- find_instrumentation_scope(name)
+  name <- name %||% inst_scope[["name"]]
+  if (!inst_scope[["on"]]) {
+    return(otel::meter_provider_noop$get_logger(name))
+  }
+
   self <- new_object(
     "otel_meter",
     create_counter = function(
@@ -37,7 +44,6 @@ meter_new <- function(
       gauge_new(self, name, description, unit)
     }
   )
-  name <- name %||% find_tracer_name()
   self$provider <- provider
   self$name <- as_string(name)
   self$version <- as_string(version)

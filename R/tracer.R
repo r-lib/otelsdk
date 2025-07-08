@@ -6,6 +6,13 @@ tracer_new <- function(
   attributes = NULL,
   ...
 ) {
+  name <- as_string(name, null = TRUE)
+  inst_scope <- find_instrumentation_scope(name)
+  name <- name %||% inst_scope[["name"]]
+  if (!inst_scope[["on"]]) {
+    return(otel::tracer_provider_noop()$get_tracer(name))
+  }
+
   self <- new_object(
     "otel_tracer",
     start_span = function(
@@ -40,7 +47,6 @@ tracer_new <- function(
       span_context_new(xptr)
     }
   )
-  name <- name %||% find_tracer_name()
   self$provider <- provider
   self$name <- as_string(name)
   self$version <- as_string(version)

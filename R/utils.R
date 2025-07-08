@@ -68,8 +68,8 @@ plural <- function(x) {
   if (x == 0 || x > 1) "s" else ""
 }
 
-find_tracer_name <- function() {
-  otel::default_tracer_name()[["name"]]
+find_instrumentation_scope <- function(name = NULL) {
+  otel::default_tracer_name(name)
 }
 
 empty_atomic_as_null <- function(x) {

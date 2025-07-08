@@ -7,6 +7,13 @@ logger_new <- function(
   attributes = NULL,
   ...
 ) {
+  name <- as_string(name, null = TRUE)
+  inst_scope <- find_instrumentation_scope(name)
+  name <- name %||% inst_scope[["name"]]
+  if (!inst_scope[["on"]]) {
+    return(otel::logger_provider_noop$get_logger(name))
+  }
+
   self <- new_object(
     "otel_logger",
     get_name = function() {
@@ -108,7 +115,6 @@ logger_new <- function(
     },
     name = NULL
   )
-  name <- name %||% find_tracer_name()
   self$provider <- provider
   minimum_severity <- as_log_severity(
     minimum_severity %||% get_default_log_severity()
