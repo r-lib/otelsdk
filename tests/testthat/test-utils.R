@@ -151,7 +151,7 @@ test_that("plural", {
 })
 
 test_that("find_tracer_name", {
-  fake(find_tracer_name, "otel::default_tracer_name", "good")
+  fake(find_tracer_name, "otel::default_tracer_name", list(name = "good"))
   expect_equal(find_tracer_name(), "good")
 })
 

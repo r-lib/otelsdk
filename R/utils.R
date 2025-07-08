@@ -69,7 +69,7 @@ plural <- function(x) {
 }
 
 find_tracer_name <- function() {
-  otel::default_tracer_name()
+  otel::default_tracer_name()[["name"]]
 }
 
 empty_atomic_as_null <- function(x) {
