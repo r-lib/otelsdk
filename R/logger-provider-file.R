@@ -1,4 +1,4 @@
-logger_provider_file_new <- function(opts) {
+logger_provider_file_new <- function(opts = NULL) {
   opts <- as_logger_provider_file_options(opts)
 
   self <- new_object(
