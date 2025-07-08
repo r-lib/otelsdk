@@ -151,31 +151,8 @@ test_that("plural", {
 })
 
 test_that("find_tracer_name", {
-  # otel is ignored
-  fake(find_tracer_name, "topenv", asNamespace("otel"))
-  expect_equal(find_tracer_name(), "org.r-project.R")
-
-  # otelsdk is ignored
-  fake(find_tracer_name, "topenv", asNamespace("otelsdk"))
-  expect_equal(find_tracer_name(), "org.r-project.R")
-
-  # base env -> R
-  fake(find_tracer_name, "topenv", baseenv())
-  expect_equal(find_tracer_name(), "org.r-project.R")
-
-  # global env -> R
-  fake(find_tracer_name, "topenv", globalenv())
-  expect_equal(find_tracer_name(), "org.r-project.R")
-
-  # package with 'otel_tracer_name'
-  fake(find_tracer_name, "topenv", asNamespace("testthat"))
-  fake(find_tracer_name, "get0", "custom-name")
-  expect_equal(find_tracer_name(), "custom-name")
-
-  # pakage without 'otel_tracer_name'
-  fake(find_tracer_name, "topenv", asNamespace("testthat"))
-  fake(find_tracer_name, "get0", NULL)
-  expect_equal(find_tracer_name(), "r.package.testthat")
+  fake(find_tracer_name, "otel::default_tracer_name", "good")
+  expect_equal(find_tracer_name(), "good")
 })
 
 test_that("empty_atomic_as_null", {
