@@ -11,3 +11,4 @@
 /README.html
 /src/extra/cmake/R-4.*/protobuf-targets.cmake
 /src/otelcpplib
+docs
