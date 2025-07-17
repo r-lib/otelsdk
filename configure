@@ -50,7 +50,7 @@ if [ "$UNAME" = "Windows" ]; then
     XCXXFLAGS="-DCURL_STATICLIB"
 elif [ "$UNAME" = "Darwin" ]; then
     CMAKE_PREFIX_PATH="/opt/R/`arch`"
-    PROTOBUF_LIBS="-lprotobuf"
+    PROTOBUF_LIBS="`pkg-config --libs protobuf --cflags`"
     LIBCURL_LIBS="-lcurl"
 else
     PROTOBUF_LIBS="`pkg-config --libs protobuf || echo '-lprotobuf'`"
