@@ -1,6 +1,9 @@
 CMD
+CRAN's
+CRAN’s
 Codecov
 Grafana
+Homebrew
 JSONL
 Jaeger
 Logfire
@@ -9,6 +12,7 @@ OpenTelemetry
 PBC
 Pydantic
 ROR
+Rtools
 SDK
 SDKs
 SigNoz
@@ -21,4 +25,6 @@ lifecycle
 observability
 opentelemetry
 otel
+protobuf
 tui
+unlink
