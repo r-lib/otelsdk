@@ -41,36 +41,52 @@ You can install the development version of otel from
 pak::pak("r-lib/otelsdk")
 ```
 
+### Compiling from source
+
+To compile otelsdk from source, you need to install the protobuf library
+first:
+
+-   On Windows install the correct version of
+    [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
+
+-   On Linux install the appropriate package from your distribution.
+
+-   On macOS, you can use CRAN’s [protobuf
+    build](https://mac.r-project.org/bin/) or Homebrew. If you are using
+    CRAN’s build, then you must uninstall or unlink Homebrew protobuf:
+
+        brew unlink protobuf
+
 ## Usage
 
-- Instrument your R package or project using the
-  [otel](https://github.com/r-lib/otel) package.
+-   Instrument your R package or project using the
+    [otel](https://github.com/r-lib/otel) package.
 
-- Choose an exporter from the otelsdk package. The `http` exporter sends
-  OpenTelemetry output through OTLP/HTTP.
+-   Choose an exporter from the otelsdk package. The `http` exporter
+    sends OpenTelemetry output through OTLP/HTTP.
 
-- Set the `OTEL_TRACES_EXPORTER` environment variable to point to the
-  exporter of your choice. E.g. for OTLP/HTTP set
-  `OTEL_TRACES_EXPORTER=http`.
+-   Set the `OTEL_TRACES_EXPORTER` environment variable to point to the
+    exporter of your choice. E.g. for OTLP/HTTP set
+    `OTEL_TRACES_EXPORTER=http`.
 
-- If you are sending telemetry data through HTTP, then you typically
-  need to configure the URL of your OpenTelemetry collector, and you
-  possibly also need to supply a token in an HTTP header, possibly some
-  resource attributes. Follow the instructions of the provider of your
-  collector. They typically don’t have instructions for R, but generic
-  instructions about environment variables will work for the otelsdk R
-  package. E.g. for [Grafana](https://grafana.com/) you need something
-  like
+-   If you are sending telemetry data through HTTP, then you typically
+    need to configure the URL of your OpenTelemetry collector, and you
+    possibly also need to supply a token in an HTTP header, possibly
+    some resource attributes. Follow the instructions of the provider of
+    your collector. They typically don’t have instructions for R, but
+    generic instructions about environment variables will work for the
+    otelsdk R package. E.g. for [Grafana](https://grafana.com/) you need
+    something like
 
-      OTEL_EXPORTER_OTLP_PROTOCOL="http"
-      OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-prod-eu-central-0.grafana.net/otlp" \
-      OTEL_RESOURCE_ATTRIBUTES="service.name=<name-of-your-app>,service.namespace=<name-of-your-namespace>,deployment.environment=test"
-      OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic%20<base64-encoded-token>"
+        OTEL_EXPORTER_OTLP_PROTOCOL="http"
+        OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-prod-eu-central-0.grafana.net/otlp" \
+        OTEL_RESOURCE_ATTRIBUTES="service.name=<name-of-your-app>,service.namespace=<name-of-your-namespace>,deployment.environment=test"
+        OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic%20<base64-encoded-token>"
 
-  See more example below.
+    See more example below.
 
-- Start R and your app. Telemetry data will be exported to the chosen
-  exporter.
+-   Start R and your app. Telemetry data will be exported to the chosen
+    exporter.
 
 ### Setup for remote collectors
 

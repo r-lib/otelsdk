@@ -49,8 +49,25 @@ if [ "$UNAME" = "Windows" ]; then
     XCFLAGS="-DCURL_STATICLIB"
     XCXXFLAGS="-DCURL_STATICLIB"
 elif [ "$UNAME" = "Darwin" ]; then
-    CMAKE_PREFIX_PATH="/opt/R/`arch`"
-    PROTOBUF_LIBS="-lprotobuf"
+    if [ -f "/opt/R/`arch`/bin/protoc" ]; then
+	echo "** Using CRAN protobuf in /opt/R/`arch`"
+	if /usr/bin/which -s pkg-config && pkg-config --silence-errors --cflags protobuf | grep -q -v /opt/R; then
+	    echo "** Seems like another version of protobuf is installed."
+	    echo "** You need to uninstall it to use CRAN's protobuf."
+	    echo "** If you are using homebrew, call 'brew unlink protobuf'".
+	    exit 2
+	fi
+	CMAKE_PREFIX_PATH="/opt/R/`arch`"
+	PROTOBUF_LIBS="-lprotobuf"
+    else
+	echo "** Using protobuf via pkg-config"
+	if ! pkg-config --exists protobuf; then
+	    echo "** Could not find protobuf with pkg-config"
+	    exit 2
+	fi
+	XCPPFLAGS="`pkg-config --cflags-only-I protobuf`"
+	PROTOBUF_LIBS="`pkg-config --libs protobuf`"
+    fi
     LIBCURL_LIBS="-lcurl"
 else
     PROTOBUF_LIBS="`pkg-config --libs protobuf || echo '-lprotobuf'`"
@@ -126,6 +143,7 @@ cat src/Makevars.in |
   sed "s|@CXX_STANDARD@|${CXX_STANDARD}|" |
   sed "s|@XCFLAGS@|${XCFLAGS}|" |
   sed "s|@XCXXFLAGS@|${XCXXFLAGS}|" |
+  sed "s|@XCPPFLAGS@|${XCPPFLAGS}|" |
   sed "s|@PROTOBUF_LIBS@|${PROTOBUF_LIBS}|" |
   sed "s|@LIBCURL_LIBS@|${LIBCURL_LIBS}|" |
   sed "s|@OTEL_CLEANUP@|${OTEL_CLEANUP}|" |

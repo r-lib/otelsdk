@@ -47,6 +47,21 @@ You can install the development version of otel from [GitHub](https://github.com
 pak::pak("r-lib/otelsdk")
 ```
 
+### Compiling from source
+
+To compile otelsdk from source, you need to install the protobuf 
+library first:
+
+* On Windows install the correct version of [Rtools](
+  https://cran.r-project.org/bin/windows/Rtools/).
+* On Linux install the appropriate package from your distribution.
+* On macOS, you can use CRAN's [protobuf build](
+  https://mac.r-project.org/bin/) or Homebrew. If you are using
+  CRAN's build, then you must uninstall or unlink Homebrew protobuf:
+  ```
+  brew unlink protobuf
+  ```
+
 ## Usage
 
 * Instrument your R package or project using the
