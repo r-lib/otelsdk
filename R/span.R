@@ -4,8 +4,8 @@ span_new <- function(
   attributes = NULL,
   links = NULL,
   options = NULL,
-  scope = parent.frame(),
-  activation_scope = parent.frame()
+  scope = NULL,
+  activation_scope = NULL
 ) {
   name <- name %||% default_span_name
   name <- as_string(name)
@@ -117,9 +117,19 @@ span_new <- function(
       invisible(self)
     },
 
-    activate = function(activation_scope = parent.frame()) {
+    activate = function(
+      activation_scope = parent.frame(),
+      end_on_exit = FALSE
+    ) {
+      force(end_on_exit)
       cscope <- ccall(otel_scope_start, self$xptr)
-      defer(ccall(otel_scope_end, cscope), envir = activation_scope)
+      defer(
+        {
+          ccall(otel_scope_end, cscope)
+          if (end_on_exit) self$end(status_code = "auto")
+        },
+        envir = activation_scope
+      )
     },
 
     name = NULL

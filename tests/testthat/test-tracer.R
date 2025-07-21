@@ -8,12 +8,12 @@ test_that("tracer_new", {
   expect_equal(class(trc), "otel_tracer")
 })
 
-test_that("start_span", {
+test_that("start_local_active_span", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span("spn1")
+    spn1 <- trc$start_local_active_span("spn1")
     expect_equal(class(spn1), "otel_span")
-    spn2 <- trc$start_span("spn2")
+    spn2 <- trc$start_local_active_span("spn2")
     spn2$end()
     spn1$end()
   })[["traces"]]
@@ -44,10 +44,10 @@ test_that("is_enabled", {
   expect_true(trc$is_enabled())
 })
 
-test_that("start_span(scope = NULL)", {
+test_that("start_span", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    sess <- trc$start_span("sess", scope = NULL)
+    sess <- trc$start_span("sess")
     sess$end()
   })[["traces"]]
 
@@ -58,7 +58,7 @@ test_that("get_active_span_context", {
   spid <- NULL
   spns <- with_otel_record(function() {
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span("spn1")
+    spn1 <- trc$start_local_active_span("spn1")
     ctx <- trc$get_active_span_context()
     spid <<- ctx$get_span_id()
   })
@@ -79,7 +79,7 @@ test_that("extract_http_context", {
   spid <- NULL
   spns <- with_otel_record(function() {
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span("spn1")
+    spn1 <- trc$start_local_active_span("spn1")
     ctx <- trc$get_active_span_context()
     hdrs <<- ctx$to_http_headers()
     trid <<- ctx$get_trace_id()
@@ -90,7 +90,7 @@ test_that("extract_http_context", {
   spns2 <- with_otel_record(function() {
     trc <- otel::get_tracer("mytracer2")
     ctx <- trc$extract_http_context(hdrs)
-    spn2 <- trc$start_span("spn2", options = list(parent = ctx))
+    spn2 <- trc$start_local_active_span("spn2", options = list(parent = ctx))
   })[["traces"]]
 
   expect_equal(spns[["spn1"]][["trace_id"]], spns2[["spn2"]][["trace_id"]])

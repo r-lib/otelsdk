@@ -7,7 +7,7 @@ test_that("tracer_provider_file", {
 
   tp <- tracer_provider_file_new()
   trc <- tp$get_tracer()
-  sp1 <- trc$start_span("s1")
+  sp1 <- trc$start_local_active_span("s1")
   sp1$end()
   tp$flush()
 

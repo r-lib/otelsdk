@@ -53,7 +53,7 @@ test_that("format.otel_attributes", {
 
 test_that("format.otel_span_data, print.otel_span_data", {
   spns <- with_otel_record(function() {
-    otel::start_span("s", tracer = "org.r-lib.otel")
+    otel::start_local_active_span("s", tracer = "org.r-lib.otel")
     trc <- otel::get_tracer("org.r-lib.otel")
   })[["traces"]]
 
@@ -65,7 +65,7 @@ test_that("format.otel_span_data, print.otel_span_data", {
 
 test_that("format.otel_instrumentation_scope_data", {
   spns <- with_otel_record(function() {
-    otel::start_span("s", tracer = "org.r-lib.otel")
+    otel::start_local_active_span("s", tracer = "org.r-lib.otel")
     trc <- otel::get_tracer("org.r-lib.otel")
   })[["traces"]]
 
@@ -80,7 +80,7 @@ test_that("format.otel_instrumentation_scope_data", {
     schema_url = "https://opentelemetry.io/schemas/1.13.0",
     attributes = list(foo = 1:5, bar = "that")
   )
-  sp <- trc$start_span("s")
+  sp <- trc$start_local_active_span("s")
   sp$end()
   spns <- tp$get_spans()
 

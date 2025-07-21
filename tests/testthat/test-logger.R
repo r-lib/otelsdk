@@ -120,7 +120,7 @@ test_that("span_context", {
   expect_true(any(grepl("trace_id\\s*:\\s*0{32}", lns)))
   expect_true(any(grepl("span_id\\s*:\\s*0{16}", lns)))
 
-  sp1 <- trc$start_span("s")
+  sp1 <- trc$start_local_active_span("s")
   lgr$info("span context test")
   lp$flush()
   sp1$end()
@@ -133,7 +133,7 @@ test_that("span_context", {
   )))
   expect_true(any(grepl(paste0("span_id\\s*:\\s*", spns[["s"]]$span_id), lns)))
 
-  sp2 <- trc$start_span("s2")
+  sp2 <- trc$start_local_active_span("s2")
   lgr$info("span context test", span_context = sp2)
   lgr$flush()
   sp2$end()
