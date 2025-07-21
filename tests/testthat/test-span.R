@@ -1,8 +1,8 @@
 test_that("named and unnamed spans", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span()
-    spn2 <- trc$start_span("my")
+    spn1 <- trc$start_local_active_span()
+    spn2 <- trc$start_local_active_span("my")
     spn2$end()
     spn1$end()
   })[["traces"]]
@@ -15,7 +15,7 @@ test_that("close span automatically", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
     do <- function(name = NULL) {
-      spn1 <- trc$start_span(name)
+      spn1 <- trc$start_local_active_span(name)
     }
     do("1")
     do("2")
@@ -32,7 +32,7 @@ test_that("close span automatically, on error", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
     do <- function(name = NULL) {
-      spn1 <- trc$start_span(name)
+      spn1 <- trc$start_local_active_span(name)
       stop("oops")
     }
     try(do("1"), silent = TRUE)
@@ -49,15 +49,15 @@ test_that("close span automatically, on error", {
 test_that("is_recording", {
   trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
-  spn1 <- trc$start_span()
+  spn1 <- trc$start_local_active_span()
   expect_true(spn1$is_recording())
 })
 
 test_that("set_attribute", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span()
-    spn2 <- trc$start_span("my")
+    spn1 <- trc$start_local_active_span()
+    spn2 <- trc$start_local_active_span("my")
     spn2$set_attribute("key", letters[1:3])
     spn1$set_attribute("key", "gone")
     spn2$end()
@@ -78,8 +78,8 @@ test_that("set_attribute", {
 test_that("add_event", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span()
-    spn2 <- trc$start_span("my")
+    spn1 <- trc$start_local_active_span()
+    spn2 <- trc$start_local_active_span("my")
     spn2$add_event("ev", attributes = list(key = "value", key2 = 1:5))
     spn2$add_event("ev2", attributes = list(x = letters[1:4]))
     spn2$end()
@@ -103,7 +103,7 @@ test_that("set_status", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
     do <- function() {
-      spn1 <- trc$start_span()
+      spn1 <- trc$start_local_active_span()
       spn1$set_status("Unset", description = "Testing preset Unset")
     }
     do()
@@ -117,7 +117,7 @@ test_that("set_status", {
 test_that("update_name", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span()
+    spn1 <- trc$start_local_active_span()
     spn1$update_name("good")
     spn1$end()
   })[["traces"]]
@@ -131,7 +131,7 @@ test_that("record_exception", {
   error_obj <- base_error()
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span()
+    spn1 <- trc$start_local_active_span()
     spn1$record_exception(error_obj)
     spn1$end()
   })[["traces"]]
@@ -173,8 +173,8 @@ test_that("format_exception", {
 test_that("create a root span", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
-    spn1 <- trc$start_span("1")
-    spn2 <- trc$start_span("2", options = list(parent = NA))
+    spn1 <- trc$start_local_active_span("1")
+    spn2 <- trc$start_local_active_span("2", options = list(parent = NA))
     spn2$end()
     spn1$end()
   })[["traces"]]
@@ -188,7 +188,7 @@ test_that("get_context", {
   spid1 <- spid2 <- NULL
   spns <- with_otel_record(function() {
     trc <- otel::get_tracer()
-    spn <- trc$start_span("1")
+    spn <- trc$start_local_active_span("1")
     spid1 <<- spn$get_context()$get_span_id()
     spid2 <<- trc$get_active_span_context()$get_span_id()
   })[["traces"]]
@@ -202,7 +202,7 @@ test_that("get_context", {
 test_that("is_valid", {
   spns <- with_otel_record(function() {
     trc <- otel::get_tracer()
-    spn <- trc$start_span("1")
+    spn <- trc$start_local_active_span("1")
     expect_true(spn$is_valid())
   })[["traces"]]
 })
@@ -210,7 +210,7 @@ test_that("is_valid", {
 test_that("span_context", {
   spns <- with_otel_record(function() {
     trc <- otel::get_tracer()
-    spn <- trc$start_span("1")
+    spn <- trc$start_local_active_span("1")
     ctx <- spn$get_context()
     expect_true(ctx$is_valid())
     expect_snapshot(ctx$get_trace_flags())

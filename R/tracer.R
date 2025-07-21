@@ -19,6 +19,22 @@ tracer_new <- function(
       name = NULL,
       attributes = NULL,
       links = NULL,
+      options = NULL
+    ) {
+      span_new(
+        self,
+        name = name,
+        attributes = attributes,
+        links = links,
+        options = options,
+        scope = NULL,
+        activation_scope = NULL
+      )
+    },
+    start_local_active_span = function(
+      name = NULL,
+      attributes = NULL,
+      links = NULL,
       options = NULL,
       scope = parent.frame(),
       activation_scope = parent.frame()

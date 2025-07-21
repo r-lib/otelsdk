@@ -9,7 +9,7 @@ test_that("writing to a file", {
   on.exit(unlink(tmp), add = TRUE)
   tp <- tracer_provider_stdstream_new(list(output = tmp))
   trc <- tp$get_tracer()
-  sp1 <- trc$start_span("testspan")
+  sp1 <- trc$start_local_active_span("testspan")
   sp1$end()
   tp$flush()
 
