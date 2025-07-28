@@ -153,21 +153,30 @@ test_that("record_exception", {
 })
 
 test_that("format_exception", {
-  expect_snapshot({
-    format_exception(base_error())
-  }, transform = function(x) trimws(x, which = "right"))
+  expect_snapshot(
+    {
+      format_exception(base_error())
+    },
+    transform = function(x) trimws(x, which = "right")
+  )
   expect_snapshot(
     {
       format_exception(cli_error())
     },
     transform = function(x) trimws(transform_srcref(x), which = "right")
   )
-  expect_snapshot({
-    format_exception(processx_error())
-  }, transform = function(x) trimws(x, which = "right"))
-  expect_snapshot({
-    format_exception(callr_error())
-  }, transform = function(x) trimws(x, which = "right"))
+  expect_snapshot(
+    {
+      format_exception(processx_error())
+    },
+    transform = function(x) trimws(x, which = "right")
+  )
+  expect_snapshot(
+    {
+      format_exception(callr_error())
+    },
+    transform = function(x) trimws(x, which = "right")
+  )
 })
 
 test_that("create a root span", {
