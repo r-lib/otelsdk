@@ -83,7 +83,12 @@ Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_R_EXPORTER_OTLP_JSON_BYTES_MAPPING</code> environment variable, or</p></li>
 <li><p>the default is <code>"hexid"</code>.</p></li>
 </ul></li>
-<li><p><code>use_json_name</code>:</p></li>
+<li><p><code>use_json_name</code>: whether to use json name of protobuf field to set
+the key of json. A flag. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_USE_JSON_NAME</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_USE_JSON_NAME</code> environment variable, or</p></li>
+<li><p>the default is <code>FALSE</code>.</p></li>
+</ul></li>
 <li><p><code>console_debug</code>:</p></li>
 <li><p><code>timeout</code>:</p></li>
 <li><p><code>ssl_insecure_skip_verify</code>:</p></li>
