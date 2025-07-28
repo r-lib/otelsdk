@@ -34,7 +34,7 @@ NULL
 NULL
 
 doc_file_exporter_options <- function(evs, def) {
-  glue::glue(
+  glue(
     "* `file_pattern`: Output file pattern. Value is set from:
        - `opts` argument, or
        - `{evs[['file_pattern']]}` environment variable, or
@@ -52,7 +52,7 @@ doc_file_exporter_options <- function(evs, def) {
 
        May contain placeholders, see below.
 
-     * `flush_interval`: Interval to force flush output. A time inverval
+     * `flush_interval`: Interval to force flush output. A time interval
        specification, see \\link{{Time Interval Options}}. Value is set from
        - `opts` argument, or
        - `{evs[['flush_interval']]}` environment variable, or
@@ -104,7 +104,7 @@ doc_file_exporter_options <- function(evs, def) {
 }
 
 doc_http_exporter_options <- function(evs, def) {
-  glue::glue(
+  glue(
     "
     * `url`: OTLP URL to send telemetry data to. Value is set from
       - the `opts` argument, needs to point to the traces endpoint, or
@@ -178,7 +178,7 @@ doc_http_exporter_options <- function(evs, def) {
 }
 
 doc_batch_processor_options <- function() {
-  glue::glue(
+  glue(
     "
     * `max_queue_size`:
 

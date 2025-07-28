@@ -61,13 +61,13 @@ tracer_provider_file_new <- function(opts = NULL) {
 #' ```{r}
 #' #| echo: FALSE
 #' #| results: asis
-#' doc_file_exporter_options(
+#' cat(doc_file_exporter_options(
 #'   tracer_provider_file_options_evs(),
 #'   list(
 #'     file_pattern = "trace-%N.jsonl",
 #'     alias_pattern = "trace-latest.jsonl"
 #'   )
-#' )
+#' ))
 #' ```
 #'
 #' @format NULL

@@ -57,7 +57,7 @@ Value is set from:
 }
 
 May contain placeholders, see below.
-\item \code{flush_interval}: Interval to force flush output. A time inverval
+\item \code{flush_interval}: Interval to force flush output. A time interval
 specification, see \link{Time Interval Options}. Value is set from
 \itemize{
 \item \code{opts} argument, or

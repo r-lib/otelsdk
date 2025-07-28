@@ -85,10 +85,10 @@ tracer_provider_http_options <- function() {
 #' ```{r}
 #' #| echo: FALSE
 #' #| results: asis
-#' doc_http_exporter_options(
+#' cat(doc_http_exporter_options(
 #'   tracer_provider_http_options_evs(),
 #'   tracer_provider_http$options()
-#' )
+#' ))
 #' ```
 #'
 #' Batch processor options:
@@ -96,7 +96,7 @@ tracer_provider_http_options <- function() {
 #' ```{r}
 #' #| echo: FALSE
 #' #| results: asis
-#' doc_batch_processor_options()
+#' cat(doc_batch_processor_options())
 #' ```
 #'
 #' @format NULL

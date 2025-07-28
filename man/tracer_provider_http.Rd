@@ -67,7 +67,14 @@ Value is set from
 \item the \code{OTEL_R_EXPORTER_OTLP_JSON_BYTES_MAPPING} environment variable, or
 \item the default is \code{"hexid"}.
 }
-\item \code{use_json_name}:
+\item \code{use_json_name}: whether to use json name of protobuf field to set
+the key of json. A flag. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_USE_JSON_NAME} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_USE_JSON_NAME} environment variable, or
+\item the default is \code{FALSE}.
+}
 \item \code{console_debug}:
 \item \code{timeout}:
 \item \code{ssl_insecure_skip_verify}:
