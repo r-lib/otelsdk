@@ -3,14 +3,97 @@
 \docType{data}
 \name{tracer_provider_http}
 \alias{tracer_provider_http}
-\title{Tracer provider to export over HTTP}
-\format{
-An object of class \code{list} of length 2.
-}
-\usage{
-tracer_provider_http
-}
+\title{Tracer provider to export traces over HTTP}
 \description{
-Tracer provider to export over HTTP
+This is the OTLP HTTP exporter.
+
+Select this tracer provider with \code{OTEL_TRACES_EXPORTER=otlp}.
 }
+\section{Usage}{
+Externally:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{OTEL_TRACER_EXPORTER=otlp
+}\if{html}{\out{</div>}}
+
+From R:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{tracer_provider_http$new(opts = NULL)
+tracer_provider_http$options()
+}\if{html}{\out{</div>}}
+}
+
+\section{Arguments}{
+\itemize{
+\item \code{opts}: Named list of options. See below.
+}
+}
+
+\section{Value}{
+\code{tracer_provider_http$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
+object.
+
+\code{tracer_provider_http$options()} returns a named list, the default
+values for all options.
+}
+
+\section{Options}{
+HTTP exporter options:
+\itemize{
+\item \code{url}: OTLP URL to send telemetry data to. Value is set from
+\itemize{
+\item the \code{opts} argument, needs to point to the traces endpoint, or
+\item \code{OTEL_EXPORTER_OTLP_TRACES_ENDPOINT} environment variable, needs to
+point to the traces endpoint, or
+\item \code{OTEL_EXPORTER_OTLP_ENDPOINT} environment variable + \verb{/v1/traces}, or
+\item the default is \verb{http://localhost:4318/v1/traces}.
+}
+\item \code{content_type}: data format used, JSON or binary. Possible values:
+\code{"json"}, \code{"application/json"}, \code{"binary"}, \code{"application/x-protobuf"}.
+Value if set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_CONTENT_TYPE} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_CONTENT_TYPE} environment variable, or
+\item the default is
+\code{"binary"}.
+}
+\item \code{json_bytes_mapping}: encoding used for trace id and span id.
+Possible values:
+\code{"hexid"}, \code{"base64"}, \code{"hex"}.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_JSON_BYTES_MAPPING} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_JSON_BYTES_MAPPING} environment variable, or
+\item the default is \code{"hexid"}.
+}
+\item \code{use_json_name}:
+\item \code{console_debug}:
+\item \code{timeout}:
+\item \code{ssl_insecure_skip_verify}:
+\item \code{ssl_ca_cert_path}:
+\item \code{ssl_ca_cert_string}:
+\item \code{ssl_client_key_path}:
+\item \code{ssl_client_key_string}:
+\item \code{ssl_client_cert_path}:
+\item \code{ssl_client_cert_string}:
+\item \code{ssl_min_tls}:
+\item \code{ssl_max_tls}:
+\item \code{ssl_cipher}:
+\item \code{ssl_cipher_suite}:
+\item \code{compression}:
+\item \code{retry_policy_max_attempts}:
+\item \code{retry_policy_initial_backoff}:
+\item \code{retry_policy_max_backoff}:
+\item \code{retry_policy_backoff_multiplier}:
+}
+
+Batch processor options:
+\itemize{
+\item \code{max_queue_size}:
+\item \code{max_export_batch_size}:
+\item \code{schedule_delay}:
+}
+}
+
 \keyword{datasets}

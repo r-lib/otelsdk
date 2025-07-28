@@ -63,6 +63,7 @@ span_new <- function(
     update_name = function(name) {
       name <- as_string(name, null = FALSE)
       ccall(otel_span_update_name, self$xptr, name)
+      self$name <- name
       invisible(self)
     },
 

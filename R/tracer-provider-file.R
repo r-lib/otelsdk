@@ -23,6 +23,55 @@ tracer_provider_file_new <- function(opts = NULL) {
 }
 
 #' Tracer provider to write traces into a JSONL file
+#'
+#' @description
+#' This is the [OTLP file exporter](
+#'   https://opentelemetry.io/docs/specs/otel/protocol/file-exporter/).
+#' It writes spans to a JSONL file, each span is a line in the file,
+#' a valid JSON value. The line separator is `\n`. The preferred file
+#' extension is `jsonl`.
+#'
+#' Select this tracer provider with `OTEL_TRACES_EXPORTER=otlp/file`.
+#'
+#' # Usage
+#'
+#' Externally:
+#' ```
+#' OTEL_TRACES_EXPORTER=otlp/file
+#' ```
+#'
+#' From R:
+#' ```
+#' tracer_provider_file$new(opts = NULL)
+#' ```
+#'
+#' # Arguments
+#'
+#' - `opts`: Named list of options. See below.
+#'
+#' # Value
+#'
+#' `tracer_provider_file$new()` returns an [otel::otel_tracer_provider]
+#' object.
+#'
+#' # Options
+#'
+#' File exporter options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' doc_file_exporter_options(
+#'   tracer_provider_file_options_evs(),
+#'   list(
+#'     file_pattern = "trace-%N.jsonl",
+#'     alias_pattern = "trace-latest.jsonl"
+#'   )
+#' )
+#' ```
+#'
+#' @format NULL
+#' @usage NULL
 #' @export
 
 tracer_provider_file <- list(

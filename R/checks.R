@@ -1160,12 +1160,8 @@ as_meter_provider_file_options <- function(
   c(opts1, opts2)
 }
 
-as_tracer_provider_file_options <- function(
-  opts,
-  arg = caller_arg(opts),
-  call = caller_env()
-) {
-  evs = c(
+tracer_provider_file_options_evs <- function() {
+  c(
     file_pattern = file_exporter_traces_file_envvar,
     alias_pattern = file_exporter_traces_alias_envvar,
     flush_interval = file_exporter_traces_flush_interval_envvar,
@@ -1173,7 +1169,14 @@ as_tracer_provider_file_options <- function(
     file_size = file_exporter_traces_file_size_envvar,
     rotate_size = file_exporter_traces_rotate_size_envvar
   )
+}
 
+as_tracer_provider_file_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- tracer_provider_file_options_evs()
   opts1 <- as_file_exporter_options(opts, evs = evs, arg = arg, call = call)
   check_known_options(opts, names(opts1), arg = arg, call = call)
 
@@ -1681,12 +1684,8 @@ as_batch_processor_options <- function(
   )
 }
 
-as_tracer_provider_http_options <- function(
-  opts,
-  arg = caller_arg(opts),
-  call = caller_env()
-) {
-  evs <- list(
+tracer_provider_http_options_evs <- function() {
+  list(
     content_type = otlp_traces_content_type_envvar,
     json_bytes_mapping = otlp_traces_json_bytes_mapping_envvar,
     use_json_name = otlp_traces_use_json_name_envvar,
@@ -1701,7 +1700,14 @@ as_tracer_provider_http_options <- function(
     retry_policy_max_backoff = otlp_traces_retry_policy_max_backoff_envvar,
     retry_policy_backoff_multiplier = otlp_traces_retry_policy_backoff_multiplier_envvar
   )
+}
 
+as_tracer_provider_http_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- tracer_provider_http_options_evs()
   opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
   opts2 <- as_batch_processor_options(opts, arg = arg, call = call)
   check_known_options(

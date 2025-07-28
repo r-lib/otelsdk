@@ -10,3 +10,52 @@ template:
 
 development:
   mode: auto
+
+navbar:
+  structure:
+    left: [gettingstarted, collectingdata, reference]
+    right: [news]
+  components:
+    gettingstarted:
+      text: Getting Started (otel Package)
+      href: https://otel.r-lib.org/reference/gettingstarted.html
+    collectingdata:
+      text: Collecting Telemetry Data
+      href: reference/collecting.html
+
+reference:
+- title: Other Documentation
+  desc: |
+    This is the reference manual of the otelsdk package. Other forms of
+    documentation:
+
+    * [Getting Started](https://otel.r-lib.org/reference/gettingstarted.html),
+      a tutorial and cookbook for instrumentation.
+    * [Collecting telemetry data](../reference/collecting.html), a tutorial
+      and cookbok on telemetry data collection.
+
+- title: Configuration
+- contents:
+  - "Environment Variables"
+  - "Time Interval Options"
+  - "File Size Options"
+
+- title: Traces
+- contents:
+  - starts_with("tracer_provider_")
+
+- title: Logs
+- contents:
+  - starts_with("logger_provider_")
+
+- title: Metrics
+- contents:
+  - starts_with("meter_provider_")
+
+- title: Utility functions
+- contents:
+  - with_otel_record
+
+- title: internal
+  contents:
+  - collecting

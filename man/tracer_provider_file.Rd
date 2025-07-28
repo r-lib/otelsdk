@@ -4,13 +4,113 @@
 \name{tracer_provider_file}
 \alias{tracer_provider_file}
 \title{Tracer provider to write traces into a JSONL file}
-\format{
-An object of class \code{list} of length 2.
-}
-\usage{
-tracer_provider_file
-}
 \description{
-Tracer provider to write traces into a JSONL file
+This is the \href{https://opentelemetry.io/docs/specs/otel/protocol/file-exporter/}{OTLP file exporter}.
+It writes spans to a JSONL file, each span is a line in the file,
+a valid JSON value. The line separator is \verb{\\n}. The preferred file
+extension is \code{jsonl}.
+
+Select this tracer provider with \code{OTEL_TRACES_EXPORTER=otlp/file}.
 }
+\section{Usage}{
+Externally:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{OTEL_TRACES_EXPORTER=otlp/file
+}\if{html}{\out{</div>}}
+
+From R:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{tracer_provider_file$new(opts = NULL)
+}\if{html}{\out{</div>}}
+}
+
+\section{Arguments}{
+\itemize{
+\item \code{opts}: Named list of options. See below.
+}
+}
+
+\section{Value}{
+\code{tracer_provider_file$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
+object.
+}
+
+\section{Options}{
+File exporter options
+\itemize{
+\item \code{file_pattern}: Output file pattern. Value is set from:
+\itemize{
+\item \code{opts} argument, or
+\item \code{OTEL_EXPORTER_OTLP_TRACES_FILE} environment variable, or
+\item \code{OTEL_EXPORTER_OTLP_FILE} environment variable, or
+\item the default is: \verb{trace-\%N.jsonl}.
+}
+
+May contain placeholders, see below.
+\item \code{alias_pattern}: The file which always point to the latest file.
+Value is set from:
+\itemize{
+\item \code{opts} argument, or
+\item \code{OTEL_EXPORTER_OTLP_TRACES_FILE_ALIAS} environment variable, or
+\item \verb{OTEL_EXPORTER_OTLP_FILE_ALIAS environment variable}, or
+\item the default is: \code{trace-latest.jsonl}.
+}
+
+May contain placeholders, see below.
+\item \code{flush_interval}: Interval to force flush output. A time inverval
+specification, see \link{Time Interval Options}. Value is set from
+\itemize{
+\item \code{opts} argument, or
+\item \code{OTEL_EXPORTER_OTLP_TRACES_FILE_FLUSH_INTERVAL} environment variable, or
+\item \code{OTEL_EXPORTER_OTLP_FILE_FLUSH_INTERVAL} environment variable, or
+\item the default is \verb{30s}, thirty seconds.
+}
+\item \code{flush_count}: Force flush output after every \code{flush_count} records.
+Value is set from
+\itemize{
+\item \code{opts} argument, or
+\item \code{OTEL_EXPORTER_OTLP_TRACES_FILE_FLUSH_COUNT} environment variable, or
+\item \code{OTEL_EXPORTER_OTLP_FILE_FLUSH_COUNT} environment variable, or
+\item the default is \code{256}.
+}
+\item \code{file_size}: File size to rotate output files. A file size
+specification, see \link{File Size Options}. Value is set from
+\itemize{
+\item \code{opts} argument, or
+\item \code{OTEL_EXPORTER_OTLP_TRACES_FILE_FILE_SIZE} environment variable, or
+\item \code{OTEL_EXPORTER_OTLP_FILE_file_SIZE} environment variable, or
+\item the default is \verb{20MB}.
+}
+\item \code{rotate_size}: How many rotated output files to keep. Value is set
+from
+\itemize{
+\item \code{opts} argument, or
+\item \code{OTEL_EXPORTER_OTLP_TRACES_FILE_ROTATE_SIZE} environment variable, or
+\item \code{OTEL_EXPORTER_OTLP_FILE_ROTATE_SIZE} environment variable, or
+\item the default is \code{10}.
+}
+}
+
+Special placeholders are available for \code{file_pattern} and
+\code{alias_pattern}:
+\itemize{
+\item \verb{\%Y}: Writes year as a 4 digit decimal number.
+\item \verb{\%y}: Writes last 2 digits of year as a decimal number (range \verb{[00,99]}).
+\item \verb{\%m}: Writes month as a decimal number (range \verb{[01,12]}).
+\item \verb{\%j}: Writes day of the year as a decimal number (range \verb{[001,366]}).
+\item \verb{\%d}: Writes day of the month as a decimal number (range \verb{[01,31]}).
+\item \verb{\%w}: Writes weekday as a decimal number, where Sunday is 0
+(range \verb{[0-6]}).
+\item \verb{\%H}: Writes hour as a decimal number, 24 hour clock (range \verb{[00-23]}).
+\item \verb{\%I}: Writes hour as a decimal number, 12 hour clock (range \verb{[01,12]}).
+\item \verb{\%M}: Writes minute as a decimal number (range \verb{[00,59]}).
+\item \verb{\%S}: Writes second as a decimal number (range \verb{[00,60]}).
+\item \verb{\%F}: Equivalent to \verb{\%Y-\%m-\%d} (the ISO 8601 date format).
+\item \verb{\%T}: Equivalent to \verb{\%H:\%M:\%S} (the ISO 8601 time format).
+\item \verb{\%R}: Equivalent to \verb{\%H:\%M}.
+\item \verb{\%N}: Rotate index, start from 0.
+\item \verb{\%n}: Rotate index, start from 1.
+}
+}
+
 \keyword{datasets}

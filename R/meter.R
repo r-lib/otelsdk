@@ -42,6 +42,9 @@ meter_new <- function(
       unit = NULL
     ) {
       gauge_new(self, name, description, unit)
+    },
+    is_enabled = function() {
+      TRUE
     }
   )
   self$provider <- provider
