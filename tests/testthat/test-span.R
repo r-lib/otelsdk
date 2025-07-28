@@ -155,19 +155,19 @@ test_that("record_exception", {
 test_that("format_exception", {
   expect_snapshot({
     format_exception(base_error())
-  })
+  }, transform = function(x) trimws(x, which = "right"))
   expect_snapshot(
     {
       format_exception(cli_error())
     },
-    transform = transform_srcref
+    transform = function(x) trimws(transform_srcref(x), which = "right")
   )
   expect_snapshot({
     format_exception(processx_error())
-  })
+  }, transform = function(x) trimws(x, which = "right"))
   expect_snapshot({
     format_exception(callr_error())
-  })
+  }, transform = function(x) trimws(x, which = "right"))
 })
 
 test_that("create a root span", {
@@ -213,7 +213,10 @@ test_that("span_context", {
     spn <- trc$start_local_active_span("1")
     ctx <- spn$get_context()
     expect_true(ctx$is_valid())
-    expect_snapshot(ctx$get_trace_flags())
+    expect_snapshot(
+      ctx$get_trace_flags(),
+      transform = function(x) trimws(x, which = "right")
+    )
     actx <- trc$get_active_span_context()
     expect_equal(actx$get_trace_id(), ctx$get_trace_id())
     expect_false(ctx$is_remote())

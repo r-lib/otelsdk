@@ -67,9 +67,9 @@
     Code
       as_span(sp)
     Output
-      list()
-      attr(,"class")
-      [1] "otel_span"
+      <otel_span>
+      name: 
+      methods:
 
 ---
 
@@ -96,9 +96,8 @@
     Code
       as_span_context(spc)
     Output
-      list()
-      attr(,"class")
-      [1] "otel_span_context"
+      <otel_span_context>
+      methods:
     Code
       as_span_context(sp)
     Output
