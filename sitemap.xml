@@ -4,6 +4,9 @@
 <url><loc>https://otelsdk.r-lib.org/LICENSE.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/authors.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/index.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/reference/collecting.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/reference/environmentvariables.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/reference/filesizeoptions.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/reference/index.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/reference/logger_provider_file.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/reference/logger_provider_http.html</loc></url>
@@ -13,6 +16,7 @@
 <url><loc>https://otelsdk.r-lib.org/reference/meter_provider_memory.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/reference/meter_provider_stdstream.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/reference/otelsdk-package.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/reference/timeintervaloptions.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/reference/tracer_provider_file.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/reference/tracer_provider_http.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/reference/tracer_provider_memory.html</loc></url>
