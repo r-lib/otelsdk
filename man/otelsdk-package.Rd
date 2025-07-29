@@ -4,9 +4,9 @@
 \name{otelsdk-package}
 \alias{otelsdk}
 \alias{otelsdk-package}
-\title{otelsdk: R Implementation of 'OpenTelemetry', Exporters}
+\title{otelsdk: 'R' 'SDK' and Exporters for 'OpenTelemetry'}
 \description{
-High-quality, ubiquitous, and portable telemetry to enable effective observability. 'OpenTelemetry' is a collection of tools, 'APIs', and 'SDKs' used to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior. Use this package to export traces, metrics, logs through the 'OpenTelemetry Protocol' ('OTLP').
+'OpenTelemetry' is a collection of tools, 'APIs', and 'SDKs' used to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior. This package contains the `OpenTelemetry' 'SDK', and exporters. Use this package to export traces, metrics, logs from instrumented 'R' code. Use the 'otel' package to instrument your 'R' code for 'OpenTelemetry'.
 }
 \seealso{
 Useful links:

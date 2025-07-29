@@ -57,7 +57,7 @@ tracer_provider_http_options <- function() {
 #'
 #' Externally:
 #' ```
-#' OTEL_TRACER_EXPORTER=otlp
+#' OTEL_TRACES_EXPORTER=otlp
 #' ```
 #'
 #' From R:
@@ -75,28 +75,29 @@ tracer_provider_http_options <- function() {
 #' `tracer_provider_http$new()` returns an [otel::otel_tracer_provider]
 #' object.
 #'
-#' `tracer_provider_http$options()` returns a named list, the default
+#' `tracer_provider_http$options()` returns a named list, the current
 #' values for all options.
 #'
 #' # Options
 #'
-#' HTTP exporter options:
+#' ## HTTP exporter options
 #'
 #' ```{r}
 #' #| echo: FALSE
 #' #| results: asis
 #' cat(doc_http_exporter_options(
+#'   "traces",
 #'   tracer_provider_http_options_evs(),
 #'   tracer_provider_http$options()
 #' ))
 #' ```
 #'
-#' Batch processor options:
+#' ## Batch processor options
 #'
 #' ```{r}
 #' #| echo: FALSE
 #' #| results: asis
-#' cat(doc_batch_processor_options())
+#' cat(doc_batch_processor_options(tracer_provider_http$options()))
 #' ```
 #'
 #' @format NULL

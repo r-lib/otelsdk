@@ -37,6 +37,51 @@ logger_provider_stdstream_options <- function() {
 
 #' Logger provider to write to the standard output or standard error or
 #' to a file
+#'
+#' @description
+#' Writes logs to the standard output or error, or to a file. Useful for
+#' debugging.
+#'
+#' # Usage
+#'
+#' Externally:
+#' ```
+#' OTEL_LOGS_EXPORTER=console
+#' OTEL_LOGS_EXPORTER=stderr
+#' ```
+#'
+#' From R:
+#' ```
+#' logger_provider_stdstream$new(opts = NULL)
+#' logger_provider_stdstream$options()
+#' ```
+#'
+#' # Arguments
+#'
+#' `opts`: Named list of options. See below.
+#'
+#' # Value
+#'
+#' `logger_provider_stdstream$new()` returns an [otel::otel_logger_provider]
+#' object.
+#'
+#' `logger_provider_stdstream$options()` returns a named list, the current
+#' values of the options.
+#'
+#' # Options
+#'
+#' ## Standard stream exporter options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_stdstream_exporter_options(
+#'   logger_provider_stdstream_options_evs()
+#' ))
+#' ```
+#'
+#' @format NULL
+#' @usage NULL
 #' @export
 
 logger_provider_stdstream <- list(

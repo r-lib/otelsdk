@@ -30,7 +30,51 @@ tracer_provider_memory_options <- function() {
   as_tracer_provider_memory_options(NULL)
 }
 
-#' In-memory tracer provider for debugging
+#' In-memory tracer provider for testing
+#'
+#' @description
+#' Collects spans in memory. This is useful for testing your instrumented
+#' R package or application.
+#'
+#' [with_otel_record()] uses this tracer provider.
+#' Use [with_otel_record()] in your tests to record telemetry and check
+#' that it is correct.
+#'
+#' # Usage
+#'
+#' ```
+#' tp <- tracer_provider_memory$new(opts = NULL)
+#' tp$get_spans()
+#' tracer_provider_memory$options()
+#' ```
+#'
+#' `tp$get_spans()` erases the internal buffer of the tracer provider.
+#'
+#' # Arguments
+#'
+#' - `opts`: Named list of options. See below.
+#'
+#' # Value
+#'
+#' `tracer_provider_memory$new()` returns an [otel::otel_tracer_provider]
+#' object. `tp$get_spans()` returns a named list of recorded spans, with
+#' the span names as names.
+#'
+#' `tracer_provider_memory$options()` returns a named list, the current
+#' values for all options.
+#'
+#' # Options
+#'
+#' ## Memory exporter options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_memory_exporter_options(tracer_provider_memory_options_evs()))
+#' ```
+#'
+#' @usage NULL
+#' @format NULL
 #' @export
 
 tracer_provider_memory <- list(

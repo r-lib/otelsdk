@@ -32,6 +32,59 @@ meter_provider_stdstream_options <- function() {
 
 #' Meter provider to write to the standard output or standard error or
 #' to a file
+#'
+#' @description
+#' Writes metrics measurements to the standard output or error, or to a
+#' file. Useful for debugging.
+#'
+#' # Usage
+#'
+#' Externally:
+#' ```
+#' OTEL_METRICS_EXPORTER=console
+#' OTEL_METRICS_EXPORTER=stderr
+#' ```
+#'
+#' From R:
+#' ```
+#' meter_provider_stdstream$new(opts = NULL)
+#' meter_provider_stdstream$options()
+#' ```
+#'
+#' # Arguments
+#'
+#' `opts`: Named list of options. See below.
+#'
+#' # Value
+#'
+#' `meter_provider_stdstream$new()` returns an [otel::otel_meter_provider]
+#' object.
+#'
+#' `meter_provider_stdstream$options()` returns a named list, the current
+#' values of the options.
+#'
+#' # Options
+#'
+#' ## Standard stream exporter options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_stdstream_exporter_options(
+#'   meter_provider_stdstream_options_evs()
+#' ))
+#' ```
+#'
+#' ## Metric reader options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_metric_reader_options())
+#' ```
+#'
+#' @format NULL
+#' @usage NULL
 #' @export
 
 meter_provider_stdstream <- list(

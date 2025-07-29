@@ -56,6 +56,59 @@ logger_provider_http_options <- function() {
 }
 
 #' Logger provider to log over HTTP
+#'
+#' @description
+#' This is the OTLP HTTP exporter.
+#'
+#' # Usage
+#'
+#' Externally:
+#' ```
+#' OTEL_LOGS_EXPORTER=otlp
+#' ```
+#'
+#' From R:
+#' ```
+#' logger_provider_http$new(opts = NULL)
+#' logger_provider_http$options()
+#' ```
+#'
+#' # Arguments
+#'
+#' - `opts`: Named list of options. See below.
+#'
+#' # Value
+#'
+#' `logger_provider_http$new()` returns an [otel::otel_logger_provider]
+#' object.
+#'
+#' `logger_provider_http$options()` returns a named list, the current
+#' values for all options.
+#'
+#' # Options
+#'
+#' ## HTTP exporter options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_http_exporter_options(
+#'   "logs",
+#'   logger_provider_http_options_evs(),
+#'   logger_provider_http$options()
+#' ))
+#' ```
+#'
+#' ## Batch processor options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_batch_processor_options(logger_provider_http$options()))
+#' ```
+#'
+#' @format NULL
+#' @usage NULL
 #' @export
 
 logger_provider_http <- list(

@@ -21,6 +21,7 @@ Externally:
 From R:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{tracer_provider_file$new(opts = NULL)
+tracer_provider_file$options()
 }\if{html}{\out{</div>}}
 }
 
@@ -33,10 +34,13 @@ From R:
 \section{Value}{
 \code{tracer_provider_file$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
 object.
+
+\code{tracer_provider_file$options()} returns a named list, the current
+values of the options.
 }
 
 \section{Options}{
-File exporter options
+\subsection{File exporter options}{
 \itemize{
 \item \code{file_pattern}: Output file pattern. Value is set from:
 \itemize{
@@ -110,6 +114,7 @@ Special placeholders are available for \code{file_pattern} and
 \item \verb{\%R}: Equivalent to \verb{\%H:\%M}.
 \item \verb{\%N}: Rotate index, start from 0.
 \item \verb{\%n}: Rotate index, start from 1.
+}
 }
 }
 

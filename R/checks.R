@@ -1080,12 +1080,8 @@ check_known_options <- function(
   x
 }
 
-as_logger_provider_file_options <- function(
-  opts,
-  arg = caller_arg(opts),
-  call = caller_env()
-) {
-  evs = c(
+logger_provider_file_options_evs <- function() {
+  c(
     file_pattern = file_exporter_logs_file_envvar,
     alias_pattern = file_exporter_logs_alias_envvar,
     flush_interval = file_exporter_logs_flush_interval_envvar,
@@ -1093,7 +1089,14 @@ as_logger_provider_file_options <- function(
     file_size = file_exporter_logs_file_size_envvar,
     rotate_size = file_exporter_logs_rotate_size_envvar
   )
+}
 
+as_logger_provider_file_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- logger_provider_file_options_evs()
   opts1 <- as_file_exporter_options(opts, evs = evs, arg = arg, call = call)
   check_known_options(opts, names(opts1), arg = arg, call = call)
 
@@ -1135,12 +1138,8 @@ as_metric_reader_options <- function(
   )
 }
 
-as_meter_provider_file_options <- function(
-  opts,
-  arg = caller_arg(opts),
-  call = caller_env()
-) {
-  evs = c(
+meter_provider_file_options_evs <- function() {
+  c(
     file_pattern = file_exporter_metrics_file_envvar,
     alias_pattern = file_exporter_metrics_alias_envvar,
     flush_interval = file_exporter_metrics_flush_interval_envvar,
@@ -1148,6 +1147,14 @@ as_meter_provider_file_options <- function(
     file_size = file_exporter_metrics_file_size_envvar,
     rotate_size = file_exporter_metrics_rotate_size_envvar
   )
+}
+
+as_meter_provider_file_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- meter_provider_file_options_evs()
   opts1 <- as_metric_reader_options(opts, arg = arg, call = call)
   opts2 <- as_file_exporter_options(opts, evs = evs, arg = arg, call = call)
   check_known_options(
@@ -1720,12 +1727,8 @@ as_tracer_provider_http_options <- function(
   c(opts1, opts2)
 }
 
-as_logger_provider_http_options <- function(
-  opts,
-  arg = caller_arg(opts),
-  call = caller_env()
-) {
-  evs <- list(
+logger_provider_http_options_evs <- function() {
+  list(
     content_type = otlp_logs_content_type_envvar,
     json_bytes_mapping = otlp_logs_json_bytes_mapping_envvar,
     use_json_name = otlp_logs_use_json_name_envvar,
@@ -1740,7 +1743,14 @@ as_logger_provider_http_options <- function(
     retry_policy_max_backoff = otlp_logs_retry_policy_max_backoff_envvar,
     retry_policy_backoff_multiplier = otlp_logs_retry_policy_backoff_multiplier_envvar
   )
+}
 
+as_logger_provider_http_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- logger_provider_http_options_evs()
   opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
   opts2 <- as_batch_processor_options(opts, arg = arg, call = call)
   check_known_options(
@@ -1827,12 +1837,8 @@ as_metric_exporter_options <- function(
   list(aggregation_temporality = aggregation_temporality)
 }
 
-as_meter_provider_http_options <- function(
-  opts,
-  arg = caller_arg(opts),
-  call = caller_env()
-) {
-  evs <- list(
+meter_provider_http_options_evs <- function() {
+  list(
     content_type = otlp_metrics_content_type_envvar,
     json_bytes_mapping = otlp_metrics_json_bytes_mapping_envvar,
     use_json_name = otlp_metrics_use_json_name_envvar,
@@ -1847,7 +1853,14 @@ as_meter_provider_http_options <- function(
     retry_policy_max_backoff = otlp_metrics_retry_policy_max_backoff_envvar,
     retry_policy_backoff_multiplier = otlp_metrics_retry_policy_backoff_multiplier_envvar
   )
+}
 
+as_meter_provider_http_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- meter_provider_http_options_evs()
   opts1 <- as_http_exporter_options(opts, evs = evs, arg = arg, call = call)
   opts2 <- as_metric_reader_options(opts, arg = arg, call = call)
   opts3 <- as_metric_exporter_options(opts, arg = arg, call = call)
@@ -1883,18 +1896,28 @@ as_stdstream_exporter_options <- function(
   list(output = output)
 }
 
+logger_provider_stdstream_options_evs <- function() {
+  list(
+    output = logger_provider_stdstream_output_envvar
+  )
+}
+
 as_logger_provider_stdstream_options <- function(
   opts,
   arg = caller_arg(opts),
   call = caller_env()
 ) {
-  evs <- list(
-    output = logger_provider_stdstream_output_envvar
-  )
+  evs <- logger_provider_stdstream_options_evs()
   opts1 <- as_stdstream_exporter_options(opts, evs, arg = arg, call = call)
   check_known_options(opts, names(opts1), arg = arg, call = call)
 
   opts1
+}
+
+meter_provider_stdstream_options_evs <- function() {
+  list(
+    output = meter_provider_stdstream_output_envvar
+  )
 }
 
 as_meter_provider_stdstream_options <- function(
@@ -1902,9 +1925,7 @@ as_meter_provider_stdstream_options <- function(
   arg = caller_arg(opts),
   call = caller_env()
 ) {
-  evs <- list(
-    output = meter_provider_stdstream_output_envvar
-  )
+  evs <- meter_provider_stdstream_options_evs()
   opts1 <- as_stdstream_exporter_options(opts, evs, arg = arg, call = call)
   opts2 <- as_metric_reader_options(opts, arg = arg, call = call)
   check_known_options(
@@ -1917,14 +1938,18 @@ as_meter_provider_stdstream_options <- function(
   c(opts1, opts2)
 }
 
+tracer_provider_stdstream_options_evs <- function() {
+  list(
+    output = tracer_provider_stdstream_output_envvar
+  )
+}
+
 as_tracer_provider_stdstream_options <- function(
   opts,
   arg = caller_arg(opts),
   call = caller_env()
 ) {
-  evs <- list(
-    output = tracer_provider_stdstream_output_envvar
-  )
+  evs <- tracer_provider_stdstream_options_evs()
   opts1 <- as_stdstream_exporter_options(opts, evs, arg = arg, call = call)
   check_known_options(opts, names(opts1), arg = arg, call = call)
 
@@ -1957,18 +1982,28 @@ as_memory_exporter_options <- function(
   list(buffer_size = buffer_size)
 }
 
+tracer_provider_memory_options_evs <- function() {
+  list(
+    buffer_size = memory_traces_buffer_size_envvar
+  )
+}
+
 as_tracer_provider_memory_options <- function(
   opts,
   arg = caller_arg(opts),
   call = caller_env()
 ) {
-  evs <- list(
-    buffer_size = memory_traces_buffer_size_envvar
-  )
+  evs <- tracer_provider_memory_options_evs()
   opts1 <- as_memory_exporter_options(opts, evs, arg = arg, call = call)
   check_known_options(opts, names(opts1), arg = arg, call = call)
 
   opts1
+}
+
+meter_provider_memory_options_evs <- function() {
+  list(
+    buffer_size = memory_metrics_buffer_size_envvar
+  )
 }
 
 as_meter_provider_memory_options <- function(
@@ -1976,9 +2011,7 @@ as_meter_provider_memory_options <- function(
   arg = caller_arg(opts),
   call = caller_env()
 ) {
-  evs <- list(
-    buffer_size = memory_metrics_buffer_size_envvar
-  )
+  evs <- meter_provider_memory_options_evs()
   opts1 <- as_memory_exporter_options(opts, evs, arg = arg, call = call)
   opts2 <- as_metric_reader_options(opts, arg = arg, call = call)
   opts3 <- as_metric_exporter_options(opts, arg = arg, call = call)

@@ -3,14 +3,82 @@
 \docType{data}
 \name{meter_provider_memory}
 \alias{meter_provider_memory}
-\title{In-memory meter provider for debugging}
-\format{
-An object of class \code{list} of length 2.
-}
-\usage{
-meter_provider_memory
-}
+\title{In-memory meter provider for testing}
 \description{
-In-memory meter provider for debugging
+Collects metrics measurements in memory. This is useful for testing your
+instrumented R package or application.
 }
+\section{Usage}{
+\if{html}{\out{<div class="sourceCode">}}\preformatted{mp <- meter_provider_memory$new(opts = NULL)
+mp$get_metrics()
+meter_provider_memory$options()
+}\if{html}{\out{</div>}}
+
+\code{mp$get_metrics()} erases the internal buffer of the meter provider.
+}
+
+\section{Arguments}{
+\itemize{
+\item \code{opts}: Named list of options. See below.
+}
+}
+
+\section{Value}{
+\code{meter_provider_memory$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
+object. \code{mp$get_metrics()} returns a named list of recorded metrics.
+
+\code{meter_provider_memory$options()} returns a named list, the current
+values for all options.
+}
+
+\section{Options}{
+\subsection{Memory exporter options}{
+\itemize{
+\item \code{buffer_size}: buffer size, this is the maximum number of spans or
+metrics measurements that the tracer provider can record.
+Must be positive. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE} environment variable, or
+\item the \code{OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE} environment variable, or
+\item the default is \code{100}.
+}
+}
+}
+
+\subsection{Metric reader options}{
+\itemize{
+\item \code{export_interval}: the time interval between the
+start of two export attempts. A time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_METRIC_EXPORT_INTERVAL} environment variable, or
+\item the default is \code{"60s"}.
+}
+\item \code{export_timeout}: Maximum allowed time to export data.
+A time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_METRIC_EXPORT_TIMEOUT} environment variable, or
+\item the default is \code{"30s"}.
+}
+}
+}
+
+\subsection{Metric exporter options}{
+\itemize{
+\item \code{aggregation_temporality}: possible values:
+\code{"unspecified"}, \code{"delta"}, \code{"cumulative"}, \code{"lowmemory"}. See the \href{https://opentelemetry.io/docs/specs/otel/metrics/data-model/#temporality}{OpenTelemetry data model}.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_AGGREGATION_TEMPORALITY} environment variable, or
+\item the default is \code{"cumulative"}.
+}
+}
+}
+}
+
 \keyword{datasets}

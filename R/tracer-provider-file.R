@@ -43,6 +43,7 @@ tracer_provider_file_new <- function(opts = NULL) {
 #' From R:
 #' ```
 #' tracer_provider_file$new(opts = NULL)
+#' tracer_provider_file$options()
 #' ```
 #'
 #' # Arguments
@@ -54,19 +55,19 @@ tracer_provider_file_new <- function(opts = NULL) {
 #' `tracer_provider_file$new()` returns an [otel::otel_tracer_provider]
 #' object.
 #'
+#' `tracer_provider_file$options()` returns a named list, the current
+#' values of the options.
+#'
 #' # Options
 #'
-#' File exporter options
+#' ## File exporter options
 #'
 #' ```{r}
 #' #| echo: FALSE
 #' #| results: asis
 #' cat(doc_file_exporter_options(
 #'   tracer_provider_file_options_evs(),
-#'   list(
-#'     file_pattern = "trace-%N.jsonl",
-#'     alias_pattern = "trace-latest.jsonl"
-#'   )
+#'   tracer_provider_file$options()
 #' ))
 #' ```
 #'

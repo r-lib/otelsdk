@@ -26,6 +26,51 @@ tracer_provider_stdstream_options <- function() {
 
 #' Tracer provider to write to the standard output or standard error or
 #' to a file
+#'
+#' @description
+#' Writes spans to the standard output or error, or to a file. Useful for
+#' debugging.
+#'
+#' # Usage
+#'
+#' Externally:
+#' ```
+#' OTEL_TRACES_EXPORTER=console
+#' OTEL_TRACES_EXPORTER=stderr
+#' ```
+#'
+#' From R:
+#' ```
+#' tracer_provider_stdstream$new(opts = NULL)
+#' tracer_provider_stdstream$options()
+#' ```
+#'
+#' # Arguments
+#'
+#' `opts`: Named list of options. See below.
+#'
+#' # Value
+#'
+#' `tracer_provider_stdstream$new()` returns an [otel::otel_tracer_provider]
+#' object.
+#'
+#' `tracer_provider_stdstream$options()` returns a named list, the current
+#' values of the options.
+#'
+#' # Options
+#'
+#' ## Standard stream exporter options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_stdstream_exporter_options(
+#'   tracer_provider_stdstream_options_evs()
+#' ))
+#' ```
+#'
+#' @format NULL
+#' @usage NULL
 #' @export
 
 tracer_provider_stdstream <- list(

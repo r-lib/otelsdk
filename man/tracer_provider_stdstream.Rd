@@ -5,14 +5,55 @@
 \alias{tracer_provider_stdstream}
 \title{Tracer provider to write to the standard output or standard error or
 to a file}
-\format{
-An object of class \code{list} of length 2.
-}
-\usage{
-tracer_provider_stdstream
-}
 \description{
-Tracer provider to write to the standard output or standard error or
-to a file
+Writes spans to the standard output or error, or to a file. Useful for
+debugging.
 }
+\section{Usage}{
+Externally:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{OTEL_TRACES_EXPORTER=console
+OTEL_TRACES_EXPORTER=stderr
+}\if{html}{\out{</div>}}
+
+From R:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{tracer_provider_stdstream$new(opts = NULL)
+tracer_provider_stdstream$options()
+}\if{html}{\out{</div>}}
+}
+
+\section{Arguments}{
+\code{opts}: Named list of options. See below.
+}
+
+\section{Value}{
+\code{tracer_provider_stdstream$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
+object.
+
+\code{tracer_provider_stdstream$options()} returns a named list, the current
+values of the options.
+}
+
+\section{Options}{
+\subsection{Standard stream exporter options}{
+\itemize{
+\item \code{output}: where to write the output. Can be
+\itemize{
+\item \code{"stdout"}: write output to the standard output,
+\item \code{"stderr"}: write output to the standard error,
+\item another string: write output to a file. (To write output to a file
+named \code{"stdout"} or \code{"stderr"}, use a \verb{./} prefix.)
+}
+
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_STDSTREAM_TRACES_OUTPUT} environment variable, or
+\item the default is \code{"stdout"}.
+}
+}
+}
+}
+
 \keyword{datasets}

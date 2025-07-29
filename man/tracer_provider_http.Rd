@@ -12,7 +12,7 @@ Select this tracer provider with \code{OTEL_TRACES_EXPORTER=otlp}.
 \section{Usage}{
 Externally:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{OTEL_TRACER_EXPORTER=otlp
+\if{html}{\out{<div class="sourceCode">}}\preformatted{OTEL_TRACES_EXPORTER=otlp
 }\if{html}{\out{</div>}}
 
 From R:
@@ -32,18 +32,18 @@ tracer_provider_http$options()
 \code{tracer_provider_http$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
 object.
 
-\code{tracer_provider_http$options()} returns a named list, the default
+\code{tracer_provider_http$options()} returns a named list, the current
 values for all options.
 }
 
 \section{Options}{
-HTTP exporter options:
+\subsection{HTTP exporter options}{
 \itemize{
 \item \code{url}: OTLP URL to send telemetry data to. Value is set from
 \itemize{
 \item the \code{opts} argument, needs to point to the traces endpoint, or
-\item \code{OTEL_EXPORTER_OTLP_TRACES_ENDPOINT} environment variable, needs to
-point to the traces endpoint, or
+\item \code{OTEL_EXPORTER_OTLP_TRACES_ENDPOINT} environment variable,
+needs to point to the traces endpoint, or
 \item \code{OTEL_EXPORTER_OTLP_ENDPOINT} environment variable + \verb{/v1/traces}, or
 \item the default is \verb{http://localhost:4318/v1/traces}.
 }
@@ -75,31 +75,195 @@ the key of json. A flag. Value is set from
 \item the \code{OTEL_R_EXPORTER_OTLP_USE_JSON_NAME} environment variable, or
 \item the default is \code{FALSE}.
 }
-\item \code{console_debug}:
-\item \code{timeout}:
-\item \code{ssl_insecure_skip_verify}:
-\item \code{ssl_ca_cert_path}:
-\item \code{ssl_ca_cert_string}:
-\item \code{ssl_client_key_path}:
-\item \code{ssl_client_key_string}:
-\item \code{ssl_client_cert_path}:
-\item \code{ssl_client_cert_string}:
-\item \code{ssl_min_tls}:
-\item \code{ssl_max_tls}:
-\item \code{ssl_cipher}:
-\item \code{ssl_cipher_suite}:
-\item \code{compression}:
-\item \code{retry_policy_max_attempts}:
-\item \code{retry_policy_initial_backoff}:
-\item \code{retry_policy_max_backoff}:
-\item \code{retry_policy_backoff_multiplier}:
+\item \code{console_debug}: whether to print debug messages to the console.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_CONSOLE_DEBUG} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_CONSOLE_DEBUG} environment variable, or
+\item the default is \code{FALSE}.
+}
+\item \code{timeout}: HTTP timeout. A time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \verb{OTEL_EXPORTER_OTLP_TRACES_TIMEOUT\}} environment
+variable, or
+\item the \code{OTEL_EXPORTER_OTLP_TIMEOUT} environment variable, or
+\item the default is \verb{10s}.
+}
+\item \code{ssl_insecure_skip_verify}: whether to disable SSL. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_INSECURE_SKIP_VERIFY} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_INSECURE_SKIP_VERIFY} environment variable, or
+\item the default is \code{FALSE}.
+}
+\item \code{ssl_ca_cert_path}: CA certificate, path to a file. Empty string uses
+the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE} environment
+variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CERTIFICATE} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_ca_cert_string}: CA certificate, as a string. Empty string uses
+the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CERTIFICATE_STRING} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_client_key_path}: SSL client key, path to a file. Empty string
+uses the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CLIENT_KEY} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_client_key_string}: SSL client key as a string. Empty string
+uses the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY_STRING}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING} environment
+variable, or
+\item the default is ``.
+}
+\item \code{ssl_client_cert_path}: SSL client certificate, path to a file.
+Empty string uses the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_client_cert_string}: SSL client certificate, as a string.
+Empty string uses the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE_STRING}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING} environment
+variable, or
+\item the default is ``.
+}
+\item \code{ssl_min_tls}: minimum TLS version. Empty string uses the system
+default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_MIN_TLS} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_MIN_TLS} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_max_tls}: maximum TLS version. Empty string uses the system
+default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_MAX_TLS} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_MAX_TLS} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_cipher}: TLS cipher. Empty string uses the system default.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_CIPHER} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_CIPHER} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_cipher_suite}: TLS cipher suite. Empty string uses the system
+default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_CIPHER_SUITE} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_CIPHER_SUITE} environment variable, or
+\item the default is ``.
+}
+\item \code{compression}: compression to use. Possible values are
+\code{"none"}, \code{"gzip"}.
+Value is the set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_TRACES_COMPRESSION} environment
+variable, or
+\item the \code{OTEL_EXPORTER_OTLP_COMPRESSION} environment variable, or
+\item the default is \code{none}.
+}
+\item \code{retry_policy_max_attempts}: the maximum number of call attempts,
+including the original attempt. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_MAX_ATTEMPTS} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_ATTEMPTS} environment variable, or
+\item the default is \code{5}.
+}
+\item \code{retry_policy_initial_backoff}: the maximum initial back-off delay
+between retry attempts. The actual backoff delay is uniform random
+between zero and this. This is a time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_INITIAL_BACKOFF} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_INITIAL_BACKOFF} environment
+variable, or
+\item the default is \verb{1000ms}.
+}
+\item \code{retry_policy_max_backoff}: the maximum backoff places an upper limit
+on exponential backoff growth. This is a time interval specification,
+see \link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_MAX_BACKOFF} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_BACKOFF} environment variable, or
+\item the default is \verb{5000ms}.
+}
+\item \code{retry_policy_backoff_multiplier}: the backoff will be multiplied by
+this value after each retry attempt. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_BACKOFF_MULTIPLIER} environment
+variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_BACKOFF_MULTIPLIER} environment
+variable, or
+\item the default is \code{1.5}.
+}
+}
 }
 
-Batch processor options:
+\subsection{Batch processor options}{
 \itemize{
-\item \code{max_queue_size}:
-\item \code{max_export_batch_size}:
-\item \code{schedule_delay}:
+\item \code{max_queue_size}: The maximum buffer/queue size. After the size is
+reached, spans are dropped. Must be positive. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_BSP_MAX_QUEUE_SIZE} environment variable, or
+\item the default is \code{2048}.
+}
+\item \code{max_export_batch_size}: the maximum batch size of every export.
+It must be smaller or equal to max_queue_size. Must be positive.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_BSP_MAX_EXPORT_BATCH_SIZE} environment variable, or
+\item the default is \code{512}.
+}
+\item \code{schedule_delay}: the time interval between two consecutive exports.
+This is a time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument` or
+\item the \code{OTEL_BSP_SCHEDULE_DELAY} environment variable, or
+\item the default is \verb{5000ms}.
+}
+}
 }
 }
 

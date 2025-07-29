@@ -48,6 +48,69 @@ meter_provider_http_options <- function() {
 
 
 #' Meter provider to send collected metrics over HTTP
+#'
+#' @description
+#' This is the OTLP HTTP exporter.
+#'
+#' Select this tracer provider with `OTEL_METRICS_EXPORTER=otlp`.
+#'
+#' # Usage
+#'
+#' Externally:
+#' ```
+#' OTEL_METRICS_EXPORTER=otlp
+#' ```
+#'
+#' From R:
+#' ```
+#' meter_provider_http$new(opts = NULL)
+#' meter_provider_http$options()
+#' ```
+#'
+#' # Arguments
+#'
+#' - `opts`: Named list of options. See below.
+#'
+#' # Value
+#'
+#' `meter_provider_http$new()` returns an [otel::otel_meter_provider]
+#' object.
+#'
+#' `meter_provider_http$options()` returns a named list, the current
+#' values for all options.
+#'
+#' # Options
+#'
+#' ## HTTP exporter options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_http_exporter_options(
+#'   "metrics",
+#'   meter_provider_http_options_evs(),
+#'   meter_provider_http$options()
+#' ))
+#' ```
+#'
+#' ## Metric reader options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_metric_reader_options())
+#' ```
+#'
+#' ## Metric exporter options
+#'
+#' ```{r}
+#' #| echo: FALSE
+#' #| results: asis
+#' cat(doc_metric_exporter_options())
+#' ```
+#'
+#' @format NULL
+#' @usage NULL
 #' @export
 
 meter_provider_http <- list(

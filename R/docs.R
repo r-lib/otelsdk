@@ -103,14 +103,14 @@ doc_file_exporter_options <- function(evs, def) {
   )
 }
 
-doc_http_exporter_options <- function(evs, def) {
+doc_http_exporter_options <- function(which, evs, def) {
   glue(
     "
     * `url`: OTLP URL to send telemetry data to. Value is set from
-      - the `opts` argument, needs to point to the traces endpoint, or
-      - `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` environment variable, needs to
-        point to the traces endpoint, or
-      - `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable + `/v1/traces`, or
+      - the `opts` argument, needs to point to the {which} endpoint, or
+      - `OTEL_EXPORTER_OTLP_{toupper(which)}_ENDPOINT` environment variable,
+        needs to point to the {which} endpoint, or
+      - `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable + `/v1/{which}`, or
       - the default is `{def[['url']]}`.
 
     * `content_type`: data format used, JSON or binary. Possible values:
@@ -120,7 +120,7 @@ doc_http_exporter_options <- function(evs, def) {
       - the `{evs[['content_type']]}` environment variable, or
       - the `{otlp_content_type_envvar}` environment variable, or
       - the default is
-        `\"{names(tracer_provider_http$options()[['content_type']])}\"`.
+        `\"{names(def[['content_type']])}\"`.
 
     * `json_bytes_mapping`: encoding used for trace id and span id.
       Possible values:
@@ -138,53 +138,239 @@ doc_http_exporter_options <- function(evs, def) {
       - the `{otlp_use_json_name_envvar}` environment variable, or
       - the default is `{otlp_use_json_name_default}`.
 
-    * `console_debug`:
+    * `console_debug`: whether to print debug messages to the console.
+      Value is set from
+      - the `opts` argument, or
+      - the `{evs[['console_debug']]}` environment variable, or
+      - the `{otlp_console_debug_envvar}` environment variable, or
+      - the default is `{otlp_console_debug_default}`.
 
-    * `timeout`:
+    * `timeout`: HTTP timeout. A time interval specification, see
+      \\link{{Time Interval Options}}. Value is set from
+      - the `opts` argument, or
+      - the `OTEL_EXPORTER_OTLP_{toupper(which)}_TIMEOUT}` environment
+        variable, or
+      - the `OTEL_EXPORTER_OTLP_TIMEOUT` environment variable, or
+      - the default is `10s`.
 
-    * `ssl_insecure_skip_verify`:
+    * `ssl_insecure_skip_verify`: whether to disable SSL. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['ssl_insecure_skip_verify']]}` environment variable, or
+      - the `{otlp_ssl_insecure_skip_verify_envvar}` environment variable, or
+      - the default is `{otlp_ssl_insecure_skip_verify_default}`.
 
-    * `ssl_ca_cert_path`:
+    * `ssl_ca_cert_path`: CA certificate, path to a file. Empty string uses
+      the system default. Value is set from
+      - the `opts` argument, or
+      - the `OTEL_EXPORTER_OTLP_{toupper(which)}_CERTIFICATE` environment
+        variable, or
+      - the `OTEL_EXPORTER_OTLP_CERTIFICATE` environment variable, or
+      - the default is `{def[['ssl_ca_cert_path']]}`.
 
-    * `ssl_ca_cert_string`:
+    * `ssl_ca_cert_string`: CA certificate, as a string. Empty string uses
+      the system default. Value is set from
+      - the `opts` argument, or
+      - the `OTEL_EXPORTER_OTLP_{toupper(which)}_CERTIFICATE_STRING`
+        environment variable, or
+      - the `OTEL_EXPORTER_OTLP_CERTIFICATE_STRING` environment variable, or
+      - the default is `{def[['ssl_ca_cert_string']]}`.
 
-    * `ssl_client_key_path`:
+    * `ssl_client_key_path`: SSL client key, path to a file. Empty string
+      uses the system default. Value is set from
+      - the `opts` argument, or
+      - the `OTEL_EXPORTER_OTLP_{toupper(which)}_CLIENT_KEY`
+        environment variable, or
+      - the `OTEL_EXPORTER_OTLP_CLIENT_KEY` environment variable, or
+      - the default is `{def[['ssl_client_key_path']]}`.
 
-    * `ssl_client_key_string`:
+    * `ssl_client_key_string`: SSL client key as a string. Empty string
+      uses the system default. Value is set from
+      - the `opts` argument, or
+      - the `OTEL_EXPORTER_OTLP_{toupper(which)}_CLIENT_KEY_STRING`
+        environment variable, or
+      - the `OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING` environment
+        variable, or
+      - the default is `{def[['ssl_client_key_string']]}`.
 
-    * `ssl_client_cert_path`:
+    * `ssl_client_cert_path`: SSL client certificate, path to a file.
+      Empty string uses the system default. Value is set from
+      - the `opts` argument, or
+      - the `OTEL_EXPORTER_OTLP_{toupper(which)}_CLIENT_CERTIFICATE`
+        environment variable, or
+      - the `OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE` environment variable, or
+      - the default is `{def[['ssl_client_cert_path']]}`.
 
-    * `ssl_client_cert_string`:
+    * `ssl_client_cert_string`: SSL client certificate, as a string.
+      Empty string uses the system default. Value is set from
+      - the `opts` argument, or
+      - the `OTEL_EXPORTER_OTLP_{toupper(which)}_CLIENT_CERTIFICATE_STRING`
+        environment variable, or
+      - the `OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING` environment
+        variable, or
+      - the default is `{def[['ssl_client_cert_string']]}`.
 
-    * `ssl_min_tls`:
+    * `ssl_min_tls`: minimum TLS version. Empty string uses the system
+      default. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['ssl_min_tls']]}` environment variable, or
+      - the `{otlp_ssl_min_tls_envvar}` environment variable, or
+      - the default is `{otlp_ssl_min_tls_default}`.
 
-    * `ssl_max_tls`:
+    * `ssl_max_tls`: maximum TLS version. Empty string uses the system
+      default. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['ssl_max_tls']]}` environment variable, or
+      - the `{otlp_ssl_max_tls_envvar}` environment variable, or
+      - the default is `{otlp_ssl_max_tls_default}`.
 
-    * `ssl_cipher`:
+    * `ssl_cipher`: TLS cipher. Empty string uses the system default.
+      Value is set from
+      - the `opts` argument, or
+      - the `{evs[['ssl_cipher']]}` environment variable, or
+      - the `{otlp_ssl_cipher_envvar}` environment variable, or
+      - the default is `{otlp_ssl_cipher_default}`.
 
-    * `ssl_cipher_suite`:
+    * `ssl_cipher_suite`: TLS cipher suite. Empty string uses the system
+      default. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['ssl_cipher_suite']]}` environment variable, or
+      - the `{otlp_ssl_cipher_suite_envvar}` environment variable, or
+      - the default is `{otlp_ssl_cipher_suite_default}`.
 
-    * `compression`:
+    * `compression`: compression to use. Possible values are
+      {paste0('`\"', otlp_compression_choices, '\"`', collapse = ', ')}.
+      Value is the set from
+      - the `opts` argument, or
+      - the `OTEL_EXPORTER_OTLP_{toupper(which)}_COMPRESSION` environment
+        variable, or
+      - the `OTEL_EXPORTER_OTLP_COMPRESSION` environment variable, or
+      - the default is `{otlp_compression_choices['default']}`.
 
-    * `retry_policy_max_attempts`:
+    * `retry_policy_max_attempts`: the maximum number of call attempts,
+      including the original attempt. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['retry_policy_max_attempts']]}` environment variable, or
+      - the `{otlp_retry_policy_max_attempts_envvar}` environment variable, or
+      - the default is `{otlp_retry_policy_max_attempts_default}`.
 
-    * `retry_policy_initial_backoff`:
+    * `retry_policy_initial_backoff`: the maximum initial back-off delay
+      between retry attempts. The actual backoff delay is uniform random
+      between zero and this. This is a time interval specification, see
+      \\link{{Time Interval Options}}. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['retry_policy_initial_backoff']]}` environment variable, or
+      - the `{otlp_retry_policy_initial_backoff_envvar}` environment
+        variable, or
+      - the default is `{otlp_retry_policy_initial_backoff_default}ms`.
 
-    * `retry_policy_max_backoff`:
+    * `retry_policy_max_backoff`: the maximum backoff places an upper limit
+      on exponential backoff growth. This is a time interval specification,
+      see \\link{{Time Interval Options}}. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['retry_policy_max_backoff']]}` environment variable, or
+      - the `{otlp_retry_policy_max_backoff_envvar}` environment variable, or
+      - the default is `{otlp_retry_policy_max_backoff_default}ms`.
 
-    * `retry_policy_backoff_multiplier`:
+    * `retry_policy_backoff_multiplier`: the backoff will be multiplied by
+      this value after each retry attempt. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['retry_policy_backoff_multiplier']]}` environment
+        variable, or
+      - the `{otlp_retry_policy_backoff_multiplier_envvar}` environment
+        variable, or
+      - the default is `{otlp_retry_policy_backoff_multiplier_default}`.
     "
   )
 }
 
-doc_batch_processor_options <- function() {
+doc_batch_processor_options <- function(def) {
   glue(
     "
-    * `max_queue_size`:
+    * `max_queue_size`: The maximum buffer/queue size. After the size is
+      reached, spans are dropped. Must be positive. Value is set from
+      - the `opts` argument, or
+      - the `OTEL_BSP_MAX_QUEUE_SIZE` environment variable, or
+      - the default is `{def[['max_queue_size']]}`.
 
-    * `max_export_batch_size`:
+    * `max_export_batch_size`: the maximum batch size of every export.
+      It must be smaller or equal to max_queue_size. Must be positive.
+      Value is set from
+      - the `opts` argument, or
+      - the `OTEL_BSP_MAX_EXPORT_BATCH_SIZE` environment variable, or
+      - the default is `{def[['max_export_batch_size']]}`.
 
-    * `schedule_delay`:
+    * `schedule_delay`: the time interval between two consecutive exports.
+      This is a time interval specification, see
+      \\link{{Time Interval Options}}. Value is set from
+      - the `opts` argument` or
+      - the `OTEL_BSP_SCHEDULE_DELAY` environment variable, or
+      - the default is `{def[['schedule_delay']]}ms`.
+    "
+  )
+}
+
+doc_memory_exporter_options <- function(evs) {
+  glue(
+    "
+    * `buffer_size`: buffer size, this is the maximum number of spans or
+      metrics measurements that the tracer provider can record.
+      Must be positive. Value is set from
+      - the `opts` argument, or
+      - the `{evs[['buffer_size']]}` environment variable, or
+      - the `{memory_buffer_size_envvar}` environment variable, or
+      - the default is `{memory_buffer_size_default}`.
+    "
+  )
+}
+
+doc_stdstream_exporter_options <- function(evs) {
+  glue(
+    "
+    * `output`: where to write the output. Can be
+      - `\"stdout\"`: write output to the standard output,
+      - `\"stderr\"`: write output to the standard error,
+      - another string: write output to a file. (To write output to a file
+        named `\"stdout\"` or `\"stderr\"`, use a `./` prefix.)
+
+      Value is set from
+      - the `opts` argument, or
+      - the `{evs[['output']]}` environment variable, or
+      - the default is `\"stdout\"`.
+    "
+  )
+}
+
+doc_metric_reader_options <- function() {
+  glue(
+    "
+    * `export_interval`: the time interval between the
+      start of two export attempts. A time interval specification, see
+      \\link{{Time Interval Options}}. Value is set from
+      - the `opts` argument, or
+      - the `{metric_export_interval_envvar}` environment variable, or
+      - the default is `\"60s\"`.
+
+    * `export_timeout`: Maximum allowed time to export data.
+      A time interval specification, see
+      \\link{{Time Interval Options}}. Value is set from
+      - the `opts` argument, or
+      - the `{metric_export_timeout_envvar}` environment variable, or
+      - the default is `\"30s\"`.
+    "
+  )
+}
+
+doc_metric_exporter_options <- function() {
+  glue(
+    "
+    * `aggregation_temporality`: possible values:
+      {paste0('`\"', otlp_aggregation_temporality_choices, '\"`',
+        collapse = ', ')}. See the [OpenTelemetry data model](
+        https://opentelemetry.io/docs/specs/otel/metrics/data-model/#temporality).
+      Value is set from
+      - the `opts` argument, or
+      - the `{otlp_aggregation_temporality_envvar}` environment variable, or
+      - the default is `\"{otlp_aggregation_temporality_default}\"`.
     "
   )
 }

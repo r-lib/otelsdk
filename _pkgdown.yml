@@ -13,7 +13,7 @@ development:
 
 navbar:
   structure:
-    left: [gettingstarted, collectingdata, reference]
+    left: [reference, gettingstarted, collectingdata]
     right: [news]
   components:
     gettingstarted:

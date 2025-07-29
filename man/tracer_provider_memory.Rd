@@ -3,14 +3,53 @@
 \docType{data}
 \name{tracer_provider_memory}
 \alias{tracer_provider_memory}
-\title{In-memory tracer provider for debugging}
-\format{
-An object of class \code{list} of length 2.
-}
-\usage{
-tracer_provider_memory
-}
+\title{In-memory tracer provider for testing}
 \description{
-In-memory tracer provider for debugging
+Collects spans in memory. This is useful for testing your instrumented
+R package or application.
+
+\code{\link[=with_otel_record]{with_otel_record()}} uses this tracer provider.
+Use \code{\link[=with_otel_record]{with_otel_record()}} in your tests to record telemetry and check
+that it is correct.
 }
+\section{Usage}{
+\if{html}{\out{<div class="sourceCode">}}\preformatted{tp <- tracer_provider_memory$new(opts = NULL)
+tp$get_spans()
+tracer_provider_memory$options()
+}\if{html}{\out{</div>}}
+
+\code{tp$get_spans()} erases the internal buffer of the tracer provider.
+}
+
+\section{Arguments}{
+\itemize{
+\item \code{opts}: Named list of options. See below.
+}
+}
+
+\section{Value}{
+\code{tracer_provider_memory$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
+object. \code{tp$get_spans()} returns a named list of recorded spans, with
+the span names as names.
+
+\code{tracer_provider_memory$options()} returns a named list, the current
+values for all options.
+}
+
+\section{Options}{
+\subsection{Memory exporter options}{
+\itemize{
+\item \code{buffer_size}: buffer size, this is the maximum number of spans or
+metrics measurements that the tracer provider can record.
+Must be positive. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE} environment variable, or
+\item the \code{OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE} environment variable, or
+\item the default is \code{100}.
+}
+}
+}
+}
+
 \keyword{datasets}

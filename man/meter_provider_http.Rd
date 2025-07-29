@@ -4,13 +4,273 @@
 \name{meter_provider_http}
 \alias{meter_provider_http}
 \title{Meter provider to send collected metrics over HTTP}
-\format{
-An object of class \code{list} of length 2.
-}
-\usage{
-meter_provider_http
-}
 \description{
-Meter provider to send collected metrics over HTTP
+This is the OTLP HTTP exporter.
+
+Select this tracer provider with \code{OTEL_METRICS_EXPORTER=otlp}.
 }
+\section{Usage}{
+Externally:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{OTEL_METRICS_EXPORTER=otlp
+}\if{html}{\out{</div>}}
+
+From R:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{meter_provider_http$new(opts = NULL)
+meter_provider_http$options()
+}\if{html}{\out{</div>}}
+}
+
+\section{Arguments}{
+\itemize{
+\item \code{opts}: Named list of options. See below.
+}
+}
+
+\section{Value}{
+\code{meter_provider_http$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
+object.
+
+\code{meter_provider_http$options()} returns a named list, the current
+values for all options.
+}
+
+\section{Options}{
+\subsection{HTTP exporter options}{
+\itemize{
+\item \code{url}: OTLP URL to send telemetry data to. Value is set from
+\itemize{
+\item the \code{opts} argument, needs to point to the metrics endpoint, or
+\item \code{OTEL_EXPORTER_OTLP_METRICS_ENDPOINT} environment variable,
+needs to point to the metrics endpoint, or
+\item \code{OTEL_EXPORTER_OTLP_ENDPOINT} environment variable + \verb{/v1/metrics}, or
+\item the default is \verb{http://localhost:4318/v1/metrics}.
+}
+\item \code{content_type}: data format used, JSON or binary. Possible values:
+\code{"json"}, \code{"application/json"}, \code{"binary"}, \code{"application/x-protobuf"}.
+Value if set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_CONTENT_TYPE} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_CONTENT_TYPE} environment variable, or
+\item the default is
+\code{"binary"}.
+}
+\item \code{json_bytes_mapping}: encoding used for trace id and span id.
+Possible values:
+\code{"hexid"}, \code{"base64"}, \code{"hex"}.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_JSON_BYTES_MAPPING} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_JSON_BYTES_MAPPING} environment variable, or
+\item the default is \code{"hexid"}.
+}
+\item \code{use_json_name}: whether to use json name of protobuf field to set
+the key of json. A flag. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_USE_JSON_NAME} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_USE_JSON_NAME} environment variable, or
+\item the default is \code{FALSE}.
+}
+\item \code{console_debug}: whether to print debug messages to the console.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_CONSOLE_DEBUG} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_CONSOLE_DEBUG} environment variable, or
+\item the default is \code{FALSE}.
+}
+\item \code{timeout}: HTTP timeout. A time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \verb{OTEL_EXPORTER_OTLP_METRICS_TIMEOUT\}} environment
+variable, or
+\item the \code{OTEL_EXPORTER_OTLP_TIMEOUT} environment variable, or
+\item the default is \verb{10s}.
+}
+\item \code{ssl_insecure_skip_verify}: whether to disable SSL. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_INSECURE_SKIP_VERIFY} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_INSECURE_SKIP_VERIFY} environment variable, or
+\item the default is \code{FALSE}.
+}
+\item \code{ssl_ca_cert_path}: CA certificate, path to a file. Empty string uses
+the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE} environment
+variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CERTIFICATE} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_ca_cert_string}: CA certificate, as a string. Empty string uses
+the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE_STRING}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CERTIFICATE_STRING} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_client_key_path}: SSL client key, path to a file. Empty string
+uses the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CLIENT_KEY} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_client_key_string}: SSL client key as a string. Empty string
+uses the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY_STRING}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING} environment
+variable, or
+\item the default is ``.
+}
+\item \code{ssl_client_cert_path}: SSL client certificate, path to a file.
+Empty string uses the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_client_cert_string}: SSL client certificate, as a string.
+Empty string uses the system default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE_STRING}
+environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING} environment
+variable, or
+\item the default is ``.
+}
+\item \code{ssl_min_tls}: minimum TLS version. Empty string uses the system
+default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_MIN_TLS} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_MIN_TLS} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_max_tls}: maximum TLS version. Empty string uses the system
+default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_MAX_TLS} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_MAX_TLS} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_cipher}: TLS cipher. Empty string uses the system default.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_CIPHER} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_CIPHER} environment variable, or
+\item the default is ``.
+}
+\item \code{ssl_cipher_suite}: TLS cipher suite. Empty string uses the system
+default. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_CIPHER_SUITE} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_SSL_CIPHER_SUITE} environment variable, or
+\item the default is ``.
+}
+\item \code{compression}: compression to use. Possible values are
+\code{"none"}, \code{"gzip"}.
+Value is the set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_METRICS_COMPRESSION} environment
+variable, or
+\item the \code{OTEL_EXPORTER_OTLP_COMPRESSION} environment variable, or
+\item the default is \code{none}.
+}
+\item \code{retry_policy_max_attempts}: the maximum number of call attempts,
+including the original attempt. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_MAX_ATTEMPTS} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_ATTEMPTS} environment variable, or
+\item the default is \code{5}.
+}
+\item \code{retry_policy_initial_backoff}: the maximum initial back-off delay
+between retry attempts. The actual backoff delay is uniform random
+between zero and this. This is a time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_INITIAL_BACKOFF} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_INITIAL_BACKOFF} environment
+variable, or
+\item the default is \verb{1000ms}.
+}
+\item \code{retry_policy_max_backoff}: the maximum backoff places an upper limit
+on exponential backoff growth. This is a time interval specification,
+see \link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_MAX_BACKOFF} environment variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_BACKOFF} environment variable, or
+\item the default is \verb{5000ms}.
+}
+\item \code{retry_policy_backoff_multiplier}: the backoff will be multiplied by
+this value after each retry attempt. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_BACKOFF_MULTIPLIER} environment
+variable, or
+\item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_BACKOFF_MULTIPLIER} environment
+variable, or
+\item the default is \code{1.5}.
+}
+}
+}
+
+\subsection{Metric reader options}{
+\itemize{
+\item \code{export_interval}: the time interval between the
+start of two export attempts. A time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_METRIC_EXPORT_INTERVAL} environment variable, or
+\item the default is \code{"60s"}.
+}
+\item \code{export_timeout}: Maximum allowed time to export data.
+A time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_METRIC_EXPORT_TIMEOUT} environment variable, or
+\item the default is \code{"30s"}.
+}
+}
+}
+
+\subsection{Metric exporter options}{
+\itemize{
+\item \code{aggregation_temporality}: possible values:
+\code{"unspecified"}, \code{"delta"}, \code{"cumulative"}, \code{"lowmemory"}. See the \href{https://opentelemetry.io/docs/specs/otel/metrics/data-model/#temporality}{OpenTelemetry data model}.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_OTLP_AGGREGATION_TEMPORALITY} environment variable, or
+\item the default is \code{"cumulative"}.
+}
+}
+}
+}
+
 \keyword{datasets}

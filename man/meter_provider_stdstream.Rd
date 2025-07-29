@@ -5,14 +5,76 @@
 \alias{meter_provider_stdstream}
 \title{Meter provider to write to the standard output or standard error or
 to a file}
-\format{
-An object of class \code{list} of length 2.
-}
-\usage{
-meter_provider_stdstream
-}
 \description{
-Meter provider to write to the standard output or standard error or
-to a file
+Writes metrics measurements to the standard output or error, or to a
+file. Useful for debugging.
 }
+\section{Usage}{
+Externally:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{OTEL_METRICS_EXPORTER=console
+OTEL_METRICS_EXPORTER=stderr
+}\if{html}{\out{</div>}}
+
+From R:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{meter_provider_stdstream$new(opts = NULL)
+meter_provider_stdstream$options()
+}\if{html}{\out{</div>}}
+}
+
+\section{Arguments}{
+\code{opts}: Named list of options. See below.
+}
+
+\section{Value}{
+\code{meter_provider_stdstream$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
+object.
+
+\code{meter_provider_stdstream$options()} returns a named list, the current
+values of the options.
+}
+
+\section{Options}{
+\subsection{Standard stream exporter options}{
+\itemize{
+\item \code{output}: where to write the output. Can be
+\itemize{
+\item \code{"stdout"}: write output to the standard output,
+\item \code{"stderr"}: write output to the standard error,
+\item another string: write output to a file. (To write output to a file
+named \code{"stdout"} or \code{"stderr"}, use a \verb{./} prefix.)
+}
+
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_R_EXPORTER_STDSTREAM_METRICS_OUTPUT} environment variable, or
+\item the default is \code{"stdout"}.
+}
+}
+}
+
+\subsection{Metric reader options}{
+\itemize{
+\item \code{export_interval}: the time interval between the
+start of two export attempts. A time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_METRIC_EXPORT_INTERVAL} environment variable, or
+\item the default is \code{"60s"}.
+}
+\item \code{export_timeout}: Maximum allowed time to export data.
+A time interval specification, see
+\link{Time Interval Options}. Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_METRIC_EXPORT_TIMEOUT} environment variable, or
+\item the default is \code{"30s"}.
+}
+}
+}
+}
+
 \keyword{datasets}
