@@ -4,6 +4,13 @@
 \name{logger_provider_file}
 \alias{logger_provider_file}
 \title{Logger provider to write log messages into a JSONL file.}
+\value{
+\code{logger_provider_file$new()} returns an \link[otel:otel_logger_provider]{otel::otel_logger_provider}
+object.
+
+\code{logger_provider_file$options()} returns a named list, the current
+values of the options.
+}
 \description{
 This is the \href{https://opentelemetry.io/docs/specs/otel/protocol/file-exporter/}{OTLP file exporter}.
 It writes logs to a JSONL file, each log is a line in the file,
@@ -29,14 +36,6 @@ logger_provider_file$options()
 \itemize{
 \item \code{opts}: Named list of options. See below.
 }
-}
-
-\section{Value}{
-\code{logger_provider_file$new()} returns an \link[otel:otel_logger_provider]{otel::otel_logger_provider}
-object.
-
-\code{logger_provider_file$options()} returns a named list, the current
-values of the options.
 }
 
 \section{Options}{
@@ -82,7 +81,7 @@ specification, see \link{File Size Options}. Value is set from
 \itemize{
 \item \code{opts} argument, or
 \item \code{OTEL_EXPORTER_OTLP_LOGS_FILE_FILE_SIZE} environment variable, or
-\item \code{OTEL_EXPORTER_OTLP_FILE_file_SIZE} environment variable, or
+\item \code{OTEL_EXPORTER_OTLP_FILE_FILE_SIZE} environment variable, or
 \item the default is \verb{20MB}.
 }
 \item \code{rotate_size}: How many rotated output files to keep. Value is set
@@ -118,4 +117,7 @@ Special placeholders are available for \code{file_pattern} and
 }
 }
 
+\examples{
+logger_provider_file$options()
+}
 \keyword{datasets}

@@ -56,14 +56,6 @@ meter_provider_memory_options <- function() {
 #'
 #' - `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `meter_provider_memory$new()` returns an [otel::otel_meter_provider]
-#' object. `mp$get_metrics()` returns a named list of recorded metrics.
-#'
-#' `meter_provider_memory$options()` returns a named list, the current
-#' values for all options.
-#'
 #' # Options
 #'
 #' ## Memory exporter options
@@ -90,9 +82,18 @@ meter_provider_memory_options <- function() {
 #' cat(doc_metric_exporter_options())
 #' ```
 #'
+#' @return
+#' `meter_provider_memory$new()` returns an [otel::otel_meter_provider]
+#' object. `mp$get_metrics()` returns a named list of recorded metrics.
+#'
+#' `meter_provider_memory$options()` returns a named list, the current
+#' values for all options.
+#'
 #' @usage NULL
 #' @format NULL
 #' @export
+#' @examples
+#' meter_provider_memory$options()
 
 meter_provider_memory <- list(
   new = meter_provider_memory_new,

@@ -49,14 +49,6 @@ tracer_provider_stdstream_options <- function() {
 #'
 #' `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `tracer_provider_stdstream$new()` returns an [otel::otel_tracer_provider]
-#' object.
-#'
-#' `tracer_provider_stdstream$options()` returns a named list, the current
-#' values of the options.
-#'
 #' # Options
 #'
 #' ## Standard stream exporter options
@@ -69,9 +61,18 @@ tracer_provider_stdstream_options <- function() {
 #' ))
 #' ```
 #'
+#' @return
+#' `tracer_provider_stdstream$new()` returns an [otel::otel_tracer_provider]
+#' object.
+#'
+#' `tracer_provider_stdstream$options()` returns a named list, the current
+#' values of the options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' tracer_provider_stdstream$options()
 
 tracer_provider_stdstream <- list(
   new = tracer_provider_stdstream_new,

@@ -4,6 +4,13 @@
 \name{logger_provider_http}
 \alias{logger_provider_http}
 \title{Logger provider to log over HTTP}
+\value{
+\code{logger_provider_http$new()} returns an \link[otel:otel_logger_provider]{otel::otel_logger_provider}
+object.
+
+\code{logger_provider_http$options()} returns a named list, the current
+values for all options.
+}
 \description{
 This is the OTLP HTTP exporter.
 }
@@ -24,14 +31,6 @@ logger_provider_http$options()
 \itemize{
 \item \code{opts}: Named list of options. See below.
 }
-}
-
-\section{Value}{
-\code{logger_provider_http$new()} returns an \link[otel:otel_logger_provider]{otel::otel_logger_provider}
-object.
-
-\code{logger_provider_http$options()} returns a named list, the current
-values for all options.
 }
 
 \section{Options}{
@@ -265,4 +264,7 @@ This is a time interval specification, see
 }
 }
 
+\examples{
+logger_provider_http$options()
+}
 \keyword{datasets}

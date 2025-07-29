@@ -55,14 +55,6 @@ meter_provider_stdstream_options <- function() {
 #'
 #' `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `meter_provider_stdstream$new()` returns an [otel::otel_meter_provider]
-#' object.
-#'
-#' `meter_provider_stdstream$options()` returns a named list, the current
-#' values of the options.
-#'
 #' # Options
 #'
 #' ## Standard stream exporter options
@@ -83,9 +75,18 @@ meter_provider_stdstream_options <- function() {
 #' cat(doc_metric_reader_options())
 #' ```
 #'
+#' @return
+#' `meter_provider_stdstream$new()` returns an [otel::otel_meter_provider]
+#' object.
+#'
+#' `meter_provider_stdstream$options()` returns a named list, the current
+#' values of the options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' meter_provider_stdstream$options()
 
 meter_provider_stdstream <- list(
   new = meter_provider_stdstream_new,

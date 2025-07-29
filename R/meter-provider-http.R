@@ -71,14 +71,6 @@ meter_provider_http_options <- function() {
 #'
 #' - `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `meter_provider_http$new()` returns an [otel::otel_meter_provider]
-#' object.
-#'
-#' `meter_provider_http$options()` returns a named list, the current
-#' values for all options.
-#'
 #' # Options
 #'
 #' ## HTTP exporter options
@@ -109,9 +101,18 @@ meter_provider_http_options <- function() {
 #' cat(doc_metric_exporter_options())
 #' ```
 #'
+#' @return
+#' `meter_provider_http$new()` returns an [otel::otel_meter_provider]
+#' object.
+#'
+#' `meter_provider_http$options()` returns a named list, the current
+#' values for all options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' meter_provider_http$options()
 
 meter_provider_http <- list(
   new = meter_provider_http_new,

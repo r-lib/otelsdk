@@ -41,3 +41,14 @@ Note: \code{with_otel_record()} cannot record logs yet.
 \code{with_otel_record()} uses \link{tracer_provider_memory} and
 \link{meter_provider_memory} internally.
 }
+\examples{
+spns <- with_otel_record({
+  trc <- otel::get_tracer("mytracer")
+  spn1 <- trc$start_local_active_span()
+  spn2 <- trc$start_local_active_span("my")
+  spn2$end()
+  spn1$end()
+  NULL
+})
+spns
+}

@@ -5,6 +5,13 @@
 \alias{logger_provider_stdstream}
 \title{Logger provider to write to the standard output or standard error or
 to a file}
+\value{
+\code{logger_provider_stdstream$new()} returns an \link[otel:otel_logger_provider]{otel::otel_logger_provider}
+object.
+
+\code{logger_provider_stdstream$options()} returns a named list, the current
+values of the options.
+}
 \description{
 Writes logs to the standard output or error, or to a file. Useful for
 debugging.
@@ -25,14 +32,6 @@ logger_provider_stdstream$options()
 
 \section{Arguments}{
 \code{opts}: Named list of options. See below.
-}
-
-\section{Value}{
-\code{logger_provider_stdstream$new()} returns an \link[otel:otel_logger_provider]{otel::otel_logger_provider}
-object.
-
-\code{logger_provider_stdstream$options()} returns a named list, the current
-values of the options.
 }
 
 \section{Options}{
@@ -56,4 +55,7 @@ Value is set from
 }
 }
 
+\examples{
+logger_provider_stdstream$options()
+}
 \keyword{datasets}

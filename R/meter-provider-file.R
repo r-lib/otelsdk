@@ -58,14 +58,6 @@ meter_provider_file_new <- function(opts = NULL) {
 #'
 #' - `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `meter_provider_file$new()` returns an [otel::otel_meter_provider]
-#' object.
-#'
-#' `meter_provider_file$options()` returns a named list, the current
-#' values of the options.
-#'
 #' # Options
 #'
 #' ## File exporter options
@@ -87,9 +79,18 @@ meter_provider_file_new <- function(opts = NULL) {
 #' cat(doc_metric_reader_options())
 #' ```
 #'
+#' @return
+#' `meter_provider_file$new()` returns an [otel::otel_meter_provider]
+#' object.
+#'
+#' `meter_provider_file$options()` returns a named list, the current
+#' values of the options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' meter_provider_file$options()
 
 meter_provider_file <- list(
   new = meter_provider_file_new,

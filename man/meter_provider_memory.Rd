@@ -4,6 +4,13 @@
 \name{meter_provider_memory}
 \alias{meter_provider_memory}
 \title{In-memory meter provider for testing}
+\value{
+\code{meter_provider_memory$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
+object. \code{mp$get_metrics()} returns a named list of recorded metrics.
+
+\code{meter_provider_memory$options()} returns a named list, the current
+values for all options.
+}
 \description{
 Collects metrics measurements in memory. This is useful for testing your
 instrumented R package or application.
@@ -25,14 +32,6 @@ meter_provider_memory$options()
 \itemize{
 \item \code{opts}: Named list of options. See below.
 }
-}
-
-\section{Value}{
-\code{meter_provider_memory$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
-object. \code{mp$get_metrics()} returns a named list of recorded metrics.
-
-\code{meter_provider_memory$options()} returns a named list, the current
-values for all options.
 }
 
 \section{Options}{
@@ -85,4 +84,7 @@ Value is set from
 }
 }
 
+\examples{
+meter_provider_memory$options()
+}
 \keyword{datasets}

@@ -4,6 +4,13 @@
 \name{meter_provider_file}
 \alias{meter_provider_file}
 \title{Meter provider to collect metrics in JSONL files}
+\value{
+\code{meter_provider_file$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
+object.
+
+\code{meter_provider_file$options()} returns a named list, the current
+values of the options.
+}
 \description{
 This is the \href{https://opentelemetry.io/docs/specs/otel/protocol/file-exporter/}{OTLP file exporter}.
 It writes measurements to a JSONL file, each measurement is a line in
@@ -29,14 +36,6 @@ meter_provider_file$options()
 \itemize{
 \item \code{opts}: Named list of options. See below.
 }
-}
-
-\section{Value}{
-\code{meter_provider_file$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
-object.
-
-\code{meter_provider_file$options()} returns a named list, the current
-values of the options.
 }
 
 \section{Options}{
@@ -82,7 +81,7 @@ specification, see \link{File Size Options}. Value is set from
 \itemize{
 \item \code{opts} argument, or
 \item \code{OTEL_EXPORTER_OTLP_METRICS_FILE_FILE_SIZE} environment variable, or
-\item \code{OTEL_EXPORTER_OTLP_FILE_file_SIZE} environment variable, or
+\item \code{OTEL_EXPORTER_OTLP_FILE_FILE_SIZE} environment variable, or
 \item the default is \verb{20MB}.
 }
 \item \code{rotate_size}: How many rotated output files to keep. Value is set
@@ -139,4 +138,7 @@ A time interval specification, see
 }
 }
 
+\examples{
+meter_provider_file$options()
+}
 \keyword{datasets}

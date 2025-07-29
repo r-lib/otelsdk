@@ -50,14 +50,6 @@ tracer_provider_file_new <- function(opts = NULL) {
 #'
 #' - `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `tracer_provider_file$new()` returns an [otel::otel_tracer_provider]
-#' object.
-#'
-#' `tracer_provider_file$options()` returns a named list, the current
-#' values of the options.
-#'
 #' # Options
 #'
 #' ## File exporter options
@@ -71,9 +63,18 @@ tracer_provider_file_new <- function(opts = NULL) {
 #' ))
 #' ```
 #'
+#' @return
+#' `tracer_provider_file$new()` returns an [otel::otel_tracer_provider]
+#' object.
+#'
+#' `tracer_provider_file$options()` returns a named list, the current
+#' values of the options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' tracer_provider_file$options()
 
 tracer_provider_file <- list(
   new = tracer_provider_file_new,

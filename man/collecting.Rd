@@ -4,6 +4,9 @@
 \alias{Collecting Telemetry Data}
 \alias{collecting}
 \title{Collecting Telemetry Data}
+\value{
+Not applicable.
+}
 \description{
 This page is about collecting telemetry data from instrumented R
 packages. If you need help with instrumenting your R package, see

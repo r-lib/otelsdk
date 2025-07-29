@@ -4,6 +4,13 @@
 \name{meter_provider_http}
 \alias{meter_provider_http}
 \title{Meter provider to send collected metrics over HTTP}
+\value{
+\code{meter_provider_http$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
+object.
+
+\code{meter_provider_http$options()} returns a named list, the current
+values for all options.
+}
 \description{
 This is the OTLP HTTP exporter.
 
@@ -26,14 +33,6 @@ meter_provider_http$options()
 \itemize{
 \item \code{opts}: Named list of options. See below.
 }
-}
-
-\section{Value}{
-\code{meter_provider_http$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
-object.
-
-\code{meter_provider_http$options()} returns a named list, the current
-values for all options.
 }
 
 \section{Options}{
@@ -273,4 +272,7 @@ Value is set from
 }
 }
 
+\examples{
+meter_provider_http$options()
+}
 \keyword{datasets}

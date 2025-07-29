@@ -4,6 +4,13 @@
 \name{tracer_provider_http}
 \alias{tracer_provider_http}
 \title{Tracer provider to export traces over HTTP}
+\value{
+\code{tracer_provider_http$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
+object.
+
+\code{tracer_provider_http$options()} returns a named list, the current
+values for all options.
+}
 \description{
 This is the OTLP HTTP exporter.
 
@@ -26,14 +33,6 @@ tracer_provider_http$options()
 \itemize{
 \item \code{opts}: Named list of options. See below.
 }
-}
-
-\section{Value}{
-\code{tracer_provider_http$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
-object.
-
-\code{tracer_provider_http$options()} returns a named list, the current
-values for all options.
 }
 
 \section{Options}{
@@ -267,4 +266,7 @@ This is a time interval specification, see
 }
 }
 
+\examples{
+tracer_provider_http$options()
+}
 \keyword{datasets}

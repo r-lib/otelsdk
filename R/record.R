@@ -29,6 +29,16 @@ otel_restore_cache <- function(copy) {
 #'   * `metrics`: the recorded metrics measurements, if requested in `what`.
 #'
 #' @export
+#' @examples
+#' spns <- with_otel_record({
+#'   trc <- otel::get_tracer("mytracer")
+#'   spn1 <- trc$start_local_active_span()
+#'   spn2 <- trc$start_local_active_span("my")
+#'   spn2$end()
+#'   spn1$end()
+#'   NULL
+#' })
+#' spns
 
 with_otel_record <- function(
   expr,

@@ -54,15 +54,6 @@ tracer_provider_memory_options <- function() {
 #'
 #' - `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `tracer_provider_memory$new()` returns an [otel::otel_tracer_provider]
-#' object. `tp$get_spans()` returns a named list of recorded spans, with
-#' the span names as names.
-#'
-#' `tracer_provider_memory$options()` returns a named list, the current
-#' values for all options.
-#'
 #' # Options
 #'
 #' ## Memory exporter options
@@ -73,9 +64,19 @@ tracer_provider_memory_options <- function() {
 #' cat(doc_memory_exporter_options(tracer_provider_memory_options_evs()))
 #' ```
 #'
+#' @return
+#' `tracer_provider_memory$new()` returns an [otel::otel_tracer_provider]
+#' object. `tp$get_spans()` returns a named list of recorded spans, with
+#' the span names as names.
+#'
+#' `tracer_provider_memory$options()` returns a named list, the current
+#' values for all options.
+#'
 #' @usage NULL
 #' @format NULL
 #' @export
+#' @examples
+#' tracer_provider_memory$options()
 
 tracer_provider_memory <- list(
   new = tracer_provider_memory_new,

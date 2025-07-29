@@ -60,14 +60,6 @@ logger_provider_stdstream_options <- function() {
 #'
 #' `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `logger_provider_stdstream$new()` returns an [otel::otel_logger_provider]
-#' object.
-#'
-#' `logger_provider_stdstream$options()` returns a named list, the current
-#' values of the options.
-#'
 #' # Options
 #'
 #' ## Standard stream exporter options
@@ -80,9 +72,18 @@ logger_provider_stdstream_options <- function() {
 #' ))
 #' ```
 #'
+#' @return
+#' `logger_provider_stdstream$new()` returns an [otel::otel_logger_provider]
+#' object.
+#'
+#' `logger_provider_stdstream$options()` returns a named list, the current
+#' values of the options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' logger_provider_stdstream$options()
 
 logger_provider_stdstream <- list(
   new = logger_provider_stdstream_new,

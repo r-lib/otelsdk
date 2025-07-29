@@ -15,3 +15,7 @@ Possible units: B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
 Units are case insensitive.
 }
 }
+\examples{
+# Maximum output file size is 128 MiB:
+# OTEL_EXPORTER_OTLP_FILE_FILE_SIZE=128MiB
+}

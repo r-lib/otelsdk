@@ -26,3 +26,7 @@ Possible time units: us (microseconds), ms (milliseconds), s (seconds),
 m (minutes), h (hours), d (days).
 }
 }
+\examples{
+# Write pending telemetry data to the output file every 5 seconds:
+# OTEL_EXPORTER_OTLP_FILE_FLUSH_INTERVAL=5s
+}

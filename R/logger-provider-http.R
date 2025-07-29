@@ -77,14 +77,6 @@ logger_provider_http_options <- function() {
 #'
 #' - `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `logger_provider_http$new()` returns an [otel::otel_logger_provider]
-#' object.
-#'
-#' `logger_provider_http$options()` returns a named list, the current
-#' values for all options.
-#'
 #' # Options
 #'
 #' ## HTTP exporter options
@@ -107,9 +99,18 @@ logger_provider_http_options <- function() {
 #' cat(doc_batch_processor_options(logger_provider_http$options()))
 #' ```
 #'
+#' @return
+#' `logger_provider_http$new()` returns an [otel::otel_logger_provider]
+#' object.
+#'
+#' `logger_provider_http$options()` returns a named list, the current
+#' values for all options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' logger_provider_http$options()
 
 logger_provider_http <- list(
   new = logger_provider_http_new,

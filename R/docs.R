@@ -11,6 +11,7 @@
 #' ```{r child = "tools/dox/collecting.Rmd"}
 #' ```
 #'
+#' @return Not applicable.
 #' @examples
 #' # See above
 NULL
@@ -393,6 +394,9 @@ doc_metric_exporter_options <- function() {
 #' - A positive number with a time unit suffix.
 #'   Possible time units: us (microseconds), ms (milliseconds), s (seconds),
 #'   m (minutes), h (hours), d (days).
+#' @examples
+#' # Write pending telemetry data to the output file every 5 seconds:
+#' # OTEL_EXPORTER_OTLP_FILE_FLUSH_INTERVAL=5s
 #' @return Not applicable.
 NULL
 
@@ -405,5 +409,8 @@ NULL
 #' - A string scalar with a positive number and a unit suffix.
 #'   Possible units: B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB.
 #'   Units are case insensitive.
+#' @examples
+#' # Maximum output file size is 128 MiB:
+#' # OTEL_EXPORTER_OTLP_FILE_FILE_SIZE=128MiB
 #' @return Not applicable.
 NULL

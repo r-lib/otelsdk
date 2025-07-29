@@ -4,6 +4,14 @@
 \name{tracer_provider_memory}
 \alias{tracer_provider_memory}
 \title{In-memory tracer provider for testing}
+\value{
+\code{tracer_provider_memory$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
+object. \code{tp$get_spans()} returns a named list of recorded spans, with
+the span names as names.
+
+\code{tracer_provider_memory$options()} returns a named list, the current
+values for all options.
+}
 \description{
 Collects spans in memory. This is useful for testing your instrumented
 R package or application.
@@ -27,15 +35,6 @@ tracer_provider_memory$options()
 }
 }
 
-\section{Value}{
-\code{tracer_provider_memory$new()} returns an \link[otel:otel_tracer_provider]{otel::otel_tracer_provider}
-object. \code{tp$get_spans()} returns a named list of recorded spans, with
-the span names as names.
-
-\code{tracer_provider_memory$options()} returns a named list, the current
-values for all options.
-}
-
 \section{Options}{
 \subsection{Memory exporter options}{
 \itemize{
@@ -52,4 +51,7 @@ Must be positive. Value is set from
 }
 }
 
+\examples{
+tracer_provider_memory$options()
+}
 \keyword{datasets}

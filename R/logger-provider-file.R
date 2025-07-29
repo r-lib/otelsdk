@@ -58,14 +58,6 @@ logger_provider_file_new <- function(opts = NULL) {
 #'
 #' - `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `logger_provider_file$new()` returns an [otel::otel_logger_provider]
-#' object.
-#'
-#' `logger_provider_file$options()` returns a named list, the current
-#' values of the options.
-#'
 #' # Options
 #'
 #' ## File exporter options
@@ -79,9 +71,18 @@ logger_provider_file_new <- function(opts = NULL) {
 #' ))
 #' ```
 #'
+#' @return
+#' `logger_provider_file$new()` returns an [otel::otel_logger_provider]
+#' object.
+#'
+#' `logger_provider_file$options()` returns a named list, the current
+#' values of the options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' logger_provider_file$options()
 
 logger_provider_file <- list(
   new = logger_provider_file_new,

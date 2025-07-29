@@ -5,6 +5,13 @@
 \alias{meter_provider_stdstream}
 \title{Meter provider to write to the standard output or standard error or
 to a file}
+\value{
+\code{meter_provider_stdstream$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
+object.
+
+\code{meter_provider_stdstream$options()} returns a named list, the current
+values of the options.
+}
 \description{
 Writes metrics measurements to the standard output or error, or to a
 file. Useful for debugging.
@@ -25,14 +32,6 @@ meter_provider_stdstream$options()
 
 \section{Arguments}{
 \code{opts}: Named list of options. See below.
-}
-
-\section{Value}{
-\code{meter_provider_stdstream$new()} returns an \link[otel:otel_meter_provider]{otel::otel_meter_provider}
-object.
-
-\code{meter_provider_stdstream$options()} returns a named list, the current
-values of the options.
 }
 
 \section{Options}{
@@ -77,4 +76,7 @@ A time interval specification, see
 }
 }
 
+\examples{
+meter_provider_stdstream$options()
+}
 \keyword{datasets}

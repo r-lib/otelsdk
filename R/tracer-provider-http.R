@@ -70,14 +70,6 @@ tracer_provider_http_options <- function() {
 #'
 #' - `opts`: Named list of options. See below.
 #'
-#' # Value
-#'
-#' `tracer_provider_http$new()` returns an [otel::otel_tracer_provider]
-#' object.
-#'
-#' `tracer_provider_http$options()` returns a named list, the current
-#' values for all options.
-#'
 #' # Options
 #'
 #' ## HTTP exporter options
@@ -100,9 +92,18 @@ tracer_provider_http_options <- function() {
 #' cat(doc_batch_processor_options(tracer_provider_http$options()))
 #' ```
 #'
+#' @return
+#' `tracer_provider_http$new()` returns an [otel::otel_tracer_provider]
+#' object.
+#'
+#' `tracer_provider_http$options()` returns a named list, the current
+#' values for all options.
+#'
 #' @format NULL
 #' @usage NULL
 #' @export
+#' @examples
+#' tracer_provider_http$options()
 
 tracer_provider_http <- list(
   new = tracer_provider_http_new,
