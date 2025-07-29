@@ -42,7 +42,7 @@ file_exporter_logs_flush_count_envvar <-
   "OTEL_EXPORTER_OTLP_LOGS_FILE_FLUSH_COUNT"
 
 file_exporter_file_size_envvar <-
-  "OTEL_EXPORTER_OTLP_FILE_file_SIZE"
+  "OTEL_EXPORTER_OTLP_FILE_FILE_SIZE"
 file_exporter_traces_file_size_envvar <-
   "OTEL_EXPORTER_OTLP_TRACES_FILE_FILE_SIZE"
 file_exporter_metrics_file_size_envvar <-
