@@ -25,7 +25,7 @@ A list with the output for each output type. Entries:
 \itemize{
 \item \code{value}: value of \code{expr}.
 \item \code{traces}: the recorded spans, if requested in \code{what}.
-\item \code{metrics}: the recorded metrics measurements, if requests in \code{what}.
+\item \code{metrics}: the recorded metrics measurements, if requested in \code{what}.
 }
 }
 \description{

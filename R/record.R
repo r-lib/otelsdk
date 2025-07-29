@@ -26,7 +26,7 @@ otel_restore_cache <- function(copy) {
 #' @return A list with the output for each output type. Entries:
 #'   * `value`: value of `expr`.
 #'   * `traces`: the recorded spans, if requested in `what`.
-#'   * `metrics`: the recorded metrics measurements, if requests in `what`.
+#'   * `metrics`: the recorded metrics measurements, if requested in `what`.
 #'
 #' @export
 
