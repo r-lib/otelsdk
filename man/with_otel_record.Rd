@@ -4,26 +4,37 @@
 \alias{with_otel_record}
 \title{Record OpenTelemetry output, for testing purposes}
 \usage{
-with_otel_record(expr, provider_args = list(), what = c("traces"))
+with_otel_record(
+  expr,
+  what = c("traces", "metrics"),
+  tracer_opts = list(),
+  meter_opts = list()
+)
 }
 \arguments{
 \item{expr}{Expression to evaluate.}
 
-\item{provider_args}{A list of arguments to pass to the in-memory
-OpenTelemetry trace provider.}
+\item{what}{Character vector, type(s) of OpenTelemetry output to collect.}
 
-\item{what}{Character vector, type(s) of OpenTelemetry output to collect.
-Currently only \code{"traces"} is supported.}
+\item{tracer_opts}{Named list of options to pass to the tracer provider.}
+
+\item{meter_opts}{Named list of options to pass to the meter provider.}
 }
 \value{
-A list with the output for each output type. Currently only
-contains \code{traces}.
+A list with the output for each output type. Entries:
+\itemize{
+\item \code{value}: value of \code{expr}.
+\item \code{traces}: the recorded spans, if requested in \code{what}.
+\item \code{metrics}: the recorded metrics measurements, if requests in \code{what}.
+}
 }
 \description{
-You can use this function to test the OpenTelemetry output is
+You can use this function to test that OpenTelemetry output is
 correctly generated for your package or application.
 }
 \details{
 It evaluates the supplied expression, collects OpenTelemetry output
 from it and returns it.
+
+Note: \code{with_otel_record()} cannot record logs yet.
 }
