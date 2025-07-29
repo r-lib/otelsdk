@@ -16,6 +16,9 @@ otel_restore_cache <- function(copy) {
 #'
 #' Note: `with_otel_record()` cannot record logs yet.
 #'
+#' `with_otel_record()` uses [tracer_provider_memory] and
+#' [meter_provider_memory] internally.
+#'
 #' @param expr Expression to evaluate.
 #' @param what Character vector, type(s) of OpenTelemetry output to collect.
 #' @param tracer_opts Named list of options to pass to the tracer provider.

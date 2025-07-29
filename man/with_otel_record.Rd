@@ -37,4 +37,7 @@ It evaluates the supplied expression, collects OpenTelemetry output
 from it and returns it.
 
 Note: \code{with_otel_record()} cannot record logs yet.
+
+\code{with_otel_record()} uses \link{tracer_provider_memory} and
+\link{meter_provider_memory} internally.
 }
