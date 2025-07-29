@@ -22,3 +22,7 @@ test_that("logger_provider_http", {
   expect_equal(lr$severity_text, "INFO")
   expect_equal(lr$body, "Test!")
 })
+
+test_that("logger_provider_http_options", {
+  expect_snapshot(logger_provider_http_options())
+})

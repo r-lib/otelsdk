@@ -2,6 +2,7 @@ test_that("meter, counter", {
   mp <- meter_provider_memory_new()
   on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()
+  expect_true(mtr$is_enabled())
   ctr <- mtr$create_counter("ctr")
   ctr$add(1)
   ctr$add(10)
@@ -67,4 +68,10 @@ test_that("meter, gauge", {
   expect_equal(md[["instrument_type"]], "gauge")
   expect_equal(md[["instrument_value_type"]], "double")
   expect_equal(md[["point_data_attr"]][[1]][["value"]][["value"]], 10)
+})
+
+test_that("meter_new when metrics are disabled", {
+  fake(meter_new, "find_instrumentation_scope", list(on = FALSE, name = "nm"))
+  mtr <- meter_new("name")
+  expect_s3_class(mtr, "otel_meter_noop")
 })

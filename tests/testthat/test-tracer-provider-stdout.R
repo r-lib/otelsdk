@@ -16,3 +16,9 @@ test_that("writing to a file", {
   lns <- readLines(tmp)
   expect_true(any(grepl("name\\s*:\\s*testspan", lns)))
 })
+
+test_that("tracer_provider_stdstream_options", {
+  expect_snapshot({
+    tracer_provider_stdstream_options()
+  })
+})

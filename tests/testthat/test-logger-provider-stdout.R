@@ -58,3 +58,7 @@ test_that("log to file", {
     as.character(as.integer(ts2))
   )
 })
+
+test_that("logger_provider_stdstream_options", {
+  expect_snapshot(logger_provider_stdstream_options())
+})

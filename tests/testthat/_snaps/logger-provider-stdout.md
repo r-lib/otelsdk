@@ -92,3 +92,12 @@
       [1] "0000000000000000"
       
 
+# logger_provider_stdstream_options
+
+    Code
+      logger_provider_stdstream_options()
+    Output
+      $output
+      [1] "stdout"
+      
+

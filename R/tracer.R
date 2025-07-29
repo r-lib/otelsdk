@@ -10,7 +10,7 @@ tracer_new <- function(
   inst_scope <- find_instrumentation_scope(name)
   name <- name %||% inst_scope[["name"]]
   if (!inst_scope[["on"]]) {
-    return(otel::tracer_provider_noop()$get_tracer(name))
+    return(otel::tracer_provider_noop$new()$get_tracer(name))
   }
 
   self <- new_object(

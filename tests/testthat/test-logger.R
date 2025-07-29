@@ -230,3 +230,9 @@ test_that("otel_log", {
     )
   })
 })
+
+test_that("logger_new when logging is disabled", {
+  fake(logger_new, "find_instrumentation_scope", list(on = FALSE, name = "nm"))
+  lgr <- logger_new("name")
+  expect_s3_class(lgr, "otel_logger_noop")
+})

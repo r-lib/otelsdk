@@ -22,3 +22,18 @@
       	telemetry.sdk.version: 1.21.0
       }
 
+# meter_provider_stdstream_options
+
+    Code
+      meter_provider_stdstream_options()
+    Output
+      $output
+      [1] "stdout"
+      
+      $export_interval
+      [1] 60000
+      
+      $export_timeout
+      [1] 30000
+      
+

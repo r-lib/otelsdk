@@ -876,6 +876,15 @@
       Error in `helper()`:
       ! Invalid argument: `h` must be a named character vector without `NA` values, but it is an integer vector.
 
+# as_batch_processor_options
+
+    Code
+      opts <- list(max_queue_size = "bad")
+      as_batch_processor_options(opts)
+    Condition
+      Error:
+      ! Invalid argument: `opts[["max_queue_size"]]` must be a positive integer scalar, but it is a string.
+
 # as_tracer_provider_http_options
 
     Code
@@ -1327,4 +1336,518 @@
     Condition
       Error in `helper()`:
       ! Invalid argument: `o[["retry_policy_backoff_multiplier"]]` must not be `NA`.
+
+# as_aggregation_temporality_env
+
+    Code
+      as_aggregation_temporality_env("FOO")
+    Condition
+      Error:
+      ! Invalid environment variable: 'FOO' must be one of 'unspecified', 'delta', 'cumulative', 'lowmemory' (case insensitive), bit it is 'notgood'.
+
+# as_metric_exporter_options
+
+    Code
+      as_metric_exporter_options(list())
+    Output
+      $aggregation_temporality
+      cumulative 
+               2 
+      
+    Code
+      as_metric_exporter_options(list(aggregation_temporality = "delta"))
+    Output
+      $aggregation_temporality
+      delta 
+          1 
+      
+
+---
+
+    Code
+      as_metric_exporter_options(o1)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_metric_exporter_options(o2)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_metric_exporter_options(o3)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["aggregation_temporality"]]` must be one of 'unspecified', 'delta', 'cumulative', 'lowmemory', but it is 'badvalue'.
+
+# as_meter_provider_http_options
+
+    Code
+      as_meter_provider_http_options(list())
+    Output
+      $url
+      NULL
+      
+      $content_type
+      binary 
+           1 
+      
+      $json_bytes_mapping
+      [1] 0
+      
+      $use_json_name
+      [1] FALSE
+      
+      $console_debug
+      [1] FALSE
+      
+      $timeout
+      NULL
+      
+      $http_headers
+      NULL
+      
+      $ssl_insecure_skip_verify
+      [1] FALSE
+      
+      $ssl_ca_cert_path
+      NULL
+      
+      $ssl_ca_cert_string
+      NULL
+      
+      $ssl_client_key_path
+      NULL
+      
+      $ssl_client_key_string
+      NULL
+      
+      $ssl_client_cert_path
+      NULL
+      
+      $ssl_client_cert_string
+      NULL
+      
+      $ssl_min_tls
+      [1] ""
+      
+      $ssl_max_tls
+      [1] ""
+      
+      $ssl_cipher
+      [1] ""
+      
+      $ssl_cipher_suite
+      [1] ""
+      
+      $compression
+      [1] 0
+      
+      $retry_policy_max_attempts
+      [1] 5
+      
+      $retry_policy_initial_backoff
+      [1] 1000
+      
+      $retry_policy_max_backoff
+      [1] 5000
+      
+      $retry_policy_backoff_multiplier
+      [1] 1.5
+      
+      $export_interval
+      [1] 60000
+      
+      $export_timeout
+      [1] 30000
+      
+      $aggregation_temporality
+      cumulative 
+               2 
+      
+    Code
+      as_meter_provider_http_options(list(export_interval = 100))
+    Output
+      $url
+      NULL
+      
+      $content_type
+      binary 
+           1 
+      
+      $json_bytes_mapping
+      [1] 0
+      
+      $use_json_name
+      [1] FALSE
+      
+      $console_debug
+      [1] FALSE
+      
+      $timeout
+      NULL
+      
+      $http_headers
+      NULL
+      
+      $ssl_insecure_skip_verify
+      [1] FALSE
+      
+      $ssl_ca_cert_path
+      NULL
+      
+      $ssl_ca_cert_string
+      NULL
+      
+      $ssl_client_key_path
+      NULL
+      
+      $ssl_client_key_string
+      NULL
+      
+      $ssl_client_cert_path
+      NULL
+      
+      $ssl_client_cert_string
+      NULL
+      
+      $ssl_min_tls
+      [1] ""
+      
+      $ssl_max_tls
+      [1] ""
+      
+      $ssl_cipher
+      [1] ""
+      
+      $ssl_cipher_suite
+      [1] ""
+      
+      $compression
+      [1] 0
+      
+      $retry_policy_max_attempts
+      [1] 5
+      
+      $retry_policy_initial_backoff
+      [1] 1000
+      
+      $retry_policy_max_backoff
+      [1] 5000
+      
+      $retry_policy_backoff_multiplier
+      [1] 1.5
+      
+      $export_interval
+      [1] 100
+      
+      $export_timeout
+      [1] 30000
+      
+      $aggregation_temporality
+      cumulative 
+               2 
+      
+
+---
+
+    Code
+      as_meter_provider_http_options(o1)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_meter_provider_http_options(o2)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_meter_provider_http_options(o3)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["export_interval"]]` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+
+# as_stdstream_exporter_options
+
+    Code
+      as_stdstream_exporter_options(list(), evs)
+    Output
+      $output
+      [1] "stdout"
+      
+    Code
+      as_stdstream_exporter_options(list(output = "stderr"), evs)
+    Output
+      $output
+      [1] "stderr"
+      
+    Code
+      as_stdstream_exporter_options(list(output = "./stderr"), evs)
+    Output
+      $output
+      [1] "./stderr"
+      
+
+---
+
+    Code
+      as_stdstream_exporter_options(o1, evs)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_stdstream_exporter_options(o2, evs)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_stdstream_exporter_options(o3, evs)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["output"]]` must be a string scalar but it is an integer vector.
+
+# as_logger_provider_stdstream_options
+
+    Code
+      as_logger_provider_stdstream_options(list())
+    Output
+      $output
+      [1] "stdout"
+      
+    Code
+      as_logger_provider_stdstream_options(list(output = "stdout"))
+    Output
+      $output
+      [1] "stdout"
+      
+
+---
+
+    Code
+      as_logger_provider_stdstream_options(o1)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_logger_provider_stdstream_options(o2)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_logger_provider_stdstream_options(o3)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["output"]]` must be a string scalar but it is an integer vector.
+
+# as_meter_provider_stdstream_options
+
+    Code
+      as_meter_provider_stdstream_options(list())
+    Output
+      $output
+      [1] "stdout"
+      
+      $export_interval
+      [1] 60000
+      
+      $export_timeout
+      [1] 30000
+      
+    Code
+      as_meter_provider_stdstream_options(list(export_interval = "3s"))
+    Output
+      $output
+      [1] "stdout"
+      
+      $export_interval
+      [1] 3000
+      
+      $export_timeout
+      [1] 30000
+      
+
+---
+
+    Code
+      as_meter_provider_stdstream_options(o1)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_meter_provider_stdstream_options(o2)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_meter_provider_stdstream_options(o3)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["output"]]` must be a string scalar but it is an integer vector.
+
+# as_tracer_provider_stdstream_options
+
+    Code
+      as_tracer_provider_stdstream_options(list())
+    Output
+      $output
+      [1] "stdout"
+      
+    Code
+      as_tracer_provider_stdstream_options(list(output = "stdout"))
+    Output
+      $output
+      [1] "stdout"
+      
+
+---
+
+    Code
+      as_tracer_provider_stdstream_options(o1)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_tracer_provider_stdstream_options(o2)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_tracer_provider_stdstream_options(o3)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["output"]]` must be a string scalar but it is an integer vector.
+    Code
+      as_tracer_provider_stdstream_options(o4)
+    Condition
+      Error:
+      ! Invalid argument: `o4` has unknown option: 'unknown'.
+
+# as_memory_exporter_options
+
+    Code
+      as_memory_exporter_options(list(), evs)
+    Output
+      $buffer_size
+      [1] 100
+      
+    Code
+      as_memory_exporter_options(list(buffer_size = 10), evs)
+    Output
+      $buffer_size
+      [1] 10
+      
+
+---
+
+    Code
+      as_memory_exporter_options(o1, evs)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_memory_exporter_options(o2, evs)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_memory_exporter_options(o3, evs)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["buffer_size"]]` must be an integer scalar, not a vector.
+
+# as_tracer_provider_memory_options
+
+    Code
+      as_tracer_provider_memory_options(list())
+    Output
+      $buffer_size
+      [1] 100
+      
+    Code
+      as_tracer_provider_memory_options(list(buffer_size = 15))
+    Output
+      $buffer_size
+      [1] 15
+      
+
+---
+
+    Code
+      as_tracer_provider_memory_options(o1)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_tracer_provider_memory_options(o2)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_tracer_provider_memory_options(o3)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["buffer_size"]]` must be an integer scalar, not a vector.
+    Code
+      as_tracer_provider_memory_options(o4)
+    Condition
+      Error:
+      ! Invalid argument: `o4` has unknown option: 'unknown'.
+
+# as_meter_provider_memory_options
+
+    Code
+      as_meter_provider_memory_options(list())
+    Output
+      $buffer_size
+      [1] 100
+      
+      $export_interval
+      [1] 60000
+      
+      $export_timeout
+      [1] 30000
+      
+      $aggregation_temporality
+      cumulative 
+               2 
+      
+    Code
+      as_meter_provider_memory_options(list(buffer_size = 15))
+    Output
+      $buffer_size
+      [1] 15
+      
+      $export_interval
+      [1] 60000
+      
+      $export_timeout
+      [1] 30000
+      
+      $aggregation_temporality
+      cumulative 
+               2 
+      
+
+---
+
+    Code
+      as_meter_provider_memory_options(o1)
+    Condition
+      Error:
+      ! Invalid argument: `o1` must be a named list, but it is a string.
+    Code
+      as_meter_provider_memory_options(o2)
+    Condition
+      Error:
+      ! Invalid argument: `o2` must be a named list, but it is not named.
+    Code
+      as_meter_provider_memory_options(o3)
+    Condition
+      Error:
+      ! Invalid argument: `o3[["buffer_size"]]` must be an integer scalar, not a vector.
+    Code
+      as_meter_provider_memory_options(o4)
+    Condition
+      Error:
+      ! Invalid argument: `o4` has unknown option: 'unknown'.
 

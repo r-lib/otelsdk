@@ -96,3 +96,9 @@ test_that("extract_http_context", {
   expect_equal(spns[["spn1"]][["trace_id"]], spns2[["spn2"]][["trace_id"]])
   expect_equal(spns[["spn1"]][["span_id"]], spns2[["spn2"]][["parent"]])
 })
+
+test_that("tracer_new when tracing is disabled", {
+  fake(tracer_new, "find_instrumentation_scope", list(on = FALSE, name = "nm"))
+  lgr <- tracer_new("name")
+  expect_s3_class(lgr, "otel_tracer_noop")
+})

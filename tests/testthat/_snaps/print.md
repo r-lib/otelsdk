@@ -278,3 +278,49 @@
     Output
       <otel_drop_point_data>
 
+# format.otel_metrics_data
+
+    Code
+      mtrs
+    Output
+      <otel_metrics_data>
+      <otel_resouce_metrics>
+      attributes:
+          os.type                     : <os-type>
+          process.owner               : <username>
+          process.pid                 : <process-pid>
+          process.runtime.description : <r-version-string>
+          process.runtime.name        : R
+          process.runtime.version     : <r-version>
+          service.name                : unknown_service
+          telemetry.sdk.language      : R
+          telemetry.sdk.name          : opentelemetry
+          telemetry.sdk.version       : <otel-version>
+      scope_metric_data [1]:
+          <otel_scope_metrics>
+          instrumentation_scope:
+              <otel_instrumentation_scope_data>
+              name       : org.r-project.R
+              version    : 
+              schema_url : 
+              attributes : 
+          metric_data [1]:
+              <otel_metric_data>
+              instrument_name        : c
+              instrument_description : 
+              instrument_unit        : 
+              instrument_type        : counter
+              instrument_value_type  : double
+              aggregation_temporality: cumulative
+              start_time             <timestamp>
+              end_time               <timestamp>
+              point_data_attributes [1]:
+                  <otel_point_data_attributes>
+                  attributes : 
+                  point_type : sum_point_data
+                  value      : 
+                      <otel_sum_point_data>
+                      value_type  : double
+                      value       : 5
+                      is_monotonic: TRUE
+

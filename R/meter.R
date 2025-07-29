@@ -10,7 +10,7 @@ meter_new <- function(
   inst_scope <- find_instrumentation_scope(name)
   name <- name %||% inst_scope[["name"]]
   if (!inst_scope[["on"]]) {
-    return(otel::meter_provider_noop$get_logger(name))
+    return(otel::meter_provider_noop$new()$get_meter(name))
   }
 
   self <- new_object(

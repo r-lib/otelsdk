@@ -143,3 +143,20 @@ test_that("format.otel_drop_point_data", {
   x <- structure(list(), class = "otel_drop_point_data")
   expect_snapshot(x)
 })
+
+test_that("format.otel_metrics_data", {
+  mp <- meter_provider_memory_new()
+  mtr <- mp$get_meter()
+  ctr <- mtr$create_counter("c")
+  ctr$add(5)
+  mp$flush()
+  mp$shutdown()
+  mtrs <- mp$get_metrics()
+  # there are two reports, and the first one might be empty,
+  # but this depends on the platforms and probably chance, so skip it
+  mtrs[[1]] <- NULL
+  expect_snapshot(
+    mtrs,
+    transform = transform_metric_data
+  )
+})

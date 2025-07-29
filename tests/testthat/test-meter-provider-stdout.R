@@ -14,3 +14,9 @@ test_that("meter_provider_stdout", {
     transform = transform_meter_provider_file
   )
 })
+
+test_that("meter_provider_stdstream_options", {
+  expect_snapshot({
+    meter_provider_stdstream_options()
+  })
+})

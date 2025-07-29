@@ -18,3 +18,9 @@ test_that("meter_provider_http", {
   mcs <- cl_mcs$scope_metrics[[1]]$metrics[[1]]
   expect_equal(mcs$name, "ctr")
 })
+
+test_that("meter_provider_http_options", {
+  expect_snapshot({
+    meter_provider_http_options()
+  })
+})

@@ -21,10 +21,6 @@ map_lgl <- function(X, FUN, ...) {
   vapply(X, FUN, FUN.VALUE = logical(1), ...)
 }
 
-drop_nulls <- function(x) {
-  x[!map_lgl(x, is.null)]
-}
-
 get_env <- function(n) {
   v <- Sys.getenv(n)
   if (v != "") v else NULL

@@ -11,7 +11,7 @@ logger_new <- function(
   inst_scope <- find_instrumentation_scope(name)
   name <- name %||% inst_scope[["name"]]
   if (!inst_scope[["on"]]) {
-    return(otel::logger_provider_noop$get_logger(name))
+    return(otel::logger_provider_noop$new()$get_logger(name))
   }
 
   self <- new_object(

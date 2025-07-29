@@ -888,6 +888,13 @@ test_that("as_http_exporter_options", {
   expect_true(TRUE)
 })
 
+test_that("as_batch_processor_options", {
+  expect_snapshot(error = TRUE, {
+    opts <- list(max_queue_size = "bad")
+    as_batch_processor_options(opts)
+  })
+})
+
 test_that("as_tracer_provider_http_options", {
   expect_snapshot(as_tracer_provider_http_options(NULL))
 
@@ -993,5 +1000,176 @@ test_that("as_logger_provider_http_options", {
     helper(v)
     v <- list(retry_policy_backoff_multiplier = NA_real_)
     helper(v)
+  })
+})
+
+test_that("as_aggregation_temporality", {
+  expect_equal(
+    as_aggregation_temporality(NULL),
+    c(cumulative = 2L)
+  )
+  expect_equal(
+    as_aggregation_temporality("unspecified"),
+    c(unspecified = 0L)
+  )
+})
+
+test_that("as_aggregation_temporality_env", {
+  withr::local_envvar(FOO = NA_character_)
+  expect_null(as_aggregation_temporality_env("FOO"))
+
+  withr::local_envvar(FOO = "delta")
+  expect_equal(as_aggregation_temporality_env("FOO"), c(delta = 1L))
+
+  withr::local_envvar(FOO = "notgood")
+  expect_snapshot(error = TRUE, {
+    as_aggregation_temporality_env("FOO")
+  })
+})
+
+test_that("as_metric_exporter_options", {
+  expect_snapshot({
+    as_metric_exporter_options(list())
+    as_metric_exporter_options(list(aggregation_temporality = "delta"))
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(aggregation_temporality = "badvalue")
+  expect_snapshot(error = TRUE, {
+    as_metric_exporter_options(o1)
+    as_metric_exporter_options(o2)
+    as_metric_exporter_options(o3)
+  })
+})
+
+test_that("as_meter_provider_http_options", {
+  expect_snapshot({
+    as_meter_provider_http_options(list())
+    as_meter_provider_http_options(list(export_interval = 100))
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(export_interval = "badvalue")
+  expect_snapshot(error = TRUE, {
+    as_meter_provider_http_options(o1)
+    as_meter_provider_http_options(o2)
+    as_meter_provider_http_options(o3)
+  })
+})
+
+test_that("as_stdstream_exporter_options", {
+  dir.create(tmp <- tempfile())
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+  withr::local_dir(tmp)
+  evs <- logger_provider_stdstream_options_evs()
+  expect_snapshot({
+    as_stdstream_exporter_options(list(), evs)
+    as_stdstream_exporter_options(list(output = "stderr"), evs)
+    as_stdstream_exporter_options(list(output = "./stderr"), evs)
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(output = 1:10)
+  expect_snapshot(error = TRUE, {
+    as_stdstream_exporter_options(o1, evs)
+    as_stdstream_exporter_options(o2, evs)
+    as_stdstream_exporter_options(o3, evs)
+  })
+})
+
+test_that("as_logger_provider_stdstream_options", {
+  expect_snapshot({
+    as_logger_provider_stdstream_options(list())
+    as_logger_provider_stdstream_options(list(output = "stdout"))
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(output = 1:10)
+  expect_snapshot(error = TRUE, {
+    as_logger_provider_stdstream_options(o1)
+    as_logger_provider_stdstream_options(o2)
+    as_logger_provider_stdstream_options(o3)
+  })
+})
+
+test_that("as_meter_provider_stdstream_options", {
+  expect_snapshot({
+    as_meter_provider_stdstream_options(list())
+    as_meter_provider_stdstream_options(list(export_interval = "3s"))
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(output = 1:10)
+  expect_snapshot(error = TRUE, {
+    as_meter_provider_stdstream_options(o1)
+    as_meter_provider_stdstream_options(o2)
+    as_meter_provider_stdstream_options(o3)
+  })
+})
+
+test_that("as_tracer_provider_stdstream_options", {
+  expect_snapshot({
+    as_tracer_provider_stdstream_options(list())
+    as_tracer_provider_stdstream_options(list(output = "stdout"))
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(output = 1:10)
+  o4 <- list(unknown = "foo")
+  expect_snapshot(error = TRUE, {
+    as_tracer_provider_stdstream_options(o1)
+    as_tracer_provider_stdstream_options(o2)
+    as_tracer_provider_stdstream_options(o3)
+    as_tracer_provider_stdstream_options(o4)
+  })
+})
+
+test_that("as_memory_exporter_options", {
+  evs <- tracer_provider_memory_options_evs()
+  expect_snapshot({
+    as_memory_exporter_options(list(), evs)
+    as_memory_exporter_options(list(buffer_size = 10), evs)
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(buffer_size = 1:10)
+  expect_snapshot(error = TRUE, {
+    as_memory_exporter_options(o1, evs)
+    as_memory_exporter_options(o2, evs)
+    as_memory_exporter_options(o3, evs)
+  })
+})
+
+test_that("as_tracer_provider_memory_options", {
+  expect_snapshot({
+    as_tracer_provider_memory_options(list())
+    as_tracer_provider_memory_options(list(buffer_size = 15))
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(buffer_size = 1:10)
+  o4 <- list(unknown = "option")
+  expect_snapshot(error = TRUE, {
+    as_tracer_provider_memory_options(o1)
+    as_tracer_provider_memory_options(o2)
+    as_tracer_provider_memory_options(o3)
+    as_tracer_provider_memory_options(o4)
+  })
+})
+
+test_that("as_meter_provider_memory_options", {
+  expect_snapshot({
+    as_meter_provider_memory_options(list())
+    as_meter_provider_memory_options(list(buffer_size = 15))
+  })
+  o1 <- "notalist"
+  o2 <- list("notnamed")
+  o3 <- list(buffer_size = 1:10)
+  o4 <- list(unknown = "option")
+  expect_snapshot(error = TRUE, {
+    as_meter_provider_memory_options(o1)
+    as_meter_provider_memory_options(o2)
+    as_meter_provider_memory_options(o3)
+    as_meter_provider_memory_options(o4)
   })
 })

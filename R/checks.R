@@ -1656,6 +1656,7 @@ as_batch_processor_options <- function(
   arg = caller_arg(opts),
   call = caller_env()
 ) {
+  force(arg)
   opts <- as_named_list(opts, arg = arg, call = call)
 
   ma <- function(nm) {
@@ -1785,9 +1786,12 @@ as_aggregation_temporality <- function(
   )
 
   if (!is.null(ret)) {
-    structure(ret, names = otlp_aggregation_temporality_choices[ret + 1])
+    structure(
+      ret,
+      names = unname(otlp_aggregation_temporality_choices[ret + 1])
+    )
   } else {
-    NULL
+    NULL # nocov
   }
 }
 
@@ -1820,6 +1824,7 @@ as_metric_exporter_options <- function(
   arg = caller_arg(opts),
   call = caller_env()
 ) {
+  force(arg)
   opts <- as_named_list(opts, arg = arg, call = call)
 
   ma <- function(nm) {
@@ -1880,6 +1885,7 @@ as_stdstream_exporter_options <- function(
   arg = caller_arg(opts),
   call = caller_env()
 ) {
+  force(arg)
   opts <- as_named_list(opts, arg = arg, call = call)
 
   ma <- function(nm) {
@@ -1962,6 +1968,7 @@ as_memory_exporter_options <- function(
   arg = caller_arg(opts),
   call = caller_env()
 ) {
+  force(arg)
   opts <- as_named_list(opts, arg = arg, call = call)
 
   ma <- function(nm) {
