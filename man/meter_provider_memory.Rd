@@ -7,6 +7,10 @@
 \description{
 Collects metrics measurements in memory. This is useful for testing your
 instrumented R package or application.
+
+\code{\link[=with_otel_record]{with_otel_record()}} uses this meter provider.
+Use \code{\link[=with_otel_record]{with_otel_record()}} in your tests to record telemetry and check
+that it is correct.
 }
 \section{Usage}{
 \if{html}{\out{<div class="sourceCode">}}\preformatted{mp <- meter_provider_memory$new(opts = NULL)

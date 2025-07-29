@@ -38,10 +38,9 @@ meter_provider_memory_options <- function() {
 #' Collects metrics measurements in memory. This is useful for testing your
 #' instrumented R package or application.
 #'
-# TODO
-# [with_otel_record()] uses this meter provider.
-# Use [with_otel_record()] in your tests to record telemetry and check
-# that it is correct.
+#' [with_otel_record()] uses this meter provider.
+#' Use [with_otel_record()] in your tests to record telemetry and check
+#' that it is correct.
 #'
 #' # Usage
 #'
