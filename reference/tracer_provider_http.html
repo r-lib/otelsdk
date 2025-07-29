@@ -17,9 +17,9 @@ Select this tracer provider with OTEL_TRACES_EXPORTER=otlp."><script defer data-
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="external-link nav-link" href="https://otel.r-lib.org/reference/gettingstarted.html">Getting Started (otel Package)</a></li>
+      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://otel.r-lib.org/reference/gettingstarted.html">Getting Started (otel Package)</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/collecting.html">Collecting Telemetry Data</a></li>
-<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
       </ul><ul class="navbar-nav"></ul></div>
 
 
@@ -42,7 +42,7 @@ Select this tracer provider with OTEL_TRACES_EXPORTER=otlp."><script defer data-
     <div class="section level2">
     <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h2>
     <p>Externally:</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>OTEL_TRACER_EXPORTER<span class="ot">=</span>otlp</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>OTEL_TRACES_EXPORTER<span class="ot">=</span>otlp</span></code></pre><p></p></div>
 <p>From R:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>tracer_provider_http<span class="sc">$</span><span class="fu">new</span>(<span class="at">opts =</span> <span class="cn">NULL</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>tracer_provider_http<span class="sc">$</span><span class="fu">options</span>()</span></code></pre><p></p></div>
@@ -56,14 +56,18 @@ Select this tracer provider with OTEL_TRACES_EXPORTER=otlp."><script defer data-
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p><code>tracer_provider_http$new()</code> returns an <a href="https://otel.r-lib.org/reference/otel_tracer_provider.html" class="external-link">otel::otel_tracer_provider</a>
 object.</p>
-<p><code>tracer_provider_http$options()</code> returns a named list, the default
+<p><code>tracer_provider_http$options()</code> returns a named list, the current
 values for all options.</p>
     </div>
     <div class="section level2">
     <h2 id="options">Options<a class="anchor" aria-label="anchor" href="#options"></a></h2>
-    <p>HTTP exporter options:</p><ul><li><p><code>url</code>: OTLP URL to send telemetry data to. Value is set from</p><ul><li><p>the <code>opts</code> argument, needs to point to the traces endpoint, or</p></li>
-<li><p><code>OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</code> environment variable, needs to
-point to the traces endpoint, or</p></li>
+
+<div class="section">
+<h3 id="http-exporter-options">HTTP exporter options<a class="anchor" aria-label="anchor" href="#http-exporter-options"></a></h3>
+
+<ul><li><p><code>url</code>: OTLP URL to send telemetry data to. Value is set from</p><ul><li><p>the <code>opts</code> argument, needs to point to the traces endpoint, or</p></li>
+<li><p><code>OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</code> environment variable,
+needs to point to the traces endpoint, or</p></li>
 <li><p><code>OTEL_EXPORTER_OTLP_ENDPOINT</code> environment variable + <code>/v1/traces</code>, or</p></li>
 <li><p>the default is <code>http://localhost:4318/v1/traces</code>.</p></li>
 </ul></li>
@@ -89,28 +93,155 @@ the key of json. A flag. Value is set from</p><ul><li><p>the <code>opts</code> a
 <li><p>the <code>OTEL_R_EXPORTER_OTLP_USE_JSON_NAME</code> environment variable, or</p></li>
 <li><p>the default is <code>FALSE</code>.</p></li>
 </ul></li>
-<li><p><code>console_debug</code>:</p></li>
-<li><p><code>timeout</code>:</p></li>
-<li><p><code>ssl_insecure_skip_verify</code>:</p></li>
-<li><p><code>ssl_ca_cert_path</code>:</p></li>
-<li><p><code>ssl_ca_cert_string</code>:</p></li>
-<li><p><code>ssl_client_key_path</code>:</p></li>
-<li><p><code>ssl_client_key_string</code>:</p></li>
-<li><p><code>ssl_client_cert_path</code>:</p></li>
-<li><p><code>ssl_client_cert_string</code>:</p></li>
-<li><p><code>ssl_min_tls</code>:</p></li>
-<li><p><code>ssl_max_tls</code>:</p></li>
-<li><p><code>ssl_cipher</code>:</p></li>
-<li><p><code>ssl_cipher_suite</code>:</p></li>
-<li><p><code>compression</code>:</p></li>
-<li><p><code>retry_policy_max_attempts</code>:</p></li>
-<li><p><code>retry_policy_initial_backoff</code>:</p></li>
-<li><p><code>retry_policy_max_backoff</code>:</p></li>
-<li><p><code>retry_policy_backoff_multiplier</code>:</p></li>
-</ul><p>Batch processor options:</p><ul><li><p><code>max_queue_size</code>:</p></li>
-<li><p><code>max_export_batch_size</code>:</p></li>
-<li><p><code>schedule_delay</code>:</p></li>
+<li><p><code>console_debug</code>: whether to print debug messages to the console.
+Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_CONSOLE_DEBUG</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_CONSOLE_DEBUG</code> environment variable, or</p></li>
+<li><p>the default is <code>FALSE</code>.</p></li>
+</ul></li>
+<li><p><code>timeout</code>: HTTP timeout. A time interval specification, see
+<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TRACES_TIMEOUT}</code> environment
+variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TIMEOUT</code> environment variable, or</p></li>
+<li><p>the default is <code>10s</code>.</p></li>
+</ul></li>
+<li><p><code>ssl_insecure_skip_verify</code>: whether to disable SSL. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_SSL_INSECURE_SKIP_VERIFY</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_SSL_INSECURE_SKIP_VERIFY</code> environment variable, or</p></li>
+<li><p>the default is <code>FALSE</code>.</p></li>
+</ul></li>
+<li><p><code>ssl_ca_cert_path</code>: CA certificate, path to a file. Empty string uses
+the system default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE</code> environment
+variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_CERTIFICATE</code> environment variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_ca_cert_string</code>: CA certificate, as a string. Empty string uses
+the system default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING</code>
+environment variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_CERTIFICATE_STRING</code> environment variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_client_key_path</code>: SSL client key, path to a file. Empty string
+uses the system default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY</code>
+environment variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_CLIENT_KEY</code> environment variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_client_key_string</code>: SSL client key as a string. Empty string
+uses the system default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY_STRING</code>
+environment variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING</code> environment
+variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_client_cert_path</code>: SSL client certificate, path to a file.
+Empty string uses the system default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE</code>
+environment variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE</code> environment variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_client_cert_string</code>: SSL client certificate, as a string.
+Empty string uses the system default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE_STRING</code>
+environment variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING</code> environment
+variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_min_tls</code>: minimum TLS version. Empty string uses the system
+default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_SSL_MIN_TLS</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_SSL_MIN_TLS</code> environment variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_max_tls</code>: maximum TLS version. Empty string uses the system
+default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_SSL_MAX_TLS</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_SSL_MAX_TLS</code> environment variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_cipher</code>: TLS cipher. Empty string uses the system default.
+Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_SSL_CIPHER</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_SSL_CIPHER</code> environment variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>ssl_cipher_suite</code>: TLS cipher suite. Empty string uses the system
+default. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_SSL_CIPHER_SUITE</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_SSL_CIPHER_SUITE</code> environment variable, or</p></li>
+<li><p>the default is “.</p></li>
+</ul></li>
+<li><p><code>compression</code>: compression to use. Possible values are
+<code>"none"</code>, <code>"gzip"</code>.
+Value is the set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_TRACES_COMPRESSION</code> environment
+variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_COMPRESSION</code> environment variable, or</p></li>
+<li><p>the default is <code>none</code>.</p></li>
+</ul></li>
+<li><p><code>retry_policy_max_attempts</code>: the maximum number of call attempts,
+including the original attempt. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_MAX_ATTEMPTS</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_ATTEMPTS</code> environment variable, or</p></li>
+<li><p>the default is <code>5</code>.</p></li>
+</ul></li>
+<li><p><code>retry_policy_initial_backoff</code>: the maximum initial back-off delay
+between retry attempts. The actual backoff delay is uniform random
+between zero and this. This is a time interval specification, see
+<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_INITIAL_BACKOFF</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_RETRY_POLICY_INITIAL_BACKOFF</code> environment
+variable, or</p></li>
+<li><p>the default is <code>1000ms</code>.</p></li>
+</ul></li>
+<li><p><code>retry_policy_max_backoff</code>: the maximum backoff places an upper limit
+on exponential backoff growth. This is a time interval specification,
+see <a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_MAX_BACKOFF</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_BACKOFF</code> environment variable, or</p></li>
+<li><p>the default is <code>5000ms</code>.</p></li>
+</ul></li>
+<li><p><code>retry_policy_backoff_multiplier</code>: the backoff will be multiplied by
+this value after each retry attempt. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_BACKOFF_MULTIPLIER</code> environment
+variable, or</p></li>
+<li><p>the <code>OTEL_R_EXPORTER_OTLP_RETRY_POLICY_BACKOFF_MULTIPLIER</code> environment
+variable, or</p></li>
+<li><p>the default is <code>1.5</code>.</p></li>
+</ul></li>
 </ul></div>
+
+<div class="section">
+<h3 id="batch-processor-options">Batch processor options<a class="anchor" aria-label="anchor" href="#batch-processor-options"></a></h3>
+
+<ul><li><p><code>max_queue_size</code>: The maximum buffer/queue size. After the size is
+reached, spans are dropped. Must be positive. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_BSP_MAX_QUEUE_SIZE</code> environment variable, or</p></li>
+<li><p>the default is <code>2048</code>.</p></li>
+</ul></li>
+<li><p><code>max_export_batch_size</code>: the maximum batch size of every export.
+It must be smaller or equal to max_queue_size. Must be positive.
+Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_BSP_MAX_EXPORT_BATCH_SIZE</code> environment variable, or</p></li>
+<li><p>the default is <code>512</code>.</p></li>
+</ul></li>
+<li><p><code>schedule_delay</code>: the time interval between two consecutive exports.
+This is a time interval specification, see
+<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument` or</p></li>
+<li><p>the <code>OTEL_BSP_SCHEDULE_DELAY</code> environment variable, or</p></li>
+<li><p>the default is <code>5000ms</code>.</p></li>
+</ul></li>
+</ul></div>
+
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
