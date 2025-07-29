@@ -72,7 +72,7 @@ correctly generated for your package or application.</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list with the output for each output type. Entries:</p><ul><li><p><code>value</code>: value of <code>expr</code>.</p></li>
 <li><p><code>traces</code>: the recorded spans, if requested in <code>what</code>.</p></li>
-<li><p><code>metrics</code>: the recorded metrics measurements, if requests in <code>what</code>.</p></li>
+<li><p><code>metrics</code>: the recorded metrics measurements, if requested in <code>what</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -83,6 +83,109 @@ from it and returns it.</p>
 <a href="meter_provider_memory.html">meter_provider_memory</a> internally.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">spns</span> <span class="op">&lt;-</span> <span class="fu">with_otel_record</span><span class="op">(</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">trc</span> <span class="op">&lt;-</span> <span class="fu">otel</span><span class="fu">::</span><span class="fu"><a href="https://otel.r-lib.org/reference/get_tracer.html" class="external-link">get_tracer</a></span><span class="op">(</span><span class="st">"mytracer"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">spn1</span> <span class="op">&lt;-</span> <span class="va">trc</span><span class="op">$</span><span class="fu">start_local_active_span</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">spn2</span> <span class="op">&lt;-</span> <span class="va">trc</span><span class="op">$</span><span class="fu">start_local_active_span</span><span class="op">(</span><span class="st">"my"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">spn2</span><span class="op">$</span><span class="fu">end</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">spn1</span><span class="op">$</span><span class="fu">end</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="cn">NULL</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">spns</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $traces</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $traces$my</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;otel_span_data&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : 3609bc44767ac71652dcef58b00ded05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : 2701b188755642c8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> name                  : my</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flags                 : +sampled -random</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> parent                : ff8ae5e8e8a0148d</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> description           : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> resource_attributes   : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8960</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.1 (2025-06-13)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     service.name                : unknown_service</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.language      : R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.name          : opentelemetry</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.version       : 0.0.0.9000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> schema_url            : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> instrumentation_scope : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;otel_instrumentation_scope_data&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     name       : mytracer</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     version    : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     schema_url : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     attributes : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> kind                  : internal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> status                : unset</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2025-07-29 12:28:04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000118562</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attributes            : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> events                : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> links                 : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $traces$`&lt;NA&gt;`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;otel_span_data&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : 3609bc44767ac71652dcef58b00ded05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : ff8ae5e8e8a0148d</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> name                  : &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> flags                 : +sampled -random</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> parent                : 0000000000000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> description           : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> resource_attributes   : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8960</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.1 (2025-06-13)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     service.name                : unknown_service</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.language      : R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.name          : opentelemetry</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.version       : 0.0.0.9000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> schema_url            : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> instrumentation_scope : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;otel_instrumentation_scope_data&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     name       : mytracer</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     version    : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     schema_url : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     attributes : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> kind                  : internal</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> status                : unset</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2025-07-29 12:28:04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000290904</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attributes            : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> events                : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> links                 : </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $metrics</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;otel_metrics_data&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;otel_resouce_metrics&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attributes:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8960</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.1 (2025-06-13)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     service.name                : unknown_service</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.language      : R</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.name          : opentelemetry</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.version       : 0.0.0.9000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> scope_metric_data [0]:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
