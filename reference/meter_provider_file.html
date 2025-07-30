@@ -135,16 +135,14 @@ from</p><ul><li><p><code>opts</code> argument, or</p></li>
 <h3 id="metric-reader-options">Metric reader options<a class="anchor" aria-label="anchor" href="#metric-reader-options"></a></h3>
 
 <ul><li><p><code>export_interval</code>: the time interval between the
-start of two export attempts. A time interval specification, see
-<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+start of two export attempts, in milliseconds. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_METRIC_EXPORT_INTERVAL</code> environment variable, or</p></li>
-<li><p>the default is <code>"60s"</code>.</p></li>
+<li><p>the default is <code>60000</code>.</p></li>
 </ul></li>
-<li><p><code>export_timeout</code>: Maximum allowed time to export data.
-A time interval specification, see
-<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p><code>export_timeout</code>: Maximum allowed time to export data, in
+milliseconds. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_METRIC_EXPORT_TIMEOUT</code> environment variable, or</p></li>
-<li><p>the default is <code>"30s"</code>.</p></li>
+<li><p>the default is <code>30000</code>.</p></li>
 </ul></li>
 </ul></div>
 

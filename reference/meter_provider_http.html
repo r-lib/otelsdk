@@ -75,12 +75,13 @@ needs to point to the metrics endpoint, or</p></li>
 <li><p>the default is <code>http://localhost:4318/v1/metrics</code>.</p></li>
 </ul></li>
 <li><p><code>content_type</code>: data format used, JSON or binary. Possible values:
-<code>"json"</code>, <code>"application/json"</code>, <code>"binary"</code>, <code>"application/x-protobuf"</code>.
+<code>"http/json"</code>, <code>"http/protobuf"</code>.
 Value if set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
-<li><p>the <code>OTEL_R_EXPORTER_OTLP_METRICS_CONTENT_TYPE</code> environment variable, or</p></li>
-<li><p>the <code>OTEL_R_EXPORTER_OTLP_CONTENT_TYPE</code> environment variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_METRICS_PROTOCOL</code> environment
+variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_PROTOCOL</code> environment variable, or</p></li>
 <li><p>the default is
-<code>"binary"</code>.</p></li>
+<code>"http/protobuf"</code>.</p></li>
 </ul></li>
 <li><p><code>json_bytes_mapping</code>: encoding used for trace id and span id.
 Possible values:
@@ -102,12 +103,21 @@ Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_R_EXPORTER_OTLP_CONSOLE_DEBUG</code> environment variable, or</p></li>
 <li><p>the default is <code>FALSE</code>.</p></li>
 </ul></li>
-<li><p><code>timeout</code>: HTTP timeout. A time interval specification, see
-<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p><code>timeout</code>: HTTP timeout in milliseconds. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_EXPORTER_OTLP_METRICS_TIMEOUT}</code> environment
 variable, or</p></li>
 <li><p>the <code>OTEL_EXPORTER_OTLP_TIMEOUT</code> environment variable, or</p></li>
-<li><p>the default is <code>10s</code>.</p></li>
+<li><p>the default is <code>10000</code>.</p></li>
+</ul></li>
+<li><p><code>http_headers</code>: additional HTTP headers to send, e.g. <code>Authorization</code>
+is commonly used. A named character vector without <code>NA</code> values.
+Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_METRICS_HEADERS</code> environment
+variable, or</p></li>
+<li><p>the <code>OTEL_EXPORTER_OTLP_HEADERS</code> environment variable, or</p></li>
+<li><p>the default is an empty named character vector.
+When specified in environment variables, it must be a comma separated
+list of headers, each in the <code>header=value</code> form.</p></li>
 </ul></li>
 <li><p><code>ssl_insecure_skip_verify</code>: whether to disable SSL. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_R_EXPORTER_OTLP_METRICS_SSL_INSECURE_SKIP_VERIFY</code> environment variable, or</p></li>
@@ -198,19 +208,17 @@ including the original attempt. Value is set from</p><ul><li><p>the <code>opts</
 </ul></li>
 <li><p><code>retry_policy_initial_backoff</code>: the maximum initial back-off delay
 between retry attempts. The actual backoff delay is uniform random
-between zero and this. This is a time interval specification, see
-<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+between zero and this. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_INITIAL_BACKOFF</code> environment variable, or</p></li>
 <li><p>the <code>OTEL_R_EXPORTER_OTLP_RETRY_POLICY_INITIAL_BACKOFF</code> environment
 variable, or</p></li>
-<li><p>the default is <code>1000ms</code>.</p></li>
+<li><p>the default is <code>1000</code>.</p></li>
 </ul></li>
 <li><p><code>retry_policy_max_backoff</code>: the maximum backoff places an upper limit
-on exponential backoff growth. This is a time interval specification,
-see <a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+on exponential backoff growth. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_MAX_BACKOFF</code> environment variable, or</p></li>
 <li><p>the <code>OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_BACKOFF</code> environment variable, or</p></li>
-<li><p>the default is <code>5000ms</code>.</p></li>
+<li><p>the default is <code>5000</code>.</p></li>
 </ul></li>
 <li><p><code>retry_policy_backoff_multiplier</code>: the backoff will be multiplied by
 this value after each retry attempt. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
@@ -226,16 +234,14 @@ variable, or</p></li>
 <h3 id="metric-reader-options">Metric reader options<a class="anchor" aria-label="anchor" href="#metric-reader-options"></a></h3>
 
 <ul><li><p><code>export_interval</code>: the time interval between the
-start of two export attempts. A time interval specification, see
-<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+start of two export attempts, in milliseconds. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_METRIC_EXPORT_INTERVAL</code> environment variable, or</p></li>
-<li><p>the default is <code>"60s"</code>.</p></li>
+<li><p>the default is <code>60000</code>.</p></li>
 </ul></li>
-<li><p><code>export_timeout</code>: Maximum allowed time to export data.
-A time interval specification, see
-<a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
+<li><p><code>export_timeout</code>: Maximum allowed time to export data, in
+milliseconds. Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <li><p>the <code>OTEL_METRIC_EXPORT_TIMEOUT</code> environment variable, or</p></li>
-<li><p>the default is <code>"30s"</code>.</p></li>
+<li><p>the default is <code>30000</code>.</p></li>
 </ul></li>
 </ul></div>
 
@@ -259,8 +265,8 @@ Value is set from</p><ul><li><p>the <code>opts</code> argument, or</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "http://localhost:4318/v1/metrics"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $content_type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> binary </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      1 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> http/protobuf </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             1 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $json_bytes_mapping</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
