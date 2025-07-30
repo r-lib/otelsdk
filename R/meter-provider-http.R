@@ -32,6 +32,7 @@ meter_provider_http_options <- function() {
   # override the ones that are in the spec
   spec <- c(
     "url",
+    "content_type",
     "timeout",
     "http_headers",
     "ssl_ca_cert_path",
@@ -43,9 +44,9 @@ meter_provider_http_options <- function() {
     "compression"
   )
   ropts[spec] <- copts[spec]
+  ropts[["content_type"]] <- as_otlp_content_type(ropts[["content_type"]])
   ropts
 }
-
 
 #' Meter provider to send collected metrics over HTTP
 #'

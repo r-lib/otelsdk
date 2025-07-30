@@ -1,3 +1,5 @@
+stdstream_output_envvar <-
+  "OTEL_R_EXPORTER_STDSTREAM_OUTPUT"
 tracer_provider_stdstream_output_envvar <-
   "OTEL_R_EXPORTER_STDSTREAM_TRACES_OUTPUT"
 logger_provider_stdstream_output_envvar <-
@@ -61,16 +63,6 @@ file_exporter_logs_rotate_size_envvar <-
 
 metric_export_interval_envvar <- "OTEL_METRIC_EXPORT_INTERVAL"
 metric_export_timeout_envvar <- "OTEL_METRIC_EXPORT_TIMEOUT"
-
-otlp_content_type_default <- "binary"
-otlp_content_type_envvar <-
-  "OTEL_R_EXPORTER_OTLP_CONTENT_TYPE"
-otlp_traces_content_type_envvar <-
-  "OTEL_R_EXPORTER_OTLP_TRACES_CONTENT_TYPE"
-otlp_metrics_content_type_envvar <-
-  "OTEL_R_EXPORTER_OTLP_METRICS_CONTENT_TYPE"
-otlp_logs_content_type_envvar <-
-  "OTEL_R_EXPORTER_OTLP_LOGS_CONTENT_TYPE"
 
 otlp_json_bytes_mapping_default <- "hexid"
 otlp_json_bytes_mapping_envvar <-

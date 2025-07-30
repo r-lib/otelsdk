@@ -49,6 +49,7 @@ Value is set from
 \itemize{
 \item the \code{opts} argument, or
 \item the \code{OTEL_R_EXPORTER_STDSTREAM_TRACES_OUTPUT} environment variable, or
+\item the \code{OTEL_R_EXPORTER_STDSTREAM_OUTPUT} environment variable, or
 \item the default is \code{"stdout"}.
 }
 }

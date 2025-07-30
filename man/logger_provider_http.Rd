@@ -45,14 +45,15 @@ needs to point to the logs endpoint, or
 \item the default is \verb{http://localhost:4318/v1/logs}.
 }
 \item \code{content_type}: data format used, JSON or binary. Possible values:
-\code{"json"}, \code{"application/json"}, \code{"binary"}, \code{"application/x-protobuf"}.
+\code{"http/json"}, \code{"http/protobuf"}.
 Value if set from
 \itemize{
 \item the \code{opts} argument, or
-\item the \code{OTEL_R_EXPORTER_OTLP_LOGS_CONTENT_TYPE} environment variable, or
-\item the \code{OTEL_R_EXPORTER_OTLP_CONTENT_TYPE} environment variable, or
+\item the \code{OTEL_EXPORTER_OTLP_LOGS_PROTOCOL} environment
+variable, or
+\item the \code{OTEL_EXPORTER_OTLP_PROTOCOL} environment variable, or
 \item the default is
-\code{"binary"}.
+\code{"http/protobuf"}.
 }
 \item \code{json_bytes_mapping}: encoding used for trace id and span id.
 Possible values:
@@ -80,14 +81,25 @@ Value is set from
 \item the \code{OTEL_R_EXPORTER_OTLP_CONSOLE_DEBUG} environment variable, or
 \item the default is \code{FALSE}.
 }
-\item \code{timeout}: HTTP timeout. A time interval specification, see
-\link{Time Interval Options}. Value is set from
+\item \code{timeout}: HTTP timeout in milliseconds. Value is set from
 \itemize{
 \item the \code{opts} argument, or
 \item the \verb{OTEL_EXPORTER_OTLP_LOGS_TIMEOUT\}} environment
 variable, or
 \item the \code{OTEL_EXPORTER_OTLP_TIMEOUT} environment variable, or
-\item the default is \verb{10s}.
+\item the default is \code{10000}.
+}
+\item \code{http_headers}: additional HTTP headers to send, e.g. \code{Authorization}
+is commonly used. A named character vector without \code{NA} values.
+Value is set from
+\itemize{
+\item the \code{opts} argument, or
+\item the \code{OTEL_EXPORTER_OTLP_LOGS_HEADERS} environment
+variable, or
+\item the \code{OTEL_EXPORTER_OTLP_HEADERS} environment variable, or
+\item the default is an empty named character vector.
+When specified in environment variables, it must be a comma separated
+list of headers, each in the \code{header=value} form.
 }
 \item \code{ssl_insecure_skip_verify}: whether to disable SSL. Value is set from
 \itemize{
@@ -204,23 +216,21 @@ including the original attempt. Value is set from
 }
 \item \code{retry_policy_initial_backoff}: the maximum initial back-off delay
 between retry attempts. The actual backoff delay is uniform random
-between zero and this. This is a time interval specification, see
-\link{Time Interval Options}. Value is set from
+between zero and this. Value is set from
 \itemize{
 \item the \code{opts} argument, or
 \item the \code{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_INITIAL_BACKOFF} environment variable, or
 \item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_INITIAL_BACKOFF} environment
 variable, or
-\item the default is \verb{1000ms}.
+\item the default is \code{1000}.
 }
 \item \code{retry_policy_max_backoff}: the maximum backoff places an upper limit
-on exponential backoff growth. This is a time interval specification,
-see \link{Time Interval Options}. Value is set from
+on exponential backoff growth. Value is set from
 \itemize{
 \item the \code{opts} argument, or
 \item the \code{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_MAX_BACKOFF} environment variable, or
 \item the \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_BACKOFF} environment variable, or
-\item the default is \verb{5000ms}.
+\item the default is \code{5000}.
 }
 \item \code{retry_policy_backoff_multiplier}: the backoff will be multiplied by
 this value after each retry attempt. Value is set from
@@ -252,13 +262,12 @@ Value is set from
 \item the \code{OTEL_BSP_MAX_EXPORT_BATCH_SIZE} environment variable, or
 \item the default is \code{512}.
 }
-\item \code{schedule_delay}: the time interval between two consecutive exports.
-This is a time interval specification, see
-\link{Time Interval Options}. Value is set from
+\item \code{schedule_delay}: the time interval between two consecutive exports,
+in milliseconds. Value is set from
 \itemize{
 \item the \code{opts} argument` or
 \item the \code{OTEL_BSP_SCHEDULE_DELAY} environment variable, or
-\item the default is \verb{5000ms}.
+\item the default is \code{5000}.
 }
 }
 }

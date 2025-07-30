@@ -179,8 +179,8 @@ SEXP otel_trace_id_size(void) {
 }
 
 const char *otel_http_request_content_type_str[] = {
-  "json",
-  "binary"
+  "http/json",
+  "http/protobuf"
 };
 
 SEXP otel_tracer_provider_http_options(void) {

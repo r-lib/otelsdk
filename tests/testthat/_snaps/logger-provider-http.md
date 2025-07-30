@@ -7,8 +7,8 @@
       [1] "http://localhost:4318/v1/logs"
       
       $content_type
-      binary 
-           1 
+      http/protobuf 
+                  1 
       
       $json_bytes_mapping
       [1] 0

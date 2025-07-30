@@ -725,10 +725,8 @@
     Code
       otlp_content_type_values
     Output
-                        json       application/json                 binary 
-                           0                      0                      1 
-      application/x-protobuf 
-                           1 
+          http/json http/protobuf 
+                  0             1 
 
 ---
 
@@ -737,13 +735,13 @@
       helper(v)
     Condition
       Error in `helper()`:
-      ! Invalid argument: `ct` must be one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is 'foo'.
+      ! Invalid argument: `ct` must be one of 'http/json', 'http/protobuf', but it is 'foo'.
     Code
       v2 <- 1:10
       helper(v2)
     Condition
       Error in `helper()`:
-      ! Invalid argument: ct must a string, one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is an integer vector.
+      ! Invalid argument: ct must a string, one of 'http/json', 'http/protobuf', but it is an integer vector.
 
 # as_otlp_content_type_env
 
@@ -751,7 +749,7 @@
       helper("FOO")
     Condition
       Error in `helper()`:
-      ! Invalid environment variable: 'FOO' must be one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is 'invalid'.
+      ! Invalid environment variable: 'FOO' must be one of 'http/json', 'http/protobuf', but it is 'invalid'.
 
 # as_otlp_json_bytes_mapping
 
@@ -894,8 +892,7 @@
       NULL
       
       $content_type
-      binary 
-           1 
+      NULL
       
       $json_bytes_mapping
       [1] 0
@@ -983,7 +980,7 @@
       helper(v)
     Condition
       Error in `helper()`:
-      ! Invalid argument: `o[["content_type"]]` must be one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is 'bad'.
+      ! Invalid argument: `o[["content_type"]]` must be one of 'http/json', 'http/protobuf', but it is 'bad'.
     Code
       v <- list(json_bytes_mapping = "no")
       helper(v)
@@ -1120,8 +1117,7 @@
       NULL
       
       $content_type
-      binary 
-           1 
+      NULL
       
       $json_bytes_mapping
       [1] 0
@@ -1209,7 +1205,7 @@
       helper(v)
     Condition
       Error in `helper()`:
-      ! Invalid argument: `o[["content_type"]]` must be one of 'json', 'application/json', 'binary', 'application/x-protobuf', but it is 'bad'.
+      ! Invalid argument: `o[["content_type"]]` must be one of 'http/json', 'http/protobuf', but it is 'bad'.
     Code
       v <- list(json_bytes_mapping = "no")
       helper(v)
@@ -1389,8 +1385,7 @@
       NULL
       
       $content_type
-      binary 
-           1 
+      NULL
       
       $json_bytes_mapping
       [1] 0
@@ -1472,8 +1467,7 @@
       NULL
       
       $content_type
-      binary 
-           1 
+      NULL
       
       $json_bytes_mapping
       [1] 0

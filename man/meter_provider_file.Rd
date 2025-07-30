@@ -119,20 +119,18 @@ Special placeholders are available for \code{file_pattern} and
 \subsection{Metric reader options}{
 \itemize{
 \item \code{export_interval}: the time interval between the
-start of two export attempts. A time interval specification, see
-\link{Time Interval Options}. Value is set from
+start of two export attempts, in milliseconds. Value is set from
 \itemize{
 \item the \code{opts} argument, or
 \item the \code{OTEL_METRIC_EXPORT_INTERVAL} environment variable, or
-\item the default is \code{"60s"}.
+\item the default is \code{60000}.
 }
-\item \code{export_timeout}: Maximum allowed time to export data.
-A time interval specification, see
-\link{Time Interval Options}. Value is set from
+\item \code{export_timeout}: Maximum allowed time to export data, in
+milliseconds. Value is set from
 \itemize{
 \item the \code{opts} argument, or
 \item the \code{OTEL_METRIC_EXPORT_TIMEOUT} environment variable, or
-\item the default is \code{"30s"}.
+\item the default is \code{30000}.
 }
 }
 }

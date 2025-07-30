@@ -39,7 +39,7 @@ tracer_provider_memory$options()
 \subsection{Memory exporter options}{
 \itemize{
 \item \code{buffer_size}: buffer size, this is the maximum number of spans or
-metrics measurements that the tracer provider can record.
+metrics measurements that the provider can record.
 Must be positive. Value is set from
 \itemize{
 \item the \code{opts} argument, or

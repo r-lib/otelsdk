@@ -33,7 +33,7 @@ reference:
     * [Getting Started](https://otel.r-lib.org/reference/gettingstarted.html),
       a tutorial and cookbook for instrumentation.
     * [Collecting telemetry data](../reference/collecting.html), a tutorial
-      and cookbok on telemetry data collection.
+      and cookbook on telemetry data collection.
 
 - title: Configuration
 - contents:

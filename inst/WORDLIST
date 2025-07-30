@@ -27,8 +27,10 @@ UI
 auth
 backoff
 cpp
+dplyr
 funder
 github
+globbing
 https
 instrance
 json
@@ -39,5 +41,6 @@ opentelemetry
 otel
 protobuf
 signoz
+temporality
 tui
 unlink

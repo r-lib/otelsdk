@@ -2,6 +2,138 @@
 % Please edit documentation in R/docs.R
 \name{Environment Variables}
 \alias{Environment Variables}
+\alias{OTEL_ENV}
+\alias{OTEL_TRACES_EXPORTER}
+\alias{OTEL_R_TRACES_EXPORTER}
+\alias{OTEL_LOGS_EXPORTER}
+\alias{OTEL_R_LOGS_EXPORTER}
+\alias{OTEL_METRICS_EXPORTER}
+\alias{OTEL_R_METRICS_EXPORTER}
+\alias{OTEL_R_EMIT_SCOPES}
+\alias{OTEL_R_SUPPRESS_SCOPES}
+\alias{OTEL_SDK_DISABLED}
+\alias{OTEL_RESOURCE_ATTRIBUTES}
+\alias{OTEL_SERVICE_NAME}
+\alias{OTEL_LOG_LEVEL}
+\alias{OTEL_EXPORTER_OTLP_PROTOCOL}
+\alias{OTEL_EXPORTER_OTLP_TRACES_PROTOCOL}
+\alias{OTEL_EXPORTER_OTLP_METRICS_PROTOCOL}
+\alias{OTEL_EXPORTER_OTLP_LOGS_PROTOCOL}
+\alias{OTEL_R_EXPORTER_OTLP_USE_JSON_NAME}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_USE_JSON_NAME}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_USE_JSON_NAME}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_USE_JSON_NAME}
+\alias{OTEL_R_EXPORTER_OTLP_CONSOLE_DEBUG}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_CONSOLE_DEBUG}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_CONSOLE_DEBUG}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_CONSOLE_DEBUG}
+\alias{OTEL_EXPORTER_OTLP_TIMEOUT}
+\alias{OTEL_EXPORTER_OTLP_TRACES_TIMEOUT}
+\alias{OTEL_EXPORTER_OTLP_METRICS_TIMEOUT}
+\alias{OTEL_EXPORTER_OTLP_LOGS_TIMEOUT}
+\alias{OTEL_EXPORTER_OTLP_HEADERS}
+\alias{OTEL_EXPORTER_OTLP_TRACES_HEADERS}
+\alias{OTEL_EXPORTER_OTLP_METRICS_HEADERS}
+\alias{OTEL_EXPORTER_OTLP_LOGS_HEADERS}
+\alias{OTEL_R_EXPORTER_OTLP_SSL_INSECURE_SKIP_VERIFY}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_SSL_INSECURE_SKIP_VERIFY}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_SSL_INSECURE_SKIP_VERIFY}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_SSL_INSECURE_SKIP_VERIFY}
+\alias{OTEL_EXPORTER_OTLP_CERTIFICATE}
+\alias{OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE}
+\alias{OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE}
+\alias{OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE}
+\alias{OTEL_EXPORTER_OTLP_CERTIFICATE_STRING}
+\alias{OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING}
+\alias{OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE_STRING}
+\alias{OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE_STRING}
+\alias{OTEL_EXPORTER_OTLP_CLIENT_KEY}
+\alias{OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY}
+\alias{OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY}
+\alias{OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY}
+\alias{OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING}
+\alias{OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY_STRING}
+\alias{OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY_STRING}
+\alias{OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY_STRING}
+\alias{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE}
+\alias{OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE}
+\alias{OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE}
+\alias{OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE}
+\alias{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING}
+\alias{OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE_STRING}
+\alias{OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE_STRING}
+\alias{OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE_STRING}
+\alias{OTEL_R_EXPORTER_OTLP_SSL_MIN_TLS}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_SSL_MIN_TLS}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_SSL_MIN_TLS}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_SSL_MIN_TLS}
+\alias{OTEL_R_EXPORTER_OTLP_SSL_MAX_TLS}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_SSL_MAX_TLS}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_SSL_MAX_TLS}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_SSL_MAX_TLS}
+\alias{OTEL_R_EXPORTER_OTLP_SSL_CIPHER}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_SSL_CIPHER}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_SSL_CIPHER}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_SSL_CIPHER}
+\alias{OTEL_R_EXPORTER_OTLP_SSL_CIPHER_SUITE}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_SSL_CIPHER_SUITE}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_SSL_CIPHER_SUITE}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_SSL_CIPHER_SUITE}
+\alias{OTEL_EXPORTER_OTLP_COMPRESSION}
+\alias{OTEL_EXPORTER_OTLP_TRACES_COMPRESSION}
+\alias{OTEL_EXPORTER_OTLP_METRICS_COMPRESSION}
+\alias{OTEL_EXPORTER_OTLP_LOGS_COMPRESSION}
+\alias{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_ATTEMPTS}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_MAX_ATTEMPTS}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_MAX_ATTEMPTS}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_MAX_ATTEMPTS}
+\alias{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_INITIAL_BACKOFF}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_INITIAL_BACKOFF}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_INITIAL_BACKOFF}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_INITIAL_BACKOFF}
+\alias{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_BACKOFF}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_MAX_BACKOFF}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_MAX_BACKOFF}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_MAX_BACKOFF}
+\alias{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_BACKOFF_MULTIPLIER}
+\alias{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_BACKOFF_MULTIPLIER}
+\alias{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_BACKOFF_MULTIPLIER}
+\alias{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_BACKOFF_MULTIPLIER}
+\alias{OTEL_EXPORTER_OTLP_FILE}
+\alias{OTEL_EXPORTER_OTLP_TRACES_FILE}
+\alias{OTEL_EXPORTER_OTLP_METRICS_FILE}
+\alias{OTEL_EXPORTER_OTLP_LOGS_FILE}
+\alias{OTEL_EXPORTER_OTLP_FILE_ALIAS}
+\alias{OTEL_EXPORTER_OTLP_TRACES_FILE_ALIAS}
+\alias{OTEL_EXPORTER_OTLP_METRICS_FILE_ALIAS}
+\alias{OTEL_EXPORTER_OTLP_LOGS_FILE_ALIAS}
+\alias{OTEL_EXPORTER_OTLP_FILE_FLUSH_INTERVAL}
+\alias{OTEL_EXPORTER_OTLP_TRACES_FILE_FLUSH_INTERVAL}
+\alias{OTEL_EXPORTER_OTLP_METRICS_FILE_FLUSH_INTERVAL}
+\alias{OTEL_EXPORTER_OTLP_LOGS_FILE_FLUSH_INTERVAL}
+\alias{OTEL_EXPORTER_OTLP_FILE_FLUSH_COUNT}
+\alias{OTEL_EXPORTER_OTLP_TRACES_FILE_FILE_SIZE}
+\alias{OTEL_EXPORTER_OTLP_METRICS_FILE_FILE_SIZE}
+\alias{OTEL_EXPORTER_OTLP_LOGS_FILE_FILE_SIZE}
+\alias{OTEL_EXPORTER_OTLP_FILE_FILE_SIZE}
+\alias{OTEL_EXPORTER_OTLP_FILE_ROTATE_SIZE}
+\alias{OTEL_EXPORTER_OTLP_TRACES_FILE_ROTATE_SIZE}
+\alias{OTEL_EXPORTER_OTLP_METRICS_FILE_ROTATE_SIZE}
+\alias{OTEL_EXPORTER_OTLP_LOGS_FILE_ROTATE_SIZE}
+\alias{OTEL_BSP_SCHEDULE_DELAY}
+\alias{OTEL_BSP_MAX_QUEUE_SIZE}
+\alias{OTEL_BSP_MAX_EXPORT_BATCH_SIZE}
+\alias{OTEL_METRIC_EXPORT_INTERVAL}
+\alias{OTEL_METRIC_EXPORT_TIMEOUT}
+\alias{OTEL_R_EXPORTER_OTLP_AGGREGATION_TEMPORALITY}
+\alias{OTEL_R_EXPORTER_STDSTREAM_OUTPUT}
+\alias{OTEL_R_EXPORTER_STDSTREAM_TRACES_OUTPUT}
+\alias{OTEL_R_EXPORTER_STDSTREAM_METRICS_OUTPUT}
+\alias{OTEL_R_EXPORTER_STDSTREAM_LOGS_OUTPUT}
+\alias{OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE}
+\alias{OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE}
+\alias{OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE}
+\alias{100}
 \title{Environment variables to configure otelsdk}
 \value{
 Not applicable.
@@ -10,13 +142,510 @@ Not applicable.
 See also the \link[otel:environmentvariables]{Environment Variables} in
 the otel package, which is charge of selecting the exporters to use.
 }
-\details{
-TODO
+\section{The OpenTelemetry Specification}{
+Most of these environment variables are based on the \href{https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/}{OpenTelemetry Specification}, version 1.47.0.
+
+The environment variables with an '\code{OTEL_R_}' prefix are not (yet) in the
+standard, and are specific for the otel and otelsdk R packages.
 }
+
+\section{General SDK Configuration}{
+\itemize{
+\item \code{OTEL_SDK_DISABLED}
+
+Set to a 'true' value to disable the SDK for all signals.
+\item \code{OTEL_RESOURCE_ATTRIBUTES}
+
+Key-value pairs to be used as resource attributes. See the
+\href{https://opentelemetry.io/docs/specs/otel/resource/sdk/#specifying-resource-information-via-an-environment-variable}{Resource SDK}
+for more details.
+\item \code{OTEL_SERVICE_NAME}
+
+Sets the value of the \href{https://opentelemetry.io/docs/specs/semconv/resource/#service}{\code{service.name}}
+resource attribute.
+\item \code{OTEL_LOG_LEVEL}
+
+Log level used by the \href{https://opentelemetry.io/docs/specs/otel/error-handling/#self-diagnostics}{SDK internal logger}.
+In R it is also used for the default log level of the OpenTelemetry
+loggers.
+}
+}
+
+\section{Selecting Exporters}{
+otel is responsible for selecting the providers to use for traces,
+logs and metrics. You can use the environment variables below to
+point the otel functions to the desired providers.
+
+If none of these environment variables are set, then otel will not
+emit any telemetry data.
+\itemize{
+\item \code{OTEL_TRACES_EXPORTER}
+
+The name of the selected tracer provider. See
+\code{\link[otel:get_default_tracer_provider]{otel::get_default_tracer_provider()}} for the possible values.
+\item \code{OTEL_R_TRACES_EXPORTER}
+
+R specific version of \code{OTEL_TRACES_EXPORTER}.
+\item \code{OTEL_LOGS_EXPORTER}
+
+The name of the selected logger provider. See
+\code{\link[otel:get_default_logger_provider]{otel::get_default_logger_provider()}} for the possible values.
+\item \code{OTEL_R_LOGS_EXPORTER}
+
+R specific version of \code{OTEL_LOGS_EXPORTER}.
+\item \code{OTEL_METRICS_EXPORTER}
+
+The name of the selected meter provider. See
+\code{\link[otel:get_default_meter_provider]{otel::get_default_meter_provider()}} for the possible values.
+\item \code{OTEL_R_METRICS_EXPORTER}
+
+R specific version of \code{OTEL_METRICS_EXPORTER}.
+}
+}
+
+\section{Suppressing Instrumentation Scopes (R Packages)}{
+otel has two environment variables to fine tune which instrumentation
+scopes (i.e. R packages, typically) emit telemetry data. By default,
+i.e. if neither of these are set, all packages emit telemetry data.
+\itemize{
+\item \code{OTEL_R_EMIT_SCOPES}
+
+Set this environment variable to a comma separated string of
+instrumentation scope names or R package names to restrict telemetry to
+these packages only. The name of the instrumentation scope is the same
+as the name of the tracer, logger or meter, see \code{\link[otel:default_tracer_name]{otel::default_tracer_name()}}.
+
+You can mix package names and instrumentation scope names and you can
+also use wildcards (globbing). For example the value
+
+OTEL_R_EMIT_SCOPES="org.r-lib.*,dplyr"
+
+selects all packages with an instrumentation scope that starts with
+\code{org.r-lib.} and also dplyr.
+\item \code{OTEL_R_SUPPRESS_SCOPES}
+
+Set this environment variable to a comma separated string of
+instrumentation scope names or R package names to suppress telemetry
+data from these packages. The name of the instrumentation scope is the same
+as the name of the tracer, logger or meter, see \code{\link[otel:default_tracer_name]{otel::default_tracer_name()}}.
+
+You can mix package names and instrumentation scope names and you can
+also use wildcards (globbing). For example the value
+
+OTEL_R_SUPPRESS_SCOPES="org.r-lib.*,dplyr"
+
+excludes packages with an instrumentation scope that starts with
+\code{org.r-lib.} and also dplyr.
+}
+}
+
+\section{\link[otel:zci]{Zero Code Instrumentation}}{
+otel can instrument R packages for OpenTelemetry data collection
+without changing their source code. This relies on changing the code
+of the R functions manually using \code{base::trace()} and can be configured
+using environment variables.
+\itemize{
+\item \code{OTEL_R_INSTRUMENT_PKGS}
+
+Set \code{OTEL_R_INSTRUMENT_PKGS} to a comma separated list of packages to
+instrument. The automatic instrumentation happens when the otel package
+is loaded, so in general it is best to set this environment variable
+before loading R.
+\item \verb{OTEL_R_INSTRUMENT_PKGS_<pkg>_INCLUDE}
+
+For an automatically instrumented package, set this environment variable
+to only instrument a subset of its functions. It is parsed as a comma
+separated string of function names, which may also include \verb{?} and \code{*}
+wildcards (globbing).
+\item \verb{OTEL_R_INSTRUMENT_PKGS_<pkg>_EXCLUDE}
+
+For an automatically instrumented package, set this environment variable
+to exclude some functions from instrumentation. It has the same syntax
+as its \verb{*_INCLUDE} pair. If both are set, then inclusion is applied
+and the exclusion.
+}
+}
+
+\section{Attribute Limits}{
+\itemize{
+\item \code{OTEL_ATTRIBUTE_COUNT_LIMIT}
+
+Set this environment variable to limit the number of attributes for a
+single span, log record, metric measurement, etc. If unset, the default
+limit is 128 attributes.
+Note that only attributes specified with \code{\link[otel:as_attributes]{otel::as_attributes()}} are
+subject to this environment variable.
+\item \code{OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT}
+
+Set this environment variable to limit the length of vectors in
+attributes for a single span, log record, metric measurement, etc.
+If unset, there is no limit on the lengths of vectors in attributes.
+Note that only attributes specified with \code{\link[otel:as_attributes]{otel::as_attributes()}} are
+subject to this environment variable.
+}
+}
+
+\section{OTLP/HTTP Exporters}{
+These environment variables are used by \link{tracer_provider_http},
+\link{meter_provider_http} and \link{logger_provider_http}.
+
+For every set of environment variables, the signal specific ones have
+priority over the generic one.
+\itemize{
+\item \code{OTEL_EXPORTER_OTLP_ENDPOINT} |
+\code{OTEL_EXPORTER_OTLP_TRACES_ENDPOINT} |
+\code{OTEL_EXPORTER_OTLP_METRICS_ENDPOINT} |
+\code{OTEL_EXPORTER_OTLP_LOGS_ENDPOINT}
+
+OTLP URL to send telemetry data to. When the generic environment
+variable is used, the exporter appends the signal specific endpoint
+to it. The signal specific environment variables are used as is.
+More in the \href{https://opentelemetry.io/docs/specs/otel/protocol/exporter/#endpoint-urls-for-otlphttp}{OpenTelemetry specification}.
+\item \code{OTEL_EXPORTER_OTLP_PROTOCOL} |
+\code{OTEL_EXPORTER_OTLP_TRACES_PROTOCOL} |
+\code{OTEL_EXPORTER_OTLP_METRICS_PROTOCOL} |
+\code{OTEL_EXPORTER_OTLP_LOGS_PROTOCOL}
+
+The transport protocol. Possible values:
+\code{http/json}, \code{http/protobuf}.
+\item \code{OTEL_R_EXPORTER_OTLP_JSON_BYTES_MAPPING} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_JSON_BYTES_MAPPING} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_JSON_BYTES_MAPPING} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_JSON_BYTES_MAPPING}
+
+Encoding used for trace ids and spans id. Possible values:
+\code{hexid}, \code{base64}, \code{hex}.
+\item \code{OTEL_R_EXPORTER_OTLP_USE_JSON_NAME} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_USE_JSON_NAME} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_USE_JSON_NAME} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_USE_JSON_NAME}
+
+Whether to use json name of protobuf field to set the key of json.
+A boolean value (flag, \code{true} or \code{false}).
+\item \code{OTEL_R_EXPORTER_OTLP_CONSOLE_DEBUG} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_CONSOLE_DEBUG} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_CONSOLE_DEBUG} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_CONSOLE_DEBUG}
+
+Whether to print debug messages to the console. A boolean value (flag,
+\code{true} or \code{false}).
+\item \code{OTEL_EXPORTER_OTLP_TIMEOUT} |
+\code{OTEL_EXPORTER_OTLP_TRACES_TIMEOUT} |
+\code{OTEL_EXPORTER_OTLP_METRICS_TIMEOUT} |
+\code{OTEL_EXPORTER_OTLP_LOGS_TIMEOUT}
+
+HTTP timeout in milliseconds.
+\item \code{OTEL_EXPORTER_OTLP_HEADERS} |
+\code{OTEL_EXPORTER_OTLP_TRACES_HEADERS} |
+\code{OTEL_EXPORTER_OTLP_METRICS_HEADERS} |
+\code{OTEL_EXPORTER_OTLP_LOGS_HEADERS}
+
+Additional HTTP headers to send. E.g. \code{Authorization} is commonly
+used. It must be a comma separated list of headers, each in the
+\code{header=value} form.
+\item \code{OTEL_R_EXPORTER_OTLP_SSL_INSECURE_SKIP_VERIFY} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_INSECURE_SKIP_VERIFY} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_INSECURE_SKIP_VERIFY} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_SSL_INSECURE_SKIP_VERIFY}
+
+Whether to disable SSL. A boolean value (flag, \code{true} or \code{false}).
+\item \code{OTEL_EXPORTER_OTLP_CERTIFICATE} |
+\code{OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE} |
+\code{OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE} |
+\code{OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE}
+
+CA certificate, path to a file.
+\item \code{OTEL_EXPORTER_OTLP_CERTIFICATE_STRING} |
+\code{OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING} |
+\code{OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE_STRING} |
+\code{OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE_STRING}
+
+CA certificate, as a string.
+\item \code{OTEL_EXPORTER_OTLP_CLIENT_KEY} |
+\code{OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY} |
+\code{OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY} |
+\code{OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY}
+
+SSL client key, path to a file.
+\item \code{OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING} |
+\code{OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY_STRING} |
+\code{OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY_STRING} |
+\code{OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY_STRING}
+
+SSL client key as a string.
+\item \code{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE} |
+\code{OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE} |
+\code{OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE} |
+\code{OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE}
+
+SSL client certificate, path to a file.
+\item \code{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING} |
+\code{OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE_STRING} |
+\code{OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE_STRING} |
+\code{OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE_STRING}
+
+SSL client certificate, as a string.
+\item \code{OTEL_R_EXPORTER_OTLP_SSL_MIN_TLS} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_MIN_TLS} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_MIN_TLS} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_SSL_MIN_TLS}
+
+Minimum TLS version.
+\item \code{OTEL_R_EXPORTER_OTLP_SSL_MAX_TLS} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_MAX_TLS} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_MAX_TLS} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_SSL_MAX_TLS}
+
+Maximum TLS version.
+\item \code{OTEL_R_EXPORTER_OTLP_SSL_CIPHER} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_CIPHER} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_CIPHER} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_SSL_CIPHER}
+
+TLS cipher.
+\item \code{OTEL_R_EXPORTER_OTLP_SSL_CIPHER_SUITE} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_SSL_CIPHER_SUITE} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_SSL_CIPHER_SUITE} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_SSL_CIPHER_SUITE}
+
+TLS cipher suite.
+\item \code{OTEL_EXPORTER_OTLP_COMPRESSION} |
+\code{OTEL_EXPORTER_OTLP_TRACES_COMPRESSION} |
+\code{OTEL_EXPORTER_OTLP_METRICS_COMPRESSION} |
+\code{OTEL_EXPORTER_OTLP_LOGS_COMPRESSION}
+
+Compression to use.
+\code{none}, \code{gzip}.
+\item \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_ATTEMPTS} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_MAX_ATTEMPTS} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_MAX_ATTEMPTS} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_MAX_ATTEMPTS}
+
+The maximum number of call attempts, including the original attempt.
+\item \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_INITIAL_BACKOFF} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_INITIAL_BACKOFF} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_INITIAL_BACKOFF} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_INITIAL_BACKOFF}
+
+The maximum initial back-off delay between retry attempts.
+The actual backoff delay is uniform random between zero and this.
+It is in milliseconds.
+\item \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_MAX_BACKOFF} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_MAX_BACKOFF} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_MAX_BACKOFF} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_MAX_BACKOFF}
+
+The maximum backoff places an upper limit on exponential backoff
+growth.
+\item \code{OTEL_R_EXPORTER_OTLP_RETRY_POLICY_BACKOFF_MULTIPLIER} |
+\code{OTEL_R_EXPORTER_OTLP_TRACES_RETRY_POLICY_BACKOFF_MULTIPLIER} |
+\code{OTEL_R_EXPORTER_OTLP_METRICS_RETRY_POLICY_BACKOFF_MULTIPLIER} |
+\code{OTEL_R_EXPORTER_OTLP_LOGS_RETRY_POLICY_BACKOFF_MULTIPLIER}
+
+The backoff will be multiplied by this value after each retry attempt.
+}
+}
+
+\section{OTLP/FILE Exporters}{
+These environment variables are used by \link{tracer_provider_file},
+\link{meter_provider_file} and \link{logger_provider_file}.
+
+For every set of environment variables, the signal specific ones have
+priority over the generic one.
+\itemize{
+\item \code{OTEL_EXPORTER_OTLP_FILE} |
+\code{OTEL_EXPORTER_OTLP_TRACES_FILE} |
+\code{OTEL_EXPORTER_OTLP_METRICS_FILE} |
+\code{OTEL_EXPORTER_OTLP_LOGS_FILE}
+
+Output file pattern. May contain placeholders, see the manual pages
+of the providers, linked at the beginning of the section.
+\item \code{OTEL_EXPORTER_OTLP_FILE_ALIAS} |
+\code{OTEL_EXPORTER_OTLP_TRACES_FILE_ALIAS} |
+\code{OTEL_EXPORTER_OTLP_METRICS_FILE_ALIAS} |
+\code{OTEL_EXPORTER_OTLP_LOGS_FILE_ALIAS}
+
+The file which always point to the latest file.
+May contain placeholders, see the manual pages
+of the providers, linked at the beginning of the section.
+\item \code{OTEL_EXPORTER_OTLP_FILE_FLUSH_INTERVAL} |
+\code{OTEL_EXPORTER_OTLP_TRACES_FILE_FLUSH_INTERVAL} |
+\code{OTEL_EXPORTER_OTLP_METRICS_FILE_FLUSH_INTERVAL} |
+\code{OTEL_EXPORTER_OTLP_LOGS_FILE_FLUSH_INTERVAL}
+
+Interval to force flush output. A time interval specification, see
+\link{Time Interval Options}.
+\item \code{OTEL_EXPORTER_OTLP_FILE_FLUSH_COUNT} |
+\code{OTEL_EXPORTER_OTLP_TRACES_FILE_FILE_SIZE} |
+\code{OTEL_EXPORTER_OTLP_METRICS_FILE_FILE_SIZE} |
+\code{OTEL_EXPORTER_OTLP_LOGS_FILE_FILE_SIZE}
+
+Force flush output after every \code{flush_count} records.
+\item \code{OTEL_EXPORTER_OTLP_FILE_FILE_SIZE} |
+\code{OTEL_EXPORTER_OTLP_TRACES_FILE_FILE_SIZE} |
+\code{OTEL_EXPORTER_OTLP_METRICS_FILE_FILE_SIZE} |
+\code{OTEL_EXPORTER_OTLP_LOGS_FILE_FILE_SIZE}
+
+File size to rotate output files. A file size specification, see
+\link{File Size Options}.
+\item \code{OTEL_EXPORTER_OTLP_FILE_ROTATE_SIZE} |
+\code{OTEL_EXPORTER_OTLP_TRACES_FILE_ROTATE_SIZE} |
+\code{OTEL_EXPORTER_OTLP_METRICS_FILE_ROTATE_SIZE} |
+\code{OTEL_EXPORTER_OTLP_LOGS_FILE_ROTATE_SIZE}
+
+How many rotated output files to keep.
+}
+}
+
+\section{Batch Processor}{
+These environment variables are used by \link{tracer_provider_http},
+and \link{logger_provider_http}.
+\itemize{
+\item \code{OTEL_BSP_SCHEDULE_DELAY}
+
+The maximum buffer/queue size. After the size is reached, spans are
+dropped. Must be positive.
+\item \code{OTEL_BSP_MAX_QUEUE_SIZE}
+
+The maximum batch size of every export. It must be smaller or equal
+to max_queue_size. Must be positive.
+\item \code{OTEL_BSP_MAX_EXPORT_BATCH_SIZE}
+
+The time interval between two consecutive exports, in milliseconds.
+}
+}
+
+\section{Metric Reader}{
+These environment variables are used by \link{meter_provider_http},
+\link{meter_provider_stdstream} \link{meter_provider_memory} and
+\link{meter_provider_file}.
+\itemize{
+\item \code{OTEL_METRIC_EXPORT_INTERVAL}
+
+The time interval between the start of two export attempts, in
+milliseconds.
+\item \code{OTEL_METRIC_EXPORT_TIMEOUT}
+
+Maximum allowed time to export data, in milliseconds.
+}
+}
+
+\section{Metric Exporters}{
+These environment variables are used by \link{meter_provider_http} and
+\link{meter_provider_memory}.
+\itemize{
+\item \code{OTEL_R_EXPORTER_OTLP_AGGREGATION_TEMPORALITY}
+
+Aggregation temporality. Possible values:
+\code{unspecified}, \code{delta}, \code{cumulative}, \code{lowmemory}.
+See the \href{https://opentelemetry.io/docs/specs/otel/metrics/data-model/#temporality}{OpenTelemetry data model}.
+}
+}
+
+\section{Standard Stream Exporters}{
+These environment variables are used by \link{tracer_provider_stdstream},
+\link{meter_provider_stdstream} and \link{logger_provider_stdstream}.
+
+The signal specific environment variables have priority over the generic
+one.
+\itemize{
+\item \code{OTEL_R_EXPORTER_STDSTREAM_OUTPUT} |
+\code{OTEL_R_EXPORTER_STDSTREAM_TRACES_OUTPUT} |
+\code{OTEL_R_EXPORTER_STDSTREAM_METRICS_OUTPUT} |
+\code{OTEL_R_EXPORTER_STDSTREAM_LOGS_OUTPUT}
+
+Where to write the output. Can be
+\itemize{
+\item \code{stdout}: write output to the standard output,
+\item \code{stderr}: write output to the standard error,
+\item another string: write output to a file. (To write output to a file
+named \code{stdout} or \verb{"stderr}, use a \verb{./} prefix.)
+}
+}
+}
+
+\section{In-Memory Exporters}{
+These environment variables are used by \link{tracer_provider_memory} and
+\link{meter_provider_memory}.
+
+The signal specific environment variables have priority over the generic
+one.
+\itemize{
+\item \code{OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE} |
+\code{OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE} |
+\code{OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE} |
+\code{100}
+
+Buffer size, this is the maximum number of spans or metrics
+measurements that the provider can record.
+}
+}
+
+\section{Support Matrix of all OpenTelemetry Environment Variables for R}{
+\tabular{ll}{
+   \emph{Name} \tab \emph{Supported} \cr
+   \code{OTEL_SDK_DISABLED} \tab + \cr
+   \code{OTEL_RESOURCE_ATTRIBUTES} \tab + \cr
+   \code{OTEL_SERVICE_NAME} \tab + \cr
+   \code{OTEL_LOG_LEVEL} \tab + \cr
+   \code{OTEL_PROPAGATORS} \tab - \cr
+   \code{OTEL_BSP_SCHEDULE_DELAY} \tab + \cr
+   \code{OTEL_BSP_EXPORT_TIMEOUT} \tab - \cr
+   \code{OTEL_BSP_MAX_QUEUE_SIZE} \tab + \cr
+   \code{OTEL_BSP_MAX_EXPORT_BATCH_SIZE} \tab + \cr
+   \code{OTEL_EXPORTER_OTLP_ENDPOINT} \tab + \cr
+   \verb{OTEL_EXPORTER_OTLP_*_ENDPOINT} \tab + \cr
+   \code{OTEL_EXPORTER_OTLP_INSECURE} \tab - \cr
+   \verb{OTEL_EXPORTER_OTLP_*_INSECURE} \tab - \cr
+   \code{OTEL_EXPORTER_OTLP_CERTIFICATE} \tab + \cr
+   \verb{OTEL_EXPORTER_OTLP_*_CERTIFICATE} \tab + \cr
+   \code{OTEL_EXPORTER_OTLP_CLIENT_KEY} \tab + \cr
+   \verb{OTEL_EXPORTER_OTLP_*_CLIENT_KEY} \tab + \cr
+   \code{OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE} \tab + \cr
+   \verb{OTEL_EXPORTER_OTLP_CLIENT_*_CERTIFICATE} \tab + \cr
+   \code{OTEL_EXPORTER_OTLP_HEADERS} \tab + \cr
+   \verb{OTEL_EXPORTER_OTLP_*_HEADERS} \tab + \cr
+   \code{OTEL_EXPORTER_OTLP_COMPRESSION} \tab + \cr
+   \verb{OTEL_EXPORTER_OTLP_*_COMPRESSION} \tab + \cr
+   \code{OTEL_EXPORTER_OTLP_PROTOCOL} \tab + \cr
+   \verb{OTEL_EXPORTER_OTLP_*_PROTOCOL} \tab + \cr
+   \code{OTEL_EXPORTER_OTLP_SPAN_INSECURE} (obsolete) \tab - \cr
+   \code{OTEL_EXPORTER_OTLP_METRIC_INSECURE} (obsolete) \tab - \cr
+   \code{OTEL_EXPORTER_ZIPKIN_ENDPOINT} \tab - \cr
+   \code{OTEL_EXPORTER_ZIPKIN_TIMEOUT} \tab - \cr
+   \code{OTEL_EXPORTER_PROMETHEUS_HOST} \tab - \cr
+   \code{OTEL_EXPORTER_PROMETHEUS_PORT} \tab - \cr
+   \code{OTEL_TRACES_EXPORTER} \tab + \cr
+   \code{OTEL_METRICS_EXPORTER} \tab + \cr
+   \code{OTEL_LOGS_EXPORTER} \tab + \cr
+   \code{OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT} \tab - \cr
+   \code{OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT} \tab - \cr
+   \code{OTEL_SPAN_EVENT_COUNT_LIMIT} \tab - \cr
+   \code{OTEL_SPAN_LINK_COUNT_LIMIT} \tab - \cr
+   \code{OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT} \tab - \cr
+   \code{OTEL_LINK_ATTRIBUTE_COUNT_LIMIT} \tab - \cr
+   \code{OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT} \tab - \cr
+   \code{OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT} \tab - \cr
+   \code{OTEL_TRACES_SAMPLER} \tab - \cr
+   \code{OTEL_TRACES_SAMPLER_ARG} \tab - \cr
+   \code{OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT} (1) \tab + \cr
+   \code{OTEL_ATTRIBUTE_COUNT_LIMIT} (1) \tab + \cr
+   \code{OTEL_METRIC_EXPORT_INTERVAL} \tab + \cr
+   \code{OTEL_METRIC_EXPORT_TIMEOUT} \tab + \cr
+   \code{OTEL_METRICS_EXEMPLAR_FILTER} \tab - \cr
+   \code{OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE} \tab - \cr
+   \code{OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION} \tab - \cr
+   \code{OTEL_EXPERIMENTAL_CONFIG_FILE} \tab - \cr
+}
+
+
+(1) In \code{\link[otel:as_attributes]{otel::as_attributes()}}.
+}
+
 \examples{
 # To start an R session using the OTLP exporter:
 # OTEL_TRACES_EXPORTER=http R -q -f script.R
 }
 \seealso{
-\link[otel:environmentvariables]{Environment Variables} in otel
+\link[otel:Environment Variables]{Environment Variables} in otel
 }

@@ -1191,10 +1191,8 @@ as_tracer_provider_file_options <- function(
 }
 
 otlp_content_type_values <- c(
-  "json" = 0L,
-  "application/json" = 0L,
-  "binary" = 1L,
-  "application/x-protobuf" = 1L
+  "http/json" = 0L,
+  "http/protobuf" = 1L
 )
 
 as_otlp_content_type <- function(
@@ -1410,15 +1408,12 @@ as_http_exporter_options <- function(
   # in spec
   url <- as_string(opts$url, arg = ma("url"), call = call)
 
-  # no support
+  # in spec
   content_type <- as_otlp_content_type(
     opts$content_type,
     arg = ma("content_type"),
     call = call
-  ) %||%
-    as_otlp_content_type_env(evs["content_type"], call = call) %||%
-    as_otlp_content_type_env(otlp_content_type_envvar, call = call) %||%
-    as_otlp_content_type(otlp_content_type_default)
+  )
 
   # no support
   json_bytes_mapping <-
@@ -1694,7 +1689,6 @@ as_batch_processor_options <- function(
 
 tracer_provider_http_options_evs <- function() {
   list(
-    content_type = otlp_traces_content_type_envvar,
     json_bytes_mapping = otlp_traces_json_bytes_mapping_envvar,
     use_json_name = otlp_traces_use_json_name_envvar,
     console_debug = otlp_traces_console_debug_envvar,
@@ -1730,7 +1724,6 @@ as_tracer_provider_http_options <- function(
 
 logger_provider_http_options_evs <- function() {
   list(
-    content_type = otlp_logs_content_type_envvar,
     json_bytes_mapping = otlp_logs_json_bytes_mapping_envvar,
     use_json_name = otlp_logs_use_json_name_envvar,
     console_debug = otlp_logs_console_debug_envvar,
@@ -1844,7 +1837,6 @@ as_metric_exporter_options <- function(
 
 meter_provider_http_options_evs <- function() {
   list(
-    content_type = otlp_metrics_content_type_envvar,
     json_bytes_mapping = otlp_metrics_json_bytes_mapping_envvar,
     use_json_name = otlp_metrics_use_json_name_envvar,
     console_debug = otlp_metrics_console_debug_envvar,
@@ -1894,6 +1886,7 @@ as_stdstream_exporter_options <- function(
 
   output <- as_string(opts$output, arg = ma("output"), call = call) %||%
     get_env(evs[["output"]]) %||%
+    get_env(stdstream_output_envvar) %||%
     "stdout"
   if (output != "stdout" && output != "stderr") {
     output <- as_output_file(output, arg = ma("output"), call = call)

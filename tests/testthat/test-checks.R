@@ -751,8 +751,8 @@ test_that("as_tracer_provider_file_options", {
 
 test_that("as_otlp_content_type", {
   expect_snapshot(otlp_content_type_values)
-  expect_equal(as_otlp_content_type("json"), c(json = 0L))
-  expect_equal(as_otlp_content_type("binary"), c(binary = 1L))
+  expect_equal(as_otlp_content_type("http/json"), c("http/json" = 0L))
+  expect_equal(as_otlp_content_type("http/protobuf"), c("http/protobuf" = 1L))
 
   helper <- function(ct) as_otlp_content_type(ct)
   expect_snapshot(error = TRUE, {
@@ -767,8 +767,8 @@ test_that("as_otlp_content_type_env", {
   withr::local_envvar(FOO = NA_character_)
   expect_null(as_otlp_content_type_env("FOO"))
 
-  withr::local_envvar(FOO = "application/json")
-  expect_equal(as_otlp_content_type_env("FOO"), c("application/json" = 0L))
+  withr::local_envvar(FOO = "http/json")
+  expect_equal(as_otlp_content_type_env("FOO"), c("http/json" = 0L))
 
   withr::local_envvar(FOO = "invalid")
   helper <- function(ev) as_otlp_content_type_env(ev)
