@@ -555,7 +555,7 @@ doc_evs <- function() {
 #' * ``r memory_buffer_size_envvar`` |
 #'   ``r memory_traces_buffer_size_envvar`` |
 #'   ``r memory_metrics_buffer_size_envvar`` |
-#'   ``r memory_buffer_size_default``
+#'   ``r memory_buffer_size_envvar``
 #'
 #'   Buffer size, this is the maximum number of spans or metrics
 #'   measurements that the provider can record.
