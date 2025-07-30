@@ -29,6 +29,7 @@ Suggests:
     callr,
     cli,
     curl,
+    gh,
     jsonlite,
     processx,
     ps,
