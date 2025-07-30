@@ -13,15 +13,16 @@ development:
 
 navbar:
   structure:
-    left: [reference, gettingstarted, collectingdata]
+    left: [gettingstarted, reference]
     right: [news]
   components:
     gettingstarted:
-      text: Getting Started (otel Package)
-      href: https://otel.r-lib.org/reference/gettingstarted.html
-    collectingdata:
-      text: Collecting Telemetry Data
-      href: reference/collecting.html
+      text: Getting Started
+      menu:
+        - text: Instrumenting R Packages (otel package)
+          href: https://otel.r-lib.org/reference/gettingstarted.html
+        - text: Collecting Telemetry Data
+          href: reference/collecting.html
 
 reference:
 - title: Other Documentation
