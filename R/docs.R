@@ -180,7 +180,7 @@ doc_evs <- function() {
     memory_buffer_size_envvar,
     memory_traces_buffer_size_envvar,
     memory_metrics_buffer_size_envvar,
-    memory_buffer_size_default
+    memory_buffer_size_envvar
   )
 }
 
