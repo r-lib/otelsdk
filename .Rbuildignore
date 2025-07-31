@@ -5,6 +5,7 @@
 ^src/.*[.]gcda$
 ^src/.*[.]gcno$
 ^src/.*[.]gcov$
+^src/symbols[.]rds$
 ^src/cpp$
 ^src/install$
 ^src/Makevars$
