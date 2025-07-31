@@ -85,7 +85,19 @@ test_that("get_current_error", {
   tryCatch(f(), error = function(e) NULL)
   expect_equal(
     err,
-    list(tried = TRUE, success = TRUE, object = "boo!", error = NULL)
+    if (.Call(otel_build_safe)) {
+      list(tried = TRUE, success = TRUE, object = "boo!", error = NULL)
+    } else {
+      list(
+        tried = FALSE,
+        success = NA,
+        object = NULL,
+        error = paste0(
+          "This version of otelsdk cannot get error messages. ",
+          "Make sure that you are using the latest version."
+        )
+      )
+    }
   )
 
   # error object
@@ -101,7 +113,19 @@ test_that("get_current_error", {
   tryCatch(f(), error = function(e) NULL)
   expect_equal(
     err,
-    list(tried = TRUE, success = TRUE, object = errobj, error = NULL)
+    if (.Call(otel_build_safe)) {
+      list(tried = TRUE, success = TRUE, object = errobj, error = NULL)
+    } else {
+      list(
+        tried = FALSE,
+        success = NA,
+        object = NULL,
+        error = paste0(
+          "This version of otelsdk cannot get error messages. ",
+          "Make sure that you are using the latest version."
+        )
+      )
+    }
   )
 
   # error from C code
@@ -113,13 +137,28 @@ test_that("get_current_error", {
   tryCatch(f(), error = function(e) NULL)
   expect_equal(
     err,
-    list(tried = TRUE, success = TRUE, object = "from C", error = NULL)
+    if (.Call(otel_build_safe)) {
+      list(tried = TRUE, success = TRUE, object = "from C", error = NULL)
+    } else {
+      list(
+        tried = FALSE,
+        success = NA,
+        object = NULL,
+        error = paste0(
+          "This version of otelsdk cannot get error messages. ",
+          "Make sure that you are using the latest version."
+        )
+      )
+    }
   )
 
   # no error
-  expect_snapshot({
-    get_current_error()
-  })
+  expect_snapshot(
+    {
+      get_current_error()
+    },
+    variant = if (.Call(otel_build_safe)) "safe" else "unsafe"
+  )
 
   # no error, from on.exit()
   err <- NULL
@@ -128,9 +167,12 @@ test_that("get_current_error", {
     "success!"
   }
   tryCatch(f(), error = function(e) NULL)
-  expect_snapshot({
-    err
-  })
+  expect_snapshot(
+    {
+      err
+    },
+    variant = if (.Call(otel_build_safe)) "safe" else "unsafe"
+  )
 })
 
 test_that("get_current_error, failure", {
