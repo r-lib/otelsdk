@@ -53,7 +53,11 @@ packages. If you need help with instrumenting your R package, see
     <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h2>
 
 <ul><li><p>Instrument your R package or project using the
-<a href="https://github.com/r-lib/otel" class="external-link">otel</a> package.</p></li>
+<a href="https://github.com/r-lib/otel" class="external-link">otel</a> package.
+Alternatively, use
+<a href="https://otel.r-lib.org/reference/zci.html" class="external-link">Zero Code Instrumentation</a> to
+automatically instrument selected packages.</p></li>
+<li><p>Install the otelsdk package.</p></li>
 <li><p>Choose an exporter from the otelsdk package. The <code>http</code> exporter sends
 OpenTelemetry output through OTLP/HTTP.</p></li>
 <li><p>Set the <code>OTEL_TRACES_EXPORTER</code> environment variable to point to the
@@ -69,9 +73,16 @@ about environment variables will work for the otelsdk R package. E.g. for
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>OTEL_EXPORTER_OTLP_ENDPOINT<span class="ot">=</span><span class="st">"https://otlp-gateway-prod-eu-central-0.grafana.net/otlp"</span> \</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>OTEL_RESOURCE_ATTRIBUTES<span class="ot">=</span><span class="st">"service.name=&lt;name-of-your-app&gt;,service.namespace=&lt;name-of-your-namespace&gt;,deployment.environment=test"</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>OTEL_EXPORTER_OTLP_HEADERS<span class="ot">=</span><span class="st">"Authorization=Basic%20&lt;base64-encoded-token&gt;"</span></span></code></pre><p></p></div>
-<p>See more example below.</p></li>
+<p>See more examples below.</p></li>
+<li><p>See all <a href="environmentvariables.html">environment variables</a> and
+the manual of your chosen provider for details on configuring otelsdk
+exporters.</p></li>
 <li><p>Start R and your app. Telemetry data will be exported to the chosen exporter.</p></li>
-</ul><div class="section">
+</ul></div>
+    <div class="section level2">
+    <h2 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a></h2>
+
+<div class="section">
 <h3 id="setup-for-remote-collectors">Setup for remote collectors<a class="anchor" aria-label="anchor" href="#setup-for-remote-collectors"></a></h3>
 
 
