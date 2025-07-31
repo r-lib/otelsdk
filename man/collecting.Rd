@@ -16,6 +16,10 @@ packages. If you need help with instrumenting your R package, see
 \itemize{
 \item Instrument your R package or project using the
 \href{https://github.com/r-lib/otel}{otel} package.
+Alternatively, use
+\link[otel:Zero Code Instrumentation]{Zero Code Instrumentation} to
+automatically instrument selected packages.
+\item Install the otelsdk package.
 \item Choose an exporter from the otelsdk package. The \code{http} exporter sends
 OpenTelemetry output through OTLP/HTTP.
 \item Set the \code{OTEL_TRACES_EXPORTER} environment variable to point to the
@@ -34,9 +38,15 @@ OTEL_RESOURCE_ATTRIBUTES="service.name=<name-of-your-app>,service.namespace=<nam
 OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic\%20<base64-encoded-token>"
 }\if{html}{\out{</div>}}
 
-See more example below.
+See more examples below.
+\item See all \link[otelsdk:Environment Variables]{environment variables} and
+the manual of your chosen provider for details on configuring otelsdk
+exporters.
 \item Start R and your app. Telemetry data will be exported to the chosen exporter.
 }
+}
+
+\section{Setup}{
 \subsection{Setup for remote collectors}{
 
 There are a lot of services that offer an OpenTelemetry collector for
