@@ -12,6 +12,13 @@
 SEXP otel_fail(void);
 SEXP otel_error_object(void);
 SEXP otel_init_constants(SEXP env);
+SEXP otel_build_safe(void) {
+#ifdef OTEL_BUILD_SAFE
+  return ScalarLogical(TRUE);
+#else
+  return ScalarLogical(FALSE);
+#endif
+}
 
 SEXP otel_create_tracer_provider_stdstream(SEXP options, SEXP attributes);
 SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes);
@@ -148,6 +155,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_fail, 0),
   CALLDEF(otel_error_object, 0),
   CALLDEF(otel_init_constants, 1),
+  CALLDEF(otel_build_safe, 0),
 
   CALLDEF(otel_create_tracer_provider_stdstream, 2),
   CALLDEF(otel_create_tracer_provider_http, 2),

@@ -27,7 +27,8 @@ OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 	meter.o meter-sdk.o	logger.o logger-sdk.o \
 	r-collector.o collector.o
 
-PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2 @XCPPFLAGS@
+PKG_SAFE = $(_R_SHLIB_BUILD_OBJECTS_SYMBOL_TABLES_)$(_R_CHECK_SIZE_OF_TARBALL_)
+PKG_CPPFLAGS = -Iinstall/include -DOPENTELEMETRY_ABI_VERSION_NO=2 @XCPPFLAGS@ -DOTEL_BUILD_SAFE$(PKG_SAFE)
 PKG_CFLAGS += @PKG_CFLAGS@
 PKG_CXXFLAGS += @PKG_CXXFLAGS@
 PKG_LIBS = \

@@ -3,7 +3,7 @@
 #include <Rversion.h>
 
 // TODO: not yet on R 4.6.x, except if forced for CI testing
-#if R_VERSION < R_Version(3,5,0)
+#if R_VERSION < R_Version(3,5,0) || !defined(OTEL_BUILD_SAFE)
 
 SEXP otel_error_object() {
   SEXP ret = PROTECT(Rf_allocVector(VECSXP, 2));
