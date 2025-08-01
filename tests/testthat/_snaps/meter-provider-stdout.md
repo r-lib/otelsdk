@@ -19,7 +19,7 @@
       	service.name: unknown_service
       	telemetry.sdk.language: cpp
       	telemetry.sdk.name: opentelemetry
-      	telemetry.sdk.version: 1.21.0
+      	telemetry.sdk.version: 1.22.0
       }
 
 # meter_provider_stdstream_options
