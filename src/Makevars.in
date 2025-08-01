@@ -114,6 +114,7 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	(cd cpp; cmake --install build)
 	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 	@find cpp/third_party/nlohmann-json -type f -name "*.hpp" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
+	@find . -type f -name "json.hpp" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 	touch otelcpplib
 
 mrproper: $(SHLIB)
