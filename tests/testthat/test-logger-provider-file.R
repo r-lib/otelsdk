@@ -1,4 +1,9 @@
 test_that("logger_provider_file", {
+  # lp$flush() triggers an integer overflow in opentelemetry-cpp and
+  # this is caught by the CRAN UBSAN checks.
+  # This is fixed in opentelemetry-cpp 1.22.0:
+  # https://github.com/open-telemetry/opentelemetry-cpp/pull/3529
+  skip_on_cran()
   tmp <- tempfile(fileext = ".jsonl")
   on.exit(unlink(tmp), add = TRUE)
   lp <- logger_provider_file_new(list(file_pattern = tmp))
