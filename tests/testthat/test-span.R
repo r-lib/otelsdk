@@ -233,4 +233,4 @@ test_that("span_context", {
   })[["traces"]]
 })
 
-test_that("span_context$to_http_headers", {})
+# test_that("span_context$to_http_headers", {})
