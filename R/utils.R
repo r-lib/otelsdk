@@ -21,6 +21,10 @@ map_lgl <- function(X, FUN, ...) {
   vapply(X, FUN, FUN.VALUE = logical(1), ...)
 }
 
+map_int <- function(X, FUN, ...) {
+  vapply(X, FUN, FUN.VALUE = integer(1), ...)
+}
+
 get_env <- function(n) {
   v <- Sys.getenv(n)
   if (v != "") v else NULL

@@ -14,3 +14,4 @@
 /src/otelcpplib
 docs
 /tests/testthat/results.rds
+/dev-lib

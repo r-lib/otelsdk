@@ -25,3 +25,4 @@
 ^pkgdown$
 ^tools$
 ^tests/testthat/results[.]rds$
+^dev-lib$
