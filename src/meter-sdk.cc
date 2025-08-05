@@ -190,7 +190,7 @@ void *otel_create_meter_provider_memory_(
 }
 
 #define BAIL(msg) do {                                    \
-  throw std::runtime_error(""); } while (0)
+  throw std::runtime_error(msg); } while (0)
 
 int otel_meter_provider_memory_get_metrics_(
     void *meter_provider_, struct otel_metrics_data *cdata) {
@@ -271,10 +271,13 @@ int otel_meter_provider_memory_get_metrics_(
               cdp.point_type = k_sum_point_data;
               cdp.value.sum_point_data.is_monotonic = d.is_monotonic_;
               if (nostd::holds_alternative<int64_t>(d.value_)) {
+              // all counters, etc are double currently
+              // # nocov start
                 int64_t v = nostd::get<int64_t>(d.value_);
                 cdp.value.sum_point_data.value_type = k_value_int64;
                 cdp.value.sum_point_data.value.int64 = v;
               } else {
+              // # nocov end
                 double v = nostd::get<double>(d.value_);
                 cdp.value.sum_point_data.value_type = k_value_double;
                 cdp.value.sum_point_data.value.dbl = v;
@@ -284,6 +287,8 @@ int otel_meter_provider_memory_get_metrics_(
                 nostd::get<metrics_sdk::HistogramPointData>(pd);
               cdp.point_type = k_histogram_point_data;
               if (nostd::holds_alternative<int64_t>(d.sum_)) {
+              // all counters, etc are double currently
+              // # nocov start
                 cdp.value.histogram_point_data.value_type = k_value_int64;
                 cdp.value.histogram_point_data.sum.int64 =
                   nostd::get<int64_t>(d.sum_);
@@ -292,6 +297,7 @@ int otel_meter_provider_memory_get_metrics_(
                 cdp.value.histogram_point_data.max.int64 =
                   nostd::get<int64_t>(d.max_);
               } else {
+              // # nocov end
                 cdp.value.histogram_point_data.value_type = k_value_double;
                 cdp.value.histogram_point_data.sum.dbl =
                   nostd::get<double>(d.sum_);
@@ -303,23 +309,30 @@ int otel_meter_provider_memory_get_metrics_(
               cdp.value.histogram_point_data.count = d.count_;
               cdp.value.histogram_point_data.record_min_max = d.record_min_max_;
               if (cc2c_otel_double_array(
+              // # nocov start
                   d.boundaries_, cdp.value.histogram_point_data.boundaries)) {
-                BAIL("");
+                BAIL("Failed to convert boundaries array from C++ to C.");
               }
+              // # nocov end
               if (cc2c_otel_double_array(
                   d.counts_, cdp.value.histogram_point_data.counts)) {
-                BAIL("");
+              // # nocov start
+                BAIL("Failed to convert counts array from C++ to C.");
               }
+              // # nocov end
 
             } else if (nostd::holds_alternative<metrics_sdk::LastValuePointData>(pd)) {
               const metrics_sdk::LastValuePointData &d =
                 nostd::get<metrics_sdk::LastValuePointData>(pd);
               cdp.point_type = k_last_value_point_data;
               if (nostd::holds_alternative<int64_t>(d.value_)) {
+              // only have double values currently
+              // # nocov start
                 cdp.value.last_value_point_data.value_type = k_value_int64;
                 cdp.value.last_value_point_data.value.int64 =
                   nostd::get<int64_t>(d.value_);
               } else {
+              // # nocov end
                 cdp.value.last_value_point_data.value_type = k_value_double;
                 cdp.value.last_value_point_data.value.dbl =
                   nostd::get<double>(d.value_);
@@ -333,8 +346,10 @@ int otel_meter_provider_memory_get_metrics_(
             } else if (nostd::holds_alternative<metrics_sdk::DropPointData>(pd)) {
               cdp.point_type = k_drop_point_data;
             } else {
-              BAIL("");
+            // # nocov start
+              BAIL("Unknown metrics data type.");
             }
+            // # nocov end
           }
         }
       }
@@ -342,9 +357,11 @@ int otel_meter_provider_memory_get_metrics_(
 
     return 0;
   } catch(...) {
+  // # nocov start
     otel_metrics_data_free(cdata);
     return 1;
   }
+  // # nocov end
 }
 
 void otel_meter_provider_flush_(void *meter_provider_, int timeout) {

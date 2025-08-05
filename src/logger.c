@@ -61,7 +61,7 @@ SEXP otel_create_logger_provider_http(SEXP options, SEXP attributes) {
   memset(&blrp_options.isset, 0, sizeof(blrp_options.isset));
   SEXP max_queue_size = rf_get_list_element(options, "max_queue_size");
   if ((blrp_options.isset.max_queue_size = !Rf_isNull(max_queue_size))) {
-    blrp_options.max_queue_size = REAL(max_queue_size)[0];
+    blrp_options.max_queue_size = INTEGER(max_queue_size)[0];
   }
   SEXP schedule_delay = rf_get_list_element(options, "schedule_delay");
   if ((blrp_options.isset.schedule_delay = !Rf_isNull(schedule_delay))) {
@@ -71,7 +71,7 @@ SEXP otel_create_logger_provider_http(SEXP options, SEXP attributes) {
     rf_get_list_element(options, "max_export_batch_size");
   if ((blrp_options.isset.max_export_batch_size =
        !Rf_isNull(max_export_batch_size))) {
-    blrp_options.max_export_batch_size = REAL(max_export_batch_size)[0];
+    blrp_options.max_export_batch_size = INTEGER(max_export_batch_size)[0];
   }
   void *logger_provider_ = otel_create_logger_provider_http_(
     &options_, &attributes_, &blrp_options);
@@ -252,8 +252,8 @@ SEXP otel_log(
 SEXP otel_logger_provider_http_options(void) {
   struct otel_provider_http_options opts = { 0 };
   if (otel_logger_provider_http_default_options_(&opts)) {
-    R_THROW_SYSTEM_ERROR("Failed to query OpenTelemetry HTTP options");
-  }
+    R_THROW_SYSTEM_ERROR("Failed to query OpenTelemetry HTTP options");// # nocov
+  }                                                                   // # nocov
 
   const char *nms[] = {
     "url",
@@ -313,11 +313,13 @@ SEXP otel_logger_provider_http_options(void) {
 SEXP otel_blrp_defaults(void) {
   struct otel_bsp_options opts;
   if (otel_blrp_defaults_(&opts)) {
+  // # nocov start
     otel_bsp_options_free(&opts);
     R_THROW_ERROR(
       "Cannot query default OpenTelemetry batch span processor options"
     );
   }
+  // # nocov end
   const char *nms[] = {
     "max_queue_size", "schedule_delay", "max_export_batch_size", "" };
   SEXP res = Rf_protect(Rf_mkNamed(VECSXP, nms));

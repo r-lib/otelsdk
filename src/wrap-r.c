@@ -21,8 +21,8 @@ void r2c_otel_string(SEXP s, struct otel_string *cs) {
   size_t n = strlen(s_);
   cs->s = malloc(n + 1);
   if (!cs->s) {
-    R_THROW_SYSTEM_ERROR("Cannot allocate memory for string");
-  }
+    R_THROW_SYSTEM_ERROR("Cannot allocate memory for string");        // # nocov
+  }                                                                   // # nocov
   cs->size = n + 1;
   memcpy(cs->s, s_, n + 1);
 }
@@ -238,7 +238,7 @@ void otel_attribute_free(struct otel_attribute *attr) {
       otel_int64_array_free(&attr->val.int64_array);
       break;
     default:
-      break;
+      break;                                                          // # nocov
   }
 }
 
@@ -296,7 +296,7 @@ void r2c_attribute(
       }
       break;
     default:
-      Rf_error("Unknown OpenTelemetry attribute type: %d.", TYPEOF(value));
+      Rf_error("Unknown OpenTelemetry attribute type: %d.", TYPEOF(value)); // # nocov
       break;
   }
 }
@@ -591,7 +591,7 @@ SEXP c2r_otel_attribute(const struct otel_attribute *attr) {
       return res;
       break;
     default:
-      return R_NilValue;
+      return R_NilValue;                                              // # nocov
       break;
   }
   return R_NilValue;
@@ -819,7 +819,7 @@ SEXP c2r_otel_value(enum otel_value_type type, union otel_value *v) {
       value = v->dbl;
       break;
     default:
-      break;
+      break;                                                          // # nocov
   }
   return Rf_ScalarReal(value);
 }
@@ -829,8 +829,8 @@ const size_t otel_value_type_names_size = 2;
 
 SEXP c2r_otel_value_type(enum otel_value_type t) {
   if (t >= otel_value_type_names_size) {
-    R_THROW_ERROR("Internal OpenTelemetry error, unknown value type");
-  }
+    R_THROW_ERROR("Internal OpenTelemetry error, unknown value type");// # nocov
+  }                                                                   // # nocov
   return mkString(otel_value_type_names[t]);
 }
 

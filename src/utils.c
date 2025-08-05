@@ -8,9 +8,10 @@
 SEXP rf_get_list_element(SEXP list, const char *str) {
   SEXP elmt = R_NilValue;
   SEXP names = PROTECT(Rf_getAttrib(list, R_NamesSymbol));
+  R_xlen_t len = Rf_xlength(list);
 
-  for (R_xlen_t i = 0; i < Rf_xlength(list); i++) {
-    if (strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
+  for (R_xlen_t i = 0; i < len; i++) {
+    if (!strcmp(CHAR(STRING_ELT(names, i)), str)) {
        elmt = VECTOR_ELT(list, i);
        break;
     }
