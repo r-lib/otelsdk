@@ -454,52 +454,68 @@ void r2c_otel_http_exporter_options(
     coptions->ssl_insecure_skip_verify = LOGICAL(ssl_insecure_skip_verify)[0];
   }
   SEXP ssl_ca_cert_path = rf_get_list_element(options, "ssl_ca_cert_path");
-  if ((coptions->isset.ssl_ca_cert_path = !Rf_isNull(ssl_ca_cert_path))) {
+  coptions->isset.ssl_ca_cert_path = !Rf_isNull(ssl_ca_cert_path) &&
+    strlen(CHAR(STRING_ELT(ssl_ca_cert_path, 0))) > 0;
+  if (coptions->isset.ssl_ca_cert_path) {
     r2c_otel_string(ssl_ca_cert_path, &coptions->ssl_ca_cert_path);
   }
   SEXP ssl_ca_cert_string = rf_get_list_element(options, "ssl_ca_cert_string");
-  if ((coptions->isset.ssl_ca_cert_string = !Rf_isNull(ssl_ca_cert_string))) {
+  coptions->isset.ssl_ca_cert_string = !Rf_isNull(ssl_ca_cert_string) &&
+    strlen(CHAR(STRING_ELT(ssl_ca_cert_string, 0))) > 0;
+  if (coptions->isset.ssl_ca_cert_string) {
     r2c_otel_string(ssl_ca_cert_string, &coptions->ssl_ca_cert_string);
   }
   SEXP ssl_client_key_path =
     rf_get_list_element(options, "ssl_client_key_path");
-  if ((coptions->isset.ssl_client_key_path =
-       !Rf_isNull(ssl_client_key_path))) {
+  coptions->isset.ssl_client_key_path = !Rf_isNull(ssl_client_key_path) &&
+    strlen(CHAR(STRING_ELT(ssl_client_key_path, 0))) > 0;
+  if (coptions->isset.ssl_client_key_path) {
     r2c_otel_string(ssl_client_key_path, &coptions->ssl_client_key_path);
   }
   SEXP ssl_client_key_string =
     rf_get_list_element(options, "ssl_client_key_string");
-  if ((coptions->isset.ssl_client_key_string =
-       !Rf_isNull(ssl_client_key_string))) {
+  coptions->isset.ssl_client_key_string = !Rf_isNull(ssl_client_key_string) &&
+    strlen(CHAR(STRING_ELT(ssl_client_key_string, 0))) > 0;
+  if (coptions->isset.ssl_client_key_string) {
     r2c_otel_string(ssl_client_key_string, &coptions->ssl_client_key_string);
   }
   SEXP ssl_client_cert_path =
     rf_get_list_element(options, "ssl_client_cert_path");
-  if ((coptions->isset.ssl_client_cert_path =
-       !Rf_isNull(ssl_client_cert_path))) {
+  coptions->isset.ssl_client_cert_path = !Rf_isNull(ssl_client_cert_path) &&
+    strlen(CHAR(STRING_ELT(ssl_client_cert_path, 0))) > 0;
+  if (coptions->isset.ssl_client_cert_path) {
     r2c_otel_string(ssl_client_cert_path, &coptions->ssl_client_cert_path);
   }
   SEXP ssl_client_cert_string =
     rf_get_list_element(options, "ssl_client_cert_string");
-  if ((coptions->isset.ssl_client_cert_string =
-       !Rf_isNull(ssl_client_cert_string))) {
+  coptions->isset.ssl_client_cert_string = !Rf_isNull(ssl_client_cert_string) &&
+    strlen(CHAR(STRING_ELT(ssl_client_cert_string, 0))) > 0;
+  if (coptions->isset.ssl_client_cert_string) {
     r2c_otel_string(
       ssl_client_cert_string, &coptions->ssl_client_cert_string);
   }
   SEXP ssl_min_tls = rf_get_list_element(options, "ssl_min_tls");
-  if ((coptions->isset.ssl_min_tls = !Rf_isNull(ssl_min_tls))) {
+  coptions->isset.ssl_min_tls = !Rf_isNull(ssl_min_tls) &&
+    strlen(CHAR(STRING_ELT(ssl_min_tls, 0))) > 0;
+  if (coptions->isset.ssl_min_tls) {
     r2c_otel_string(ssl_min_tls, &coptions->ssl_min_tls);
   }
   SEXP ssl_max_tls = rf_get_list_element(options, "ssl_max_tls");
-  if ((coptions->isset.ssl_max_tls = !Rf_isNull(ssl_max_tls))) {
+  coptions->isset.ssl_max_tls = !Rf_isNull(ssl_max_tls) &&
+    strlen(CHAR(STRING_ELT(ssl_max_tls, 0))) > 0;
+  if (coptions->isset.ssl_max_tls) {
     r2c_otel_string(ssl_max_tls, &coptions->ssl_max_tls);
   }
   SEXP ssl_cipher = rf_get_list_element(options, "ssl_cipher");
-  if ((coptions->isset.ssl_cipher = !Rf_isNull(ssl_cipher))) {
+  coptions->isset.ssl_cipher = !Rf_isNull(ssl_cipher) &&
+    strlen(CHAR(STRING_ELT(ssl_cipher, 0))) > 0;
+  if (ssl_cipher) {
     r2c_otel_string(ssl_cipher, &coptions->ssl_cipher);
   }
   SEXP ssl_cipher_suite = rf_get_list_element(options, "ssl_cipher_suite");
-  if ((coptions->isset.ssl_cipher_suite = !Rf_isNull(ssl_cipher_suite))) {
+  coptions->isset.ssl_cipher_suite = !Rf_isNull(ssl_cipher_suite) &&
+    strlen(CHAR(STRING_ELT(ssl_cipher_suite, 0))) > 0;
+  if (ssl_cipher_suite) {
     r2c_otel_string(ssl_cipher_suite, &coptions->ssl_cipher_suite);
   }
   SEXP compression = rf_get_list_element(options, "compression");
