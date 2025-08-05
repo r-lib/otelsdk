@@ -72,7 +72,10 @@ elif [ "$UNAME" = "Darwin" ]; then
 else
     PROTOBUF_LIBS="`pkg-config --libs protobuf || echo '-lprotobuf'`"
     LIBCURL_LIBS="`pkg-config --libs libcurl || echo '-lcurl'`"
-    CMAKE_PREFIX_PATH=""
+    # this is for the R-hub images that have protobuf in /usr/local/clang
+    if [ -f "/usr/local/clang/bin/protoc" ]; then
+	CMAKE_PREFIX_PATH="/usr/local/clang"
+    fi
 fi
 
 # We do parallel build if
