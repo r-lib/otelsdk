@@ -124,13 +124,21 @@ span_new <- function(
     ) {
       force(end_on_exit)
       cscope <- ccall(otel_scope_start, self$xptr)
-      defer(
-        {
-          ccall(otel_scope_end, cscope)
-          if (end_on_exit) self$end(status_code = "auto")
-        },
-        envir = activation_scope
-      )
+      if (!is.null(activation_scope)) {
+        defer(
+          {
+            ccall(otel_scope_end, cscope)
+            if (end_on_exit) self$end(status_code = "auto")
+          },
+          envir = activation_scope
+        )
+      } else {
+        cscope
+      }
+    },
+
+    deactivate = function(cscope) {
+      ccall(otel_scope_end, cscope)
     },
 
     name = NULL
