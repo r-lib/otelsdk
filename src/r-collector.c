@@ -48,7 +48,9 @@ SEXP otel_encode_response(
   };
   // # nocov end LCOV_EXCL_STOP
   SEXP res = Rf_protect(Rf_allocVector(RAWSXP, msg.size));
-  memcpy(RAW(res), msg.s, msg.size);
+  if (msg.size > 0) {
+    memcpy(RAW(res), msg.s, msg.size);
+  }
   // TODO: cleancall
   otel_string_free(&msg);
 
