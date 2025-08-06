@@ -167,9 +167,11 @@ SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value) {
   }
   void *span_ = R_ExternalPtrAddr(span);
   if (span_) {
-    struct otel_attribute attr;
+    struct otel_attribute attr = { 0 };
     r2c_attribute(CHAR(STRING_ELT(name, 0)),value, &attr);
     otel_span_set_attribute_(span_, &attr);
+    // TODO: cleancall
+    otel_attribute_free(&attr);
   }
   return R_NilValue;
 }
@@ -189,6 +191,8 @@ SEXP otel_span_add_event(
       timestamp_ = REAL(timestamp);
     }
     otel_span_add_event_(span_, name_, &attributes_, timestamp_);
+    // TODO: cleancall
+    otel_attributes_free(&attributes_);
   }
   return R_NilValue;
 }

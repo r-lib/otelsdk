@@ -145,6 +145,7 @@ void otel_span_data_free(struct otel_span_data *cdata) {
         }
         otel_attributes_free(&xi->attributes);
         otel_events_free(&xi->events);
+	otel_span_links_free(&xi->links);
       }
       free(cdata->a);
       cdata->a = NULL;
@@ -245,18 +246,19 @@ void otel_attribute_free(struct otel_attribute *attr) {
 void r2c_attribute(
     const char *name, SEXP value, struct otel_attribute *attr) {
 
-  attr->name = name;
+  attr->name = strdup(name);
   R_len_t l = Rf_length(value);
   switch (TYPEOF(value)) {
     case STRSXP:
       if (l == 1) {
         attr->type = k_string;
-        attr->val.string.s = (char*) CHAR(STRING_ELT(value, 0));
+        attr->val.string.s = strdup((char*) CHAR(STRING_ELT(value, 0)));
         attr->val.string.size = strlen(attr->val.string.s);
       } else {
         attr->type = k_string_array;
         attr->val.string_array.a = (char**) malloc(l * sizeof(char*));
         for (R_len_t i = 0; i < l; i++) {
+	  // does not own the strings!
           attr->val.string_array.a[i] = (char*) CHAR(STRING_ELT(value, i));
         }
         attr->val.string_array.count = l;
@@ -320,8 +322,9 @@ void r2c_attributes(SEXP r, struct otel_attributes *c) {
     return;
   }
 
+  // need to zero out memory, cleanup functions rely on this
   c->a = (struct otel_attribute *)
-    malloc(c->count * sizeof(struct otel_attribute));
+    calloc(c->count, sizeof(struct otel_attribute));
   SEXP nms = Rf_getAttrib(r, R_NamesSymbol);
   for (R_len_t i = 0; i < c->count; i++) {
     r2c_attribute(CHAR(STRING_ELT(nms, i)), VECTOR_ELT(r, i), c->a + i);
@@ -418,7 +421,8 @@ void otel_http_exporter_options_free(struct otel_http_exporter_options *o) {
 void r2c_otel_http_exporter_options(
   SEXP options, struct otel_http_exporter_options *coptions
 ) {
-  memset(&coptions->isset, 0, sizeof(coptions->isset));
+  // zero all out, so otel_string_free etc. works
+  memset(coptions, 0, sizeof(*coptions));
   SEXP url = rf_get_list_element(options, "url");
   if ((coptions->isset.url = !Rf_isNull(url))) {
     r2c_otel_string(url, &coptions->url);
@@ -1233,6 +1237,7 @@ void otel_collector_scope_metric_free(
     for (size_t i = 0; i < sl->count; i++) {
       otel_collector_metric_free(&sl->metrics[i]);
     }
+    free(sl->metrics);
     sl->metrics = NULL;
   }
   sl->count = 0;
@@ -1263,6 +1268,7 @@ void otel_collector_resource_metric_free(
     for (size_t i = 0; i < rm->count; i++) {
       otel_collector_scope_metric_free(&rm->scope_metrics[i]);
     }
+    free(rm->scope_metrics);
     rm->scope_metrics = NULL;
   }
   rm->count = 0;
@@ -1295,6 +1301,7 @@ void otel_collector_resource_metrics_free(
     for (size_t i = 0; i < rm->count; i++) {
       otel_collector_resource_metric_free(&rm->resource_metrics[i]);
     }
+    free(rm->resource_metrics);
     rm->resource_metrics = NULL;
   }
   rm->count = 0;
@@ -1316,4 +1323,21 @@ SEXP c2r_otel_collector_resource_metrics(
 
 void otel_bsp_options_free(struct otel_bsp_options *o) {
   // nothing to do
+}
+
+void otel_provider_http_options_free(struct otel_provider_http_options *opts) {
+  if (!opts) return;
+  otel_string_free(&opts->url);
+  otel_strings_free(&opts->http_headers);
+  otel_string_free(&opts->ssl_ca_cert_path);
+  otel_string_free(&opts->ssl_ca_cert_string);
+  otel_string_free(&opts->ssl_client_key_path);
+  otel_string_free(&opts->ssl_client_key_string);
+  otel_string_free(&opts->ssl_client_cert_path);
+  otel_string_free(&opts->ssl_client_cert_string);
+  otel_string_free(&opts->ssl_min_tls);
+  otel_string_free(&opts->ssl_max_tls);
+  otel_string_free(&opts->ssl_cipher);
+  otel_string_free(&opts->ssl_cipher_suite);
+  otel_string_free(&opts->compression);
 }

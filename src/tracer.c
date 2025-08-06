@@ -43,6 +43,8 @@ SEXP otel_create_tracer_provider_stdstream(SEXP options, SEXP attributes) {
     cstream, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
+  // TODO cleancall
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -71,6 +73,9 @@ SEXP otel_create_tracer_provider_http(SEXP options, SEXP attributes) {
     otel_create_tracer_provider_http_(&options_, &attributes_, &bsp_options);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
+  // TODO cleancall
+  otel_http_exporter_options_free(&options_);
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -83,6 +88,8 @@ SEXP otel_create_tracer_provider_memory(SEXP options, SEXP attributes) {
     cbuffer_size, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -96,6 +103,9 @@ SEXP otel_create_tracer_provider_file(SEXP options, SEXP attributes) {
     &options_, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_provider_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_file_exporter_options_free(&options_);
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -150,6 +160,8 @@ SEXP otel_get_tracer(
     tracer_provider_, name_, version_, schema_url_, &attributes_);
   SEXP xptr = R_MakeExternalPtr(tracer_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_tracer_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -240,6 +252,8 @@ SEXP otel_tracer_provider_http_options(void) {
   SET_VECTOR_ELT(res, 20, Rf_ScalarReal(opts.retry_policy_max_backoff));
   SET_VECTOR_ELT(res, 21, Rf_ScalarReal(opts.retry_policy_backoff_multiplier));
 
+  // TODO: cleancall
+  otel_provider_http_options_free(&opts);
   UNPROTECT(1);
   return res;
 }

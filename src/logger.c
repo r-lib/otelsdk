@@ -49,6 +49,8 @@ SEXP otel_create_logger_provider_stdstream(SEXP options, SEXP attributes) {
     cstream, &attributes_);
   SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -77,6 +79,9 @@ SEXP otel_create_logger_provider_http(SEXP options, SEXP attributes) {
     &options_, &attributes_, &blrp_options);
   SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_http_exporter_options_free(&options_);
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -246,6 +251,8 @@ SEXP otel_log(
   otel_log_(
     logger_, format_, severity_, span_id_, trace_id_, timestamp_,
     observed_timestamp_, &attributes_);
+  // TODO: cleancall
+  otel_attributes_free(&attributes_);
   return R_NilValue;
 }
 
@@ -306,6 +313,7 @@ SEXP otel_logger_provider_http_options(void) {
   SET_VECTOR_ELT(res, 20, Rf_ScalarReal(opts.retry_policy_max_backoff));
   SET_VECTOR_ELT(res, 21, Rf_ScalarReal(opts.retry_policy_backoff_multiplier));
 
+  otel_provider_http_options_free(&opts);
   UNPROTECT(1);
   return res;
 }

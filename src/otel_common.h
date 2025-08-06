@@ -162,6 +162,8 @@ struct otel_provider_http_options {
   int aggregation_temporality;
 };
 
+void otel_provider_http_options_free(struct otel_provider_http_options *opts);
+
 struct otel_trace_flags {
   int is_sampled;
   int is_random;

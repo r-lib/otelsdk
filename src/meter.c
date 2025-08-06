@@ -51,6 +51,8 @@ SEXP otel_create_meter_provider_stdstream(SEXP options, SEXP attributes) {
     cstream, cexport_interval, cexport_timeout);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_meter_provider_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -70,6 +72,9 @@ SEXP otel_create_meter_provider_http(SEXP options, SEXP attributes) {
     aggregation_temporality);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_meter_provider_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_http_exporter_options_free(&options_);
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -113,6 +118,8 @@ SEXP otel_create_meter_provider_memory(SEXP options, SEXP attributes) {
     &attributes_);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_meter_provider_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_attributes_free(&attributes_);
   return xptr;
 }
 
@@ -484,6 +491,7 @@ SEXP otel_meter_provider_http_options(void) {
   SET_VECTOR_ELT(res, 20, Rf_ScalarReal(opts.retry_policy_max_backoff));
   SET_VECTOR_ELT(res, 21, Rf_ScalarReal(opts.retry_policy_backoff_multiplier));
 
+  otel_provider_http_options_free(&opts);
   UNPROTECT(1);
   return res;
 }
