@@ -70,7 +70,7 @@ int otel_decode_log_record_(
           lr_->body = { nullptr, 0 };
           if (lr_->has_body) {
             common::AnyValue body = lr.body();
-            if (body.has_string_value()) {
+            if (body.value_case() == common::AnyValue::kStringValue) {
               cc2c_otel_string(body.string_value(), lr_->body);
             }
           }
