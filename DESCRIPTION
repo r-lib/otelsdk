@@ -36,12 +36,10 @@ Suggests:
     rlang,
     spelling,
     testthat (>= 3.0.0),
-    testthatlabs,
     webfakes,
     withr
-Remotes:
-    gaborcsardi/testthatlabs,
-    r-lib/otel
 Config/testthat/edition: 3
 URL: https://otelsdk.r-lib.org, https://github.com/r-lib/otelsdk
-Config/Needs/website: tidyverse/tidytemplate
+Config/Needs/check: r-lib/otel, gaborcsardi/testthatlabs
+Config/Needs/coverage: r-lib/otel/ gaborcsardi/testthatlabs
+Config/Needs/website: tidyverse/tidytemplate, r-lib/otel
