@@ -41,5 +41,5 @@ Suggests:
 Config/testthat/edition: 3
 URL: https://otelsdk.r-lib.org, https://github.com/r-lib/otelsdk
 Config/Needs/check: r-lib/otel, gaborcsardi/testthatlabs
-Config/Needs/coverage: r-lib/otel/ gaborcsardi/testthatlabs
+Config/Needs/coverage: r-lib/otel, gaborcsardi/testthatlabs
 Config/Needs/website: tidyverse/tidytemplate, r-lib/otel
