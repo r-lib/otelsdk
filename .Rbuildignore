@@ -26,3 +26,4 @@
 ^tools$
 ^tests/testthat/results[.]rds$
 ^dev-lib$
+^CRAN-SUBMISSION$
