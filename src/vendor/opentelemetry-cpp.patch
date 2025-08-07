@@ -138,3 +138,17 @@
 +    context_->Shutdown((std::chrono::microseconds::max)(), true);
    }
  }
+
+--- cpp/exporters/otlp/src/otlp_file_client.cc 2025-06-18 17:35:34
++++ cpp/exporters/otlp/src/otlp_file_client.cc.new 2025-07-01 12:43:16
+@@ -93,8 +93,8 @@
+       snprintf_s(buffer, static_cast<rsize_t>(bufsz), fmt, ##args)
+ #  endif
+ #else
+-#  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, args...) \
+-    snprintf(buffer, static_cast<size_t>(bufsz), fmt, ##args)
++#  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, ...) \
++    snprintf(buffer, static_cast<size_t>(bufsz), fmt, __VA_ARGS__)
+ #endif
+
+ #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
