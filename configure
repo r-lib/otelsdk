@@ -74,40 +74,47 @@ else
     LIBCURL_LIBS="`pkg-config --libs libcurl || echo '-lcurl'`"
     # this is for the R-hub images that have protobuf in /usr/local/clang
     if [ -f "/usr/local/clang/bin/protoc" ]; then
-	CMAKE_PREFIX_PATH="/usr/local/clang"
+      CMAKE_PREFIX_PATH="/usr/local/clang"
     fi
 fi
 
 # We do parallel build if
 # - on Github Actions, or
 # - if NOT_CRAN == "true", or
-# - if we are _not_ in `R CMD check`.
+# - if we are in load_all().
 CMAKE_BUILD_PARALLEL_LEVEL=""
-if [ "$DO_PARALLEL" = "false" ]; then
-    echo '** parallel build is off'
+if [ "$R_INSTALL_PARALLEL" = "false" ]; then
+  echo '** parallel build is off'
+elif [ "$R_INSTALL_PARALLEL" = "true" ]; then
+  echo '** parallel build is on because R_INSTALL_PARALLEL=true'
 else
-    if [ "$GITHUB_ACTIONS" = "true" ]; then
-	echo '** parallel build selected because of GitHub Action'
-	DO_PARALLEL=true
-    elif [ "$NOT_CRAN" = "true" ]; then
-	echo '** parallel build selected because NOT_CRAN=true is set'
-	DO_PARALLEL=true
-    fi
-    if ! echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck &&
-	    ! echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
-	echo '** parallel build selected because not in `R CMD check`'
-    DO_PARALLEL=true
+  if [ "$GITHUB_ACTIONS" = "true" ]; then
+    echo '** parallel build selected because of GitHub Action'
+    R_INSTALL_PARALLEL=true
+  elif [ "$NOT_CRAN" = "true" ]; then
+    echo '** parallel build selected because NOT_CRAN=true is set'
+    R_INSTALL_PARALLEL=true
+  elif [ -n "$DEVTOOLS_LOAD" ]; then
+    echo '** parallel build selected in load_all()'
+    R_INSTALL_PARALLEL=true
   fi
 fi
 
-MRPROPER=""
+# no need to clean up on GHA or in `load_all()` or if
+# R_INSTALL_PARALLEL=true, which I set locally on my machine
+MRPROPER="mrproper"
 if echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck ||
-  echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
-    MRPROPER="mrproper"
+   echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
+  MRPROPER="mrproper"
+elif [ "$GITHUB_ACTIONS" = "true" ] ||
+   [ "$NOT_CRAN" = "true" ] ||
+   [ "$R_INSTALL_PARALLEL" = "true" ] ||
+   [ -n "$DEVTOOLS_LOAD" ]; then
+  MRPROPER=""
 fi
 
 # Look up number of processors, if parallel build.
-if [ "$DO_PARALLEL" = "true" ]; then
+if [ "$R_INSTALL_PARALLEL" = "true" ]; then
   if [ -n "$NCPU" ]; then
     # already set
     true
@@ -132,13 +139,6 @@ if [ "$DO_PARALLEL" = "true" ]; then
     echo '**'" parallel compilation is disabled."
     NCPU=""
   fi
-fi
-
-if [ -n "$CODE_COVERAGE" ]; then
-  echo '**'" compiling for test coverage"
-  PKG_CFLAGS="-O0 --coverage -DGCOV_COMPILE"
-  PKG_CXXFLAGS="-O0 --coverage -DGCOV_COMPILE"
-  PKG_LDFLAGS="--coverage"
 fi
 
 cat src/Makevars.in |
