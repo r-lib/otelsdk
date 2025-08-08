@@ -334,6 +334,7 @@ void r2c_attributes(SEXP r, struct otel_attributes *c) {
 void r2c_otel_file_exporter_options(
   SEXP options, struct otel_file_exporter_options *coptions
 ) {
+  memset(coptions, 0, sizeof(*coptions));
   SEXP file_pattern = rf_get_list_element(options, "file_pattern");
   coptions->has_file_pattern = !Rf_isNull(file_pattern);
   if (coptions->has_file_pattern) {
