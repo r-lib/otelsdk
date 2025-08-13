@@ -26,7 +26,7 @@ public:
           cont = callback(attr.name, attr.val.string.s);
           break;
         case k_boolean:
-          cont = callback(attr.name, attr.val.boolean);
+          cont = callback(attr.name, (bool) attr.val.boolean);
           break;
         case k_double:
           cont = callback(attr.name, attr.val.dbl);
