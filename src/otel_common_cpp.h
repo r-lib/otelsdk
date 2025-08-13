@@ -135,10 +135,12 @@ int cc2c_otel_attributes(const T &attrs, struct otel_attributes &cattrs) {
 
     return 0;
 
+  // # nocov start
   } catch (...) {
     otel_attributes_free(&cattrs);
     return 1;
   }
+  // # nocov end
 }
 
 int cc2c_otel_boolean_array(

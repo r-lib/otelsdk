@@ -233,4 +233,24 @@ test_that("span_context", {
   })[["traces"]]
 })
 
-# test_that("span_context$to_http_headers", {})
+test_that("activate, deactivate manually", {
+  # as used in ZCI
+  env <- new.env()
+  env$fun <- function() {
+    fun2()
+  }
+  environment(env$fun) <- env
+  env$fun2 <- function() {
+    NULL
+  }
+  environment(env$fun2) <- env
+
+  asNamespace("otel")$trace_env(env, name = "test")
+
+  spns <- with_otel_record(function() {
+    env$fun()
+  })[["traces"]]
+
+  expect_equal(names(spns), c("test::fun2", "test::fun"))
+  expect_equal(spns[["test::fun2"]]$parent, spns[["test::fun"]]$span_id)
+})

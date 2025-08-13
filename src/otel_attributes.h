@@ -70,16 +70,19 @@ public:
           break;
         default:
           // noexcept, but this cannot happen, anyway.
-          break;
+          break; // # nocov
       }
       if (!cont) return(false);
     }
     return(true);
   }
 
+  // TODO: is this needed?
+  // # nocov start
   virtual size_t size() const noexcept {
     return attributes_.count;
   }
+  // # nocov end
 
 private:
   struct otel_attributes &attributes_;

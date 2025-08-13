@@ -19,3 +19,9 @@ test_that("meter_provider_file", {
   expect_equal(md$name, "ctr")
   expect_equal(md$sum$dataPoints[[1]]$asDouble, 11)
 })
+
+test_that("meter_provider_file$options", {
+  expect_snapshot({
+    meter_provider_file$options()
+  })
+})

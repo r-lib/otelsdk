@@ -437,8 +437,8 @@ SEXP otel_gauge_record(
 SEXP otel_meter_provider_http_options(void) {
   struct otel_provider_http_options opts = { 0 };
   if (otel_meter_provider_http_default_options_(&opts)) {
-    R_THROW_SYSTEM_ERROR("Failed to query OpenTelemetry HTTP options");
-  }
+    R_THROW_SYSTEM_ERROR("Failed to query OpenTelemetry HTTP options"); // # nocov
+  }                                                                     // # nocov
 
   const char *nms[] = {
     "url",

@@ -371,7 +371,7 @@ void otel_meter_provider_flush_(void *meter_provider_, int timeout) {
   if (timeout < 0) {
     meter_provider.ForceFlush();
   } else {
-    meter_provider.ForceFlush((std::chrono::microseconds) timeout);
+    meter_provider.ForceFlush((std::chrono::microseconds) timeout); // # nocov
   }
   if (mps->stream.is_open()) {
     mps->stream.flush();
@@ -386,7 +386,7 @@ void otel_meter_provider_shutdown_(void *meter_provider_, int timeout) {
   if (timeout < 0) {
     meter_provider.Shutdown();
   } else {
-    meter_provider.Shutdown((std::chrono::microseconds) timeout);
+    meter_provider.Shutdown((std::chrono::microseconds) timeout); // # nocov
   }
   mps->shutdown_called = true;
   if (mps->stream.is_open()) {
