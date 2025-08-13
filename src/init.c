@@ -129,23 +129,6 @@ SEXP glue_(SEXP x, SEXP f, SEXP open_arg, SEXP close_arg, SEXP cli_arg);
 SEXP trim_(SEXP x);
 SEXP create_empty_xptr(void);
 
-#ifdef GCOV_COMPILE
-
-void __gcov_dump();
-SEXP otel_gcov_flush() {
-  REprintf("Flushing coverage info\n");
-  __gcov_dump();
-  return R_NilValue;
-}
-
-#else
-
-SEXP otel_gcov_flush(void) {
-  return R_NilValue;
-}
-
-#endif
-
 #define CALLDEF(name, n) \
   { #name, (DL_FUNC)&name, n }
 
@@ -234,7 +217,6 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(glue_, 5),
   CALLDEF(trim_, 1),
   CALLDEF(create_empty_xptr, 0),
-  CALLDEF(otel_gcov_flush, 0),
 
   { NULL, NULL, 0 }
 };
