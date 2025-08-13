@@ -11,12 +11,11 @@ meter_provider_stdstream_new <- function(opts = NULL) {
     ) {
       meter_new(self, name, version, schema_url, attributes, ...)
     },
-    flush = function(timeout = NULL) {
-      # TODO: check arg
-      ccall(otel_meter_provider_flush, self$xptr, timeout)
+    flush = function() {
+      ccall(otel_meter_provider_flush, self$xptr, NULL)
     },
-    shutdown = function(timeout = NULL) {
-      ccall(otel_meter_provider_shutdown, self$xptr, timeout)
+    shutdown = function() {
+      ccall(otel_meter_provider_shutdown, self$xptr, NULL)
       invisible(self)
     }
   )

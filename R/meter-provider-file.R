@@ -12,11 +12,11 @@ meter_provider_file_new <- function(opts = NULL) {
     ) {
       meter_new(self, name, version, schema_url, attributes, ...)
     },
-    flush = function(timeout = NULL) {
-      invisible(ccall(otel_meter_provider_flush, self$xptr, timeout))
+    flush = function() {
+      invisible(ccall(otel_meter_provider_flush, self$xptr, NULL))
     },
-    shutdown = function(timeout = NULL) {
-      ccall(otel_meter_provider_shutdown, self$xptr, timeout)
+    shutdown = function() {
+      ccall(otel_meter_provider_shutdown, self$xptr, NULL)
       invisible(self)
     }
   )
