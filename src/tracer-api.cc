@@ -123,7 +123,7 @@ void * otel_start_span_(
   struct otel_tracer *ts = (struct otel_tracer *) tracer_;
   trace::Tracer &tracer = *(ts->ptr);
   struct otel_span *ss = new struct otel_span;
-  ss->ptr = tracer.StartSpan(name, attributes, opts);
+  ss->ptr = tracer.StartSpan(name, attributes, links, opts);
 
   return (void *) ss;
 }
