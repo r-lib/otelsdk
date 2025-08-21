@@ -198,7 +198,7 @@ doc_evs <- function() {
 #' Most of these environment variables are based on the [OpenTelemetry
 #' Specification](
 #'   https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
-#' ), version 1.47.0.
+#' ), version 1.48.0.
 #'
 #' The environment variables with an '`OTEL_R_`' prefix are not (yet) in the
 #' standard, and are specific for the otel and otelsdk R packages.

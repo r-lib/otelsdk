@@ -142,7 +142,7 @@ See also the \link[otel:environmentvariables]{Environment Variables} in
 the otel package, which is charge of selecting the exporters to use.
 }
 \section{The OpenTelemetry Specification}{
-Most of these environment variables are based on the \href{https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/}{OpenTelemetry Specification}, version 1.47.0.
+Most of these environment variables are based on the \href{https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/}{OpenTelemetry Specification}, version 1.48.0.
 
 The environment variables with an '\code{OTEL_R_}' prefix are not (yet) in the
 standard, and are specific for the otel and otelsdk R packages.
