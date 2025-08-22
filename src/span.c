@@ -212,11 +212,24 @@ SEXP otel_span_add_event(
   return R_NilValue;
 }
 
-// ABI v2
-// SEXP otel_span_add_link(SEXP span, SEXP link) {
-//   // TODO
-//   return R_NilValue;
-// }
+SEXP otel_span_add_link(SEXP span, SEXP target, SEXP attributes) {
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
+  if (TYPEOF(target) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid target span pointer.");
+  }
+  void *span_ = R_ExternalPtrAddr(span);
+  void *target_ = R_ExternalPtrAddr(target);
+  if (span_) {
+    struct otel_attributes attributes_;
+    r2c_attributes(attributes, &attributes_);
+    otel_span_add_link_(span_, target_, &attributes_);
+    // TODO: cleancall
+    otel_attributes_free(&attributes_);
+  }
+  return R_NilValue;
+}
 
 SEXP otel_span_set_status(
     SEXP span, SEXP status_code, SEXP description) {

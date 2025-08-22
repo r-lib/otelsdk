@@ -242,6 +242,21 @@ void otel_span_add_event_(
   }
 }
 
+void otel_span_add_link_(
+  void *span_,
+  void *target_,
+  struct otel_attributes *attributes_
+) {
+  struct otel_span *ss = (struct otel_span *) span_;
+  trace::Span &span = *(ss->ptr);
+
+  struct otel_span *ts = (struct otel_span *) target_;
+  trace::Span &target = *(ts->ptr);
+
+  RKeyValueIterable attributes(*attributes_);
+  span.AddLink(target.GetContext(), attributes);
+}
+
 void otel_span_end_(void *span_, double *end_steady_time_) {
   struct otel_span *ss = (struct otel_span *) span_;
   trace::Span &span = *(ss->ptr);

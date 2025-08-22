@@ -604,6 +604,11 @@ void otel_span_add_event_(
   struct otel_attributes *attr,
   void *timestamp
 );
+void otel_span_add_link_(
+  void *span,
+  void *target,
+  struct otel_attributes *attr
+);
 void otel_span_set_status_(
   void *span_,
   int status_code_,

@@ -33,11 +33,12 @@ span_base_new <- function(
       invisible(self)
     },
 
-    # This needs ABI v2
-    # add_link = function(link) {
-    #   ccall(otel_span_add_link, self$xptr, link)
-    #   invisible(self)
-    # },
+    add_link = function(target, attributes) {
+      target <- as_span(target)
+      attributes <- as_otel_attributes(attributes)
+      ccall(otel_span_add_link, self$xptr, target$xptr, attributes)
+      invisible(self)
+    },
 
     set_status = function(status_code = NULL, description = NULL) {
       status_code <- as_choice(status_code, the$span_status_codes)
