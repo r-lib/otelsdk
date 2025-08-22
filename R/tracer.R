@@ -54,6 +54,10 @@ tracer_new <- function(
       xptr <- ccall(otel_get_active_span_context, self$xptr)
       span_context_new(xptr)
     },
+    get_active_span = function() {
+      xptr <- ccall(otel_get_active_span, self$xptr)
+      span_base_new(self, xptr)
+    },
     flush = function() {
       self$provider$flush()
     },

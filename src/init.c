@@ -32,6 +32,7 @@ SEXP otel_get_tracer(
   SEXP provider, SEXP name, SEXP version, SEXP schema_url,
   SEXP attributes);
 SEXP otel_get_active_span_context(SEXP tracer);
+SEXP otel_get_active_span(SEXP tracer);
 
 SEXP otel_start_span(
   SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options);
@@ -150,6 +151,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_tracer_provider_flush, 1),
   CALLDEF(otel_get_tracer, 5),
   CALLDEF(otel_get_active_span_context, 1),
+  CALLDEF(otel_get_active_span, 1),
   CALLDEF(otel_start_span, 5),
   CALLDEF(otel_span_get_context, 1),
   CALLDEF(otel_span_is_valid, 1),

@@ -76,6 +76,15 @@ void *otel_get_active_span_context_(void *tracer_) {
   return (void*) span_context;
 }
 
+void *otel_get_active_span_(void *tracer_) {
+  struct otel_tracer *ts = (struct otel_tracer *) tracer_;
+  trace::Tracer &tracer = *(ts->ptr);
+
+  struct otel_span *ss = new struct otel_span;
+  ss->ptr = tracer.GetCurrentSpan();
+  return (void *) ss;
+}
+
 void * otel_start_span_(
   void *tracer_,
   const char *name,

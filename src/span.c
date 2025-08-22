@@ -123,6 +123,21 @@ SEXP otel_start_span(
   return res;
 }
 
+SEXP otel_get_active_span(SEXP tracer) {
+  if (TYPEOF(tracer) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid tracer pointer.");
+  }
+  void *tracer_ = R_ExternalPtrAddr(tracer);
+  if (!tracer_) {
+    Rf_error("Opentelemetry tracer cleaned up already, internal error.");
+  }
+
+  void *span_ = otel_get_active_span_(tracer_);
+  SEXP xptr = R_MakeExternalPtr(span_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_span_finally, (Rboolean) 1);
+  return xptr;
+}
+
 SEXP otel_span_get_context(SEXP span) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");

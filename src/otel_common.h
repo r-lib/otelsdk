@@ -581,6 +581,7 @@ void *otel_get_tracer_(
     void *tracer_provider_, const char *name, const char *version,
     const char *schema_url, struct otel_attributes *attributes);
 void *otel_get_active_span_context_(void *tracer);
+void *otel_get_active_span_(void *tracer);
 
 void *otel_start_span_(
   void *tracer,

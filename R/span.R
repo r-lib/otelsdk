@@ -1,20 +1,7 @@
-span_new <- function(
+span_base_new <- function(
   tracer,
-  name = NULL,
-  attributes = NULL,
-  links = NULL,
-  options = NULL,
-  scope = NULL,
-  activation_scope = NULL
+  xptr
 ) {
-  name <- name %||% default_span_name
-  name <- as_string(name)
-  attributes <- as_otel_attributes(attributes)
-  links <- as_span_links(links)
-  options <- as_span_options(options)
-  scope <- as_env(scope)
-  activation_scope <- as_env(activation_scope)
-
   self <- new_object(
     "otel_span",
 
@@ -145,17 +132,41 @@ span_new <- function(
   )
 
   self$tracer <- tracer
-  self$name <- name
-  self$status_set <- FALSE
+  self$xptr <- xptr
 
-  self$xptr <- ccall(
+  self
+}
+
+span_new <- function(
+  tracer,
+  name = NULL,
+  attributes = NULL,
+  links = NULL,
+  options = NULL,
+  scope = NULL,
+  activation_scope = NULL
+) {
+  name <- name %||% default_span_name
+  name <- as_string(name)
+  attributes <- as_otel_attributes(attributes)
+  links <- as_span_links(links)
+  options <- as_span_options(options)
+  scope <- as_env(scope)
+  activation_scope <- as_env(activation_scope)
+
+  xptr <- ccall(
     otel_start_span,
-    self$tracer$xptr,
-    self$name,
+    tracer$xptr,
+    name,
     attributes,
     links,
     options
   )
+
+  self <- span_base_new(tracer, xptr)
+
+  self$name <- name
+  self$status_set <- FALSE
 
   if (!is.null(scope)) {
     defer(self$end(status_code = "auto"), envir = scope)
