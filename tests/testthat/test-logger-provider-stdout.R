@@ -16,11 +16,10 @@ test_that("log to file", {
   lgr$log("This is a simple log message")
   lgr$log("This is a warning", severity = "warn")
 
-  type <- "structured"
   ts <- Sys.time()
-  lgr$log("This is a {type} log message.")
+  lgr$log("This is a log message.")
   lgr$log(
-    "This is a {type} log message with attributes",
+    "This is a log message with attributes",
     attributes = list(foo = "bar"),
     timestamp = ts2 <- Sys.time()
   )

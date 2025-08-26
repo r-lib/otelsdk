@@ -26,23 +26,23 @@ logger_new <- function(
     #   ccall(otel_emit_log_record, self$xptr, log_record)
     #   invisible(self)
     # },
-    trace = function(msg = "", ..., .envir = parent.frame()) {
-      self$log(msg = msg, severity = "trace", ..., .envir = .envir)
+    trace = function(msg = "", ...) {
+      self$log(msg = msg, severity = "trace", ...)
     },
-    debug = function(msg = "", ..., .envir = parent.frame()) {
-      self$log(msg = msg, severity = "debug", ..., .envir = .envir)
+    debug = function(msg = "", ...) {
+      self$log(msg = msg, severity = "debug", ...)
     },
-    info = function(msg = "", ..., .envir = parent.frame()) {
-      self$log(msg = msg, severity = "info", ..., .envir = .envir)
+    info = function(msg = "", ...) {
+      self$log(msg = msg, severity = "info", ...)
     },
-    warn = function(msg = "", ..., .envir = parent.frame()) {
-      self$log(msg = msg, severity = "warn", ..., .envir = .envir)
+    warn = function(msg = "", ...) {
+      self$log(msg = msg, severity = "warn", ...)
     },
-    error = function(msg = "", ..., .envir = parent.frame()) {
-      self$log(msg = msg, severity = "error", ..., .envir = .envir)
+    error = function(msg = "", ...) {
+      self$log(msg = msg, severity = "error", ...)
     },
-    fatal = function(msg = "", ..., .envir = parent.frame()) {
-      self$log(msg = msg, severity = "fatal", ..., .envir = .envir)
+    fatal = function(msg = "", ...) {
+      self$log(msg = msg, severity = "fatal", ...)
     },
     is_enabled = function(severity = "info", event_id = NULL) {
       severity <- as_log_severity(severity)
@@ -68,8 +68,7 @@ logger_new <- function(
       trace_flags = NULL,
       timestamp = Sys.time(),
       observed_timestamp = NULL,
-      attributes = NULL,
-      .envir = parent.frame()
+      attributes = NULL
     ) {
       msg <- as_string(msg, null = FALSE)
       severity <- as_log_severity(severity)
@@ -80,7 +79,7 @@ logger_new <- function(
       trace_flags <- as_trace_flags(trace_flags)
       timestamp <- as_timestamp(timestamp)
       observed_timestamp <- as_timestamp(observed_timestamp)
-      attributes <- as_otel_attributes(attributes)
+      attributes <- as.list(as_otel_attributes(attributes))
 
       if (!is_na(span_context)) {
         span_context <- span_context %||% otel::get_active_span_context()
@@ -91,14 +90,10 @@ logger_new <- function(
         }
       }
 
-      # `attributes` overwrites attributes in the message
-      prsd <- extract_otel_attributes(msg, .envir = .envir)
-      attributes <- utils::modifyList(prsd$attributes, as.list(attributes))
-
       ccall(
         otel_log,
         self$xptr,
-        prsd$text,
+        msg,
         severity,
         event_id,
         span_id,

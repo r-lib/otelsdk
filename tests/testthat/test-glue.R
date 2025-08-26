@@ -19,15 +19,6 @@ test_that("glue", {
   expect_equal(glue("1+1={1+1}"), "1+1=2")
 })
 
-test_that("extract_otel_attributes", {
-  x <- 1:2
-  y <- letters[1:3]
-  expect_equal(
-    extract_otel_attributes("This {x} and that {y}."),
-    list(text = "This 12 and that abc.", attributes = list(x = x, y = y))
-  )
-})
-
 test_that("escaped delimiters", {
   expect_equal(glue("this {{ is verbatim }}"), "this { is verbatim }")
 })

@@ -52,12 +52,10 @@
       [1] "INFO"
       
       $body
-      [1] "This is a structured log message."
+      [1] "This is a log message."
       
       $attributes
-      $attributes$type
-      [1] "structured"
-      
+      named list()
       
       $trace_id
       [1] "00000000000000000000000000000000"
@@ -75,14 +73,11 @@
       [1] "INFO"
       
       $body
-      [1] "This is a structured log message with attributes"
+      [1] "This is a log message with attributes"
       
       $attributes
       $attributes$foo
       [1] "bar"
-      
-      $attributes$type
-      [1] "structured"
       
       
       $trace_id

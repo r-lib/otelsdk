@@ -35,26 +35,3 @@ glue <- function(
 identity_transformer <- function(text, envir) {
   eval(parse(text = text, keep.source = FALSE), envir)
 }
-
-create_collector_transformer <- function(record) {
-  record
-  function(text, envir) {
-    val <- eval(parse(text = text, keep.source = FALSE), envir)
-    val <- as_otel_attribute_value(val)
-    record[[text]] <- val
-    eval(parse(text = text, keep.source = FALSE), envir)
-  }
-}
-
-extract_otel_attributes <- function(
-  text,
-  .envir = parent.frame(),
-  .attributes = NULL,
-  .transformer = NULL,
-  ...
-) {
-  record <- as.environment(.attributes %||% new.env(parent = emptyenv()))
-  .transformer <- .transformer %||% create_collector_transformer(record)
-  prsd <- glue(text, .envir = .envir, .transformer = .transformer, ...)
-  list(text = prsd, attributes = as.list(record))
-}
