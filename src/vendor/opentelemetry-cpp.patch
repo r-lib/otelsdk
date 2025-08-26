@@ -152,3 +152,140 @@
  #endif
 
  #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
+--- cpp/api/include/opentelemetry/trace/span.h	2025-06-18 17:35:34
++++ cpp/api/include/opentelemetry/trace/span.h.new	2025-07-18 17:35:34
+@@ -235,6 +235,9 @@ public:
+   // recorded, and implementations are free to ignore previous calls.
+   virtual void SetStatus(StatusCode code, nostd::string_view description = "") noexcept = 0;
+
++  // Gets the status of the span.
++  virtual StatusCode GetStatus() noexcept = 0;
++
+   // Updates the name of the Span. If used, this will override the name provided
+   // during creation.
+   virtual void UpdateName(nostd::string_view name) noexcept = 0;
+--- cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h	2025-06-20 19:27:56
++++ cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h.new	2025-07-20 19:27:56
+@@ -104,6 +104,15 @@ public:
+     }
+   }
+
++  opentelemetry::trace::StatusCode GetStatus() noexcept override
++  {
++    for (auto &recordable : recordables_)
++    {
++      return recordable.second->GetStatus();
++    }
++    return opentelemetry::trace::StatusCode::kUnset;
++  }
++
+   void SetName(nostd::string_view name) noexcept override
+   {
+     for (auto &recordable : recordables_)
+
+--- cpp/sdk/include/opentelemetry/sdk/trace/recordable.h	2025-06-20 19:27:56
++++ cpp/sdk/include/opentelemetry/sdk/trace/recordable.h.new	2025-07-20 19:27:56
+@@ -129,6 +129,11 @@ public:
+   virtual void SetStatus(opentelemetry::trace::StatusCode code,
+                          nostd::string_view description) noexcept = 0;
+
++  /**
++   * Get the status of the span.
++   */
++  virtual opentelemetry::trace::StatusCode GetStatus() noexcept = 0;
++
+   /**
+    * Set the name of the span.
+    * @param name the name to set
+--- cpp/sdk/src/trace/span.cc	2025-06-20 19:27:56
++++ cpp/sdk/src/trace/span.cc.new	2025-07-20 19:27:56
+@@ -190,6 +190,16 @@ void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view d
+   recordable_->SetStatus(code, description);
+ }
+
++opentelemetry::trace::StatusCode Span::GetStatus() noexcept
++{
++  std::lock_guard<std::mutex> lock_guard{mu_};
++  if (recordable_ == nullptr)
++  {
++    return opentelemetry::trace::StatusCode::kUnset;
++  }
++  return recordable_->GetStatus();
++}
++
+ void Span::UpdateName(nostd::string_view name) noexcept
+ {
+   std::lock_guard<std::mutex> lock_guard{mu_};
+--- cpp/api/include/opentelemetry/trace/default_span.h	2025-06-20 19:27:56
++++ cpp/api/include/opentelemetry/trace/default_span.h.new	2025-07-20 19:27:56
+@@ -57,6 +57,8 @@ public:
+
+   void SetStatus(StatusCode /* status */, nostd::string_view /* description */) noexcept override {}
+
++  StatusCode GetStatus() noexcept override { return StatusCode::kUnset; }
++
+   void UpdateName(nostd::string_view /* name */) noexcept override {}
+
+   void End(const EndSpanOptions & /* options */) noexcept override {}
+--- cpp/api/include/opentelemetry/trace/noop.h	2025-06-20 19:27:56
++++ cpp/api/include/opentelemetry/trace/noop.h.new	2025-07-20 19:27:56
+@@ -75,6 +75,8 @@ public:
+
+   void SetStatus(StatusCode /*code*/, nostd::string_view /*description*/) noexcept override {}
+
++  StatusCode GetStatus() noexcept override { return StatusCode::kUnset; }
++
+   void UpdateName(nostd::string_view /*name*/) noexcept override {}
+
+   void End(const EndSpanOptions & /*options*/) noexcept override {}
+--- cpp/sdk/src/trace/span.h
++++ cpp/sdk/src/trace/span.h.new
+@@ -63,6 +63,8 @@ public:
+   void SetStatus(opentelemetry::trace::StatusCode code,
+                  nostd::string_view description) noexcept override;
+
++  opentelemetry::trace::StatusCode GetStatus() noexcept override;
++
+   void UpdateName(nostd::string_view name) noexcept override;
+
+   void End(const opentelemetry::trace::EndSpanOptions &options = {}) noexcept override;
+--- cpp/sdk/include/opentelemetry/sdk/trace/span_data.h
++++ cpp/sdk/include/opentelemetry/sdk/trace/span_data.h.new
+@@ -278,6 +278,11 @@ public:
+     status_desc_ = std::string(description);
+   }
+
++  opentelemetry::trace::StatusCode GetStatus() noexcept override
++  {
++    return status_code_;
++  }
++
+   void SetName(nostd::string_view name) noexcept override
+   {
+     name_ = std::string(name.data(), name.length());
+--- cpp/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_recordable.h
++++ cpp/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_recordable.h.new
+@@ -65,6 +65,8 @@ public:
+   void SetStatus(opentelemetry::trace::StatusCode code,
+                  nostd::string_view description) noexcept override;
+
++  opentelemetry::trace::StatusCode GetStatus() noexcept override;
++
+   void SetName(nostd::string_view name) noexcept override;
+
+   void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override;
+diff --git a/exporters/otlp/src/otlp_recordable.cc b/exporters/otlp/src/otlp_recordable.cc
+index 3564448..49a09a3 100644
+--- cpp/exporters/otlp/src/otlp_recordable.cc
++++ cpp/exporters/otlp/src/otlp_recordable.cc.new
+@@ -162,6 +162,10 @@ void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view descri
+   }
+ }
+
++opentelemetry::trace::StatusCode OtlpRecordable::GetStatus() noexcept {
++  return (opentelemetry::trace::StatusCode) span_.mutable_status()->code();
++}
++
+ void OtlpRecordable::SetName(nostd::string_view name) noexcept
+ {
+   span_.set_name(name.data(), name.size());

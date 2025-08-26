@@ -301,6 +301,13 @@ void otel_span_set_status_(
   }
 }
 
+int otel_span_is_status_set_(void *span_) {
+  struct otel_span *ss = (struct otel_span *) span_;
+  trace::Span &span = *(ss->ptr);
+  trace::StatusCode status_code = span.GetStatus();
+  return status_code == trace::StatusCode::kUnset ? 0 : 1;
+}
+
 void otel_span_update_name_(void *span_, const char *name_) {
   struct otel_span *ss = (struct otel_span *) span_;
   trace::Span &span = *(ss->ptr);

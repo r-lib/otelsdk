@@ -248,6 +248,18 @@ SEXP otel_span_set_status(
   return R_NilValue;
 }
 
+SEXP otel_span_is_status_set(SEXP span) {
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
+  void *span_ = R_ExternalPtrAddr(span);
+  if (span_) {
+    return Rf_ScalarLogical(otel_span_is_status_set_(span_));
+  } else {
+    return Rf_ScalarLogical(0);
+  }
+}
+
 SEXP otel_span_update_name(SEXP span, SEXP name) {
   if (TYPEOF(span) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid span pointer.");

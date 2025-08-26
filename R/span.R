@@ -44,7 +44,6 @@ span_base_new <- function(
       status_code <- as_choice(status_code, the$span_status_codes)
       description <- as_string(description)
       ccall(otel_span_set_status, self$xptr, status_code, description)
-      self$status_set <- TRUE
       invisible(self)
     },
 
@@ -63,7 +62,8 @@ span_base_new <- function(
         # if 'auto' then we are in 'on.exit()', check if this is an error
         # hopefully returnValue() works for this
         if (status_code == 3L) {
-          if (self$status_set) {
+          is_status_set <- ccall(otel_span_is_status_set, self$xptr)
+          if (is_status_set) {
             status_code <- NULL
           } else if (identical(returnValue(random_token), random_token)) {
             err <- get_current_error()
@@ -165,9 +165,7 @@ span_new <- function(
   )
 
   self <- span_base_new(tracer, xptr)
-
   self$name <- name
-  self$status_set <- FALSE
 
   if (!is.null(scope)) {
     defer(self$end(status_code = "auto"), envir = scope)

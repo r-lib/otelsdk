@@ -13,8 +13,8 @@ test_that("named and unnamed spans", {
 
 test_that("close span automatically", {
   spns <- with_otel_record({
-    trc <- otel::get_tracer("mytracer")
     do <- function(name = NULL) {
+      trc <- otel::get_tracer("mytracer")
       spn1 <- trc$start_local_active_span(name)
     }
     do("1")
@@ -99,7 +99,7 @@ test_that("add_event", {
   )
 })
 
-test_that("set_status", {
+test_that("set_status, unset means it is set automatically", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
     do <- function() {
@@ -110,8 +110,8 @@ test_that("set_status", {
   })[["traces"]]
 
   expect_equal(spns[[1]]$parent, "0000000000000000")
-  expect_equal(spns[[1]]$status, "unset")
-  expect_equal(spns[[1]]$description, "Testing preset Unset")
+  expect_equal(spns[[1]]$status, "ok")
+  expect_equal(spns[[1]]$description, "")
 })
 
 test_that("update_name", {

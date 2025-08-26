@@ -614,6 +614,7 @@ void otel_span_set_status_(
   int status_code_,
   char *description_
 );
+int otel_span_is_status_set_(void *span_);
 void otel_span_update_name_(void *span_, const char *name_);
 void otel_span_end_(void *span, double *end_steady_time);
 
