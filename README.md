@@ -77,12 +77,10 @@ higher on Windows.
 
 ## Installation
 
-You can install the development version of otel from
-[GitHub](https://github.com/) with:
+You can install the otel from CRAN:
 
 ``` r
-# install.packages("pak")
-pak::pak("r-lib/otelsdk")
+install.packages("otelsdk")
 ```
 
 ### Compiling from source
