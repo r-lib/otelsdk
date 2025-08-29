@@ -20,6 +20,7 @@ Useful links:
 \itemize{
   \item \url{https://otelsdk.r-lib.org}
   \item \url{https://github.com/r-lib/otelsdk}
+  \item Report bugs at \url{https://github.com/r-lib/otelsdk/issues}
 }
 
 }
