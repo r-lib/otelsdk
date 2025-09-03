@@ -69,7 +69,11 @@ with_otel_record <- function(
   # return recorded results
   list(
     value = value,
-    traces = tmp[["tracer_provider"]]$get_spans(),
-    metrics = tmp[["meter_provider"]]$get_metrics()
+    traces = if ("traces" %in% what) {
+      tmp[["tracer_provider"]]$get_spans()
+    },
+    metrics = if ("metrics" %in% what) {
+      tmp[["meter_provider"]]$get_metrics()
+    }
   )
 }
