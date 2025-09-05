@@ -110,7 +110,7 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 		sed -i.bak -e 's/^M$$//' cpp/build/CMakeFiles/3.30.4/CompilerIdCXX/CMakeCXXCompilerId.cpp; \
 		/usr/bin/find . -name Makefile | xargs sed -i.bak -e 's/^M$$//'; \
 	fi
-	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ cmake --build build)
+	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ cmake --build build 2>&1) | grep -v 'warning:.*variadic'
 	(cd cpp; cmake --install build)
 	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 	@find cpp/third_party/nlohmann-json -type f -name "*.hpp" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
