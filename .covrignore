@@ -3,7 +3,5 @@ src/install
 src/cleancall.c
 src/errors.c
 R/collapse.R
-R/collector.R
 R/docs.R
 R/friendly-type.R
-R/otelsdk-package.R
