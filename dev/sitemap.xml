@@ -1,0 +1,26 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://otelsdk.r-lib.org/dev/LICENSE-text.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/LICENSE.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/authors.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/index.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/news/index.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/collecting.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/environmentvariables.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/filesizeoptions.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/index.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/logger_provider_file.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/logger_provider_http.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/logger_provider_stdstream.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/meter_provider_file.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/meter_provider_http.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/meter_provider_memory.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/meter_provider_stdstream.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/otelsdk-package.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/timeintervaloptions.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/tracer_provider_file.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/tracer_provider_http.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/tracer_provider_memory.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/tracer_provider_stdstream.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/with_otel_record.html</loc></url>
+</urlset>
+
