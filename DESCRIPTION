@@ -39,6 +39,7 @@ Suggests:
     webfakes,
     withr
 Config/testthat/edition: 3
+Config/testthat/parallel: TRUE
 URL: https://otelsdk.r-lib.org, https://github.com/r-lib/otelsdk
 Config/Needs/check: r-lib/otel, gaborcsardi/testthatlabs
 Config/Needs/coverage: r-lib/otel, gaborcsardi/testthatlabs
