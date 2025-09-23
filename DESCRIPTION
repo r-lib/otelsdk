@@ -1,6 +1,6 @@
 Package: otelsdk
 Title: 'R' 'SDK' and Exporters for 'OpenTelemetry'
-Version: 0.2.1
+Version: 0.2.1.9000
 Authors@R: c(
     person("Gábor", "Csárdi", , "csardi.gabor@gmail.com",
         role = c("aut", "cre")),
