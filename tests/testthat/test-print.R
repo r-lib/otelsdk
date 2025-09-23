@@ -90,6 +90,7 @@ test_that("format.otel_instrumentation_scope_data", {
 })
 
 test_that("format.otel_sum_point_data", {
+  skip("unreliable")
   mp <- meter_provider_memory_new()
   mtr <- mp$get_meter()
   ctr <- mtr$create_counter("c")

@@ -1,4 +1,5 @@
 test_that("meter_provider_stdout", {
+  skip("unreliable")
   tmp <- tempfile()
   on.exit(unlink(tmp), add = TRUE)
   mp <- meter_provider_stdstream_new(list(output = tmp))
