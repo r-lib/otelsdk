@@ -102,10 +102,12 @@ fi
 
 # no need to clean up on GHA or in `load_all()` or if
 # R_INSTALL_PARALLEL=true, which I set locally on my machine
+FILTER="cat"
 MRPROPER="mrproper"
 if echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck ||
    echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
   MRPROPER="mrproper"
+  FILTER="grep -v warning:"
 elif [ "$GITHUB_ACTIONS" = "true" ] ||
    [ "$NOT_CRAN" = "true" ] ||
    [ "$R_INSTALL_PARALLEL" = "true" ] ||
@@ -153,6 +155,7 @@ cat src/Makevars.in |
   sed "s|@CMAKE_PREFIX_PATH@|${CMAKE_PREFIX_PATH}|" |
   sed "s|@CMAKE_BUILD_PARALLEL_LEVEL@|${CMAKE_BUILD_PARALLEL_LEVEL}|" |
   sed "s|@MRPROPER@|${MRPROPER}|" |
+  sed "s|@FILTER@|${FILTER}|" |
   sed "s|@MAKEFLAGS@|${MAKEFLAGS}|" |
   sed "s|@PKG_CFLAGS@|${PKG_CFLAGS}|" |
   sed "s|@PKG_CXXFLAGS@|${PKG_CXXFLAGS}|" |
