@@ -18,6 +18,17 @@ else
     CXX_STANDARD=14
 fi
 
+if [ -z "$CMAKE" ]; then
+  CMAKE="`which cmake`"
+fi
+if [ -z "$CMAKE" ] && [ -f "/Applications/CMake.app/Contents/bin/cmake" ]; then
+  CMAKE="/Applications/CMake.app/Contents/bin/cmake"
+fi
+if [ -z "$CMAKE" ]; then
+  echo "no 'cmake' command found"
+  exit 1
+fi
+
 AX="ax"
 if [ "$UNAME" = "Windows" ]; then
     # https://bugs.r-project.org/show_bug.cgi?id=18869
@@ -144,6 +155,7 @@ if [ "$R_INSTALL_PARALLEL" = "true" ]; then
 fi
 
 cat src/Makevars.in |
+  sed "s|@CMAKE@|${CMAKE}|" |
   sed "s|@UNAME@|${UNAME}|" |
   sed "s|@CXX_STANDARD@|${CXX_STANDARD}|" |
   sed "s|@XCFLAGS@|${XCFLAGS}|" |

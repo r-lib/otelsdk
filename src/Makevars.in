@@ -78,6 +78,8 @@ libstdstream-exporter.a: stdstream.o
 $(OTEL_CPP_LIBS): otelcpplib
 	@true
 
+CMAKE="@CMAKE@"
+
 # need to build our proto lib with -DNDEBUG in CXXFLAGS, because of a bug:
 # https://github.com/protocolbuffers/protobuf/issues/9947
 # https://stackoverflow.com/a/73074255/604364
@@ -94,7 +96,7 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	RANLIB="$(RANLIB)" CPPFLAGS="$(CPPFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS) $(CXXPICFLAGS) -DNDEBUG @XCXXFLAGS@" \
 	CFLAGS="$(CFLAGS) $(CPICFLAGS) -DNDEBUG @XCFLAGS@" \
-	cmake -S . -B build \
+	"$(CMAKE)" -S . -B build \
 	-DWITH_ABI_VERSION_1=OFF -DWITH_ABI_VERSION_2=ON \
 	-DCMAKE_INSTALL_PREFIX=../install -DCMAKE_INSTALL_LIBDIR=lib \
 	-DCMAKE_PREFIX_PATH="@CMAKE_PREFIX_PATH@" \
@@ -110,8 +112,8 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 		sed -i.bak -e 's/^M$$//' cpp/build/CMakeFiles/3.30.4/CompilerIdCXX/CMakeCXXCompilerId.cpp; \
 		/usr/bin/find . -name Makefile | xargs sed -i.bak -e 's/^M$$//'; \
 	fi
-	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ cmake --build build 2>&1) | @FILTER@
-	(cd cpp; cmake --install build)
+	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ "$(CMAKE)" --build build 2>&1) | @FILTER@
+	(cd cpp; "$(CMAKE)" --install build)
 	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 	@find cpp/third_party/nlohmann-json -type f -name "*.hpp" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 	@find . -type f -name "json.hpp" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
