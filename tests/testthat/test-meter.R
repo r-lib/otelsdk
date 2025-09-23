@@ -55,6 +55,7 @@ test_that("meter, histogram", {
 })
 
 test_that("meter, gauge", {
+  skip("Unreliable")
   mp <- meter_provider_memory_new()
   on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()

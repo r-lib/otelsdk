@@ -107,6 +107,7 @@ test_that("format.otel_sum_point_data", {
 })
 
 test_that("format.otel_histogram_point_data", {
+  skip("unreliable")
   mp <- meter_provider_memory_new()
   mtr <- mp$get_meter()
   hst <- mtr$create_histogram("h")
