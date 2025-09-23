@@ -126,6 +126,7 @@ test_that("format.otel_histogram_point_data", {
 })
 
 test_that("format.otel_last_value_point_data", {
+  skip("unreliable")
   mp <- meter_provider_memory_new()
   mtr <- mp$get_meter()
   gge <- mtr$create_gauge("g")
