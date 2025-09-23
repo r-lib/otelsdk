@@ -46,8 +46,7 @@ void otel_scope_finally(SEXP x) {
 }
 
 SEXP otel_start_span(
-    SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options,
-    SEXP session) {
+    SEXP tracer, SEXP name, SEXP attributes, SEXP links, SEXP options) {
 
   if (TYPEOF(tracer) != EXTPTRSXP) {
     Rf_error("OpenTelemetry: invalid tracer pointer.");
