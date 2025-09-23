@@ -1,4 +1,4 @@
-# otelsdk (development version)
+# otelsdk 0.2.1
 
 * otelsdk now compiles on macOS if `cmake` was installed from the installer
   and is not on the `PATH`.
