@@ -19,7 +19,7 @@ Description: 'OpenTelemetry' is a collection of tools,
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2.9000
+RoxygenNote: 7.3.3
 SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
     GNU make
 Imports:
