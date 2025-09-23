@@ -60,15 +60,15 @@ if [ "$UNAME" = "Windows" ]; then
     XCFLAGS="-DCURL_STATICLIB"
     XCXXFLAGS="-DCURL_STATICLIB"
 elif [ "$UNAME" = "Darwin" ]; then
-    if [ -f "/opt/R/`arch`/bin/protoc" ]; then
-    	echo "** Using CRAN protobuf in /opt/R/`arch`"
+    if [ -f "/opt/R/`uname -m`/bin/protoc" ]; then
+        echo "** Using CRAN protobuf in /opt/R/`uname -m`"
 	    if /usr/bin/which -s pkg-config && pkg-config --silence-errors --cflags protobuf | grep -q -v /opt/R; then
   	    echo "** Seems like another version of protobuf is installed."
 	      echo "** You need to uninstall it to use CRAN's protobuf."
 	      echo "** If you are using homebrew, call 'brew unlink protobuf'".
 	      exit 2
     	fi
-	    CMAKE_PREFIX_PATH="/opt/R/`arch`"
+	    CMAKE_PREFIX_PATH="/opt/R/`uname -m`"
 	    PROTOBUF_LIBS="-lprotobuf"
     else
 	    echo "** Using protobuf via pkg-config"
