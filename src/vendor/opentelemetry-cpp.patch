@@ -274,8 +274,6 @@
    void SetName(nostd::string_view name) noexcept override;
 
    void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override;
-diff --git a/exporters/otlp/src/otlp_recordable.cc b/exporters/otlp/src/otlp_recordable.cc
-index 3564448..49a09a3 100644
 --- cpp/exporters/otlp/src/otlp_recordable.cc
 +++ cpp/exporters/otlp/src/otlp_recordable.cc.new
 @@ -162,6 +162,10 @@ void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view descri
@@ -289,3 +287,58 @@ index 3564448..49a09a3 100644
  void OtlpRecordable::SetName(nostd::string_view name) noexcept
  {
    span_.set_name(name.data(), name.size());
+--- cpp/api/include/opentelemetry/context/runtime_context.h
++++ cpp/api/include/opentelemetry/context/runtime_context.h.new
+@@ -5,6 +5,7 @@
+
+ #include <stddef.h>
+ #include <algorithm>
++#include <limits>
+
+ #include "opentelemetry/common/macros.h"
+ #include "opentelemetry/context/context.h"
+@@ -301,6 +302,10 @@ private:
+       {
+         new_capacity = 2;
+       }
++      if (new_capacity >= std::numeric_limits<ssize_t>::max() / sizeof(Context))
++      {
++        new_capacity = std::numeric_limits<ssize_t>::max() / sizeof(Context);
++      }
+       Context *temp = new Context[new_capacity];
+       if (base_ != nullptr)
+       {
+--- cpp/sdk/include/opentelemetry/sdk/common/circular_buffer.h
++++ cpp/sdk/include/opentelemetry/sdk/common/circular_buffer.h.new
+@@ -9,6 +9,7 @@
+ #include <cstdint>
+ #include <functional>
+ #include <memory>
++#include <limits>
+ 
+ #include "opentelemetry/nostd/span.h"
+ #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
+@@ -29,7 +30,7 @@ class CircularBuffer
+ {
+ public:
+   explicit CircularBuffer(size_t max_size)
+-      : data_{new AtomicUniquePtr<T>[max_size + 1]}, capacity_{max_size + 1}
++    : data_{new AtomicUniquePtr<T>[sanitize_size(max_size + 1)]}, capacity_{sanitize_size(max_size + 1)}
+   {}
+ 
+   /**
+@@ -173,6 +174,14 @@ class CircularBuffer
+   std::atomic<uint64_t> head_{0};
+   std::atomic<uint64_t> tail_{0};
+ 
++  size_t sanitize_size(size_t s) {
++    if (s >= std::numeric_limits<ssize_t>::max() / sizeof(AtomicUniquePtr<T>))
++    {
++      s = std::numeric_limits<ssize_t>::max() / sizeof(AtomicUniquePtr<T>);
++    }
++    return s;
++  }
++
+   CircularBufferRange<AtomicUniquePtr<T>> PeekImpl() noexcept
+   {
+     uint64_t tail_index = tail_ % capacity_;
