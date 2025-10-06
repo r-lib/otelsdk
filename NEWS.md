@@ -1,4 +1,4 @@
-# otelsdk (development version)
+# otelsdk 0.2.2
 
 * No user visible changes.
 
