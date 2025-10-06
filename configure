@@ -115,8 +115,8 @@ fi
 # R_INSTALL_PARALLEL=true, which I set locally on my machine
 FILTER="cat"
 MRPROPER="mrproper"
-if echo ${R_LIBRARY_DIR} | grep -q otelsdk.Rcheck ||
-   echo ${R_LIBS} | grep -q otelsdk.Rcheck; then
+if echo ${R_LIBRARY_DIR} | grep -q '[.]Rcheck' ||
+   echo ${R_LIBS} | grep -q '[.]Rcheck'; then
   MRPROPER="mrproper"
   FILTER="grep -v warning:"
 elif [ "$GITHUB_ACTIONS" = "true" ] ||
