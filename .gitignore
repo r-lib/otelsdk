@@ -16,3 +16,4 @@ docs
 /tests/testthat/results.rds
 /dev-lib
 /.dev
+/revdep

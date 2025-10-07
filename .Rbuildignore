@@ -28,3 +28,4 @@
 ^dev-lib$
 ^CRAN-SUBMISSION$
 ^[.]dev$
+^revdep$
