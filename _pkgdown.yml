@@ -20,10 +20,10 @@ navbar:
     gettingstarted:
       text: Getting Started
       menu:
-      - text: Instrumenting R Packages (otel package)
-        href: https://otel.r-lib.org/reference/gettingstarted.html
-      - text: Collecting Telemetry Data
-        href: reference/collecting.html
+        - text: Instrumenting R Packages (otel package)
+          href: https://otel.r-lib.org/reference/gettingstarted.html
+        - text: Collecting Telemetry Data
+          href: reference/collecting.html
 
 reference:
 - title: Other Documentation
