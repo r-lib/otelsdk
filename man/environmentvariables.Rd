@@ -142,7 +142,7 @@ See also the \link[otel:environmentvariables]{Environment Variables} in
 the otel package, which is charge of selecting the exporters to use.
 }
 \section{The OpenTelemetry Specification}{
-Most of these environment variables are based on the \href{https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/}{OpenTelemetry Specification}, version 1.49.0.
+Most of these environment variables are based on the \href{https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/}{OpenTelemetry Specification}, version 1.55.0.
 
 The environment variables with an '\code{OTEL_R_}' prefix are not (yet) in the
 standard, and are specific for the otel and otelsdk R packages.
@@ -636,6 +636,7 @@ measurements that the provider can record.
    \code{OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE} \tab - \cr
    \code{OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION} \tab - \cr
    \code{OTEL_EXPERIMENTAL_CONFIG_FILE} \tab - \cr
+   \code{OTEL_CONFIG_FILE} \tab - \cr
 }
 
 
