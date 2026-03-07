@@ -342,3 +342,88 @@
    CircularBufferRange<AtomicUniquePtr<T>> PeekImpl() noexcept
    {
      uint64_t tail_index = tail_ % capacity_;
+--- cpp/cmake/opentelemetry-proto.cmake
++++ cpp/cmake/opentelemetry-proto.cmake.new
+@@ -192,11 +192,11 @@ set(PROTOBUF_COMMON_FLAGS "--proto_path=${PROTO_PATH}"
+                           "--cpp_out=${GENERATED_PROTOBUF_PATH}")
+ # --experimental_allow_proto3_optional is available from 3.13 and be stable and
+ # enabled by default from 3.16
+-if(Protobuf_VERSION AND Protobuf_VERSION VERSION_LESS "3.16")
+-  list(APPEND PROTOBUF_COMMON_FLAGS "--experimental_allow_proto3_optional")
+-elseif(PROTOBUF_VERSION AND PROTOBUF_VERSION VERSION_LESS "3.16")
+-  list(APPEND PROTOBUF_COMMON_FLAGS "--experimental_allow_proto3_optional")
+-endif()
++# if(Protobuf_VERSION AND Protobuf_VERSION VERSION_LESS "3.16")
++#   list(APPEND PROTOBUF_COMMON_FLAGS "--experimental_allow_proto3_optional")
++# elseif(PROTOBUF_VERSION AND PROTOBUF_VERSION VERSION_LESS "3.16")
++#   list(APPEND PROTOBUF_COMMON_FLAGS "--experimental_allow_proto3_optional")
++# endif()
+ 
+ # protobuf uses numerous global variables, which can lead to conflicts when a
+ # user's dynamic libraries, executables, and otel-cpp are all built as dynamic
+--- cpp/third_party/opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
++++ cpp/third_party/opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto.new
+@@ -453,7 +453,7 @@ message HistogramDataPoint {
+   // Negative events *can* be recorded, but sum should not be filled out when
+   // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+   // see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
+-  optional double sum = 5;
++  double sum = 5;
+ 
+   // bucket_counts is an optional field contains the count values of histogram
+   // for each bucket.
+@@ -493,10 +493,10 @@ message HistogramDataPoint {
+   uint32 flags = 10;
+ 
+   // min is the minimum value over (start_time, end_time].
+-  optional double min = 11;
++  double min = 11;
+ 
+   // max is the maximum value over (start_time, end_time].
+-  optional double max = 12;
++  double max = 12;
+ }
+ 
+ // ExponentialHistogramDataPoint is a single data point in a timeseries that describes the
+@@ -537,7 +537,7 @@ message ExponentialHistogramDataPoint {
+   // Negative events *can* be recorded, but sum should not be filled out when
+   // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
+   // see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
+-  optional double sum = 5;
++  double sum = 5;
+ 
+   // scale describes the resolution of the histogram.  Boundaries are
+   // located at powers of the base, where:
+@@ -601,10 +601,10 @@ message ExponentialHistogramDataPoint {
+   repeated Exemplar exemplars = 11;
+ 
+   // min is the minimum value over (start_time, end_time].
+-  optional double min = 12;
++  double min = 12;
+ 
+   // max is the maximum value over (start_time, end_time].
+-  optional double max = 13;
++  double max = 13;
+ 
+   // ZeroThreshold may be optionally set to convey the width of the zero
+   // region. Where the zero region is defined as the closed interval
+--- cpp/third_party/opentelemetry-proto/opentelemetry/proto/profiles/v1development/profiles.proto
++++ cpp/third_party/opentelemetry-proto/opentelemetry/proto/profiles/v1development/profiles.proto.new
+@@ -402,7 +402,7 @@ message Sample {
+   repeated int32 attribute_indices = 4;
+ 
+   // Reference to link in ProfilesDictionary.link_table. [optional]
+-  optional int32 link_index = 5;
++  int32 link_index = 5;
+ 
+   // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
+   // to fall within the Profile's time range. [optional]
+@@ -436,7 +436,7 @@ message Location {
+   // Reference to mapping in ProfilesDictionary.mapping_table.
+   // It can be unset if the mapping is unknown or not applicable for
+   // this profile type.
+-  optional int32 mapping_index = 1;
++  int32 mapping_index = 1;
+   // The instruction address for this location, if available.  It
+   // should be within [Mapping.memory_start...Mapping.memory_limit]
+   // for the corresponding mapping. A non-leaf address may be in the
