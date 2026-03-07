@@ -23,7 +23,10 @@ correctly generated for your package or application."><script defer data-domain=
     <li><a class="dropdown-item" href="../reference/collecting.html">Collecting Telemetry Data</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/r-lib/otelsdk/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -33,7 +36,7 @@ correctly generated for your package or application."><script defer data-domain=
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Record OpenTelemetry output, for testing purposes</h1>
-      <small class="dont-index">Source: <a href="https://github.com/r-lib/otelsdk/blob/main/R/record.R" class="external-link"><code>R/record.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/r-lib/otelsdk/blob/cran-0-2-2/R/record.R" class="external-link"><code>R/record.R</code></a></small>
       <div class="d-none name"><code>with_otel_record.Rd</code></div>
     </div>
 
@@ -104,19 +107,19 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $traces</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $traces$my</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;otel_span_data&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : 1096b8981d282e3165e2387cd82d33cc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : 4cf4cec564f290ab</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : 8e7869d67e854d05218805a2ed27b559</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : f9a1c8415a20c413</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> name                  : my</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flags                 : +sampled -random</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> parent                : 5c221620d4d2cada</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> parent                : 8a32f20681f01b75</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> description           : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> resource_attributes   : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 9543</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.1 (2025-06-13)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8472</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.2 (2025-10-31)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     service.name                : unknown_service</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.language      : R</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.name          : opentelemetry</span>
@@ -130,16 +133,16 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     attributes : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> kind                  : internal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> status                : unset</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2025-10-07 10:51:17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000152785</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2026-03-07 20:38:40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000136545</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attributes            : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> events                : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> links                 : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $traces$`&lt;NA&gt;`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;otel_span_data&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : 1096b8981d282e3165e2387cd82d33cc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : 5c221620d4d2cada</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : 8e7869d67e854d05218805a2ed27b559</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : 8a32f20681f01b75</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> name                  : &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flags                 : +sampled -random</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> parent                : 0000000000000000</span>
@@ -147,10 +150,10 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> resource_attributes   : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 9543</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.1 (2025-06-13)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8472</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.2 (2025-10-31)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     service.name                : unknown_service</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.language      : R</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.name          : opentelemetry</span>
@@ -164,8 +167,8 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     attributes : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> kind                  : internal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> status                : unset</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2025-10-07 10:51:17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000637697</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2026-03-07 20:38:40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000604663</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attributes            : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> events                : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> links                 : </span>
@@ -177,10 +180,10 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attributes:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 9543</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.1 (2025-06-13)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8472</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.2 (2025-10-31)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     service.name                : unknown_service</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.language      : R</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     telemetry.sdk.name          : opentelemetry</span>
@@ -201,7 +204,7 @@ from it and returns it.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
   </div></footer></body></html>
