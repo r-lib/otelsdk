@@ -83,9 +83,12 @@ elif [ "$UNAME" = "Darwin" ]; then
 else
     PROTOBUF_LIBS="`pkg-config --libs protobuf || echo '-lprotobuf'`"
     LIBCURL_LIBS="`pkg-config --libs libcurl || echo '-lcurl'`"
-    # this is for the R-hub images that have protobuf in /usr/local/clang
-    if [ -n "$R_HUB" ] && [ -f "/usr/local/clang/bin/protoc" ]; then
-      CMAKE_PREFIX_PATH="/usr/local/clang"
+    echo "** Detected PROTOBUF_LIBS=\"$PROTOBUF_LIBS\""
+    echo "** Detected LIBCURL_LIBS=\"$LIBCURL_LIBS\""
+    common_path="`pkg-config --cflags-only-I protobuf || echo ''`"
+    if [ -n "$common_path" ]; then
+       CMAKE_PREFIX_PATH=$(dirname "${common_path#-I}")
+       echo "** Setting CMAKE_PREFIX_PATH=\"$CMAKE_PREFIX_PATH\""
     fi
 fi
 
