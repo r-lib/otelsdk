@@ -23,7 +23,10 @@ correctly generated for your package or application."><meta name="robots" conten
     <li><a class="dropdown-item" href="../reference/collecting.html">Collecting Telemetry Data</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/r-lib/otelsdk/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -104,16 +107,16 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $traces</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $traces$my</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;otel_span_data&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : bb826d8019d5c34202c9d35cce68a4a2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : af8018ddf4afa028</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : d309cc59b108bf4106b2901cee81d674</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : 74e9d2f6a4abbcdb</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> name                  : my</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flags                 : +sampled -random</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> parent                : d34df4de6102b0cc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> parent                : 1f9443000a8ee8c5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> description           : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> resource_attributes   : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8524</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8512</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.2 (2025-10-31)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.2</span>
@@ -130,16 +133,16 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     attributes : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> kind                  : internal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> status                : unset</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2026-03-07 19:31:43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000147045</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2026-03-07 20:32:46</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000166302</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attributes            : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> events                : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> links                 : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $traces$`&lt;NA&gt;`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;otel_span_data&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : bb826d8019d5c34202c9d35cce68a4a2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : d34df4de6102b0cc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> trace_id              : d309cc59b108bf4106b2901cee81d674</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> span_id               : 1f9443000a8ee8c5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> name                  : &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> flags                 : +sampled -random</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> parent                : 0000000000000000</span>
@@ -147,7 +150,7 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> resource_attributes   : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8524</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8512</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.2 (2025-10-31)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.2</span>
@@ -164,8 +167,8 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     attributes : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> kind                  : internal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> status                : unset</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2026-03-07 19:31:43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000661988</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> start_time            : 2026-03-07 20:32:46</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> duration              : 0.000615413</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attributes            : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> events                : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> links                 : </span>
@@ -177,7 +180,7 @@ from it and returns it.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attributes:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     os.type                     : linux</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.owner               : runner</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8524</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     process.pid                 : 8512</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.description : R version 4.5.2 (2025-10-31)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.name        : R</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     process.runtime.version     : 4.5.2</span>
