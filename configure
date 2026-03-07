@@ -81,11 +81,16 @@ elif [ "$UNAME" = "Darwin" ]; then
     fi
     LIBCURL_LIBS="-lcurl"
 else
+    PROTOBUF_INCLUDE="`pkg-config --cflags protobuf || echo ''`"
     PROTOBUF_LIBS="`pkg-config --libs protobuf || echo '-lprotobuf'`"
     LIBCURL_LIBS="`pkg-config --libs libcurl || echo '-lcurl'`"
-    # this is for the R-hub images that have protobuf in /usr/local/clang
-    if [ -n "$R_HUB" ] && [ -f "/usr/local/clang/bin/protoc" ]; then
-      CMAKE_PREFIX_PATH="/usr/local/clang"
+    echo "** Detected PROTOBUF_INCLUDE=\"$PROTOBUF_INCLUDE\""
+    echo "** Detected PROTOBUF_LIBS=\"$PROTOBUF_LIBS\""
+    echo "** Detected LIBCURL_LIBS=\"$LIBCURL_LIBS\""
+    common_path="`pkg-config --cflags-only-I protobuf || echo ''`"
+    if [ -n "$common_path" ]; then
+       CMAKE_PREFIX_PATH=$(dirname "${common_path#-I}")
+       echo "** Setting CMAKE_PREFIX_PATH=\"$CMAKE_PREFIX_PATH\""
     fi
 fi
 
@@ -161,6 +166,7 @@ cat src/Makevars.in |
   sed "s|@XCFLAGS@|${XCFLAGS}|" |
   sed "s|@XCXXFLAGS@|${XCXXFLAGS}|" |
   sed "s|@XCPPFLAGS@|${XCPPFLAGS}|" |
+  sed "s|@PROTOBUF_INCLUDE@|${PROTOBUF_INCLUDE}|" |
   sed "s|@PROTOBUF_LIBS@|${PROTOBUF_LIBS}|" |
   sed "s|@LIBCURL_LIBS@|${LIBCURL_LIBS}|" |
   sed "s|@OTEL_CLEANUP@|${OTEL_CLEANUP}|" |
