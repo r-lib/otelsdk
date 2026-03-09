@@ -10,11 +10,14 @@ Jaeger
 KiB
 Logfire
 MiB
+OTEL
 OTLP
 OpenTelemetry
+Otel
 PBC
 PiB
 Pydantic
+RHEL
 ROR
 Rtools
 SDK
@@ -23,6 +26,7 @@ SSL
 SigNoz
 TiB
 TLS
+TiB
 UI
 auth
 backoff
@@ -35,12 +39,14 @@ http
 https
 instrance
 json
+libprotobuf
 lifecycle
 macOS
 observability
 opentelemetry
 otel
 protobuf
+protoc
 signoz
 stdstream
 temporality
