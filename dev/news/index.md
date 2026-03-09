@@ -2,6 +2,10 @@
 
 ## otelsdk (development version)
 
+- otelsdk now compiles with older libprotobuf, e.g. on RHEL 8. It also
+  handles it better when multiple versions of libprotobuf and protoc are
+  available, by using `pkg-config` to find protobuf.
+
 ## otelsdk 0.2.2
 
 CRAN release: 2025-10-07
