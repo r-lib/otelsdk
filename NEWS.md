@@ -1,3 +1,5 @@
+# otelsdk (development version)
+
 # otelsdk 0.2.3
 
 * otelsdk now compiles with older libprotobuf, e.g. on RHEL 8. It also
