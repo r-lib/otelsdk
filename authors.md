@@ -14,15 +14,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/r-lib/otelsdk/blob/cran-0-2-2/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/r-lib/otelsdk/blob/main/DESCRIPTION)
 
-Csárdi G (2026). *otelsdk: 'R' 'SDK' and Exporters for 'OpenTelemetry'*.
-R package version 0.2.2, <https://otelsdk.r-lib.org>.
+Csárdi G (2026). *otelsdk: R SDK and Exporters for OpenTelemetry*. R
+package version 0.2.3, <https://otelsdk.r-lib.org>.
 
     @Manual{,
-      title = {otelsdk: 'R' 'SDK' and Exporters for 'OpenTelemetry'},
+      title = {otelsdk: R SDK and Exporters for OpenTelemetry},
       author = {Gábor Csárdi},
       year = {2026},
-      note = {R package version 0.2.2},
+      note = {R package version 0.2.3},
       url = {https://otelsdk.r-lib.org},
     }

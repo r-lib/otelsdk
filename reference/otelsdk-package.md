@@ -1,12 +1,12 @@
-# otelsdk: 'R' 'SDK' and Exporters for 'OpenTelemetry'
+# otelsdk: R SDK and Exporters for OpenTelemetry
 
-'OpenTelemetry' is a collection of tools, 'APIs', and 'SDKs' used to
+OpenTelemetry is a collection of tools, APIs, and SDKs used to
 instrument, generate, collect, and export telemetry data (metrics, logs,
 and traces) for analysis in order to understand your software's
-performance and behavior. This package contains the 'OpenTelemetry'
-'SDK', and exporters. Use this package to export traces, metrics, logs
-from instrumented 'R' code. Use the 'otel' package to instrument your
-'R' code for 'OpenTelemetry'.
+performance and behavior. This package contains the OpenTelemetry SDK,
+and exporters. Use this package to export traces, metrics, logs from
+instrumented R code. Use the otel package to instrument your R code for
+OpenTelemetry.
 
 ## Value
 

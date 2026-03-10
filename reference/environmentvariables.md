@@ -11,7 +11,7 @@ Not applicable.
 
 Most of these environment variables are based on the [OpenTelemetry
 Specification](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/),
-version 1.49.0.
+version 1.55.0.
 
 The environment variables with an '`OTEL_R_`' prefix are not (yet) in
 the standard, and are specific for the otel and otelsdk R packages.
@@ -557,6 +557,7 @@ one.
 | `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE`        | \-          |
 | `OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION` | \-          |
 | `OTEL_EXPERIMENTAL_CONFIG_FILE`                            | \-          |
+| `OTEL_CONFIG_FILE`                                         | \-          |
 
 \(1\) In
 [`otel::as_attributes()`](https://otel.r-lib.org/reference/as_attributes.html).
