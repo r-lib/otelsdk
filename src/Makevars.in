@@ -96,10 +96,10 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	patch -p0 < vendor/opentelemetry-cpp.patch
 	@mkdir -p cpp/.git
 	(cd cpp; MAKEFLAGS= CC="$(CC)" CXX="$(CXX)" AR="$(AR)" \
-	RANLIB="$(RANLIB)" CPPFLAGS="$(CPPFLAGS)" \
+	RANLIB="$(RANLIB)" CPPFLAGS="$(CPPFLAGS) -DUTIL_FS_DISABLE_LINK" \
 	CXXFLAGS="$(CXXFLAGS) $(CXXPICFLAGS) -DNDEBUG @XCXXFLAGS@" \
 	CFLAGS="$(CFLAGS) $(CPICFLAGS) -DNDEBUG @XCFLAGS@" \
-	"$(CMAKE)" -S . -B build \
+	"$(CMAKE)" -G "Unix Makefiles" -S . -B build \
 	-DWITH_ABI_VERSION_1=OFF -DWITH_ABI_VERSION_2=ON \
 	-DCMAKE_INSTALL_PREFIX=../install -DCMAKE_INSTALL_LIBDIR=lib \
 	-DCMAKE_PREFIX_PATH="@CMAKE_PREFIX_PATH@" \

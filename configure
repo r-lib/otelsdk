@@ -40,6 +40,10 @@ if [ "$UNAME" = "Windows" ]; then
           cat src/extra/cmake/R-4.4/protobuf-targets.cmake.in |
               sed "s|@RTOOLS44@|${RT}|" |
               cat > src/extra/cmake/R-4.4/protobuf-targets.cmake
+	  PROTOBUF_LIBS="`pkg-config --libs protobuf`"
+	  LIBCURL_LIBS="`pkg-config --libs libcurl`"
+	  XCFLAGS="-DCURL_STATICLIB"
+	  XCXXFLAGS="-DCURL_STATICLIB"
           ;;
       4.3.*)
           CMAKE_PREFIX_PATH="../extra/cmake/R-4.3"
@@ -47,18 +51,45 @@ if [ "$UNAME" = "Windows" ]; then
           cat src/extra/cmake/R-4.3/protobuf-targets.cmake.in |
               sed "s|@RTOOLS43@|${RT}|" |
               cat > src/extra/cmake/R-4.3/protobuf-targets.cmake
+	  PROTOBUF_LIBS="`pkg-config --libs protobuf`"
+	  LIBCURL_LIBS="`pkg-config --libs libcurl`"
+	  XCFLAGS="-DCURL_STATICLIB"
+	  XCXXFLAGS="-DCURL_STATICLIB"
           ;;
       4.2.*)
-      ;;
-      4.1.*)
-      ;;
-      4.0.*)
-      ;;
+	  "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" tools/winlibs.R
+	  rm -rf windows/protobuf/protobuf/lib
+	  cp -r windows/protobuf/protobuf/lib-10.4.0 windows/protobuf/protobuf/lib
+	  RWINLIB=../windows/protobuf/protobuf
+	  XCPPFLAGS=" -I${RWINLIB}/include"
+	  PROTOBUF_LIBS=" -L${RWINLIB}/lib -lprotobuf"
+	  LIBCURL_LIBS="-lcurl -lidn2 -lunistring -liconv -lcharset  -lssh2 -lssh2 -lgcrypt -lgpg-error -lws2_32 -lgcrypt -lgpg-error -lws2_32 -lz  -ladvapi32 -lcrypt32 -lssl -lcrypto -lssl -lz -lws2_32 -lgdi32 -lcrypt32 -lcrypto -lz -lws2_32 -lgdi32 -lcrypt32  -lgdi32 -lwldap32 -lzstd  -lz -lws2_32 -lpthread"
+	  CMAKE_PREFIX_PATH="../${RWINLIB}"
+	  XCFLAGS="-DCURL_STATICLIB"
+	  XCXXFLAGS="-DCURL_STATICLIB"
+	  ;;
+      4.1.*|4.0.*)
+	  "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" tools/winlibs.R
+	  rm -rf windows/protobuf/protobuf/lib
+	  cp -r windows/protobuf/protobuf/lib-8.3.0/x64 windows/protobuf/protobuf/lib
+	  rm -rf windows/libcurl/libcurl/lib
+	  cp -r windows/libcurl/libcurl/lib-8.3.0/x64 windows/libcurl/libcurl/lib
+	  PROTOBUF_HOME=../windows/protobuf/protobuf
+	  LIBCURL_HOME=../windows/libcurl/libcurl
+	  CMAKE_PREFIX_PATH="../${PROTOBUF_HOME};../${LIBCURL_HOME}"
+	  PROTOBUF_LIBS=" -L${PROTOBUF_HOME}/lib -lprotobuf"
+	  LIBCURL_LIBS="-L${LIBCURL_HOME}/lib -lwinhttp -lcurl -lnghttp2 -lssh2 -lz -lssl -lcrypto -pthread -lgdi32 -lws2_32 -lcrypt32 -lbcrypt -lwldap32"
+	  XCFLAGS="-DCURL_STATICLIB"
+	  XCXXFLAGS="-DCURL_STATICLIB -DUTIL_FS_DISABLE_LINK -DFS_DISABLE_LINK"
+	  XCPPFLAGS="-I${PROTOBUF_HOME}/include -I${LIBCURL_HOME}/include"
+	  ;;
+      *)
+	  PROTOBUF_LIBS="`pkg-config --libs protobuf`"
+	  LIBCURL_LIBS="`pkg-config --libs libcurl`"
+	  XCFLAGS="-DCURL_STATICLIB"
+	  XCXXFLAGS="-DCURL_STATICLIB"
+	  ;;
     esac
-    PROTOBUF_LIBS="`pkg-config --libs protobuf`"
-    LIBCURL_LIBS="`pkg-config --libs libcurl`"
-    XCFLAGS="-DCURL_STATICLIB"
-    XCXXFLAGS="-DCURL_STATICLIB"
 elif [ "$UNAME" = "Darwin" ]; then
     if [ -f "/opt/R/`uname -m`/bin/protoc" ]; then
         echo "** Using CRAN protobuf in /opt/R/`uname -m`"
