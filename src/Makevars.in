@@ -96,7 +96,7 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	patch -p0 < vendor/opentelemetry-cpp.patch
 	@mkdir -p cpp/.git
 	(cd cpp; MAKEFLAGS= CC="$(CC)" CXX="$(CXX)" AR="$(AR)" \
-	RANLIB="$(RANLIB)" CPPFLAGS="$(CPPFLAGS) -DUTIL_FS_DISABLE_LINK" \
+	RANLIB="$(RANLIB)" CPPFLAGS="$(CPPFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS) $(CXXPICFLAGS) -DNDEBUG @XCXXFLAGS@" \
 	CFLAGS="$(CFLAGS) $(CPICFLAGS) -DNDEBUG @XCFLAGS@" \
 	"$(CMAKE)" -G "Unix Makefiles" -S . -B build \

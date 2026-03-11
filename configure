@@ -80,7 +80,7 @@ if [ "$UNAME" = "Windows" ]; then
 	  PROTOBUF_LIBS=" -L${PROTOBUF_HOME}/lib -lprotobuf"
 	  LIBCURL_LIBS="-L${LIBCURL_HOME}/lib -lwinhttp -lcurl -lnghttp2 -lssh2 -lz -lssl -lcrypto -pthread -lgdi32 -lws2_32 -lcrypt32 -lbcrypt -lwldap32"
 	  XCFLAGS="-DCURL_STATICLIB"
-	  XCXXFLAGS="-DCURL_STATICLIB -DUTIL_FS_DISABLE_LINK -DFS_DISABLE_LINK"
+	  XCXXFLAGS="-DCURL_STATICLIB"
 	  XCPPFLAGS="-I${PROTOBUF_HOME}/include -I${LIBCURL_HOME}/include"
 	  ;;
       *)
