@@ -63,6 +63,7 @@ if [ "$UNAME" = "Windows" ]; then
 	  RWINLIB=../windows/protobuf/protobuf
 	  XCPPFLAGS=" -I${RWINLIB}/include"
 	  PROTOBUF_LIBS=" -L${RWINLIB}/lib -lprotobuf"
+	  PROTOBUF_PROTOC_EXECUTABLE="../../windows/protobuf/protobuf/bin/protoc.exe"
 	  LIBCURL_LIBS="-lcurl -lidn2 -lunistring -liconv -lcharset  -lssh2 -lssh2 -lgcrypt -lgpg-error -lws2_32 -lgcrypt -lgpg-error -lws2_32 -lz  -ladvapi32 -lcrypt32 -lssl -lcrypto -lssl -lz -lws2_32 -lgdi32 -lcrypt32 -lcrypto -lz -lws2_32 -lgdi32 -lcrypt32  -lgdi32 -lwldap32 -lzstd  -lz -lws2_32 -lpthread"
 	  CMAKE_PREFIX_PATH="../${RWINLIB}"
 	  XCFLAGS="-DCURL_STATICLIB"
@@ -209,4 +210,5 @@ cat src/Makevars.in |
   sed "s|@PKG_CFLAGS@|${PKG_CFLAGS}|" |
   sed "s|@PKG_CXXFLAGS@|${PKG_CXXFLAGS}|" |
   sed "s|@PKG_LDFLAGS@|${PKG_LDFLAGS}|" |
+  sed "s|@PROTOBUF_PROTOC_EXECUTABLE@|${PROTOBUF_PROTOC_EXECUTABLE}|" |
   cat > src/Makevars
