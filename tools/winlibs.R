@@ -1,4 +1,6 @@
-if (!file.exists("windows/protobuf/protobuf/include/google/protobuf/descriptor.h")){
+if (
+  !file.exists("windows/protobuf/protobuf/include/google/protobuf/descriptor.h")
+) {
   unlink("windows/protobuf", recursive = TRUE, )
   url <- "https://github.com/rwinlib/protobuf/archive/v21.12.tar.gz"
   download.file(url, basename(url), quiet = TRUE)
