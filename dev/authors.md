@@ -17,12 +17,12 @@ Source:
 [`DESCRIPTION`](https://github.com/r-lib/otelsdk/blob/main/DESCRIPTION)
 
 Csárdi G (2026). *otelsdk: R SDK and Exporters for OpenTelemetry*. R
-package version 0.2.3.9000, <https://otelsdk.r-lib.org>.
+package version 0.2.4.9000, <https://otelsdk.r-lib.org>.
 
     @Manual{,
       title = {otelsdk: R SDK and Exporters for OpenTelemetry},
       author = {Gábor Csárdi},
       year = {2026},
-      note = {R package version 0.2.3.9000},
+      note = {R package version 0.2.4.9000},
       url = {https://otelsdk.r-lib.org},
     }
