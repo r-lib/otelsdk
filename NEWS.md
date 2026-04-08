@@ -1,5 +1,7 @@
 # otelsdk (development version)
 
+* otel and otelsdk now support R 4.2.x on Windows.
+
 # otelsdk 0.2.3
 
 * otelsdk now compiles with older libprotobuf, e.g. on RHEL 8. It also
