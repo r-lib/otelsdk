@@ -1,6 +1,14 @@
 # Changelog
 
+## otelsdk 0.2.4
+
+CRAN release: 2026-04-08
+
+- otel and otelsdk now support R 4.2.x on Windows.
+
 ## otelsdk 0.2.3
+
+CRAN release: 2026-03-10
 
 - otelsdk now compiles with older libprotobuf, e.g. on RHEL 8. It also
   handles it better when multiple versions of libprotobuf and protoc are
