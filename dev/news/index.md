@@ -2,6 +2,8 @@
 
 ## otelsdk (development version)
 
+- otel and otelsdk now support R 4.2.x on Windows.
+
 ## otelsdk 0.2.3
 
 CRAN release: 2026-03-10
