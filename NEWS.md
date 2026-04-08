@@ -1,4 +1,4 @@
-# otelsdk (development version)
+# otelsdk 0.2.4
 
 * otel and otelsdk now support R 4.2.x on Windows.
 
