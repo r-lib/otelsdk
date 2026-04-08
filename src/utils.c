@@ -1,7 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "Rinternals.h"
+#include <Rinternals.h>
+#include <Rversion.h>
 
 #include "otel_common.h"
 
@@ -28,11 +29,15 @@ SEXP otel_fail(void) {
 SEXP otel_span_kinds = NULL;
 SEXP otel_span_status_codes = NULL;
 
+#if (defined(R_VERSION) && R_VERSION < R_Version(4, 5, 0))
+#define R_getVar(x,y,z) Rf_findVarInFrame(x,y)
+#endif
+
 SEXP otel_init_constants(SEXP env) {
   R_PreserveObject(env);
-  otel_span_kinds = Rf_findVarInFrame(env, Rf_install("span_kinds"));
+  otel_span_kinds = R_getVar(Rf_install("span_kinds"), env, TRUE);
   otel_span_status_codes =
-    Rf_findVarInFrame(env, Rf_install("span_status_codes"));
+    R_getVar(Rf_install("span_status_codes"), env, TRUE);
   return R_NilValue;
 }
 
