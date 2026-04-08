@@ -30,7 +30,7 @@ SEXP otel_span_kinds = NULL;
 SEXP otel_span_status_codes = NULL;
 
 #if (defined(R_VERSION) && R_VERSION < R_Version(4, 5, 0))
-#define R_getVar(x,y,z) Rf_findVarInFrame(x,y)
+#define R_getVar(x,y,z) Rf_findVarInFrame(y,x)
 #endif
 
 SEXP otel_init_constants(SEXP env) {
