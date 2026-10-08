@@ -4,5 +4,5 @@
       gh::gh("https://api.github.com/repos/{owner}/{repo}/releases/latest", owner = "open-telemetry",
         repo = "opentelemetry-specification")$tag_name
     Output
-      [1] "v1.55.0"
+      [1] "v1.61.0"
 

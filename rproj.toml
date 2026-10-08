@@ -1,0 +1,74 @@
+[project]
+name = "otelsdk"
+version = "0.2.4.9000"
+type = "package"
+title = "R SDK and Exporters for OpenTelemetry"
+description = '''
+OpenTelemetry is a collection of tools,
+APIs, and SDKs used to instrument, generate, collect, and export
+telemetry data (metrics, logs, and traces) for analysis in order to
+understand your software's performance and behavior.
+This package contains the OpenTelemetry SDK, and exporters.
+Use this package to export traces, metrics, logs from instrumented
+R code. Use the otel package to instrument your R code for
+OpenTelemetry.'''
+license = "MIT + file LICENSE"
+
+[[project.authors]]
+name = "Gábor Csárdi"
+email = "csardi.gabor@gmail.com"
+roles = [
+    "aut",
+    "cre",
+]
+
+[[project.authors]]
+name = "Posit Software, PBC"
+roles = [
+    "cph",
+    "fnd",
+]
+ror = "03wc8by49"
+
+[[project.authors]]
+name = "opentelemetry-cpp authors"
+roles = ["ctb"]
+
+[project.urls]
+bugreports = "https://github.com/r-lib/otelsdk/issues"
+homepage = "https://otelsdk.r-lib.org"
+source = "https://github.com/r-lib/otelsdk"
+
+[dependencies]
+R = ">= 4.1"
+otel = "*"
+utils = "*"
+
+[dependency-groups.dev]
+callr = "*"
+cli = "*"
+curl = "*"
+gh = "*"
+jsonlite = "*"
+processx = "*"
+ps = "*"
+rlang = "*"
+spelling = "*"
+testthat = ">= 3.0.0"
+webfakes = "*"
+withr = "*"
+
+[dependency-groups.website]
+tidytemplate = { git = "https://github.com/tidyverse/tidytemplate.git", ref = "tidyverse/tidytemplate" }
+
+[config.roxygen2]
+version = "8.1.0"
+
+[config.testthat]
+edition = 3
+parallel = true
+
+[description]
+Encoding = "UTF-8"
+Roxygen = "list(markdown = TRUE)"
+SystemRequirements = "cmake, protobuf-compiler, libprotobuf, libcurl, zlib, GNU make"

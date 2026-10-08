@@ -138,11 +138,11 @@
 Not applicable.
 }
 \description{
-See also the \link[otel:environmentvariables]{Environment Variables} in
+See also the \link[otel:Environment Variables]{Environment Variables} in
 the otel package, which is charge of selecting the exporters to use.
 }
 \section{The OpenTelemetry Specification}{
-Most of these environment variables are based on the \href{https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/}{OpenTelemetry Specification}, version 1.55.0.
+Most of these environment variables are based on the \href{https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/}{OpenTelemetry Specification}, version 1.61.0.
 
 The environment variables with an '\code{OTEL_R_}' prefix are not (yet) in the
 standard, and are specific for the otel and otelsdk R packages.
@@ -238,7 +238,7 @@ excludes packages with an instrumentation scope that starts with
 }
 }
 
-\section{\link[otel:zci]{Zero Code Instrumentation}}{
+\section{\link[otel:Zero Code Instrumentation]{Zero Code Instrumentation}}{
 otel can instrument R packages for OpenTelemetry data collection
 without changing their source code. This relies on changing the code
 of the R functions manually using \code{base::trace()} and can be configured

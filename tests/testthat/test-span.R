@@ -279,3 +279,13 @@ test_that("name of the active span", {
     expect_error(spn1$name <- "foo", "update_name")
   })
 })
+
+test_that("end_steady_time", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn <- trc$start_span("s", options = list(start_steady_time = 100))
+    spn$end(options = list(end_steady_time = 105))
+  })[["traces"]]
+
+  expect_equal(spns[[1]]$duration, 5)
+})

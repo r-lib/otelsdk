@@ -338,7 +338,7 @@ void otel_span_end_(void *span_, double *end_steady_time_) {
     common::SteadyTimestamp ts2(ts);
     opts.end_steady_time = ts2;
   }
-  span.End();
+  span.End(opts);
 }
 
 void *otel_scope_start_(void *span_) {

@@ -3,6 +3,11 @@
 * The span object returned by `otel::get_active_span()` now has the
   correct span name in `$name` (#80).
 
+* The `end_steady_time` option of the `end()` method of spans is now
+  correctly used for the end time of the span.
+
+* Documentation update for the new Otel 1.61.0 specification.
+
 # otelsdk 0.2.4
 
 * otel and otelsdk now support R 4.2.x on Windows.

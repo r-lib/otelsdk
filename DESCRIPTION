@@ -19,7 +19,6 @@ Description: OpenTelemetry is a collection of tools,
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
     GNU make
 Imports:
@@ -41,7 +40,6 @@ Suggests:
 Config/testthat/edition: 3
 Config/testthat/parallel: TRUE
 URL: https://otelsdk.r-lib.org, https://github.com/r-lib/otelsdk
-Config/Needs/check: r-lib/otel, gaborcsardi/testthatlabs
-Config/Needs/coverage: r-lib/otel, gaborcsardi/testthatlabs
-Config/Needs/website: tidyverse/tidytemplate, r-lib/otel
+Config/Needs/website: tidyverse/tidytemplate
 BugReports: https://github.com/r-lib/otelsdk/issues
+Config/roxygen2/version: 8.1.0
