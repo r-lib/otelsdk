@@ -6,6 +6,8 @@
   [`end()`](https://rdrr.io/r/stats/start.html) method of spans is now
   correctly used for the end time of the span.
 
+- Documentation update for the new Otel 1.61.0 specification.
+
 ## otelsdk 0.2.4
 
 CRAN release: 2026-04-08

@@ -41,7 +41,7 @@ the otel package, which is charge of selecting the exporters to use."><meta name
     </div>
 
     <div class="ref-description section level2">
-    <p>See also the Environment Variables in
+    <p>See also the <a href="https://otel.r-lib.org/reference/environmentvariables.html" class="external-link">Environment Variables</a> in
 the otel package, which is charge of selecting the exporters to use.</p>
     </div>
 
@@ -52,7 +52,7 @@ the otel package, which is charge of selecting the exporters to use.</p>
     </div>
     <div class="section level2">
     <h2 id="the-opentelemetry-specification">The OpenTelemetry Specification<a class="anchor" aria-label="anchor" href="#the-opentelemetry-specification"></a></h2>
-    <p>Most of these environment variables are based on the <a href="https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/" class="external-link">OpenTelemetry Specification</a>, version 1.55.0.</p>
+    <p>Most of these environment variables are based on the <a href="https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/" class="external-link">OpenTelemetry Specification</a>, version 1.61.0.</p>
 <p>The environment variables with an '<code>OTEL_R_</code>' prefix are not (yet) in the
 standard, and are specific for the otel and otelsdk R packages.</p>
     </div>
@@ -121,7 +121,7 @@ also use wildcards (globbing). For example the value</p>
 <code>org.r-lib.</code> and also dplyr.</p></li>
 </ul></div>
     <div class="section level2">
-    <h2 id="zero-code-instrumentation">Zero Code Instrumentation<a class="anchor" aria-label="anchor" href="#zero-code-instrumentation"></a></h2>
+    <h2 id="zero-code-instrumentation"><a href="https://otel.r-lib.org/reference/zci.html" class="external-link">Zero Code Instrumentation</a><a class="anchor" aria-label="anchor" href="#zero-code-instrumentation"></a></h2>
     <p>otel can instrument R packages for OpenTelemetry data collection
 without changing their source code. This relies on changing the code
 of the R functions manually using <code><a href="https://rdrr.io/r/base/trace.html" class="external-link">base::trace()</a></code> and can be configured

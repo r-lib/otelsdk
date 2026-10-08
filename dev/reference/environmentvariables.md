@@ -1,7 +1,8 @@
 # Environment variables to configure otelsdk
 
-See also the Environment Variables in the otel package, which is charge
-of selecting the exporters to use.
+See also the [Environment
+Variables](https://otel.r-lib.org/reference/environmentvariables.html)
+in the otel package, which is charge of selecting the exporters to use.
 
 ## Value
 
@@ -11,7 +12,7 @@ Not applicable.
 
 Most of these environment variables are based on the [OpenTelemetry
 Specification](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/),
-version 1.55.0.
+version 1.61.0.
 
 The environment variables with an '`OTEL_R_`' prefix are not (yet) in
 the standard, and are specific for the otel and otelsdk R packages.
@@ -118,7 +119,7 @@ i.e. if neither of these are set, all packages emit telemetry data.
   excludes packages with an instrumentation scope that starts with
   `org.r-lib.` and also dplyr.
 
-## Zero Code Instrumentation
+## [Zero Code Instrumentation](https://otel.r-lib.org/reference/zci.html)
 
 otel can instrument R packages for OpenTelemetry data collection without
 changing their source code. This relies on changing the code of the R
