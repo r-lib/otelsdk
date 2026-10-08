@@ -155,9 +155,15 @@ test_that("format.otel_metrics_data", {
   mp$flush()
   mp$shutdown()
   mtrs <- mp$get_metrics()
-  # there are two reports, and the first one might be empty,
-  # but this depends on the platforms and probably chance, so skip it
-  mtrs[[1]] <- NULL
+  # The number of reports depends on timing, and some of them might
+  # be empty. Keep the last non-empty one, it has the cumulative value.
+  nonempty <- which(vapply(
+    mtrs,
+    function(r) length(r[["scope_metric_data"]]) > 0,
+    logical(1)
+  ))
+  expect_true(length(nonempty) > 0)
+  mtrs[setdiff(seq_along(mtrs), utils::tail(nonempty, 1))] <- NULL
   expect_snapshot(
     mtrs,
     transform = transform_metric_data
