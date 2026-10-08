@@ -39,7 +39,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="otelsdk-development-version">otelsdk (development version)<a class="anchor" aria-label="anchor" href="#otelsdk-development-version"></a></h2>
-<ul><li><p>The <code>end_steady_time</code> option of the <code><a href="https://rdrr.io/r/stats/start.html" class="external-link">end()</a></code> method of spans is now correctly used for the end time of the span.</p></li>
+<ul><li><p>The span object returned by <code><a href="https://otel.r-lib.org/reference/get_active_span.html" class="external-link">otel::get_active_span()</a></code> now has the correct span name in <code>$name</code> (<a href="https://github.com/r-lib/otelsdk/issues/80" class="external-link">#80</a>).</p></li>
+<li><p>The <code>end_steady_time</code> option of the <code><a href="https://rdrr.io/r/stats/start.html" class="external-link">end()</a></code> method of spans is now correctly used for the end time of the span.</p></li>
 <li><p>Documentation update for the new Otel 1.61.0 specification.</p></li>
 </ul></div>
     <div class="section level2">

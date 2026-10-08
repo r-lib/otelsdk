@@ -2,6 +2,11 @@
 
 ## otelsdk (development version)
 
+- The span object returned by
+  [`otel::get_active_span()`](https://otel.r-lib.org/reference/get_active_span.html)
+  now has the correct span name in `$name`
+  ([\#80](https://github.com/r-lib/otelsdk/issues/80)).
+
 - The `end_steady_time` option of the
   [`end()`](https://rdrr.io/r/stats/start.html) method of spans is now
   correctly used for the end time of the span.
