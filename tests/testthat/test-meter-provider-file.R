@@ -14,7 +14,11 @@ test_that("meter_provider_file", {
   mp$shutdown()
   expect_true(file.exists(tmp))
   expect_true(file.exists(tmp2))
-  mtcs <- jsonlite::fromJSON(readLines(tmp)[1], simplifyVector = FALSE)
+  # The periodic reader might export between the two `add()` calls, so
+  # there might be multiple lines. Temporality is cumulative, so the last
+  # line has the final value.
+  lns <- readLines(tmp)
+  mtcs <- jsonlite::fromJSON(lns[length(lns)], simplifyVector = FALSE)
   md <- mtcs$resourceMetrics[[1]]$scopeMetrics[[1]]$metrics[[1]]
   expect_equal(md$name, "ctr")
   expect_equal(md$sum$dataPoints[[1]]$asDouble, 11)
