@@ -254,3 +254,28 @@ test_that("activate, deactivate manually", {
   expect_equal(names(spns), c("test::fun2", "test::fun"))
   expect_equal(spns[["test::fun2"]]$parent, spns[["test::fun"]]$span_id)
 })
+
+test_that("name of the active span", {
+  with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    expect_null(otel::get_active_span()$name)
+
+    spn1 <- trc$start_local_active_span("outer")
+    expect_equal(spn1$name, "outer")
+    expect_equal(otel::get_active_span()$name, "outer")
+
+    do <- function() {
+      spn2 <- trc$start_local_active_span("inner")
+      expect_equal(otel::get_active_span()$name, "inner")
+      spn2$update_name("inner2")
+      expect_equal(otel::get_active_span()$name, "inner2")
+    }
+    do()
+    expect_equal(otel::get_active_span()$name, "outer")
+
+    act <- otel::get_active_span()
+    act$update_name("outer2")
+    expect_equal(spn1$name, "outer2")
+    expect_error(spn1$name <- "foo", "update_name")
+  })
+})
