@@ -1,5 +1,10 @@
 # otelsdk (development version)
 
+* Span and span context methods do not throw errors any more. On failure
+  they emit a message of class `otel_error_message` and return a default
+  value, usually the span itself. Set `OTEL_ENV=dev` to get errors instead
+  (r-lib/otel#36).
+
 * The `end_steady_time` option of the `end()` method of spans is now
   correctly used for the end time of the span.
 

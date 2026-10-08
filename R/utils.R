@@ -1,5 +1,13 @@
 `%||%` <- function(l, r) if (is.null(l)) r else l
 
+errmsg <- function(..., class = "otel_error_message") {
+  cnd <- structure(
+    list(message = paste0(c(..., "\n"), collapse = "")),
+    class = c(class, "message", "condition")
+  )
+  message(cnd)
+}
+
 is_true <- function(x) {
   is.logical(x) && length(x) == 1L && !is.na(x) && x
 }

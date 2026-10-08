@@ -264,3 +264,112 @@ test_that("end_steady_time", {
 
   expect_equal(spns[[1]]$duration, 5)
 })
+
+msg <- function(expr) {
+  expect_message(val <- expr, class = "otel_error_message")
+  val
+}
+
+test_that("span methods do not error", {
+  trc_prv <- tracer_provider_memory_new()
+  trc <- trc_prv$get_tracer("mytracer")
+  spn <- trc$start_span("s")
+  spn$end()
+
+  local_mocked_bindings(ccall = function(...) stop("boo"))
+  expect_s3_class(msg(spn$get_context()), "otel_span_context_noop")
+  expect_false(msg(spn$is_valid()))
+  expect_false(msg(spn$is_recording()))
+  expect_identical(msg(spn$set_attribute("a", "b")), spn)
+  expect_identical(msg(spn$add_event("e")), spn)
+  expect_identical(msg(spn$add_link(spn)), spn)
+  expect_identical(msg(spn$set_status("ok")), spn)
+  expect_identical(msg(spn$update_name("new")), spn)
+  expect_identical(msg(spn$end()), spn)
+  expect_identical(msg(spn$record_exception(simpleError("boo"))), spn)
+  expect_null(msg(spn$activate(NULL)))
+  expect_null(msg(spn$deactivate(NULL)))
+})
+
+test_that("span methods do not error on bad arguments", {
+  trc_prv <- tracer_provider_memory_new()
+  trc <- trc_prv$get_tracer("mytracer")
+  spn <- trc$start_span("s")
+  on.exit(spn$end(), add = TRUE)
+  expect_identical(msg(spn$set_attribute(1:2, "b")), spn)
+  expect_identical(msg(spn$add_event(1:2)), spn)
+  expect_identical(msg(spn$set_status("bogus")), spn)
+  expect_identical(
+    msg(spn$record_exception(simpleError("boo"), attributes = 1:3)),
+    spn
+  )
+})
+
+test_that("span methods error in dev mode", {
+  trc_prv <- tracer_provider_memory_new()
+  trc <- trc_prv$get_tracer("mytracer")
+  spn <- span_base_new_dev(trc, NULL)
+  local_mocked_bindings(ccall = function(...) stop("boo"))
+
+  expect_error(spn$get_context())
+  expect_error(spn$is_valid())
+  expect_error(spn$is_recording())
+  expect_error(spn$set_attribute("a", "b"))
+  expect_error(spn$add_event("e"))
+  expect_error(spn$add_link(spn))
+  expect_error(spn$set_status("ok"))
+  expect_error(spn$update_name("new"))
+  expect_error(spn$end())
+  expect_error(spn$record_exception(simpleError("boo")))
+  expect_error(spn$activate(NULL))
+  expect_error(spn$deactivate(NULL))
+})
+
+test_that("span context methods do not error", {
+  local_mocked_bindings(ccall = function(...) stop("boo"))
+  spc <- span_context_new(NULL)
+  expect_false(msg(spc$is_valid()))
+  expect_equal(msg(spc$get_trace_flags()), list())
+  expect_equal(msg(spc$get_trace_id()), otel::invalid_trace_id)
+  expect_equal(msg(spc$get_span_id()), otel::invalid_span_id)
+  expect_false(msg(spc$is_remote()))
+  expect_false(msg(spc$is_sampled()))
+  expect_equal(
+    msg(spc$to_http_headers()),
+    structure(character(), names = character())
+  )
+
+  spc <- span_context_new_dev(NULL)
+  expect_error(spc$is_valid())
+  expect_error(spc$get_trace_flags())
+  expect_error(spc$get_trace_id())
+  expect_error(spc$get_span_id())
+  expect_error(spc$is_remote())
+  expect_error(spc$is_sampled())
+  expect_error(spc$to_http_headers())
+})
+
+test_that("setup_dev_env", {
+  env <- new.env()
+  withr::local_envvar(OTEL_ENV = "dev")
+  setup_dev_env(env)
+  expect_identical(env$span_base_new, span_base_new_dev)
+  expect_identical(env$span_context_new, span_context_new_dev)
+
+  env <- new.env()
+  withr::local_envvar(OTEL_ENV = NA_character_)
+  setup_dev_env(env)
+  expect_null(env$span_base_new)
+})
+
+test_that("R/span-dev.R is up to date", {
+  skip_on_cran()
+  root <- test_path("../..")
+  skip_if_not(file.exists(file.path(root, "tools/template/dev.R")))
+  out <- tempfile(fileext = ".R")
+  on.exit(unlink(out), add = TRUE)
+  withr::local_envvar(OTEL_DEV_API_OUTPUT_FILE = out)
+  withr::local_dir(root)
+  suppressMessages(source("tools/template/dev.R", local = new.env()))
+  expect_equal(readLines(out), readLines("R/span-dev.R"))
+})
