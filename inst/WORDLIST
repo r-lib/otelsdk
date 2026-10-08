@@ -30,6 +30,7 @@ TiB
 UI
 auth
 backoff
+bor
 cpp
 dplyr
 funder
@@ -47,6 +48,7 @@ opentelemetry
 otel
 protobuf
 protoc
+rdi
 signoz
 stdstream
 temporality
