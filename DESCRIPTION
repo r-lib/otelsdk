@@ -40,8 +40,6 @@ Suggests:
 Config/testthat/edition: 3
 Config/testthat/parallel: TRUE
 URL: https://otelsdk.r-lib.org, https://github.com/r-lib/otelsdk
-Config/Needs/check: r-lib/otel
-Config/Needs/coverage: r-lib/otel
-Config/Needs/website: tidyverse/tidytemplate, r-lib/otel
+Config/Needs/website: tidyverse/tidytemplate
 BugReports: https://github.com/r-lib/otelsdk/issues
 Config/roxygen2/version: 8.1.0
