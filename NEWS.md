@@ -1,5 +1,8 @@
 # otelsdk (development version)
 
+* The `end_steady_time` option of the `end()` method of spans is now
+  correctly used for the end time of the span.
+
 # otelsdk 0.2.4
 
 * otel and otelsdk now support R 4.2.x on Windows.

@@ -254,3 +254,13 @@ test_that("activate, deactivate manually", {
   expect_equal(names(spns), c("test::fun2", "test::fun"))
   expect_equal(spns[["test::fun2"]]$parent, spns[["test::fun"]]$span_id)
 })
+
+test_that("end_steady_time", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn <- trc$start_span("s", options = list(start_steady_time = 100))
+    spn$end(options = list(end_steady_time = 105))
+  })[["traces"]]
+
+  expect_equal(spns[[1]]$duration, 5)
+})
