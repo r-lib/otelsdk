@@ -50,7 +50,6 @@ span_base_new <- function(
     update_name = function(name) {
       name <- as_string(name, null = FALSE)
       ccall(otel_span_update_name, self$xptr, name)
-      self$name <- name
       invisible(self)
     },
 
@@ -127,13 +126,23 @@ span_base_new <- function(
 
     deactivate = function(cscope) {
       ccall(otel_scope_end, cscope)
-    },
-
-    name = NULL
+    }
   )
 
   self$tracer <- tracer
   self$xptr <- xptr
+  # The name is kept in C, so all span objects that point to the same
+  # span, e.g. the one from get_active_span(), see the same name.
+  makeActiveBinding(
+    "name",
+    function(value) {
+      if (!missing(value)) {
+        stop("Use `update_name()` to change the name of a span.")
+      }
+      ccall(otel_span_get_name, self$xptr)
+    },
+    self
+  )
 
   self
 }
@@ -165,7 +174,6 @@ span_new <- function(
   )
 
   self <- span_base_new(tracer, xptr)
-  self$name <- name
 
   if (!is.null(scope)) {
     defer(self$end(status_code = "auto"), envir = scope)

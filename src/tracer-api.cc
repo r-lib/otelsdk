@@ -64,6 +64,70 @@ private:
   size_t num_real_links;
 };
 
+// opentelemetry-cpp cannot query the name of a span, so we wrap every
+// span we create and keep the name here. Activating the span puts the
+// wrapper into the context, so GetCurrentSpan() returns it as well.
+class RSpan: public trace::Span {
+public:
+  RSpan(nostd::shared_ptr<trace::Span> inner, nostd::string_view name)
+    : inner_(inner), name_(name.data(), name.size()) { }
+
+  const std::string &GetName() const { return name_; }
+
+  void SetAttribute(nostd::string_view key,
+                    const common::AttributeValue &value) noexcept override {
+    inner_->SetAttribute(key, value);
+  }
+  void AddEvent(nostd::string_view name) noexcept override {
+    inner_->AddEvent(name);
+  }
+  void AddEvent(nostd::string_view name,
+                common::SystemTimestamp timestamp) noexcept override {
+    inner_->AddEvent(name, timestamp);
+  }
+  void AddEvent(nostd::string_view name,
+                common::SystemTimestamp timestamp,
+                const common::KeyValueIterable &attributes) noexcept override {
+    inner_->AddEvent(name, timestamp, attributes);
+  }
+  void AddEvent(nostd::string_view name,
+                const common::KeyValueIterable &attributes) noexcept override {
+    inner_->AddEvent(name, attributes);
+  }
+  void AddLink(const trace::SpanContext &target,
+               const common::KeyValueIterable &attrs) noexcept override {
+    inner_->AddLink(target, attrs);
+  }
+  void AddLinks(
+      const trace::SpanContextKeyValueIterable &links) noexcept override {
+    inner_->AddLinks(links);
+  }
+  void SetStatus(trace::StatusCode code,
+                 nostd::string_view description = "") noexcept override {
+    inner_->SetStatus(code, description);
+  }
+  trace::StatusCode GetStatus() noexcept override {
+    return inner_->GetStatus();
+  }
+  void UpdateName(nostd::string_view name) noexcept override {
+    name_.assign(name.data(), name.size());
+    inner_->UpdateName(name);
+  }
+  void End(const trace::EndSpanOptions &options = {}) noexcept override {
+    inner_->End(options);
+  }
+  trace::SpanContext GetContext() const noexcept override {
+    return inner_->GetContext();
+  }
+  bool IsRecording() const noexcept override {
+    return inner_->IsRecording();
+  }
+
+private:
+  nostd::shared_ptr<trace::Span> inner_;
+  std::string name_;
+};
+
 extern "C" {
 
 void *otel_get_active_span_context_(void *tracer_) {
@@ -132,9 +196,17 @@ void * otel_start_span_(
   struct otel_tracer *ts = (struct otel_tracer *) tracer_;
   trace::Tracer &tracer = *(ts->ptr);
   struct otel_span *ss = new struct otel_span;
-  ss->ptr = tracer.StartSpan(name, attributes, links, opts);
+  ss->ptr = nostd::shared_ptr<trace::Span>(
+    new RSpan(tracer.StartSpan(name, attributes, links, opts), name)
+  );
 
   return (void *) ss;
+}
+
+const char *otel_span_get_name_(void *span_) {
+  struct otel_span *ss = (struct otel_span *) span_;
+  RSpan *span = dynamic_cast<RSpan*>(ss->ptr.get());
+  return span ? span->GetName().c_str() : NULL;
 }
 
 void *otel_span_get_context_(void *span_) {

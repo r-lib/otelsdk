@@ -271,6 +271,20 @@ SEXP otel_span_update_name(SEXP span, SEXP name) {
   return R_NilValue;
 }
 
+SEXP otel_span_get_name(SEXP span) {
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
+  void *span_ = R_ExternalPtrAddr(span);
+  if (span_) {
+    const char *name_ = otel_span_get_name_(span_);
+    if (name_) {
+      return Rf_mkString(name_);
+    }
+  }
+  return R_NilValue;
+}
+
 SEXP otel_span_end(
     SEXP span, SEXP options, SEXP status_code) {
   if (TYPEOF(span) != EXTPTRSXP) {

@@ -1,5 +1,8 @@
 # otelsdk (development version)
 
+* The span object returned by `otel::get_active_span()` now has the
+  correct span name in `$name` (#80).
+
 * The `end_steady_time` option of the `end()` method of spans is now
   correctly used for the end time of the span.
 
