@@ -73,19 +73,19 @@ spns
 #> $traces
 #> $traces$my
 #> <otel_span_data>
-#> trace_id              : 4c239755e9e7d5c6f2af408150190fb6
-#> span_id               : b8d0bf9a480eb0e2
+#> trace_id              : 8b831ac0ab9075fb527b8b6c0dbe92a5
+#> span_id               : 3c96aa14d9673d00
 #> name                  : my
 #> flags                 : +sampled -random
-#> parent                : 0b98276c62fab461
+#> parent                : 92cc61db77aec811
 #> description           : 
 #> resource_attributes   : 
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8994
-#>     process.runtime.description : R version 4.5.3 (2026-03-11)
+#>     process.pid                 : 8431
+#>     process.runtime.description : R version 4.6.1 (2026-06-24)
 #>     process.runtime.name        : R
-#>     process.runtime.version     : 4.5.3
+#>     process.runtime.version     : 4.6.1
 #>     service.name                : unknown_service
 #>     telemetry.sdk.language      : R
 #>     telemetry.sdk.name          : opentelemetry
@@ -99,16 +99,16 @@ spns
 #>     attributes : 
 #> kind                  : internal
 #> status                : unset
-#> start_time            : 2026-04-08 11:27:00
-#> duration              : 0.000131257
+#> start_time            : 2026-10-08 11:30:00
+#> duration              : 0.000108985
 #> attributes            : 
 #> events                : 
 #> links                 : 
 #> 
 #> $traces$`<NA>`
 #> <otel_span_data>
-#> trace_id              : 4c239755e9e7d5c6f2af408150190fb6
-#> span_id               : 0b98276c62fab461
+#> trace_id              : 8b831ac0ab9075fb527b8b6c0dbe92a5
+#> span_id               : 92cc61db77aec811
 #> name                  : <NA>
 #> flags                 : +sampled -random
 #> parent                : 0000000000000000
@@ -116,10 +116,10 @@ spns
 #> resource_attributes   : 
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8994
-#>     process.runtime.description : R version 4.5.3 (2026-03-11)
+#>     process.pid                 : 8431
+#>     process.runtime.description : R version 4.6.1 (2026-06-24)
 #>     process.runtime.name        : R
-#>     process.runtime.version     : 4.5.3
+#>     process.runtime.version     : 4.6.1
 #>     service.name                : unknown_service
 #>     telemetry.sdk.language      : R
 #>     telemetry.sdk.name          : opentelemetry
@@ -133,8 +133,8 @@ spns
 #>     attributes : 
 #> kind                  : internal
 #> status                : unset
-#> start_time            : 2026-04-08 11:27:00
-#> duration              : 0.000559814
+#> start_time            : 2026-10-08 11:30:00
+#> duration              : 0.000464442
 #> attributes            : 
 #> events                : 
 #> links                 : 
@@ -146,10 +146,10 @@ spns
 #> attributes:
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8994
-#>     process.runtime.description : R version 4.5.3 (2026-03-11)
+#>     process.pid                 : 8431
+#>     process.runtime.description : R version 4.6.1 (2026-06-24)
 #>     process.runtime.name        : R
-#>     process.runtime.version     : 4.5.3
+#>     process.runtime.version     : 4.6.1
 #>     service.name                : unknown_service
 #>     telemetry.sdk.language      : R
 #>     telemetry.sdk.name          : opentelemetry

@@ -2,6 +2,10 @@
 
 ## otelsdk (development version)
 
+- The `end_steady_time` option of the
+  [`end()`](https://rdrr.io/r/stats/start.html) method of spans is now
+  correctly used for the end time of the span.
+
 ## otelsdk 0.2.4
 
 CRAN release: 2026-04-08

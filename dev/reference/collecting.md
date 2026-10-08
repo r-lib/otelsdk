@@ -82,6 +82,7 @@ your dashboard.
 If you want to export logs and/or metrics, set these environment
 variables, respectively:
 
+
     OTEL_LOGS_EXPORTER=http
     OTEL_LOG_LEVEL=debug
     OTEL_METRICS_EXPORTER=http
