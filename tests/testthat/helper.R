@@ -146,6 +146,11 @@ record_object <- function(expr, envir = parent.frame()) {
     c(deparse(expr), sprintf("saveRDS(.Last.value, '%s')", rds)),
     con = rs
   )
+  # A rig project's .Renviron can leave R_DEFAULT_PACKAGES pointing to
+  # the rvenv package in parallel test workers, and then every child process
+  # warns at startup that it cannot find it. That warning would end up in
+  # the stderr of the recorded callr errors.
+  withr::local_envvar(R_DEFAULT_PACKAGES = NA)
   callr::rscript(rs, show = FALSE)
   readRDS(rds)
 }

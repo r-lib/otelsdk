@@ -31,3 +31,9 @@
 ^[.]cache$
 ^revdep$
 ^windows$
+^\.Renviron$
+^\.rvenv$
+^\.rvenvlib$
+^\.Renviron$
+^rproj\.toml$
+^rproj\.lock$
