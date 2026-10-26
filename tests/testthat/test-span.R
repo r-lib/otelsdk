@@ -75,6 +75,30 @@ test_that("set_attribute", {
   )
 })
 
+test_that("set_attributes", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_local_active_span()
+    spn2 <- trc$start_local_active_span("my")
+    spn2$set_attributes(list(key = letters[1:3], key2 = 1:2))
+    spn1$set_attributes(list(key = "gone"))
+    spn2$end()
+    spn1$set_attributes(list(key = "updated", key3 = TRUE))
+    spn1$set_attributes(list())
+    spn1$set_attributes(NULL)
+    spn1$end()
+  })[["traces"]]
+
+  expect_equal(
+    sort_named_list(spns[[1]]$attributes),
+    list(key = letters[1:3], key2 = as.double(1:2))
+  )
+  expect_equal(
+    sort_named_list(spns[[2]]$attributes),
+    list(key = "updated", key3 = TRUE)
+  )
+})
+
 test_that("add_event", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")

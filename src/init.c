@@ -40,6 +40,7 @@ SEXP otel_span_get_context(SEXP span);
 SEXP otel_span_is_valid(SEXP span);
 SEXP otel_span_is_recording(SEXP span);
 SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value);
+SEXP otel_span_set_attributes(SEXP span, SEXP attributes);
 SEXP otel_span_add_event(
   SEXP span, SEXP name, SEXP attributes, SEXP timestamp
 );
@@ -158,6 +159,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_is_valid, 1),
   CALLDEF(otel_span_is_recording, 1),
   CALLDEF(otel_span_set_attribute, 3),
+  CALLDEF(otel_span_set_attributes, 2),
   CALLDEF(otel_span_add_event, 4),
   CALLDEF(otel_span_add_link, 3),
   CALLDEF(otel_span_set_status, 3),

@@ -25,6 +25,12 @@ span_base_new <- function(
       invisible(self)
     },
 
+    set_attributes = function(attributes = NULL) {
+      attributes <- as_otel_attributes(attributes)
+      ccall(otel_span_set_attributes, self$xptr, attributes)
+      invisible(self)
+    },
+
     add_event = function(name, attributes = NULL, timestamp = NULL) {
       name <- as_string(name, null = FALSE)
       attributes <- as_otel_attributes(attributes)
