@@ -73,11 +73,11 @@ spns
 #> $traces
 #> $traces$my
 #> <otel_span_data>
-#> trace_id              : 56aa16f42f5cefd40fd479b1d59e10ce
-#> span_id               : a13ecf8858ff26e1
+#> trace_id              : b2762bfda6a6f2d956f3f642d719a249
+#> span_id               : f5a318bb0f292d1d
 #> name                  : my
 #> flags                 : +sampled -random
-#> parent                : 81cd95f5aa96651d
+#> parent                : 72199228128e649b
 #> description           : 
 #> resource_attributes   : 
 #>     os.type                     : linux
@@ -99,16 +99,16 @@ spns
 #>     attributes : 
 #> kind                  : internal
 #> status                : unset
-#> start_time            : 2026-10-26 12:08:08
-#> duration              : 0.000135693
+#> start_time            : 2026-10-26 12:52:04
+#> duration              : 0.000141404
 #> attributes            : 
 #> events                : 
 #> links                 : 
 #> 
 #> $traces$`<NA>`
 #> <otel_span_data>
-#> trace_id              : 56aa16f42f5cefd40fd479b1d59e10ce
-#> span_id               : 81cd95f5aa96651d
+#> trace_id              : b2762bfda6a6f2d956f3f642d719a249
+#> span_id               : 72199228128e649b
 #> name                  : <NA>
 #> flags                 : +sampled -random
 #> parent                : 0000000000000000
@@ -133,8 +133,8 @@ spns
 #>     attributes : 
 #> kind                  : internal
 #> status                : unset
-#> start_time            : 2026-10-26 12:08:08
-#> duration              : 0.000626676
+#> start_time            : 2026-10-26 12:52:04
+#> duration              : 0.000629807
 #> attributes            : 
 #> events                : 
 #> links                 : 
