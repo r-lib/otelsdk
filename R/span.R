@@ -95,7 +95,8 @@ span_base_new <- function(
             )
             status_code <- 2L
           } else {
-            status_code <- 1L
+            # no error, leave the status unset, see r-lib/otel#30
+            status_code <- NULL
           }
         }
       }

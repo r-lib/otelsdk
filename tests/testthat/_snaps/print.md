@@ -95,7 +95,7 @@
           schema_url : 
           attributes : 
       kind                  : internal
-      status                : ok
+      status                : unset
       start_time            : <timestamp>
       duration              : <duration>
       attributes            : 
