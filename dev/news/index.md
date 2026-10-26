@@ -2,6 +2,9 @@
 
 ## otelsdk (development version)
 
+- Spans now have a `set_attributes()` method, to set multiple attributes
+  at once (r-lib/otel#35).
+
 - The span object returned by
   [`otel::get_active_span()`](https://otel.r-lib.org/reference/get_active_span.html)
   now has the correct span name in `$name`
