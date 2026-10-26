@@ -638,6 +638,10 @@ doc_file_exporter_options <- function(evs, def) {
 
        May contain placeholders, see below.
 
+       If it is `stdout` or `stderr`, then the output is written to the
+       standard output or standard error, instead of a file. In this case
+       the other options are ignored.
+
      * `alias_pattern`: The file which always point to the latest file.
        Value is set from:
        - `opts` argument, or

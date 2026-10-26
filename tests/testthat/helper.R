@@ -219,3 +219,38 @@ callr_error <- local({
     err
   }
 })
+
+# C++ code writes to std::cout and std::cerr, which we cannot capture
+# from R, so we run `fun` in a subprocess. This needs an installed
+# otelsdk, the same version as the one we are testing.
+run_in_otelsdk_subprocess <- function(fun, args = list()) {
+  pkg <- system.file(package = "otelsdk")
+  lib <- dirname(pkg)
+  ver <- callr::r(
+    function() as.character(utils::packageVersion("otelsdk")),
+    libpath = c(lib, .libPaths())
+  )
+  if (ver != as.character(utils::packageVersion("otelsdk"))) {
+    skip("installed otelsdk has a different version")
+  }
+  out <- tempfile()
+  err <- tempfile()
+  on.exit(unlink(c(out, err)), add = TRUE)
+  callr::r(
+    fun,
+    args = args,
+    libpath = c(lib, .libPaths()),
+    stdout = out,
+    stderr = err
+  )
+  list(
+    stdout = if (file.exists(out)) readLines(out) else character(),
+    stderr = if (file.exists(err)) readLines(err) else character()
+  )
+}
+
+# Pick the lines of JSON output, and parse them
+parse_jsonl_lines <- function(lns) {
+  lns <- grep("^[{]", lns, value = TRUE)
+  lapply(lns, jsonlite::fromJSON, simplifyVector = FALSE)
+}

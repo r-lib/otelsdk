@@ -1,3 +1,6 @@
+#include <cstring>
+#include <iostream>
+
 #include "otel_common.h"
 #include "otel_common_cpp.h"
 
@@ -398,6 +401,24 @@ void c2cc_file_exporter_options(
   }
   if (options.has_rotate_size) {
     backend_opts.rotate_size = options.rotate_size;
+  }
+}
+
+// "stdout" and "stderr" are special file patterns, they write to the
+// standard output or error instead of a file
+void c2cc_file_exporter_backend(
+    const struct otel_file_exporter_options &options,
+    otlp::OtlpFileClientBackendOptions &backend) {
+  if (options.has_file_pattern && !strcmp(options.file_pattern.s, "stdout")) {
+    backend = std::ref(std::cout);
+  } else if (options.has_file_pattern &&
+             !strcmp(options.file_pattern.s, "stderr")) {
+    backend = std::ref(std::cerr);
+  } else {
+    otlp::OtlpFileClientFileSystemOptions backend_opts =
+      nostd::get<otlp::OtlpFileClientFileSystemOptions>(backend);
+    c2cc_file_exporter_options(options, backend_opts);
+    backend = backend_opts;
   }
 }
 

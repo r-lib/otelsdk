@@ -173,6 +173,9 @@ void c2cc_file_exporter_options(
 void cc2c_file_exporter_options(
     const otlp::OtlpFileClientFileSystemOptions &backend_opts,
     struct otel_file_exporter_options &options);
+void c2cc_file_exporter_backend(
+  const struct otel_file_exporter_options &options,
+  otlp::OtlpFileClientBackendOptions &backend);
 
 template<typename T>
 void c2cc_otel_http_exporter_options(

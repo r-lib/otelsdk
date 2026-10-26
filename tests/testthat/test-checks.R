@@ -674,6 +674,17 @@ test_that("as_logger_provider_file_options", {
     modifyList(opts, c(opts1, list(alias_pattern = "foo-latest")))
   )
 
+  # no alias for stdout and stderr
+  withr::local_envvar(
+    OTEL_EXPORTER_OTLP_FILE_ALIAS = NA_character_,
+    OTEL_EXPORTER_OTLP_LOGS_FILE_ALIAS = NA_character_
+  )
+  for (output in c("stdout", "stderr")) {
+    opts2 <- as_logger_provider_file_options(list(file_pattern = output))
+    expect_equal(opts2$file_pattern, output)
+    expect_null(opts2$alias_pattern)
+  }
+
   helper <- function(o) as_logger_provider_file_options(o)
   expect_snapshot(error = TRUE, {
     v <- list(file_pattern = 1L)

@@ -17,6 +17,10 @@ a valid JSON value. The line separator is \verb{\\n}. The preferred file
 extension is \code{jsonl}.
 
 Select this tracer provider with \code{OTEL_TRACES_EXPORTER=otlp/file}.
+
+Select \code{OTEL_TRACES_EXPORTER=otlp/stdout} to write to the standard
+output instead of a file. This is the same as setting the \code{file_pattern}
+option to \code{stdout}.
 }
 \section{Usage}{
 Externally:
@@ -49,6 +53,10 @@ tracer_provider_file$options()
 }
 
 May contain placeholders, see below.
+
+If it is \code{stdout} or \code{stderr}, then the output is written to the
+standard output or standard error, instead of a file. In this case
+the other options are ignored.
 \item \code{alias_pattern}: The file which always point to the latest file.
 Value is set from:
 \itemize{

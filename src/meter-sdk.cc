@@ -128,10 +128,7 @@ void *otel_create_meter_provider_file_(
     std::chrono::milliseconds(export_timeout);
 
   otlp::OtlpFileMetricExporterOptions opts;
-  otlp::OtlpFileClientFileSystemOptions backend_opts =
-    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
-  c2cc_file_exporter_options(*options, backend_opts);
-  opts.backend_options = backend_opts;
+  c2cc_file_exporter_backend(*options, opts.backend_options);
 
   auto exporter = otlp::OtlpFileMetricExporterFactory::Create(opts);
   auto reader = metrics_sdk::PeriodicExportingMetricReaderFactory::Create(

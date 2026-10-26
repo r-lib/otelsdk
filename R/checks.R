@@ -1021,7 +1021,9 @@ as_file_exporter_options <- function(
     as_string(opts$alias_pattern, arg = ma("alias_pattern"), call = call) %||%
     get_env(evs[["alias_pattern"]]) %||%
     get_env(file_exporter_alias_envvar) %||%
-    empty_atomic_as_null(sub("%N", "latest", file_pattern))
+    if (!isTRUE(file_pattern %in% c("stdout", "stderr"))) {
+      empty_atomic_as_null(sub("%N", "latest", file_pattern))
+    }
 
   flush_interval <-
     as_difftime_spec(

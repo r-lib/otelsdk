@@ -43,10 +43,7 @@ void otel_logger_finally_(void *logger_) {
 void *otel_create_logger_provider_file_(
     struct otel_file_exporter_options *options) {
   opentelemetry::exporter::otlp::OtlpFileLogRecordExporterOptions opts;
-  otlp::OtlpFileClientFileSystemOptions backend_opts =
-    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
-  c2cc_file_exporter_options(*options, backend_opts);
-  opts.backend_options = backend_opts;
+  c2cc_file_exporter_backend(*options, opts.backend_options);
 
   auto exporter  = otlp::OtlpFileLogRecordExporterFactory::Create(opts);
   auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
