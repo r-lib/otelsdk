@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">otelsdk</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.2.4.9002</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.2.4.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="otelsdk-development-version">otelsdk (development version)<a class="anchor" aria-label="anchor" href="#otelsdk-development-version"></a></h2>
-<ul><li><p>Spans now have a <code>set_attributes()</code> method, to set multiple attributes at once (r-lib/otel#35).</p></li>
+<ul><li><p>Spans ended automatically, without an error, now keep the <code>unset</code> status, instead of being set to <code>ok</code> (r-lib/otel#30).</p></li>
+<li><p>Spans now have a <code>set_attributes()</code> method, to set multiple attributes at once (r-lib/otel#35).</p></li>
 <li><p>The span object returned by <code><a href="https://otel.r-lib.org/reference/get_active_span.html" class="external-link">otel::get_active_span()</a></code> now has the correct span name in <code>$name</code> (<a href="https://github.com/r-lib/otelsdk/issues/80" class="external-link">#80</a>).</p></li>
 <li><p>The file tracer, logger and meter providers now write to the standard output or standard error if the <code>file_pattern</code> option is <code>stdout</code> or <code>stderr</code>. otel uses this for the <code>otlp/stdout</code> exporter (r-lib/otel#18).</p></li>
 <li><p>The <code>end_steady_time</code> option of the <code><a href="https://rdrr.io/r/stats/start.html" class="external-link">end()</a></code> method of spans is now correctly used for the end time of the span.</p></li>

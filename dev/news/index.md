@@ -2,6 +2,9 @@
 
 ## otelsdk (development version)
 
+- Spans ended automatically, without an error, now keep the `unset`
+  status, instead of being set to `ok` (r-lib/otel#30).
+
 - Spans now have a `set_attributes()` method, to set multiple attributes
   at once (r-lib/otel#35).
 
