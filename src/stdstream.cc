@@ -51,6 +51,14 @@ namespace logs_exporter    = opentelemetry::exporter::logs;
 #include "otel_common_cpp.h"
 #include "otel_attributes.h"
 
+std::ostream &otel_cout() {
+  return std::cout;
+}
+
+std::ostream &otel_cerr() {
+  return std::cerr;
+}
+
 void *otel_create_tracer_provider_stdstream_(
   const char *stream, struct otel_attributes *resource_attributes) {
   int sout = !strcmp(stream, "stdout");

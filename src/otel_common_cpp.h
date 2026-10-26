@@ -177,6 +177,11 @@ void c2cc_file_exporter_backend(
   const struct otel_file_exporter_options &options,
   otlp::OtlpFileClientBackendOptions &backend);
 
+// These are in stdstream.cc, which is linked from a static library,
+// so R CMD check does not complain about std::cout and std::cerr.
+std::ostream &otel_cout();
+std::ostream &otel_cerr();
+
 template<typename T>
 void c2cc_otel_http_exporter_options(
   const struct otel_http_exporter_options &coptions,

@@ -1,5 +1,4 @@
 #include <cstring>
-#include <iostream>
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
@@ -410,10 +409,10 @@ void c2cc_file_exporter_backend(
     const struct otel_file_exporter_options &options,
     otlp::OtlpFileClientBackendOptions &backend) {
   if (options.has_file_pattern && !strcmp(options.file_pattern.s, "stdout")) {
-    backend = std::ref(std::cout);
+    backend = std::ref(otel_cout());
   } else if (options.has_file_pattern &&
              !strcmp(options.file_pattern.s, "stderr")) {
-    backend = std::ref(std::cerr);
+    backend = std::ref(otel_cerr());
   } else {
     otlp::OtlpFileClientFileSystemOptions backend_opts =
       nostd::get<otlp::OtlpFileClientFileSystemOptions>(backend);
