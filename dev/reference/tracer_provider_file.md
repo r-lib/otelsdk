@@ -8,6 +8,10 @@ extension is `jsonl`.
 
 Select this tracer provider with `OTEL_TRACES_EXPORTER=otlp/file`.
 
+Select `OTEL_TRACES_EXPORTER=otlp/stdout` to write to the standard
+output instead of a file. This is the same as setting the `file_pattern`
+option to `stdout`.
+
 ## Value
 
 `tracer_provider_file$new()` returns an
@@ -47,6 +51,10 @@ From R:
   - the default is: `trace-%N.jsonl`.
 
   May contain placeholders, see below.
+
+  If it is `stdout` or `stderr`, then the output is written to the
+  standard output or standard error, instead of a file. In this case the
+  other options are ignored.
 
 - `alias_pattern`: The file which always point to the latest file. Value
   is set from:

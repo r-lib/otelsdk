@@ -7,6 +7,11 @@
   now has the correct span name in `$name`
   ([\#80](https://github.com/r-lib/otelsdk/issues/80)).
 
+- The file tracer, logger and meter providers now write to the standard
+  output or standard error if the `file_pattern` option is `stdout` or
+  `stderr`. otel uses this for the `otlp/stdout` exporter
+  (r-lib/otel#18).
+
 - The `end_steady_time` option of the
   [`end()`](https://rdrr.io/r/stats/start.html) method of spans is now
   correctly used for the end time of the span.
