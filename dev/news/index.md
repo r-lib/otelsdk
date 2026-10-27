@@ -28,6 +28,12 @@
 
 - Documentation update for the new Otel 1.62.0 specification.
 
+- otelsdk now bundles opentelemetry-cpp 1.30.0. Notable changes:
+
+  - The default `schedule_delay` of the batch log processor is now 1000
+    ms, instead of 5000 ms.
+  - New trace IDs now have the W3C `random` trace flag set.
+
 ## otelsdk 0.2.4
 
 CRAN release: 2026-04-08

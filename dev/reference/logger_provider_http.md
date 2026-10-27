@@ -333,7 +333,7 @@ From R:
 
   - the `OTEL_BSP_SCHEDULE_DELAY` environment variable, or
 
-  - the default is `5000`.
+  - the default is `1000`.
 
 ## Examples
 
@@ -416,6 +416,6 @@ logger_provider_http$options()
 #> [1] 512
 #> 
 #> $schedule_delay
-#> [1] 5000
+#> [1] 1000
 #> 
 ```
