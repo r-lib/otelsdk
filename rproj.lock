@@ -348,17 +348,17 @@ metadata = { RemoteHash = "cdfef9035405891d8b104b258a40f62656f215aba7dcdc9f32262
 
 [[targets.packages]]
 package = "otel"
-version = "0.2.0.9000"
+version = "0.2.0.9001"
 binary = false
 platform = "source"
 dependencies = []
-sources = ["git+https://github.com/r-lib/otel.git#commit=988a522d69a1a9468f3f1329ddaee19b57e55b6b"]
-target = "git/github/r-lib/otel/988a522d69a1a9468f3f1329ddaee19b57e55b6b"
+sources = ["git+https://github.com/r-lib/otel.git#commit=2a6062dda9d5872e338b2de58830adafe4cbd4b4"]
+target = "git/github/r-lib/otel/2a6062dda9d5872e338b2de58830adafe4cbd4b4"
 groups = [
     "dev",
     "main",
 ]
-metadata = { RemoteHost = "github.com", RemoteRepo = "r-lib/otel", RemoteSha = "988a522d69a1a9468f3f1329ddaee19b57e55b6b", RemoteType = "github", RemoteUrl = "https://github.com/r-lib/otel.git", RemoteUsername = "r-lib" }
+metadata = { RemoteHost = "github.com", RemoteRepo = "r-lib/otel", RemoteSha = "2a6062dda9d5872e338b2de58830adafe4cbd4b4", RemoteType = "github", RemoteUrl = "https://github.com/r-lib/otel.git", RemoteUsername = "r-lib" }
 
 [[targets.packages]]
 package = "pkgload"
@@ -669,7 +669,7 @@ sources = ["."]
 target = ""
 groups = ["main"]
 is_project = true
-metadata = { RemoteSha = "1a01a69c7164b1e0d8ea3a752c3c1b9daeb2582e61ba0b6d8a7532e413415496", RemoteType = "local", RemoteUrl = "." }
+metadata = { RemoteSha = "2201aae3246b94063e2950b120a5fc7719ae9188763b0f79e5bcd60d97edafc2", RemoteType = "local", RemoteUrl = "." }
 
 [[targets]]
 r_version = "4.6.1"
@@ -1023,17 +1023,17 @@ metadata = { RemoteHash = "5e539f91ca36b8ed80933101baf2a57462b9342c68556f5d4dcb8
 
 [[targets.packages]]
 package = "otel"
-version = "0.2.0.9000"
+version = "0.2.0.9001"
 binary = false
 platform = "source"
 dependencies = []
-sources = ["git+https://github.com/r-lib/otel.git#commit=988a522d69a1a9468f3f1329ddaee19b57e55b6b"]
-target = "git/github/r-lib/otel/988a522d69a1a9468f3f1329ddaee19b57e55b6b"
+sources = ["git+https://github.com/r-lib/otel.git#commit=2a6062dda9d5872e338b2de58830adafe4cbd4b4"]
+target = "git/github/r-lib/otel/2a6062dda9d5872e338b2de58830adafe4cbd4b4"
 groups = [
     "dev",
     "main",
 ]
-metadata = { RemoteHost = "github.com", RemoteRepo = "r-lib/otel", RemoteSha = "988a522d69a1a9468f3f1329ddaee19b57e55b6b", RemoteType = "github", RemoteUrl = "https://github.com/r-lib/otel.git", RemoteUsername = "r-lib" }
+metadata = { RemoteHost = "github.com", RemoteRepo = "r-lib/otel", RemoteSha = "2a6062dda9d5872e338b2de58830adafe4cbd4b4", RemoteType = "github", RemoteUrl = "https://github.com/r-lib/otel.git", RemoteUsername = "r-lib" }
 
 [[targets.packages]]
 package = "Rcpp"
@@ -1338,7 +1338,7 @@ sources = ["."]
 target = ""
 groups = ["main"]
 is_project = true
-metadata = { RemoteSha = "1a01a69c7164b1e0d8ea3a752c3c1b9daeb2582e61ba0b6d8a7532e413415496", RemoteType = "local", RemoteUrl = "." }
+metadata = { RemoteSha = "2201aae3246b94063e2950b120a5fc7719ae9188763b0f79e5bcd60d97edafc2", RemoteType = "local", RemoteUrl = "." }
 
 [[targets]]
 r_version = "4.6.1"
@@ -1680,17 +1680,17 @@ metadata = { RemoteHash = "cdfef9035405891d8b104b258a40f62656f215aba7dcdc9f32262
 
 [[targets.packages]]
 package = "otel"
-version = "0.2.0.9000"
+version = "0.2.0.9001"
 binary = false
 platform = "source"
 dependencies = []
-sources = ["git+https://github.com/r-lib/otel.git#commit=988a522d69a1a9468f3f1329ddaee19b57e55b6b"]
-target = "git/github/r-lib/otel/988a522d69a1a9468f3f1329ddaee19b57e55b6b"
+sources = ["git+https://github.com/r-lib/otel.git#commit=2a6062dda9d5872e338b2de58830adafe4cbd4b4"]
+target = "git/github/r-lib/otel/2a6062dda9d5872e338b2de58830adafe4cbd4b4"
 groups = [
     "dev",
     "main",
 ]
-metadata = { RemoteHost = "github.com", RemoteRepo = "r-lib/otel", RemoteSha = "988a522d69a1a9468f3f1329ddaee19b57e55b6b", RemoteType = "github", RemoteUrl = "https://github.com/r-lib/otel.git", RemoteUsername = "r-lib" }
+metadata = { RemoteHost = "github.com", RemoteRepo = "r-lib/otel", RemoteSha = "2a6062dda9d5872e338b2de58830adafe4cbd4b4", RemoteType = "github", RemoteUrl = "https://github.com/r-lib/otel.git", RemoteUsername = "r-lib" }
 
 [[targets.packages]]
 package = "pkgload"
@@ -1852,11 +1852,11 @@ metadata = { RemoteHash = "a9f22335ea39039de25bb27bccd5ff1ffb2b743579b31d150b6b9
 [[targets.packages]]
 package = "ini"
 version = "0.3.1"
-binary = false
-platform = "source"
+binary = true
+platform = "x86_64-unknown-linux-gnu"
 dependencies = []
-sources = ["https://p3m.dev/cran/2018-05-21/src/contrib/ini_0.3.1.tar.gz"]
-target = "src/ini_0.3.1-c2250a10.tar.gz"
+sources = ["https://p3m.dev/cran/2018-05-21/bin/linux/manylinux_2_28-x86_64/4.6/src/contrib/ini_0.3.1.tar.gz"]
+target = "bin/linux/manylinux_2_28-x86_64/4.6/ini_0.3.1-c2250a10.tar.gz"
 groups = ["dev"]
 metadata = { RemoteHash = "7b191a54019c8c52d6c2211c14878c95564154ec4865f57007953742868cd813" }
 
@@ -2001,7 +2001,7 @@ sources = ["."]
 target = ""
 groups = ["main"]
 is_project = true
-metadata = { RemoteSha = "1a01a69c7164b1e0d8ea3a752c3c1b9daeb2582e61ba0b6d8a7532e413415496", RemoteType = "local", RemoteUrl = "." }
+metadata = { RemoteSha = "2201aae3246b94063e2950b120a5fc7719ae9188763b0f79e5bcd60d97edafc2", RemoteType = "local", RemoteUrl = "." }
 
 [[targets]]
 r_version = "4.6.1"
@@ -2343,17 +2343,17 @@ metadata = { RemoteHash = "cdfef9035405891d8b104b258a40f62656f215aba7dcdc9f32262
 
 [[targets.packages]]
 package = "otel"
-version = "0.2.0.9000"
+version = "0.2.0.9001"
 binary = false
 platform = "source"
 dependencies = []
-sources = ["git+https://github.com/r-lib/otel.git#commit=988a522d69a1a9468f3f1329ddaee19b57e55b6b"]
-target = "git/github/r-lib/otel/988a522d69a1a9468f3f1329ddaee19b57e55b6b"
+sources = ["git+https://github.com/r-lib/otel.git#commit=2a6062dda9d5872e338b2de58830adafe4cbd4b4"]
+target = "git/github/r-lib/otel/2a6062dda9d5872e338b2de58830adafe4cbd4b4"
 groups = [
     "dev",
     "main",
 ]
-metadata = { RemoteHost = "github.com", RemoteRepo = "r-lib/otel", RemoteSha = "988a522d69a1a9468f3f1329ddaee19b57e55b6b", RemoteType = "github", RemoteUrl = "https://github.com/r-lib/otel.git", RemoteUsername = "r-lib" }
+metadata = { RemoteHost = "github.com", RemoteRepo = "r-lib/otel", RemoteSha = "2a6062dda9d5872e338b2de58830adafe4cbd4b4", RemoteType = "github", RemoteUrl = "https://github.com/r-lib/otel.git", RemoteUsername = "r-lib" }
 
 [[targets.packages]]
 package = "pkgload"
@@ -2515,11 +2515,11 @@ metadata = { RemoteHash = "a9f22335ea39039de25bb27bccd5ff1ffb2b743579b31d150b6b9
 [[targets.packages]]
 package = "ini"
 version = "0.3.1"
-binary = false
-platform = "source"
+binary = true
+platform = "x86_64-w64-mingw32"
 dependencies = []
-sources = ["https://p3m.dev/cran/2018-05-21/src/contrib/ini_0.3.1.tar.gz"]
-target = "src/ini_0.3.1-c2250a10.tar.gz"
+sources = ["https://p3m.dev/cran/2018-05-21/bin/windows/contrib/4.6/ini_0.3.1.zip"]
+target = "bin/windows/4.6/ini_0.3.1-c2250a10.zip"
 groups = ["dev"]
 metadata = { RemoteHash = "7b191a54019c8c52d6c2211c14878c95564154ec4865f57007953742868cd813" }
 
@@ -2664,4 +2664,4 @@ sources = ["."]
 target = ""
 groups = ["main"]
 is_project = true
-metadata = { RemoteSha = "1a01a69c7164b1e0d8ea3a752c3c1b9daeb2582e61ba0b6d8a7532e413415496", RemoteType = "local", RemoteUrl = "." }
+metadata = { RemoteSha = "2201aae3246b94063e2950b120a5fc7719ae9188763b0f79e5bcd60d97edafc2", RemoteType = "local", RemoteUrl = "." }
