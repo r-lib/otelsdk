@@ -1,5 +1,9 @@
 # otelsdk (development version)
 
+* The `create_histogram()` method of meters now has a `boundaries`
+  argument, to set explicit bucket boundaries for the histogram
+  (r-lib/otel#49).
+
 * Length one attribute values that are R arrays, e.g. created with
   `as.array()`, are now recorded as arrays, instead of scalars
   (r-lib/otel#48).

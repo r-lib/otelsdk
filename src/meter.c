@@ -174,7 +174,8 @@ SEXP otel_get_meter(
   r2c_attributes(attributes, &attributes_);
   void *meter_ = otel_get_meter_(
     meter_provider_, name_, version_, schema_url_, &attributes_);
-  SEXP xptr = R_MakeExternalPtr(meter_, R_NilValue, R_NilValue);
+  // keep the provider alive, the meter refers to it
+  SEXP xptr = R_MakeExternalPtr(meter_, R_NilValue, provider);
   R_RegisterCFinalizerEx(xptr, otel_meter_finally, (Rboolean) 1);
   return xptr;
 }
@@ -355,7 +356,7 @@ SEXP otel_up_down_counter_add(
 }
 
 SEXP otel_create_histogram(
-    SEXP meter, SEXP name, SEXP description, SEXP unit) {
+    SEXP meter, SEXP name, SEXP description, SEXP unit, SEXP boundaries) {
   if (TYPEOF(meter) != EXTPTRSXP) {
     Rf_error("Opentelemetry: invalid meter pointer");
   }
@@ -368,8 +369,10 @@ SEXP otel_create_histogram(
   const char *cdescription =
     Rf_isNull(description) ? NULL : CHAR(STRING_ELT(description, 0));
   const char *cunit = Rf_isNull(unit) ? NULL : CHAR(STRING_ELT(unit, 0));
-  void *histogram_ =
-    otel_create_histogram_(meter_, cname, cdescription, cunit);
+  const double *cboundaries = Rf_isNull(boundaries) ? NULL : REAL(boundaries);
+  size_t num_boundaries = Rf_isNull(boundaries) ? 0 : XLENGTH(boundaries);
+  void *histogram_ = otel_create_histogram_(
+    meter_, cname, cdescription, cunit, cboundaries, num_boundaries);
   SEXP xptr = R_MakeExternalPtr(histogram_, R_NilValue, R_NilValue);
   R_RegisterCFinalizerEx(xptr, otel_histogram_finally, (Rboolean) 1);
   return xptr;

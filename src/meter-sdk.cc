@@ -15,6 +15,9 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
@@ -402,6 +405,10 @@ void *otel_get_meter_(
   ms->ptr = meter_provider.GetMeter(
     name, version ? version : "", schema_url ? schema_url : "",
     &attributes_);
+  ms->provider = mps;
+  ms->name = name;
+  ms->version = version ? version : "";
+  ms->schema_url = schema_url ? schema_url : "";
 
   return (void*) ms;
 }
@@ -450,9 +457,40 @@ void otel_up_down_counter_add_(
 
 void *otel_create_histogram_(
     void *meter_, const char *name, const char *description,
-    const char *unit) {
+    const char *unit, const double *boundaries, size_t num_boundaries) {
   struct otel_meter *ms = (struct otel_meter*) meter_;
   metrics_api::Meter &meter = *(ms->ptr);
+
+  // The C++ API does not have advisory parameters, so we add a view
+  // for this histogram, with the explicit bucket boundaries. We only
+  // do this once per histogram, the first boundaries win.
+  if (boundaries) {
+    std::vector<std::string> key = {
+      ms->name, ms->version, ms->schema_url, name
+    };
+    struct otel_meter_provider *mps = ms->provider;
+    if (mps->histogram_views.find(key) == mps->histogram_views.end()) {
+      auto config = std::make_shared<metrics_sdk::HistogramAggregationConfig>();
+      config->boundaries_.assign(boundaries, boundaries + num_boundaries);
+      std::unique_ptr<metrics_sdk::InstrumentSelector> instrument_selector(
+        new metrics_sdk::InstrumentSelector(
+          metrics_sdk::InstrumentType::kHistogram, name, "",
+          metrics_sdk::PredicateType::kExact));
+      std::unique_ptr<metrics_sdk::MeterSelector> meter_selector(
+        new metrics_sdk::MeterSelector(
+          ms->name, ms->version, ms->schema_url));
+      std::unique_ptr<metrics_sdk::View> view(
+        new metrics_sdk::View(
+          "", "", metrics_sdk::AggregationType::kHistogram, config));
+      mps->ptr->AddView(
+        std::move(instrument_selector),
+        std::move(meter_selector),
+        std::move(view)
+      );
+      mps->histogram_views.insert(key);
+    }
+  }
+
   struct otel_histogram *cs = new otel_histogram;
   cs->ptr = meter.CreateDoubleHistogram(
     name, description ? description : "", unit ? unit : "");

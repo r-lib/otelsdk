@@ -85,8 +85,8 @@ test_that("otel_up_down_counter_add error", {
 test_that("otel_create_histogram error", {
   x <- ccall(create_empty_xptr)
   expect_snapshot(error = TRUE, {
-    ccall(otel_create_histogram, 1L, NULL, NULL, NULL)
-    ccall(otel_create_histogram, x, NULL, NULL, NULL)
+    ccall(otel_create_histogram, 1L, NULL, NULL, NULL, NULL)
+    ccall(otel_create_histogram, x, NULL, NULL, NULL, NULL)
   })
 })
 

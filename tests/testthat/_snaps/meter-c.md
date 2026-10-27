@@ -114,12 +114,12 @@
 # otel_create_histogram error
 
     Code
-      ccall(otel_create_histogram, 1L, NULL, NULL, NULL)
+      ccall(otel_create_histogram, 1L, NULL, NULL, NULL, NULL)
     Condition
       Error:
       ! Opentelemetry: invalid meter pointer
     Code
-      ccall(otel_create_histogram, x, NULL, NULL, NULL)
+      ccall(otel_create_histogram, x, NULL, NULL, NULL, NULL)
     Condition
       Error:
       ! Opentelemetry meter cleaned up already, internal error.

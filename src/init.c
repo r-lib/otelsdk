@@ -112,7 +112,7 @@ SEXP otel_up_down_counter_add(
   SEXP up_down_counter, SEXP value, SEXP attributes, SEXP context);
 
 SEXP otel_create_histogram(
-  SEXP meter, SEXP name, SEXP description, SEXP unit);
+  SEXP meter, SEXP name, SEXP description, SEXP unit, SEXP boundaries);
 SEXP otel_histogram_record(
   SEXP histogram, SEXP value, SEXP attributes, SEXP unit);
 
@@ -211,7 +211,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_counter_add, 4),
   CALLDEF(otel_create_up_down_counter, 4),
   CALLDEF(otel_up_down_counter_add, 4),
-  CALLDEF(otel_create_histogram, 4),
+  CALLDEF(otel_create_histogram, 5),
   CALLDEF(otel_histogram_record, 4),
   CALLDEF(otel_create_gauge, 4),
   CALLDEF(otel_gauge_record, 4),

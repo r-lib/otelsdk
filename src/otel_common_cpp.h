@@ -2,6 +2,9 @@
 #define OTEL_COMMON_CPP_H
 
 #include <fstream>
+#include <set>
+#include <string>
+#include <vector>
 
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
@@ -56,10 +59,17 @@ struct otel_meter_provider {
   std::fstream stream;
   std::shared_ptr<memory::CircularBufferInMemoryMetricData> metricdata;
   bool shutdown_called;
+  // histograms that have a view with explicit bucket boundaries already
+  std::set<std::vector<std::string>> histogram_views;
 };
 
 struct otel_meter {
   nostd::shared_ptr<metrics_api::Meter> ptr;
+  // the meter provider is kept alive by the R meter object
+  struct otel_meter_provider *provider;
+  std::string name;
+  std::string version;
+  std::string schema_url;
 };
 
 struct otel_counter {

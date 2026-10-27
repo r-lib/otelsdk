@@ -1215,3 +1215,24 @@ test_that("as_meter_provider_memory_options", {
     as_meter_provider_memory_options(o4)
   })
 })
+
+test_that("as_histogram_boundaries", {
+  expect_null(as_histogram_boundaries(NULL))
+  expect_identical(as_histogram_boundaries(1:3), c(1, 2, 3))
+  expect_identical(as_histogram_boundaries(c(0.5, 1)), c(0.5, 1))
+  expect_identical(as_histogram_boundaries(double()), double())
+
+  helper <- function(b) as_histogram_boundaries(b)
+  v1 <- "boo"
+  v2 <- c(1, NA)
+  v3 <- c(1, Inf)
+  v4 <- c(1, 3, 2)
+  v5 <- c(1, 1)
+  expect_snapshot(error = TRUE, {
+    helper(v1)
+    helper(v2)
+    helper(v3)
+    helper(v4)
+    helper(v5)
+  })
+})

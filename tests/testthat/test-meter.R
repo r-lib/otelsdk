@@ -54,6 +54,78 @@ test_that("meter, histogram", {
   expect_equal(md[["point_data_attr"]][[1]][["value"]][["count"]], 2)
 })
 
+test_that("meter, histogram with boundaries", {
+  mp <- meter_provider_memory_new()
+  on.exit(mp$shutdown(), add = TRUE)
+  mtr <- mp$get_meter("mtr1")
+  hst <- mtr$create_histogram("hst", boundaries = c(1, 2, 4))
+  # first boundaries win
+  hst2 <- mtr$create_histogram("hst", boundaries = c(10, 20))
+  hst3 <- mtr$create_histogram("hst")
+  hst$record(0.5)
+  hst2$record(3)
+  hst3$record(100)
+  # other histograms are not affected
+  oth <- mtr$create_histogram("oth")
+  oth$record(1)
+  mtr2 <- mp$get_meter("mtr2")
+  hst4 <- mtr2$create_histogram("hst")
+  hst4$record(1)
+  mp$flush()
+  mp$shutdown()
+  mrcs <- mp$get_metrics()
+
+  # the number of reports varies, use the last one that has data
+  find <- function(meter, inst) {
+    res <- NULL
+    for (r in mrcs) {
+      for (sm in r[["scope_metric_data"]]) {
+        if (sm[["instrumentation_scope"]][["name"]] != meter) {
+          next
+        }
+        for (md in sm[["metric_data"]]) {
+          if (md[["instrument_name"]] == inst) {
+            res <- md[["point_data_attr"]][[1]][["value"]]
+          }
+        }
+      }
+    }
+    res
+  }
+  default <- c(
+    0,
+    5,
+    10,
+    25,
+    50,
+    75,
+    100,
+    250,
+    500,
+    750,
+    1000,
+    2500,
+    5000,
+    7500,
+    10000
+  )
+
+  hpd <- find("mtr1", "hst")
+  expect_equal(hpd[["boundaries"]], c(1, 2, 4))
+  expect_equal(hpd[["counts"]], c(1, 0, 1, 1))
+  expect_equal(find("mtr1", "oth")[["boundaries"]], default)
+  expect_equal(find("mtr2", "hst")[["boundaries"]], default)
+})
+
+test_that("meter, histogram with invalid boundaries", {
+  mp <- meter_provider_memory_new()
+  on.exit(mp$shutdown(), add = TRUE)
+  mtr <- mp$get_meter()
+  expect_snapshot(error = TRUE, {
+    mtr$create_histogram("hst", boundaries = c(2, 1))
+  })
+})
+
 test_that("meter, gauge", {
   skip("Unreliable")
   mp <- meter_provider_memory_new()

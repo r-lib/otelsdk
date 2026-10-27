@@ -1,6 +1,6 @@
 Package: otelsdk
 Title: R SDK and Exporters for OpenTelemetry
-Version: 0.2.4.9004
+Version: 0.2.4.9005
 Authors@R: c(
     person("Gábor", "Csárdi", , "csardi.gabor@gmail.com",
         role = c("aut", "cre")),
@@ -22,7 +22,7 @@ Roxygen: list(markdown = TRUE)
 SystemRequirements: cmake, protobuf-compiler, libprotobuf, libcurl, zlib,
     GNU make
 Imports:
-    otel (>= 0.2.0.9001),
+    otel (>= 0.2.0.9002),
     utils
 Suggests:
     callr,

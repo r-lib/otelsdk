@@ -1853,3 +1853,31 @@
       Error:
       ! Invalid argument: `o4` has unknown option: 'unknown'.
 
+# as_histogram_boundaries
+
+    Code
+      helper(v1)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must be a numeric vector, but it is a string.
+    Code
+      helper(v2)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must not contain missing or infinite values.
+    Code
+      helper(v3)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must not contain missing or infinite values.
+    Code
+      helper(v4)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must be strictly increasing.
+    Code
+      helper(v5)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must be strictly increasing.
+

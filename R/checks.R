@@ -2026,3 +2026,34 @@ as_meter_provider_memory_options <- function(
 
   c(opts1, opts2, opts3)
 }
+
+as_histogram_boundaries <- function(
+  x,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (is.null(x)) {
+    return(x)
+  }
+  if (!is.numeric(x)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a numeric vector, but it is \\
+       {typename(x)}."
+    ))
+  }
+  if (any(!is.finite(x))) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must not contain missing or \\
+       infinite values."
+    ))
+  }
+  if (any(diff(x) <= 0)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be strictly increasing."
+    ))
+  }
+  as.double(x)
+}
