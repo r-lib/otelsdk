@@ -726,6 +726,37 @@ test_that("as_metric_reader_options", {
   })
 })
 
+test_that("as_metric_reader_options, env vars", {
+  withr::local_envvar(
+    OTEL_METRIC_EXPORT_INTERVAL = NA_character_,
+    OTEL_METRIC_EXPORT_TIMEOUT = NA_character_
+  )
+  expect_equal(
+    as_metric_reader_options(NULL),
+    list(export_interval = 60000L, export_timeout = 30000L)
+  )
+
+  withr::local_envvar(
+    OTEL_METRIC_EXPORT_INTERVAL = "1000",
+    OTEL_METRIC_EXPORT_TIMEOUT = "2s"
+  )
+  expect_equal(
+    as_metric_reader_options(NULL),
+    list(export_interval = 1000, export_timeout = 2000)
+  )
+
+  # explicit options take precedence
+  expect_equal(
+    as_metric_reader_options(list(export_interval = 500)),
+    list(export_interval = 500, export_timeout = 2000)
+  )
+
+  withr::local_envvar(OTEL_METRIC_EXPORT_INTERVAL = "bad")
+  expect_snapshot(error = TRUE, {
+    as_metric_reader_options(NULL)
+  })
+})
+
 test_that("as_meter_provider_file_options", {
   opts <- as_meter_provider_file_options(NULL)
   opts1 <- list(flush_interval = "1m")
