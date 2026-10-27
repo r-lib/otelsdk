@@ -381,14 +381,12 @@ void otel_meter_provider_flush_(void *meter_provider_, int timeout) {
 void otel_meter_provider_shutdown_(void *meter_provider_, int timeout) {
   struct otel_meter_provider *mps =
     (struct otel_meter_provider *) meter_provider_;
-  if (mps->shutdown_called) return;
   metrics_sdk::MeterProvider &meter_provider = *(mps->ptr);
   if (timeout < 0) {
     meter_provider.Shutdown();
   } else {
     meter_provider.Shutdown((std::chrono::microseconds) timeout); // # nocov
   }
-  mps->shutdown_called = true;
   if (mps->stream.is_open()) {
     mps->stream.flush();
   }
