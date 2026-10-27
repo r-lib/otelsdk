@@ -266,7 +266,7 @@ in milliseconds. Value is set from
 \itemize{
 \item the \code{opts} argument` or
 \item the \code{OTEL_BSP_SCHEDULE_DELAY} environment variable, or
-\item the default is \code{5000}.
+\item the default is \code{1000}.
 }
 }
 }

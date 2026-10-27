@@ -11,6 +11,13 @@ else
     UNAME=Windows
 fi
 
+# ETW is on by default on Windows, and setting it is an error elsewhere
+if [ "$UNAME" = "Windows" ]; then
+    ETW_FLAG="-DOTELCPP_WITH_ETW=OFF"
+else
+    ETW_FLAG=""
+fi
+
 # CentOS 7 seems to work with C++-14
 if [ "$UNAME" = "Linux" ]; then
     CXX_STANDARD=14
@@ -193,6 +200,7 @@ fi
 cat src/Makevars.in |
   sed "s|@CMAKE@|${CMAKE}|" |
   sed "s|@UNAME@|${UNAME}|" |
+  sed "s|@ETW_FLAG@|${ETW_FLAG}|" |
   sed "s|@CXX_STANDARD@|${CXX_STANDARD}|" |
   sed "s|@XCFLAGS@|${XCFLAGS}|" |
   sed "s|@XCXXFLAGS@|${XCXXFLAGS}|" |

@@ -1,38 +1,71 @@
---- cpp/exporters/otlp/src/otlp_file_client.cc.old	2025-06-20 19:27:44
-+++ cpp/exporters/otlp/src/otlp_file_client.cc	2025-06-20 19:27:56
-@@ -1253,7 +1253,8 @@
-         strerror_s(error_message, sizeof(error_message) - 1, error_code);
- #else
-         char error_message[256] = {0};
--        strerror_r(error_code, error_message, sizeof(error_message) - 1);
-+        auto ret_ = strerror_r(error_code, error_message, sizeof(error_message) - 1);
-+        (void) ret_;
- #endif
-         OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Create directory \""
-                                 << directory_name << "\" failed.errno: " << error_code
---- cpp/third_party/opentelemetry-proto/Makefile.orig	2025-06-30 10:22:30
-+++ cpp/third_party/opentelemetry-proto/Makefile	2025-06-30 10:23:02
-@@ -58,6 +58,7 @@
- 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
- 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
- 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/profiles/v1development/profiles_service.proto
-+	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/common/v1/status.proto
-
- # Generate gRPC/Protobuf implementation for C#.
- .PHONY: gen-csharp
---- cpp/cmake/opentelemetry-proto.cmake	2025-06-18 17:34:53
-+++ cpp/cmake/opentelemetry-proto.cmake.new	2025-06-30 10:48:19
-@@ -90,6 +90,9 @@
+--- cpp/api/include/opentelemetry/context/runtime_context.h	2026-10-26 15:20:49
++++ cpp/api/include/opentelemetry/context/runtime_context.h	2026-10-26 15:21:39
+@@ -5,6 +5,7 @@
+ 
+ #include <algorithm>
+ #include <cstddef>
++#include <limits>
+ 
+ #include "opentelemetry/common/macros.h"
+ #include "opentelemetry/context/context.h"
+@@ -357,6 +358,10 @@
+       {
+         // Last increase
+         new_capacity = max_capacity_;
++      }
++      if (new_capacity >= std::numeric_limits<ssize_t>::max() / sizeof(Context))
++      {
++        new_capacity = std::numeric_limits<ssize_t>::max() / sizeof(Context);
+       }
+       Context *temp = new Context[new_capacity];
+       if (base_ != nullptr)
+--- cpp/api/include/opentelemetry/trace/default_span.h	2026-10-26 15:20:49
++++ cpp/api/include/opentelemetry/trace/default_span.h	2026-10-26 15:20:49
+@@ -60,6 +60,8 @@
+ 
+   void SetStatus(StatusCode /* status */, nostd::string_view /* description */) noexcept override {}
+ 
++  StatusCode GetStatus() noexcept override { return StatusCode::kUnset; }
++
+   void UpdateName(nostd::string_view /* name */) noexcept override {}
+ 
+   void End(const EndSpanOptions & /* options */) noexcept override {}
+--- cpp/api/include/opentelemetry/trace/noop.h	2026-10-26 15:20:49
++++ cpp/api/include/opentelemetry/trace/noop.h	2026-10-26 15:20:49
+@@ -76,6 +76,8 @@
+ 
+   void SetStatus(StatusCode /*code*/, nostd::string_view /*description*/) noexcept override {}
+ 
++  StatusCode GetStatus() noexcept override { return StatusCode::kUnset; }
++
+   void UpdateName(nostd::string_view /*name*/) noexcept override {}
+ 
+   void End(const EndSpanOptions & /*options*/) noexcept override {}
+--- cpp/api/include/opentelemetry/trace/span.h	2026-10-26 15:20:49
++++ cpp/api/include/opentelemetry/trace/span.h	2026-10-26 15:20:49
+@@ -235,6 +235,9 @@
+   // recorded, and implementations are free to ignore previous calls.
+   virtual void SetStatus(StatusCode code, nostd::string_view description = "") noexcept = 0;
+ 
++  // Gets the status of the span.
++  virtual StatusCode GetStatus() noexcept = 0;
++
+   // Updates the name of the Span. If used, this will override the name provided
+   // during creation.
+   virtual void UpdateName(nostd::string_view name) noexcept = 0;
+--- cpp/cmake/opentelemetry-proto.cmake	2026-10-26 15:20:48
++++ cpp/cmake/opentelemetry-proto.cmake	2026-10-26 15:20:49
+@@ -67,6 +67,9 @@
  set(METRICS_SERVICE_PROTO
      "${PROTO_PATH}/opentelemetry/proto/collector/metrics/v1/metrics_service.proto"
  )
 +set(COMMON_SERVICE_PROTO
 +    "${PROTO_PATH}/opentelemetry/proto/collector/common/v1/status.proto"
 +)
-
+ 
  set(PROFILES_SERVICE_PROTO
      "${PROTO_PATH}/opentelemetry/proto/collector/profiles/v1development/profiles_service.proto"
-@@ -127,6 +130,12 @@
+@@ -104,6 +107,12 @@
  set(TRACE_SERVICE_PB_H_FILE
      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
  )
@@ -42,310 +75,24 @@
 +set(COMMON_SERVICE_PB_H_FILE
 +    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/common/v1/status.pb.h"
 +)
-
+ 
  #
  # Notes about the PROFILES signal: - *.proto files added in opentelemetry-proto
-@@ -145,6 +154,12 @@
- )
+@@ -123,6 +132,12 @@
  set(PROFILES_SERVICE_PB_CPP_FILE
      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1development/profiles_service.pb.cc"
-+)
+ )
 +set(COMMON_SERVICE_PB_H_FILE
 +    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/common/v1/status.pb.h"
 +)
 +set(COMMON_SERVICE_PB_CPP_FILE
 +    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/common/v1/status.pb.cc"
++)
+ 
+ if(OTELCPP_WITH_OTLP_GRPC)
+   set(PROFILES_SERVICE_GRPC_PB_H_FILE
+@@ -180,11 +195,11 @@
  )
-
- if(WITH_OTLP_GRPC)
-@@ -241,7 +256,9 @@
-     ${METRICS_SERVICE_PB_H_FILE}
-     ${METRICS_SERVICE_PB_CPP_FILE}
-     ${PROFILES_SERVICE_PB_H_FILE}
--    ${PROFILES_SERVICE_PB_CPP_FILE})
-+    ${PROFILES_SERVICE_PB_CPP_FILE}
-+    ${COMMON_SERVICE_PB_H_FILE}
-+    ${COMMON_SERVICE_PB_CPP_FILE})
-
- if(WITH_OTLP_GRPC)
-   list(APPEND PROTOBUF_COMMON_FLAGS
-@@ -275,7 +292,8 @@
-   ${TRACE_SERVICE_PROTO}
-   ${LOGS_SERVICE_PROTO}
-   ${METRICS_SERVICE_PROTO}
--  ${PROFILES_SERVICE_PROTO})
-+  ${PROFILES_SERVICE_PROTO}
-+  ${COMMON_SERVICE_PROTO})
-   set(PROTOBUF_RUN_PROTOC_COMMAND
-       "${PROTOBUF_RUN_PROTOC_COMMAND} \"${PROTOBUF_RUN_PROTOC_ARG}\"")
- endforeach()
-@@ -287,6 +305,7 @@
-     ${PROTOBUF_INCLUDE_FLAGS} ${COMMON_PROTO} ${RESOURCE_PROTO} ${TRACE_PROTO}
-     ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
-     ${METRICS_SERVICE_PROTO} ${PROFILES_PROTO} ${PROFILES_SERVICE_PROTO}
-+    ${COMMON_SERVICE_PROTO}
-   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}"
-   DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
-
-@@ -310,7 +329,8 @@
-   ${METRICS_PB_CPP_FILE}
-   ${TRACE_SERVICE_PB_CPP_FILE}
-   ${LOGS_SERVICE_PB_CPP_FILE}
--  ${METRICS_SERVICE_PB_CPP_FILE})
-+  ${METRICS_SERVICE_PB_CPP_FILE}
-+  ${COMMON_SERVICE_PB_CPP_FILE})
- set_target_version(opentelemetry_proto)
-
- target_include_directories(
---- cpp/sdk/src/metrics/meter_context.cc	2025-06-18 17:35:34
-+++ cpp/sdk/src/metrics/meter_context.cc.new	2025-07-01 12:38:22
-@@ -154,7 +154,7 @@
-   meters_.swap(filtered_meters);
- }
-
--bool MeterContext::Shutdown(std::chrono::microseconds timeout) noexcept
-+bool MeterContext::Shutdown(std::chrono::microseconds timeout, bool dest) noexcept
- {
-   bool result = true;
-   // Shutdown only once.
-@@ -170,7 +170,7 @@
-       OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric readers");
-     }
-   }
--  else
-+  else if (!dest)
-   {
-     OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Shutdown can be invoked only once.");
-   }
---- cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h	2025-06-18 17:35:34
-+++ cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h.new	2025-07-01 12:38:45
-@@ -168,7 +168,7 @@
-   /**
-    * Shutdown the Collectors associated with this meter provider.
-    */
--  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
-+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)(), bool dest = false) noexcept;
-
- private:
-   friend class ::testing::MetricCollectorTest;
---- cpp/sdk/src/metrics/meter_provider.cc	2025-06-18 17:35:34
-+++ cpp/sdk/src/metrics/meter_provider.cc.new	2025-07-01 12:43:16
-@@ -159,7 +159,7 @@
- {
-   if (context_)
-   {
--    context_->Shutdown();
-+    context_->Shutdown((std::chrono::microseconds::max)(), true);
-   }
- }
-
---- cpp/exporters/otlp/src/otlp_file_client.cc 2025-06-18 17:35:34
-+++ cpp/exporters/otlp/src/otlp_file_client.cc.new 2025-07-01 12:43:16
-@@ -93,8 +93,8 @@
-       snprintf_s(buffer, static_cast<rsize_t>(bufsz), fmt, ##args)
- #  endif
- #else
--#  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, args...) \
--    snprintf(buffer, static_cast<size_t>(bufsz), fmt, ##args)
-+#  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, ...) \
-+    snprintf(buffer, static_cast<size_t>(bufsz), fmt, __VA_ARGS__)
- #endif
-
- #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
---- cpp/api/include/opentelemetry/trace/span.h	2025-06-18 17:35:34
-+++ cpp/api/include/opentelemetry/trace/span.h.new	2025-07-18 17:35:34
-@@ -235,6 +235,9 @@ public:
-   // recorded, and implementations are free to ignore previous calls.
-   virtual void SetStatus(StatusCode code, nostd::string_view description = "") noexcept = 0;
-
-+  // Gets the status of the span.
-+  virtual StatusCode GetStatus() noexcept = 0;
-+
-   // Updates the name of the Span. If used, this will override the name provided
-   // during creation.
-   virtual void UpdateName(nostd::string_view name) noexcept = 0;
---- cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h	2025-06-20 19:27:56
-+++ cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h.new	2025-07-20 19:27:56
-@@ -104,6 +104,15 @@ public:
-     }
-   }
-
-+  opentelemetry::trace::StatusCode GetStatus() noexcept override
-+  {
-+    for (auto &recordable : recordables_)
-+    {
-+      return recordable.second->GetStatus();
-+    }
-+    return opentelemetry::trace::StatusCode::kUnset;
-+  }
-+
-   void SetName(nostd::string_view name) noexcept override
-   {
-     for (auto &recordable : recordables_)
-
---- cpp/sdk/include/opentelemetry/sdk/trace/recordable.h	2025-06-20 19:27:56
-+++ cpp/sdk/include/opentelemetry/sdk/trace/recordable.h.new	2025-07-20 19:27:56
-@@ -129,6 +129,11 @@ public:
-   virtual void SetStatus(opentelemetry::trace::StatusCode code,
-                          nostd::string_view description) noexcept = 0;
-
-+  /**
-+   * Get the status of the span.
-+   */
-+  virtual opentelemetry::trace::StatusCode GetStatus() noexcept = 0;
-+
-   /**
-    * Set the name of the span.
-    * @param name the name to set
---- cpp/sdk/src/trace/span.cc	2025-06-20 19:27:56
-+++ cpp/sdk/src/trace/span.cc.new	2025-07-20 19:27:56
-@@ -190,6 +190,16 @@ void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view d
-   recordable_->SetStatus(code, description);
- }
-
-+opentelemetry::trace::StatusCode Span::GetStatus() noexcept
-+{
-+  std::lock_guard<std::mutex> lock_guard{mu_};
-+  if (recordable_ == nullptr)
-+  {
-+    return opentelemetry::trace::StatusCode::kUnset;
-+  }
-+  return recordable_->GetStatus();
-+}
-+
- void Span::UpdateName(nostd::string_view name) noexcept
- {
-   std::lock_guard<std::mutex> lock_guard{mu_};
---- cpp/api/include/opentelemetry/trace/default_span.h	2025-06-20 19:27:56
-+++ cpp/api/include/opentelemetry/trace/default_span.h.new	2025-07-20 19:27:56
-@@ -57,6 +57,8 @@ public:
-
-   void SetStatus(StatusCode /* status */, nostd::string_view /* description */) noexcept override {}
-
-+  StatusCode GetStatus() noexcept override { return StatusCode::kUnset; }
-+
-   void UpdateName(nostd::string_view /* name */) noexcept override {}
-
-   void End(const EndSpanOptions & /* options */) noexcept override {}
---- cpp/api/include/opentelemetry/trace/noop.h	2025-06-20 19:27:56
-+++ cpp/api/include/opentelemetry/trace/noop.h.new	2025-07-20 19:27:56
-@@ -75,6 +75,8 @@ public:
-
-   void SetStatus(StatusCode /*code*/, nostd::string_view /*description*/) noexcept override {}
-
-+  StatusCode GetStatus() noexcept override { return StatusCode::kUnset; }
-+
-   void UpdateName(nostd::string_view /*name*/) noexcept override {}
-
-   void End(const EndSpanOptions & /*options*/) noexcept override {}
---- cpp/sdk/src/trace/span.h
-+++ cpp/sdk/src/trace/span.h.new
-@@ -63,6 +63,8 @@ public:
-   void SetStatus(opentelemetry::trace::StatusCode code,
-                  nostd::string_view description) noexcept override;
-
-+  opentelemetry::trace::StatusCode GetStatus() noexcept override;
-+
-   void UpdateName(nostd::string_view name) noexcept override;
-
-   void End(const opentelemetry::trace::EndSpanOptions &options = {}) noexcept override;
---- cpp/sdk/include/opentelemetry/sdk/trace/span_data.h
-+++ cpp/sdk/include/opentelemetry/sdk/trace/span_data.h.new
-@@ -278,6 +278,11 @@ public:
-     status_desc_ = std::string(description);
-   }
-
-+  opentelemetry::trace::StatusCode GetStatus() noexcept override
-+  {
-+    return status_code_;
-+  }
-+
-   void SetName(nostd::string_view name) noexcept override
-   {
-     name_ = std::string(name.data(), name.length());
---- cpp/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_recordable.h
-+++ cpp/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_recordable.h.new
-@@ -65,6 +65,8 @@ public:
-   void SetStatus(opentelemetry::trace::StatusCode code,
-                  nostd::string_view description) noexcept override;
-
-+  opentelemetry::trace::StatusCode GetStatus() noexcept override;
-+
-   void SetName(nostd::string_view name) noexcept override;
-
-   void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override;
---- cpp/exporters/otlp/src/otlp_recordable.cc
-+++ cpp/exporters/otlp/src/otlp_recordable.cc.new
-@@ -162,6 +162,10 @@ void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view descri
-   }
- }
-
-+opentelemetry::trace::StatusCode OtlpRecordable::GetStatus() noexcept {
-+  return (opentelemetry::trace::StatusCode) span_.mutable_status()->code();
-+}
-+
- void OtlpRecordable::SetName(nostd::string_view name) noexcept
- {
-   span_.set_name(name.data(), name.size());
---- cpp/api/include/opentelemetry/context/runtime_context.h
-+++ cpp/api/include/opentelemetry/context/runtime_context.h.new
-@@ -5,6 +5,7 @@
-
- #include <stddef.h>
- #include <algorithm>
-+#include <limits>
-
- #include "opentelemetry/common/macros.h"
- #include "opentelemetry/context/context.h"
-@@ -301,6 +302,10 @@ private:
-       {
-         new_capacity = 2;
-       }
-+      if (new_capacity >= std::numeric_limits<ssize_t>::max() / sizeof(Context))
-+      {
-+        new_capacity = std::numeric_limits<ssize_t>::max() / sizeof(Context);
-+      }
-       Context *temp = new Context[new_capacity];
-       if (base_ != nullptr)
-       {
---- cpp/sdk/include/opentelemetry/sdk/common/circular_buffer.h
-+++ cpp/sdk/include/opentelemetry/sdk/common/circular_buffer.h.new
-@@ -9,6 +9,7 @@
- #include <cstdint>
- #include <functional>
- #include <memory>
-+#include <limits>
- 
- #include "opentelemetry/nostd/span.h"
- #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
-@@ -29,7 +30,7 @@ class CircularBuffer
- {
- public:
-   explicit CircularBuffer(size_t max_size)
--      : data_{new AtomicUniquePtr<T>[max_size + 1]}, capacity_{max_size + 1}
-+    : data_{new AtomicUniquePtr<T>[sanitize_size(max_size + 1)]}, capacity_{sanitize_size(max_size + 1)}
-   {}
- 
-   /**
-@@ -173,6 +174,14 @@ class CircularBuffer
-   std::atomic<uint64_t> head_{0};
-   std::atomic<uint64_t> tail_{0};
- 
-+  size_t sanitize_size(size_t s) {
-+    if (s >= std::numeric_limits<ssize_t>::max() / sizeof(AtomicUniquePtr<T>))
-+    {
-+      s = std::numeric_limits<ssize_t>::max() / sizeof(AtomicUniquePtr<T>);
-+    }
-+    return s;
-+  }
-+
-   CircularBufferRange<AtomicUniquePtr<T>> PeekImpl() noexcept
-   {
-     uint64_t tail_index = tail_ % capacity_;
---- cpp/cmake/opentelemetry-proto.cmake
-+++ cpp/cmake/opentelemetry-proto.cmake.new
-@@ -192,11 +192,11 @@ set(PROTOBUF_COMMON_FLAGS "--proto_path=${PROTO_PATH}"
-                           "--cpp_out=${GENERATED_PROTOBUF_PATH}")
  # --experimental_allow_proto3_optional is available from 3.13 and be stable and
  # enabled by default from 3.16
 -if(Protobuf_VERSION AND Protobuf_VERSION VERSION_LESS "3.16")
@@ -361,9 +108,227 @@
  
  # protobuf uses numerous global variables, which can lead to conflicts when a
  # user's dynamic libraries, executables, and otel-cpp are all built as dynamic
---- cpp/third_party/opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
-+++ cpp/third_party/opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto.new
-@@ -453,7 +453,7 @@ message HistogramDataPoint {
+@@ -225,7 +240,9 @@
+     ${METRICS_SERVICE_PB_H_FILE}
+     ${METRICS_SERVICE_PB_CPP_FILE}
+     ${PROFILES_SERVICE_PB_H_FILE}
+-    ${PROFILES_SERVICE_PB_CPP_FILE})
++    ${PROFILES_SERVICE_PB_CPP_FILE}
++    ${COMMON_SERVICE_PB_H_FILE}
++    ${COMMON_SERVICE_PB_CPP_FILE})
+ 
+ set(PROTOBUF_GENERATE_DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
+ 
+@@ -262,7 +279,8 @@
+   ${TRACE_SERVICE_PROTO}
+   ${LOGS_SERVICE_PROTO}
+   ${METRICS_SERVICE_PROTO}
+-  ${PROFILES_SERVICE_PROTO})
++  ${PROFILES_SERVICE_PROTO}
++  ${COMMON_SERVICE_PROTO})
+   set(PROTOBUF_RUN_PROTOC_COMMAND
+       "${PROTOBUF_RUN_PROTOC_COMMAND} \"${PROTOBUF_RUN_PROTOC_ARG}\"")
+ endforeach()
+@@ -274,6 +292,7 @@
+     ${PROTOBUF_INCLUDE_FLAGS} ${COMMON_PROTO} ${RESOURCE_PROTO} ${TRACE_PROTO}
+     ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
+     ${METRICS_SERVICE_PROTO} ${PROFILES_PROTO} ${PROFILES_SERVICE_PROTO}
++    ${COMMON_SERVICE_PROTO}
+   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}"
+   DEPENDS ${PROTOBUF_GENERATE_DEPENDS})
+ 
+@@ -298,7 +317,8 @@
+   ${METRICS_PB_CPP_FILE}
+   ${TRACE_SERVICE_PB_CPP_FILE}
+   ${LOGS_SERVICE_PB_CPP_FILE}
+-  ${METRICS_SERVICE_PB_CPP_FILE})
++  ${METRICS_SERVICE_PB_CPP_FILE}
++  ${COMMON_SERVICE_PB_CPP_FILE})
+ set_target_version(opentelemetry_proto)
+ 
+ if(OTELCPP_PROTO_LIB_TYPE STREQUAL "SHARED_LIBRARY")
+--- cpp/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_recordable.h	2026-10-26 15:20:48
++++ cpp/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_recordable.h	2026-10-26 15:20:49
+@@ -89,6 +89,8 @@
+   void SetStatus(opentelemetry::trace::StatusCode code,
+                  nostd::string_view description) noexcept override;
+ 
++  opentelemetry::trace::StatusCode GetStatus() noexcept override;
++
+   void SetName(nostd::string_view name) noexcept override;
+ 
+   void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override;
+--- cpp/exporters/otlp/src/otlp_file_client.cc	2026-10-26 15:20:48
++++ cpp/exporters/otlp/src/otlp_file_client.cc	2026-10-26 15:21:39
+@@ -85,8 +85,8 @@
+       snprintf_s(buffer, static_cast<rsize_t>(bufsz), fmt, ##args)
+ #  endif
+ #else
+-#  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, args...) \
+-    std::snprintf(buffer, static_cast<size_t>(bufsz), fmt, ##args)
++#  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, ...) \
++    std::snprintf(buffer, static_cast<size_t>(bufsz), fmt, __VA_ARGS__)
+ #endif
+ 
+ #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
+--- cpp/exporters/otlp/src/otlp_recordable.cc	2026-10-26 15:20:48
++++ cpp/exporters/otlp/src/otlp_recordable.cc	2026-10-26 15:20:49
+@@ -219,6 +219,10 @@
+   }
+ }
+ 
++opentelemetry::trace::StatusCode OtlpRecordable::GetStatus() noexcept {
++  return (opentelemetry::trace::StatusCode) span_.mutable_status()->code();
++}
++
+ void OtlpRecordable::SetName(nostd::string_view name) noexcept
+ {
+   span_.set_name(name.data(), name.size());
+--- cpp/sdk/include/opentelemetry/sdk/common/circular_buffer.h	2026-10-26 15:20:49
++++ cpp/sdk/include/opentelemetry/sdk/common/circular_buffer.h	2026-10-26 15:21:39
+@@ -8,6 +8,7 @@
+ #include <cstddef>
+ #include <cstdint>
+ #include <functional>
++#include <limits>
+ #include <memory>
+ #include <utility>
+ 
+@@ -30,7 +31,7 @@
+ {
+ public:
+   explicit CircularBuffer(size_t max_size)
+-      : data_{new AtomicUniquePtr<T>[max_size + 1]}, capacity_{max_size + 1}
++    : data_{new AtomicUniquePtr<T>[sanitize_size(max_size + 1)]}, capacity_{sanitize_size(max_size + 1)}
+   {}
+ 
+   /**
+@@ -168,6 +169,14 @@
+   size_t capacity_;
+   std::atomic<uint64_t> head_{0};
+   std::atomic<uint64_t> tail_{0};
++
++  size_t sanitize_size(size_t s) {
++    if (s >= std::numeric_limits<ssize_t>::max() / sizeof(AtomicUniquePtr<T>))
++    {
++      s = std::numeric_limits<ssize_t>::max() / sizeof(AtomicUniquePtr<T>);
++    }
++    return s;
++  }
+ 
+   CircularBufferRange<AtomicUniquePtr<T>> PeekImpl() const noexcept
+   {
+--- cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h	2026-10-26 15:20:49
++++ cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h	2026-10-26 15:21:39
+@@ -46,6 +46,8 @@
+   void SetStatus(opentelemetry::trace::StatusCode code,
+                  nostd::string_view description) noexcept override;
+ 
++  opentelemetry::trace::StatusCode GetStatus() noexcept override;
++
+   void SetName(nostd::string_view name) noexcept override;
+ 
+   void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override;
+--- cpp/sdk/include/opentelemetry/sdk/trace/recordable.h	2026-10-26 15:20:49
++++ cpp/sdk/include/opentelemetry/sdk/trace/recordable.h	2026-10-26 15:20:49
+@@ -138,6 +138,11 @@
+                          nostd::string_view description) noexcept = 0;
+ 
+   /**
++   * Get the status of the span.
++   */
++  virtual opentelemetry::trace::StatusCode GetStatus() noexcept = 0;
++
++  /**
+    * Set the name of the span.
+    * @param name the name to set
+    */
+--- cpp/sdk/include/opentelemetry/sdk/trace/span_data.h	2026-10-26 15:20:49
++++ cpp/sdk/include/opentelemetry/sdk/trace/span_data.h	2026-10-26 15:21:39
+@@ -246,6 +246,8 @@
+   void SetStatus(opentelemetry::trace::StatusCode code,
+                  nostd::string_view description) noexcept override;
+ 
++  opentelemetry::trace::StatusCode GetStatus() noexcept override;
++
+   void SetName(nostd::string_view name) noexcept override;
+ 
+   void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override;
+--- cpp/sdk/src/trace/multi_recordable.cc	2026-10-26 15:20:49
++++ cpp/sdk/src/trace/multi_recordable.cc	2026-10-26 15:21:39
+@@ -114,6 +114,15 @@
+   }
+ }
+ 
++opentelemetry::trace::StatusCode MultiRecordable::GetStatus() noexcept
++{
++  for (auto &recordable : recordables_)
++  {
++    return recordable.second->GetStatus();
++  }
++  return opentelemetry::trace::StatusCode::kUnset;
++}
++
+ void MultiRecordable::SetName(nostd::string_view name) noexcept
+ {
+   for (auto &recordable : recordables_)
+--- cpp/sdk/src/trace/span.cc	2026-10-26 15:20:49
++++ cpp/sdk/src/trace/span.cc	2026-10-26 15:20:49
+@@ -213,6 +213,16 @@
+   recordable_->SetStatus(transition.code, transition.description);
+ }
+ 
++opentelemetry::trace::StatusCode Span::GetStatus() noexcept
++{
++  std::lock_guard<std::mutex> lock_guard{mu_};
++  if (recordable_ == nullptr)
++  {
++    return opentelemetry::trace::StatusCode::kUnset;
++  }
++  return recordable_->GetStatus();
++}
++
+ void Span::UpdateName(nostd::string_view name) noexcept
+ {
+   std::lock_guard<std::mutex> lock_guard{mu_};
+--- cpp/sdk/src/trace/span.h	2026-10-26 15:20:49
++++ cpp/sdk/src/trace/span.h	2026-10-26 15:20:49
+@@ -70,6 +70,8 @@
+   void SetStatus(opentelemetry::trace::StatusCode code,
+                  nostd::string_view description) noexcept override;
+ 
++  opentelemetry::trace::StatusCode GetStatus() noexcept override;
++
+   void UpdateName(nostd::string_view name) noexcept override;
+ 
+   void End(const opentelemetry::trace::EndSpanOptions &options = {}) noexcept override;
+--- cpp/sdk/src/trace/span_data.cc	2026-10-26 15:20:49
++++ cpp/sdk/src/trace/span_data.cc	2026-10-26 15:21:39
+@@ -211,6 +211,11 @@
+   status_desc_ = std::string(description);
+ }
+ 
++opentelemetry::trace::StatusCode SpanData::GetStatus() noexcept
++{
++  return status_code_;
++}
++
+ void SpanData::SetName(nostd::string_view name) noexcept
+ {
+   name_ = std::string(name.data(), name.length());
+--- cpp/third_party/opentelemetry-proto/Makefile	2026-10-26 15:20:49
++++ cpp/third_party/opentelemetry-proto/Makefile	2026-10-26 15:20:49
+@@ -60,6 +60,7 @@
+ 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/metrics/v1/metrics_service.proto
+ 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/logs/v1/logs_service.proto
+ 	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/profiles/v1development/profiles_service.proto
++	$(PROTOC) --cpp_out=./$(PROTO_GEN_CPP_DIR) --grpc-cpp_out=./$(PROTO_GEN_CPP_DIR) opentelemetry/proto/collector/common/v1/status.proto
+ 
+ # Generate gRPC/Protobuf implementation for C#.
+ .PHONY: gen-csharp
+--- cpp/third_party/opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto	2026-10-26 15:20:49
++++ cpp/third_party/opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto	2026-10-26 15:21:39
+@@ -467,7 +467,7 @@
    // Negative events *can* be recorded, but sum should not be filled out when
    // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
    // see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
@@ -372,7 +337,7 @@
  
    // bucket_counts is an optional field contains the count values of histogram
    // for each bucket.
-@@ -493,10 +493,10 @@ message HistogramDataPoint {
+@@ -507,10 +507,10 @@
    uint32 flags = 10;
  
    // min is the minimum value over (start_time, end_time].
@@ -385,7 +350,7 @@
  }
  
  // ExponentialHistogramDataPoint is a single data point in a timeseries that describes the
-@@ -537,7 +537,7 @@ message ExponentialHistogramDataPoint {
+@@ -552,7 +552,7 @@
    // Negative events *can* be recorded, but sum should not be filled out when
    // doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
    // see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
@@ -394,36 +359,16 @@
  
    // scale describes the resolution of the histogram.  Boundaries are
    // located at powers of the base, where:
-@@ -601,10 +601,10 @@ message ExponentialHistogramDataPoint {
+@@ -616,10 +616,10 @@
    repeated Exemplar exemplars = 11;
  
-   // min is the minimum value over (start_time, end_time].
+   // The minimum value over (start_time, end_time].
 -  optional double min = 12;
 +  double min = 12;
  
-   // max is the maximum value over (start_time, end_time].
+   // The maximum value over (start_time, end_time].
 -  optional double max = 13;
 +  double max = 13;
  
    // ZeroThreshold may be optionally set to convey the width of the zero
    // region. Where the zero region is defined as the closed interval
---- cpp/third_party/opentelemetry-proto/opentelemetry/proto/profiles/v1development/profiles.proto
-+++ cpp/third_party/opentelemetry-proto/opentelemetry/proto/profiles/v1development/profiles.proto.new
-@@ -402,7 +402,7 @@ message Sample {
-   repeated int32 attribute_indices = 4;
- 
-   // Reference to link in ProfilesDictionary.link_table. [optional]
--  optional int32 link_index = 5;
-+  int32 link_index = 5;
- 
-   // Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
-   // to fall within the Profile's time range. [optional]
-@@ -436,7 +436,7 @@ message Location {
-   // Reference to mapping in ProfilesDictionary.mapping_table.
-   // It can be unset if the mapping is unknown or not applicable for
-   // this profile type.
--  optional int32 mapping_index = 1;
-+  int32 mapping_index = 1;
-   // The instruction address for this location, if available.  It
-   // should be within [Mapping.memory_start...Mapping.memory_limit]
-   // for the corresponding mapping. A non-leaf address may be in the

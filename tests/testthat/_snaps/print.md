@@ -73,7 +73,7 @@
       trace_id              : <trace-id>
       span_id               : <span-id>
       name                  : s
-      flags                 : +sampled -random
+      flags                 : +sampled +random
       parent                : 0000000000000000
       description           : 
       resource_attributes   : 
