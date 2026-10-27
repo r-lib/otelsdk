@@ -2,6 +2,10 @@
 
 ## otelsdk (development version)
 
+- Length one attribute values that are R arrays, e.g. created with
+  [`as.array()`](https://rdrr.io/r/base/array.html), are now recorded as
+  arrays, instead of scalars (r-lib/otel#48).
+
 - Spans ended automatically, without an error, now keep the `unset`
   status, instead of being set to `ok` (r-lib/otel#30).
 
