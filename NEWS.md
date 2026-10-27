@@ -1,5 +1,10 @@
 # otelsdk (development version)
 
+* Setting the metric export interval or timeout, via the
+  `OTEL_METRIC_EXPORT_INTERVAL` or `OTEL_METRIC_EXPORT_TIMEOUT`
+  environment variables, or the `export_interval` or `export_timeout`
+  options, does not fail any more (#79).
+
 * The `create_histogram()` method of meters now has a `boundaries`
   argument, to set explicit bucket boundaries for the histogram
   (r-lib/otel#49).

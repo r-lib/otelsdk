@@ -1124,7 +1124,7 @@ as_metric_reader_options <- function(
       call = call
     ) %||%
     as_difftime_env(metric_export_interval_envvar, call = call) %||%
-    60000L
+    60000
   export_timeout <-
     as_difftime_spec(
       opts$export_timeout,
@@ -1132,7 +1132,7 @@ as_metric_reader_options <- function(
       call = call
     ) %||%
     as_difftime_env(metric_export_timeout_envvar, call = call) %||%
-    30000L
+    30000
 
   list(
     export_interval = export_interval,

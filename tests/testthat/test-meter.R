@@ -149,3 +149,36 @@ test_that("meter_new when metrics are disabled", {
   mtr <- meter_new("name")
   expect_s3_class(mtr, "otel_meter_noop")
 })
+
+test_that("custom export interval and timeout (#79)", {
+  tmp <- tempfile(fileext = ".jsonl")
+  on.exit(unlink(c(tmp, paste0(tmp, "-a"))), add = TRUE)
+  check <- function(opts, interval = NA_character_, timeout = NA_character_) {
+    withr::local_envvar(
+      OTEL_METRIC_EXPORT_INTERVAL = interval,
+      OTEL_METRIC_EXPORT_TIMEOUT = timeout
+    )
+    mps <- list(
+      meter_provider_stdstream_new(c(opts, list(output = tmp))),
+      meter_provider_memory_new(opts),
+      meter_provider_file_new(c(
+        opts,
+        list(file_pattern = tmp, alias_pattern = paste0(tmp, "-a"))
+      )),
+      meter_provider_http_new(c(opts, list(url = "http://127.0.0.1:1")))
+    )
+    for (mp in mps) {
+      expect_true(inherits(mp, "otel_meter_provider"))
+      mp$shutdown()
+    }
+  }
+  check(list(export_interval = 5000L, export_timeout = 1000L))
+  check(list(export_interval = 5000, export_timeout = 1000))
+  check(list(export_interval = "5s", export_timeout = "1s"))
+  check(list(
+    export_interval = as.difftime(5, units = "secs"),
+    export_timeout = as.difftime(1, units = "secs")
+  ))
+  check(NULL, interval = "5000", timeout = "1000")
+  check(NULL, interval = "5s", timeout = "1s")
+})

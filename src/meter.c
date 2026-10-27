@@ -44,9 +44,9 @@ SEXP otel_create_meter_provider_stdstream(SEXP options, SEXP attributes) {
   r2c_attributes(attributes, &attributes_);
   const char *cstream = CHAR(STRING_ELT(stream, 0));
   int cexport_interval =
-    INTEGER(rf_get_list_element(options, "export_interval"))[0];
+    Rf_asReal(rf_get_list_element(options, "export_interval"));
   int cexport_timeout =
-    INTEGER(rf_get_list_element(options, "export_timeout"))[0];
+    Rf_asReal(rf_get_list_element(options, "export_timeout"));
   void *meter_provider_ = otel_create_meter_provider_stdstream_(
     cstream, cexport_interval, cexport_timeout);
   SEXP xptr = R_MakeExternalPtr(meter_provider_, R_NilValue, R_NilValue);
@@ -62,9 +62,9 @@ SEXP otel_create_meter_provider_http(SEXP options, SEXP attributes) {
   r2c_otel_http_exporter_options(options, &options_);
   r2c_attributes(attributes, &attributes_);
   int cexport_interval =
-    INTEGER(rf_get_list_element(options, "export_interval"))[0];
+    Rf_asReal(rf_get_list_element(options, "export_interval"));
   int cexport_timeout =
-    INTEGER(rf_get_list_element(options, "export_timeout"))[0];
+    Rf_asReal(rf_get_list_element(options, "export_timeout"));
   int aggregation_temporality =
     INTEGER(rf_get_list_element(options, "aggregation_temporality"))[0];
   void *meter_provider_ = otel_create_meter_provider_http_(
@@ -80,8 +80,8 @@ SEXP otel_create_meter_provider_http(SEXP options, SEXP attributes) {
 
 SEXP otel_create_meter_provider_file(
     SEXP export_interval, SEXP export_timeout, SEXP options) {
-  int cexport_interval = INTEGER(export_interval)[0];
-  int cexport_timeout = INTEGER(export_timeout)[0];
+  int cexport_interval = Rf_asReal(export_interval);
+  int cexport_timeout = Rf_asReal(export_timeout);
   struct otel_file_exporter_options options_ = { 0 };
   r2c_otel_file_exporter_options(options, &options_);
   void *meter_provider_ = otel_create_meter_provider_file_(
@@ -109,8 +109,8 @@ SEXP otel_create_meter_provider_memory(SEXP options, SEXP attributes) {
   SEXP buffer_size = rf_get_list_element(options, "buffer_size");
   SEXP aggregation_temporality = rf_get_list_element(
     options, "aggregation_temporality");
-  int cexport_interval = INTEGER(export_interval)[0];
-  int cexport_timeout = INTEGER(export_timeout)[0];
+  int cexport_interval = Rf_asReal(export_interval);
+  int cexport_timeout = Rf_asReal(export_timeout);
   int cbuffer_size = INTEGER(buffer_size)[0];
   int ctemporality = INTEGER(aggregation_temporality)[0];
   void *meter_provider_ = otel_create_meter_provider_memory_(
