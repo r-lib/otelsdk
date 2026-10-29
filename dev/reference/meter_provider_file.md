@@ -67,6 +67,11 @@ From R:
 
   - the default is: `metrics-latest.jsonl`.
 
+  If `file_pattern` is set, but `alias_pattern` is not, then the default
+  alias is created from `file_pattern`: the last group of placeholders
+  in the file name is replaced by `latest`, and all other placeholders
+  are removed, e.g. `trace-%F-%T-%N.jsonl` becomes `trace-latest.jsonl`.
+
   May contain placeholders, see below.
 
 - `flush_interval`: Interval to force flush output. A time interval

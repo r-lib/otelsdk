@@ -103,7 +103,12 @@ Value is set from:</p><ul><li><p><code>opts</code> argument, or</p></li>
 <li><p><code>OTEL_EXPORTER_OTLP_METRICS_FILE_ALIAS</code> environment variable, or</p></li>
 <li><p><code>OTEL_EXPORTER_OTLP_FILE_ALIAS environment variable</code>, or</p></li>
 <li><p>the default is: <code>metrics-latest.jsonl</code>.</p></li>
-</ul><p>May contain placeholders, see below.</p></li>
+</ul><p>If <code>file_pattern</code> is set, but <code>alias_pattern</code> is not, then the
+default alias is created from <code>file_pattern</code>: the last group of
+placeholders in the file name is replaced by <code>latest</code>, and all
+other placeholders are removed, e.g. <code>trace-%F-%T-%N.jsonl</code> becomes
+<code>trace-latest.jsonl</code>.</p>
+<p>May contain placeholders, see below.</p></li>
 <li><p><code>flush_interval</code>: Interval to force flush output. A time interval
 specification, see <a href="timeintervaloptions.html">Time Interval Options</a>. Value is set from</p><ul><li><p><code>opts</code> argument, or</p></li>
 <li><p><code>OTEL_EXPORTER_OTLP_METRICS_FILE_FLUSH_INTERVAL</code> environment variable, or</p></li>
