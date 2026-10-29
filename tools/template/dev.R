@@ -1,7 +1,7 @@
 output_file <- Sys.getenv("OTEL_DEV_API_OUTPUT_FILE", "R/span-dev.R")
 
 r_files <- dir("R")
-all_lines <- character()
+all_lines <- "# fmt: skip file"
 for (r_file in r_files) {
   lns <- readLines(file.path("R", r_file), warn = FALSE)
   if (!any(grepl("^# safe start", lns))) {

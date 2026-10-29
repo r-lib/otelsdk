@@ -1,3 +1,5 @@
+# fmt: skip file
+
 # safe start
 span_base_new <- function(
   tracer,

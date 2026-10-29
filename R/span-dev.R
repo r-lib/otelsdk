@@ -1,3 +1,4 @@
+# fmt: skip file
 
 span_base_new_dev <- function(
   tracer,
