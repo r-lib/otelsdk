@@ -616,6 +616,7 @@ void otel_span_set_status_(
 );
 int otel_span_is_status_set_(void *span_);
 void otel_span_update_name_(void *span_, const char *name_);
+const char *otel_span_get_name_(void *span_);
 void otel_span_end_(void *span, double *end_steady_time);
 
 void *otel_scope_start_(void *span);
@@ -702,7 +703,8 @@ void otel_up_down_counter_add_(
   otel_attributes *attributes_);
 
 void *otel_create_histogram_(
-  void *meter_, const char *name, const char *description, const char *unit);
+  void *meter_, const char *name, const char *description, const char *unit,
+  const double *boundaries, size_t num_boundaries);
 void otel_histogram_record_(
   void *histogram_, double cvalue, struct otel_attributes *attributes_);
 

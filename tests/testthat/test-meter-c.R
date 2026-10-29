@@ -85,8 +85,8 @@ test_that("otel_up_down_counter_add error", {
 test_that("otel_create_histogram error", {
   x <- ccall(create_empty_xptr)
   expect_snapshot(error = TRUE, {
-    ccall(otel_create_histogram, 1L, NULL, NULL, NULL)
-    ccall(otel_create_histogram, x, NULL, NULL, NULL)
+    ccall(otel_create_histogram, 1L, NULL, NULL, NULL, NULL)
+    ccall(otel_create_histogram, x, NULL, NULL, NULL, NULL)
   })
 })
 
@@ -112,4 +112,15 @@ test_that("otel_gauge_record error", {
     ccall(otel_gauge_record, 1L, NULL, NULL, NULL)
     ccall(otel_gauge_record, x, NULL, NULL, NULL)
   })
+})
+
+test_that("export interval and timeout can be integer or double (#79)", {
+  opts <- as_meter_provider_memory_options(NULL)
+  for (conv in list(as.integer, as.double)) {
+    opts$export_interval <- conv(5000)
+    opts$export_timeout <- conv(1000)
+    mp <- ccall(otel_create_meter_provider_memory, opts, NULL)
+    expect_true(inherits(mp, "externalptr"))
+    ccall(otel_meter_provider_shutdown, mp, NULL)
+  }
 })

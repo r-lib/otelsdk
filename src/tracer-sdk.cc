@@ -121,10 +121,7 @@ void *otel_create_tracer_provider_file_(
   struct otel_tracer_provider *tps = new otel_tracer_provider();
 
   otlp::OtlpFileExporterOptions opts;
-  otlp::OtlpFileClientFileSystemOptions backend_opts =
-    nostd::get<otlp::OtlpFileClientFileSystemOptions>(opts.backend_options);
-  c2cc_file_exporter_options(*options, backend_opts);
-  opts.backend_options = backend_opts;
+  c2cc_file_exporter_backend(*options, opts.backend_options);
   auto exporter = otlp::OtlpFileExporterFactory::Create(opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(
     std::move(exporter));

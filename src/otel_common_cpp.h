@@ -2,6 +2,9 @@
 #define OTEL_COMMON_CPP_H
 
 #include <fstream>
+#include <set>
+#include <string>
+#include <vector>
 
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
@@ -33,7 +36,6 @@ struct otel_tracer_provider {
   std::unique_ptr<trace_sdk::TracerProvider> ptr;
   std::fstream stream;
   std::shared_ptr<memory::InMemorySpanData> spandata;
-  bool shutdown_called;
 };
 
 struct otel_tracer {
@@ -43,7 +45,6 @@ struct otel_tracer {
 struct otel_logger_provider {
   std::unique_ptr<logs_sdk::LoggerProvider> ptr;
   std::fstream stream;
-  bool shutdown_called;
 };
 
 struct otel_logger {
@@ -55,11 +56,17 @@ struct otel_meter_provider {
   std::unique_ptr<metrics_sdk::MeterProvider> ptr;
   std::fstream stream;
   std::shared_ptr<memory::CircularBufferInMemoryMetricData> metricdata;
-  bool shutdown_called;
+  // histograms that have a view with explicit bucket boundaries already
+  std::set<std::vector<std::string>> histogram_views;
 };
 
 struct otel_meter {
   nostd::shared_ptr<metrics_api::Meter> ptr;
+  // the meter provider is kept alive by the R meter object
+  struct otel_meter_provider *provider;
+  std::string name;
+  std::string version;
+  std::string schema_url;
 };
 
 struct otel_counter {
@@ -173,6 +180,14 @@ void c2cc_file_exporter_options(
 void cc2c_file_exporter_options(
     const otlp::OtlpFileClientFileSystemOptions &backend_opts,
     struct otel_file_exporter_options &options);
+void c2cc_file_exporter_backend(
+  const struct otel_file_exporter_options &options,
+  otlp::OtlpFileClientBackendOptions &backend);
+
+// These are in stdstream.cc, which is linked from a static library,
+// so R CMD check does not complain about std::cout and std::cerr.
+std::ostream &otel_cout();
+std::ostream &otel_cerr();
 
 template<typename T>
 void c2cc_otel_http_exporter_options(

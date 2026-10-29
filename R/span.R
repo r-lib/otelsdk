@@ -45,6 +45,16 @@ span_base_new <- function(
       invisible(self)
     },
 
+    set_attributes = function(attributes = NULL) {
+      tryCatch({                                                     # safe
+        attributes <- as_otel_attributes(attributes)
+        ccall(otel_span_set_attributes, self$xptr, attributes)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
+      invisible(self)
+    },
+
     add_event = function(name, attributes = NULL, timestamp = NULL) {
       tryCatch({                                                     # safe
         name <- as_string(name, null = FALSE)
@@ -83,7 +93,6 @@ span_base_new <- function(
       tryCatch({                                                     # safe
         name <- as_string(name, null = FALSE)
         ccall(otel_span_update_name, self$xptr, name)
-        self$name <- name
       }, error = function(err) {                                     # safe
         errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
       })                                                             # safe
@@ -135,7 +144,8 @@ span_base_new <- function(
               )
               status_code <- 2L
             } else {
-              status_code <- 1L
+              # no error, leave the status unset, see r-lib/otel#30
+              status_code <- NULL
             }
           }
         }
@@ -189,13 +199,23 @@ span_base_new <- function(
         errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
       })                                                             # safe
       invisible(NULL)
-    },
-
-    name = NULL
+    }
   )
 
   self$tracer <- tracer
   self$xptr <- xptr
+  # The name is kept in C, so all span objects that point to the same
+  # span, e.g. the one from get_active_span(), see the same name.
+  makeActiveBinding(
+    "name",
+    function(value) {
+      if (!missing(value)) {
+        stop("Use `update_name()` to change the name of a span.")
+      }
+      ccall(otel_span_get_name, self$xptr)
+    },
+    self
+  )
 
   self
 }
@@ -228,7 +248,6 @@ span_new <- function(
   )
 
   self <- span_base_new(tracer, xptr)
-  self$name <- name
 
   if (!is.null(scope)) {
     defer(self$end(status_code = "auto"), envir = scope)

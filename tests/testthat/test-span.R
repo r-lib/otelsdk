@@ -24,8 +24,8 @@ test_that("close span automatically", {
   # they are not stacked
   expect_equal(spns[[1]]$parent, "0000000000000000")
   expect_equal(spns[[2]]$parent, "0000000000000000")
-  expect_equal(spns[[1]]$status, "ok")
-  expect_equal(spns[[2]]$status, "ok")
+  expect_equal(spns[[1]]$status, "unset")
+  expect_equal(spns[[2]]$status, "unset")
 })
 
 test_that("close span automatically, on error", {
@@ -75,6 +75,30 @@ test_that("set_attribute", {
   )
 })
 
+test_that("set_attributes", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_local_active_span()
+    spn2 <- trc$start_local_active_span("my")
+    spn2$set_attributes(list(key = letters[1:3], key2 = 1:2))
+    spn1$set_attributes(list(key = "gone"))
+    spn2$end()
+    spn1$set_attributes(list(key = "updated", key3 = TRUE))
+    spn1$set_attributes(list())
+    spn1$set_attributes(NULL)
+    spn1$end()
+  })[["traces"]]
+
+  expect_equal(
+    sort_named_list(spns[[1]]$attributes),
+    list(key = letters[1:3], key2 = as.double(1:2))
+  )
+  expect_equal(
+    sort_named_list(spns[[2]]$attributes),
+    list(key = "updated", key3 = TRUE)
+  )
+})
+
 test_that("add_event", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
@@ -99,7 +123,7 @@ test_that("add_event", {
   )
 })
 
-test_that("set_status, unset means it is set automatically", {
+test_that("set_status, unset stays unset if there is no error", {
   spns <- with_otel_record({
     trc <- otel::get_tracer("mytracer")
     do <- function() {
@@ -110,8 +134,92 @@ test_that("set_status, unset means it is set automatically", {
   })[["traces"]]
 
   expect_equal(spns[[1]]$parent, "0000000000000000")
+  expect_equal(spns[[1]]$status, "unset")
+})
+
+test_that("set_status, explicit ok is kept", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    do <- function() {
+      spn1 <- trc$start_local_active_span()
+      spn1$set_status("ok")
+    }
+    do()
+  })[["traces"]]
+
   expect_equal(spns[[1]]$status, "ok")
-  expect_equal(spns[[1]]$description, "")
+})
+
+test_that("set_status, explicit error is kept", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    do <- function() {
+      spn1 <- trc$start_local_active_span()
+      spn1$set_status("error", description = "failed")
+    }
+    do()
+  })[["traces"]]
+
+  expect_equal(spns[[1]]$status, "error")
+  expect_equal(spns[[1]]$description, "failed")
+  expect_equal(length(spns[[1]]$events), 0)
+})
+
+test_that("set_status, explicit ok is kept on error", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    do <- function() {
+      spn1 <- trc$start_local_active_span()
+      spn1$set_status("ok")
+      stop("oops")
+    }
+    try(do(), silent = TRUE)
+  })[["traces"]]
+
+  expect_equal(spns[[1]]$status, "ok")
+  expect_equal(length(spns[[1]]$events), 0)
+})
+
+test_that("set_status on manually ended spans", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn1 <- trc$start_span("1")
+    spn1$set_status("ok")
+    spn1$end()
+    spn2 <- trc$start_span("2")
+    spn2$set_status("error", description = "failed")
+    spn2$end()
+  })[["traces"]]
+
+  expect_equal(spns[[1]]$status, "ok")
+  expect_equal(spns[[2]]$status, "error")
+  expect_equal(spns[[2]]$description, "failed")
+})
+
+test_that("end(status_code = )", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    trc$start_span("1")$end(status_code = "ok")
+    trc$start_span("2")$end(status_code = "error")
+    trc$start_span("3")$end(status_code = "unset")
+    trc$start_span("4")$end()
+  })[["traces"]]
+
+  expect_equal(spns[[1]]$status, "ok")
+  expect_equal(spns[[2]]$status, "error")
+  expect_equal(spns[[3]]$status, "unset")
+  expect_equal(spns[[4]]$status, "unset")
+})
+
+test_that("end(status_code = ) overrides set_status()", {
+  spns <- with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    spn <- trc$start_span()
+    spn$set_status("error")
+    spn$end(status_code = "ok")
+  })[["traces"]]
+
+  expect_equal(spns[[1]]$status, "ok")
 })
 
 test_that("update_name", {
@@ -253,6 +361,31 @@ test_that("activate, deactivate manually", {
 
   expect_equal(names(spns), c("test::fun2", "test::fun"))
   expect_equal(spns[["test::fun2"]]$parent, spns[["test::fun"]]$span_id)
+})
+
+test_that("name of the active span", {
+  with_otel_record({
+    trc <- otel::get_tracer("mytracer")
+    expect_null(otel::get_active_span()$name)
+
+    spn1 <- trc$start_local_active_span("outer")
+    expect_equal(spn1$name, "outer")
+    expect_equal(otel::get_active_span()$name, "outer")
+
+    do <- function() {
+      spn2 <- trc$start_local_active_span("inner")
+      expect_equal(otel::get_active_span()$name, "inner")
+      spn2$update_name("inner2")
+      expect_equal(otel::get_active_span()$name, "inner2")
+    }
+    do()
+    expect_equal(otel::get_active_span()$name, "outer")
+
+    act <- otel::get_active_span()
+    act$update_name("outer2")
+    expect_equal(spn1$name, "outer2")
+    expect_error(spn1$name <- "foo", "update_name")
+  })
 })
 
 test_that("end_steady_time", {

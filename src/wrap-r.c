@@ -248,9 +248,11 @@ void r2c_attribute(
 
   attr->name = strdup(name);
   R_len_t l = Rf_length(value);
+  // a length one array (e.g. from as.array()) is kept as an array
+  int scalar = l == 1 && !Rf_isArray(value);
   switch (TYPEOF(value)) {
     case STRSXP:
-      if (l == 1) {
+      if (scalar) {
         attr->type = k_string;
         attr->val.string.s = strdup((char*) CHAR(STRING_ELT(value, 0)));
         attr->val.string.size = strlen(attr->val.string.s);
@@ -265,7 +267,7 @@ void r2c_attribute(
       }
       break;
     case LGLSXP:
-      if (l == 1) {
+      if (scalar) {
         attr->type = k_boolean;
         attr->val.boolean = LOGICAL(value)[0];
       } else {
@@ -275,7 +277,7 @@ void r2c_attribute(
       }
       break;
     case REALSXP:
-      if (l == 1) {
+      if (scalar) {
         attr->type = k_double;
         attr->val.dbl = REAL(value)[0];
       } else {
@@ -285,7 +287,7 @@ void r2c_attribute(
       }
       break;
     case INTSXP:
-      if (l == 1) {
+      if (scalar) {
         attr->type = k_int64;
         attr->val.int64 = INTEGER(value)[0];
       } else {
@@ -623,7 +625,22 @@ SEXP c2r_otel_attributes(const struct otel_attributes *attrs) {
   SEXP res = PROTECT(Rf_allocVector(VECSXP, nattrs));
   SEXP nms = PROTECT(Rf_allocVector(STRSXP, nattrs));
   for (R_xlen_t i = 0; i < nattrs; i++) {
-    SET_VECTOR_ELT(res, i, c2r_otel_attribute(&attrs->a[i]));
+    SEXP val = PROTECT(c2r_otel_attribute(&attrs->a[i]));
+    // make length one arrays R arrays, to tell them apart from scalars
+    switch (attrs->a[i].type) {
+      case k_string_array:
+      case k_boolean_array:
+      case k_double_array:
+      case k_int64_array:
+        if (Rf_length(val) == 1) {
+          Rf_setAttrib(val, R_DimSymbol, Rf_ScalarInteger(1));
+        }
+        break;
+      default:
+        break;
+    }
+    SET_VECTOR_ELT(res, i, val);
+    UNPROTECT(1);
     SET_STRING_ELT(nms, i, Rf_mkCharCE(attrs->a[i].name, CE_UTF8));
   }
   Rf_setAttrib(res, R_NamesSymbol, nms);

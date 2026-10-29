@@ -102,6 +102,6 @@
       [1] TRUE
       
       $is_random
-      [1] FALSE
+      [1] TRUE
       
 

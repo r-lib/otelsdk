@@ -40,6 +40,7 @@ SEXP otel_span_get_context(SEXP span);
 SEXP otel_span_is_valid(SEXP span);
 SEXP otel_span_is_recording(SEXP span);
 SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value);
+SEXP otel_span_set_attributes(SEXP span, SEXP attributes);
 SEXP otel_span_add_event(
   SEXP span, SEXP name, SEXP attributes, SEXP timestamp
 );
@@ -47,6 +48,7 @@ SEXP otel_span_add_link(SEXP span, SEXP target, SEXP attributes);
 SEXP otel_span_set_status(SEXP span, SEXP status_code, SEXP description);
 SEXP otel_span_is_status_set(SEXP span);
 SEXP otel_span_update_name(SEXP span, SEXP name);
+SEXP otel_span_get_name(SEXP span);
 SEXP otel_span_end(SEXP span, SEXP options, SEXP status_code);
 
 SEXP otel_bsp_defaults(void);
@@ -110,7 +112,7 @@ SEXP otel_up_down_counter_add(
   SEXP up_down_counter, SEXP value, SEXP attributes, SEXP context);
 
 SEXP otel_create_histogram(
-  SEXP meter, SEXP name, SEXP description, SEXP unit);
+  SEXP meter, SEXP name, SEXP description, SEXP unit, SEXP boundaries);
 SEXP otel_histogram_record(
   SEXP histogram, SEXP value, SEXP attributes, SEXP unit);
 
@@ -157,11 +159,13 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_span_is_valid, 1),
   CALLDEF(otel_span_is_recording, 1),
   CALLDEF(otel_span_set_attribute, 3),
+  CALLDEF(otel_span_set_attributes, 2),
   CALLDEF(otel_span_add_event, 4),
   CALLDEF(otel_span_add_link, 3),
   CALLDEF(otel_span_set_status, 3),
   CALLDEF(otel_span_is_status_set, 1),
   CALLDEF(otel_span_update_name, 2),
+  CALLDEF(otel_span_get_name, 1),
   CALLDEF(otel_span_end, 3),
   CALLDEF(otel_bsp_defaults, 0),
   CALLDEF(otel_blrp_defaults, 0),
@@ -207,7 +211,7 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_counter_add, 4),
   CALLDEF(otel_create_up_down_counter, 4),
   CALLDEF(otel_up_down_counter_add, 4),
-  CALLDEF(otel_create_histogram, 4),
+  CALLDEF(otel_create_histogram, 5),
   CALLDEF(otel_histogram_record, 4),
   CALLDEF(otel_create_gauge, 4),
   CALLDEF(otel_gauge_record, 4),

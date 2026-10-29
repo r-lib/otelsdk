@@ -1000,6 +1000,50 @@ as_named_list <- function(x, arg = caller_arg(x), call = caller_env()) {
   }
 }
 
+# Default alias pattern, derived from the file pattern. The alias must not
+# contain date/time placeholders or the rotation index, otherwise a new
+# alias is created for every new file. So we replace the last group of
+# placeholders in the file name with 'latest', and drop all other
+# placeholders, together with a separator next to them. Directory
+# components that become empty are dropped.
+default_alias_pattern <- function(file_pattern) {
+  if (is.null(file_pattern)) {
+    return(NULL)
+  }
+  ph <- "%[YymjdwHIMSFTRNn]"
+  if (!grepl(ph, gsub("%%", "", file_pattern, fixed = TRUE))) {
+    return(file_pattern)
+  }
+  run <- paste0(ph, "(?:[-_.: ]*", ph, ")*")
+  drop_runs <- function(x) {
+    x <- gsub(paste0("[-_.: ]", run), "", x, perl = TRUE)
+    x <- gsub(paste0("(^|[/\\\\])", run, "[-_: ]?"), "\\1", x, perl = TRUE)
+    gsub(run, "", x, perl = TRUE)
+  }
+
+  # protect literal '%' characters
+  x <- gsub("%%", "\001", file_pattern, fixed = TRUE)
+  dir <- sub("[^/\\\\]*$", "", x)
+  base <- substring(x, nchar(dir) + 1L)
+
+  m <- gregexpr(run, base, perl = TRUE)[[1]]
+  if (m[1] != -1) {
+    last <- length(m)
+    start <- m[last]
+    end <- start + attr(m, "match.length")[last]
+    base <- paste0(substr(base, 1, start - 1L), "\002", substring(base, end))
+  }
+  base <- sub("\002", "latest", drop_runs(base), fixed = TRUE)
+
+  dir2 <- drop_runs(dir)
+  dir2 <- gsub("(?<=[^/\\\\])([/\\\\])[/\\\\]+", "\\1", dir2, perl = TRUE)
+  if (!grepl("^[/\\\\]", dir)) {
+    dir2 <- sub("^[/\\\\]+", "", dir2)
+  }
+
+  gsub("\001", "%%", paste0(dir2, base), fixed = TRUE)
+}
+
 as_file_exporter_options <- function(
   opts,
   evs,
@@ -1021,7 +1065,9 @@ as_file_exporter_options <- function(
     as_string(opts$alias_pattern, arg = ma("alias_pattern"), call = call) %||%
     get_env(evs[["alias_pattern"]]) %||%
     get_env(file_exporter_alias_envvar) %||%
-    empty_atomic_as_null(sub("%N", "latest", file_pattern))
+    if (!isTRUE(file_pattern %in% c("stdout", "stderr"))) {
+      empty_atomic_as_null(default_alias_pattern(file_pattern))
+    }
 
   flush_interval <-
     as_difftime_spec(
@@ -1122,7 +1168,7 @@ as_metric_reader_options <- function(
       call = call
     ) %||%
     as_difftime_env(metric_export_interval_envvar, call = call) %||%
-    60000L
+    60000
   export_timeout <-
     as_difftime_spec(
       opts$export_timeout,
@@ -1130,7 +1176,7 @@ as_metric_reader_options <- function(
       call = call
     ) %||%
     as_difftime_env(metric_export_timeout_envvar, call = call) %||%
-    30000L
+    30000
 
   list(
     export_interval = export_interval,
@@ -2023,4 +2069,35 @@ as_meter_provider_memory_options <- function(
   )
 
   c(opts1, opts2, opts3)
+}
+
+as_histogram_boundaries <- function(
+  x,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (is.null(x)) {
+    return(x)
+  }
+  if (!is.numeric(x)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be a numeric vector, but it is \\
+       {typename(x)}."
+    ))
+  }
+  if (any(!is.finite(x))) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must not contain missing or \\
+       infinite values."
+    ))
+  }
+  if (any(diff(x) <= 0)) {
+    stop(cnd(
+      call = call,
+      "Invalid argument: `{arg}` must be strictly increasing."
+    ))
+  }
+  as.double(x)
 }

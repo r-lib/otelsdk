@@ -15,10 +15,12 @@ OTEL_CPP_LIBS =  \
 	install/lib/libopentelemetry_exporter_otlp_file_client.a \
 	install/lib/libopentelemetry_http_client_curl.a \
 	install/lib/libopentelemetry_otlp_recordable.a \
+	install/lib/libopentelemetry_otlp_common.a \
 	install/lib/libopentelemetry_trace.a \
 	install/lib/libopentelemetry_logs.a \
 	install/lib/libopentelemetry_metrics.a \
 	install/lib/libopentelemetry_resources.a \
+	install/lib/libopentelemetry_instrumentation_scope.a \
 	install/lib/libopentelemetry_common.a \
 	install/lib/libopentelemetry_proto.a
 
@@ -29,7 +31,7 @@ OBJECTS = init.o cleancall.o wrap-r.o wrap-c.o glue.o utils.o errors.o \
 
 PKG_SAFE = $(_R_SHLIB_BUILD_OBJECTS_SYMBOL_TABLES_)$(_R_CHECK_SIZE_OF_TARBALL_)
 PKG_CPPFLAGS = -Iinstall/include \
-	-DOPENTELEMETRY_ABI_VERSION_NO=2 \
+	-DOPENTELEMETRY_ABI_VERSION_NO=2 -DOPENTELEMETRY_PROTO_API= \
 	@XCPPFLAGS@ @PROTOBUF_INCLUDE@ \
 	-DOTEL_BUILD_SAFE$(PKG_SAFE)
 PKG_CFLAGS += @PKG_CFLAGS@
@@ -51,10 +53,12 @@ PKG_LIBS = \
 	-lopentelemetry_exporter_otlp_file_client \
 	-lopentelemetry_http_client_curl \
 	-lopentelemetry_otlp_recordable \
+	-lopentelemetry_otlp_common \
 	-lopentelemetry_trace \
 	-lopentelemetry_logs \
 	-lopentelemetry_metrics \
 	-lopentelemetry_resources \
+	-lopentelemetry_instrumentation_scope \
 	-lopentelemetry_common \
 	-lopentelemetry_proto \
 	@PROTOBUF_LIBS@ \
@@ -101,15 +105,15 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 	CFLAGS="$(CFLAGS) $(CPICFLAGS) -DNDEBUG @XCFLAGS@" \
 	"$(CMAKE)" -G "Unix Makefiles" -S . -B build \
 	-DCMAKE_WARN_DEPRECATED=OFF \
-	-DWITH_ABI_VERSION_1=OFF -DWITH_ABI_VERSION_2=ON \
+	-DOTELCPP_WITH_ABI_VERSION_1=OFF -DOTELCPP_WITH_ABI_VERSION_2=ON \
 	-DCMAKE_INSTALL_PREFIX=../install -DCMAKE_INSTALL_LIBDIR=lib \
 	-DCMAKE_PREFIX_PATH=@CMAKE_PREFIX_PATH@ \
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	-DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_STANDARD=@CXX_STANDARD@ \
-	-DWITH_ELASTICSEARCH=OFF -DWITH_EXAMPLES=OFF \
-	-DWITH_OTLP_GRPC=OFF -DWITH_OTLP_HTTP=ON -DWITH_OTLP_FILE=ON \
-	-DWITH_ABSEIL=OFF -DWITH_PROMETHEUS=OFF -DBUILD_TESTING=OFF \
-	-DWITH_BENCHMARK=OFF -DWITH_FUNC_TESTS=OFF -DWITH_ETW=OFF)
+	-DOTELCPP_WITH_ELASTICSEARCH=OFF -DOTELCPP_WITH_EXAMPLES=OFF \
+	-DOTELCPP_WITH_OTLP_GRPC=OFF -DOTELCPP_WITH_OTLP_HTTP=ON -DOTELCPP_WITH_OTLP_FILE=ON \
+	-DOTELCPP_WITH_PROMETHEUS=OFF -DOTELCPP_BUILD_TESTING=OFF \
+	-DOTELCPP_WITH_BENCHMARK=OFF -DOTELCPP_WITH_FUNC_TESTS=OFF @ETW_FLAG@)
 	@rm -rf cpp/.git
 	@if [ "@UNAME@" = "Windows" ]; then \
 		/usr/bin/find . -name Makefile | xargs sed -i.bak -e 's/^M$$//'; \

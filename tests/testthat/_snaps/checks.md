@@ -690,6 +690,14 @@
       Error in `helper()`:
       ! Invalid argument: `o[["export_timeout"]]` must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
 
+# as_metric_reader_options, env vars
+
+    Code
+      as_metric_reader_options(NULL)
+    Condition
+      Error:
+      ! Invalid environment variable: OTEL_METRIC_EXPORT_INTERVAL='bad'. It must be a time interval specification, a positive number with a time unit suffix: us (microseconds), ms (milliseconds), s (seconds), m (minutes), h (hours), or d (days).
+
 # as_meter_provider_file_options
 
     Code
@@ -1844,4 +1852,32 @@
     Condition
       Error:
       ! Invalid argument: `o4` has unknown option: 'unknown'.
+
+# as_histogram_boundaries
+
+    Code
+      helper(v1)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must be a numeric vector, but it is a string.
+    Code
+      helper(v2)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must not contain missing or infinite values.
+    Code
+      helper(v3)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must not contain missing or infinite values.
+    Code
+      helper(v4)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must be strictly increasing.
+    Code
+      helper(v5)
+    Condition
+      Error in `helper()`:
+      ! Invalid argument: `b` must be strictly increasing.
 

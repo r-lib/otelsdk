@@ -198,7 +198,7 @@ doc_evs <- function() {
 #' Most of these environment variables are based on the [OpenTelemetry
 #' Specification](
 #'   https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
-#' ), version 1.61.0.
+#' ), version 1.62.0.
 #'
 #' The environment variables with an '`OTEL_R_`' prefix are not (yet) in the
 #' standard, and are specific for the otel and otelsdk R packages.
@@ -565,7 +565,6 @@ doc_evs <- function() {
 #' | *Name*                                          | *Supported*
 #' |:------------------------------------------------|:------------
 #' | `OTEL_SDK_DISABLED`                             | +
-#' | `OTEL_ENTITIES`                                 | -
 #' | `OTEL_RESOURCE_ATTRIBUTES`                      | +
 #' | `OTEL_SERVICE_NAME`                             | +
 #' | `OTEL_LOG_LEVEL`                                | +
@@ -638,12 +637,22 @@ doc_file_exporter_options <- function(evs, def) {
 
        May contain placeholders, see below.
 
+       If it is `stdout` or `stderr`, then the output is written to the
+       standard output or standard error, instead of a file. In this case
+       the other options are ignored.
+
      * `alias_pattern`: The file which always point to the latest file.
        Value is set from:
        - `opts` argument, or
        - `{evs[['alias_pattern']]}` environment variable, or
        - `{file_exporter_alias_envvar} environment variable`, or
        - the default is: `{def[['alias_pattern']]}`.
+
+       If `file_pattern` is set, but `alias_pattern` is not, then the
+       default alias is created from `file_pattern`: the last group of
+       placeholders in the file name is replaced by `latest`, and all
+       other placeholders are removed, e.g. `trace-%F-%T-%N.jsonl` becomes
+       `trace-latest.jsonl`.
 
        May contain placeholders, see below.
 

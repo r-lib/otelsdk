@@ -190,6 +190,23 @@ SEXP otel_span_set_attribute(SEXP span, SEXP name, SEXP value) {
   return R_NilValue;
 }
 
+SEXP otel_span_set_attributes(SEXP span, SEXP attributes) {
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
+  void *span_ = R_ExternalPtrAddr(span);
+  if (span_) {
+    struct otel_attributes attributes_;
+    r2c_attributes(attributes, &attributes_);
+    for (size_t i = 0; i < attributes_.count; i++) {
+      otel_span_set_attribute_(span_, attributes_.a + i);
+    }
+    // TODO: cleancall
+    otel_attributes_free(&attributes_);
+  }
+  return R_NilValue;
+}
+
 SEXP otel_span_add_event(
     SEXP span, SEXP name, SEXP attributes, SEXP timestamp) {
   if (TYPEOF(span) != EXTPTRSXP) {
@@ -267,6 +284,20 @@ SEXP otel_span_update_name(SEXP span, SEXP name) {
   if (span_) {
     const char *name_ = CHAR(STRING_ELT(name, 0));
     otel_span_update_name_(span_, name_);
+  }
+  return R_NilValue;
+}
+
+SEXP otel_span_get_name(SEXP span) {
+  if (TYPEOF(span) != EXTPTRSXP) {
+    Rf_error("OpenTelemetry: invalid span pointer.");
+  }
+  void *span_ = R_ExternalPtrAddr(span);
+  if (span_) {
+    const char *name_ = otel_span_get_name_(span_);
+    if (name_) {
+      return Rf_mkString(name_);
+    }
   }
   return R_NilValue;
 }

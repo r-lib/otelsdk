@@ -41,6 +41,10 @@ meter_provider_file_new <- function(opts = NULL) {
 #'
 #' Select this tracer provider with `OTEL_METRICS_EXPORTER=otlp/file`.
 #'
+#' Select `OTEL_METRICS_EXPORTER=otlp/stdout` to write to the standard
+#' output instead of a file. This is the same as setting the `file_pattern`
+#' option to `stdout`.
+#'
 #' # Usage
 #'
 #' Externally:

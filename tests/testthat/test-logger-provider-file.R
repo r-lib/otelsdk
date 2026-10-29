@@ -43,3 +43,24 @@ test_that("logger_provider_file", {
     "ERROR"
   )
 })
+
+test_that("logger_provider_file to stdout and stderr", {
+  fun <- function(output) {
+    lp <- otelsdk::logger_provider_file$new(list(file_pattern = output))
+    lgr <- lp$get_logger("org.r-lib.otel")
+    lgr$warn("warn!")
+    lp$flush()
+    invisible()
+  }
+  for (output in c("stdout", "stderr")) {
+    withr::local_dir(withr::local_tempdir())
+    res <- run_in_otelsdk_subprocess(fun, list(output = output))
+    obj <- parse_jsonl_lines(res[[output]])
+    expect_equal(length(obj), 1L)
+    expect_equal(
+      obj[[1]]$resourceLogs[[1]]$scopeLogs[[1]]$logRecords[[1]]$severityText,
+      "WARN"
+    )
+    expect_equal(dir(), character())
+  }
+})

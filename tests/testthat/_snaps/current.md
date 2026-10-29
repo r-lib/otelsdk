@@ -1,8 +1,7 @@
 # env vars are current for otel spec
 
     Code
-      gh::gh("https://api.github.com/repos/{owner}/{repo}/releases/latest", owner = "open-telemetry",
-        repo = "opentelemetry-specification")$tag_name
+      spec_version
     Output
-      [1] "v1.61.0"
+      [1] "v1.62.0"
 

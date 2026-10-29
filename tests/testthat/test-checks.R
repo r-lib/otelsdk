@@ -655,6 +655,34 @@ test_that("as_file_exporter_options", {
   expect_true(TRUE)
 })
 
+test_that("default_alias_pattern", {
+  expect_null(default_alias_pattern(NULL))
+  cases <- c(
+    "foo" = "foo",
+    "foo-%N" = "foo-latest",
+    "trace-%N.jsonl" = "trace-latest.jsonl",
+    "trace-%n.jsonl" = "trace-latest.jsonl",
+    "trace-%T.jsonl" = "trace-latest.jsonl",
+    "trace-%F-%T-%N.jsonl" = "trace-latest.jsonl",
+    "trace-%Y%m%d-%H%M%S.jsonl" = "trace-latest.jsonl",
+    "trace-%H:%M:%S-%N.jsonl" = "trace-latest.jsonl",
+    "trace-%F_%R.jsonl" = "trace-latest.jsonl",
+    "%F.jsonl" = "latest.jsonl",
+    "%F-trace-%N.jsonl" = "trace-latest.jsonl",
+    "app-%F-trace-%N.jsonl" = "app-trace-latest.jsonl",
+    "logs/%F/trace-%N.jsonl" = "logs/trace-latest.jsonl",
+    "logs/%Y/%m/%d/trace-%N.jsonl" = "logs/trace-latest.jsonl",
+    "logs/%F/trace.jsonl" = "logs/trace.jsonl",
+    "%F/trace-%N.jsonl" = "trace-latest.jsonl",
+    "/var/log/%F/trace-%N.jsonl" = "/var/log/trace-latest.jsonl",
+    "C:\\logs\\%F\\trace-%N.jsonl" = "C:\\logs\\trace-latest.jsonl",
+    "100%%-%N.jsonl" = "100%%-latest.jsonl"
+  )
+  for (i in seq_along(cases)) {
+    expect_equal(default_alias_pattern(names(cases)[i]), cases[[i]])
+  }
+})
+
 test_that("check_known_options", {
   opts <- list(a = 1, b = 2)
   expect_equal(check_known_options(opts, c("a", "b", "c")), opts)
@@ -673,6 +701,17 @@ test_that("as_logger_provider_file_options", {
     as_logger_provider_file_options(opts1),
     modifyList(opts, c(opts1, list(alias_pattern = "foo-latest")))
   )
+
+  # no alias for stdout and stderr
+  withr::local_envvar(
+    OTEL_EXPORTER_OTLP_FILE_ALIAS = NA_character_,
+    OTEL_EXPORTER_OTLP_LOGS_FILE_ALIAS = NA_character_
+  )
+  for (output in c("stdout", "stderr")) {
+    opts2 <- as_logger_provider_file_options(list(file_pattern = output))
+    expect_equal(opts2$file_pattern, output)
+    expect_null(opts2$alias_pattern)
+  }
 
   helper <- function(o) as_logger_provider_file_options(o)
   expect_snapshot(error = TRUE, {
@@ -712,6 +751,37 @@ test_that("as_metric_reader_options", {
     helper(v)
     v <- list(export_interval = "100s", export_timeout = "no")
     helper(v)
+  })
+})
+
+test_that("as_metric_reader_options, env vars", {
+  withr::local_envvar(
+    OTEL_METRIC_EXPORT_INTERVAL = NA_character_,
+    OTEL_METRIC_EXPORT_TIMEOUT = NA_character_
+  )
+  expect_identical(
+    as_metric_reader_options(NULL),
+    list(export_interval = 60000, export_timeout = 30000)
+  )
+
+  withr::local_envvar(
+    OTEL_METRIC_EXPORT_INTERVAL = "1000",
+    OTEL_METRIC_EXPORT_TIMEOUT = "2s"
+  )
+  expect_identical(
+    as_metric_reader_options(NULL),
+    list(export_interval = 1000, export_timeout = 2000)
+  )
+
+  # explicit options take precedence
+  expect_identical(
+    as_metric_reader_options(list(export_interval = 500)),
+    list(export_interval = 500, export_timeout = 2000)
+  )
+
+  withr::local_envvar(OTEL_METRIC_EXPORT_INTERVAL = "bad")
+  expect_snapshot(error = TRUE, {
+    as_metric_reader_options(NULL)
   })
 })
 
@@ -1171,5 +1241,26 @@ test_that("as_meter_provider_memory_options", {
     as_meter_provider_memory_options(o2)
     as_meter_provider_memory_options(o3)
     as_meter_provider_memory_options(o4)
+  })
+})
+
+test_that("as_histogram_boundaries", {
+  expect_null(as_histogram_boundaries(NULL))
+  expect_identical(as_histogram_boundaries(1:3), c(1, 2, 3))
+  expect_identical(as_histogram_boundaries(c(0.5, 1)), c(0.5, 1))
+  expect_identical(as_histogram_boundaries(double()), double())
+
+  helper <- function(b) as_histogram_boundaries(b)
+  v1 <- "boo"
+  v2 <- c(1, NA)
+  v3 <- c(1, Inf)
+  v4 <- c(1, 3, 2)
+  v5 <- c(1, 1)
+  expect_snapshot(error = TRUE, {
+    helper(v1)
+    helper(v2)
+    helper(v3)
+    helper(v4)
+    helper(v5)
   })
 })

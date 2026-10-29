@@ -1,5 +1,9 @@
 #! /bin/bash
 
+# Needs an opentelemetry-cpp checkout next to otelsdk, with the
+# nlohmann-json and opentelemetry-proto submodules:
+# git submodule update --init third_party/nlohmann-json third_party/opentelemetry-proto
+
 cd src/vendor
 rm -rf cpp cpp-old
 tar xzf opentelemetry-cpp.tgz
@@ -26,7 +30,15 @@ mkdir -p cpp/third_party
 cp ${CPP}/third_party/BUILD cpp/third_party/
 cp -r ${CPP}/third_party/nlohmann-json cpp/third_party/
 rm cpp/third_party/nlohmann-json/CITATION.cff
+# keep the .git files of the submodules, otherwise cmake downloads them
+rm -rf cpp/third_party/nlohmann-json/tests
+rm -rf cpp/third_party/nlohmann-json/tools
+rm -rf cpp/third_party/nlohmann-json/.github
 cp -r ${CPP}/third_party/opentelemetry-proto cpp/third_party/
+rm -rf cpp/third_party/opentelemetry-proto/.github
+rm -rf cpp/third_party/opentelemetry-proto/.agents
+rm -rf cpp/third_party/opentelemetry-proto/.bcr
+rm -rf cpp/third_party/opentelemetry-proto/.vscode
 
 mkdir -p cpp/sdk/include
 cp -r ${CPP}/sdk/include/opentelemetry cpp/sdk/include/

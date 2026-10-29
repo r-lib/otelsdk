@@ -2,7 +2,8 @@ test_that("meter_provider_http", {
   coll <- webfakes::local_app_process(collector_app())
   withr::local_envvar(OTEL_EXPORTER_OTLP_ENDPOINT = coll$url())
   mp <- meter_provider_http_new()
-  on.exit(mp$shutdown(), add = TRUE)
+  # shut down before the collector is stopped, to avoid export errors
+  withr::defer(mp$shutdown())
   mtr <- mp$get_meter()
   ctr <- mtr$create_counter("ctr")
   ctr$add(1)

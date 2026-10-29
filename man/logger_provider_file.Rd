@@ -17,6 +17,10 @@ a valid JSON value. The line separator is \verb{\\n}. The preferred file
 extension is \code{jsonl}.
 
 Select this tracer provider with \code{OTEL_LOGS_EXPORTER=otlp/file}.
+
+Select \code{OTEL_LOGS_EXPORTER=otlp/stdout} to write to the standard
+output instead of a file. This is the same as setting the \code{file_pattern}
+option to \code{stdout}.
 }
 \section{Usage}{
 Externally:
@@ -49,6 +53,10 @@ logger_provider_file$options()
 }
 
 May contain placeholders, see below.
+
+If it is \code{stdout} or \code{stderr}, then the output is written to the
+standard output or standard error, instead of a file. In this case
+the other options are ignored.
 \item \code{alias_pattern}: The file which always point to the latest file.
 Value is set from:
 \itemize{
@@ -57,6 +65,12 @@ Value is set from:
 \item \verb{OTEL_EXPORTER_OTLP_FILE_ALIAS environment variable}, or
 \item the default is: \code{logs-latest.jsonl}.
 }
+
+If \code{file_pattern} is set, but \code{alias_pattern} is not, then the
+default alias is created from \code{file_pattern}: the last group of
+placeholders in the file name is replaced by \code{latest}, and all
+other placeholders are removed, e.g. \verb{trace-\%F-\%T-\%N.jsonl} becomes
+\code{trace-latest.jsonl}.
 
 May contain placeholders, see below.
 \item \code{flush_interval}: Interval to force flush output. A time interval

@@ -32,9 +32,10 @@ meter_new <- function(
     create_histogram = function(
       name,
       description = NULL,
-      unit = NULL
+      unit = NULL,
+      boundaries = NULL
     ) {
-      histogram_new(self, name, description, unit)
+      histogram_new(self, name, description, unit, boundaries)
     },
     create_gauge = function(
       name,
@@ -120,7 +121,14 @@ up_down_counter_new <- function(
   self
 }
 
-histogram_new <- function(meter, name, description = NULL, unit = NULL) {
+histogram_new <- function(
+  meter,
+  name,
+  description = NULL,
+  unit = NULL,
+  boundaries = NULL
+) {
+  boundaries <- as_histogram_boundaries(boundaries)
   self <- new_object(
     "otel_histogram",
     record = function(
@@ -138,7 +146,8 @@ histogram_new <- function(meter, name, description = NULL, unit = NULL) {
     meter$xptr,
     name,
     description,
-    unit
+    unit,
+    boundaries
   )
   self
 }

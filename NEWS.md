@@ -5,10 +5,46 @@
   value, usually the span itself. Set `OTEL_ENV=dev` to get errors instead
   (r-lib/otel#36).
 
+* The default alias pattern of the file exporters, used when only the
+  file pattern is set, does not contain date and time placeholders any
+  more. Previously a file pattern like `trace-%F-%T-%N.jsonl` created a
+  new alias file for every output file (#70).
+
+* Setting the metric export interval or timeout, via the
+  `OTEL_METRIC_EXPORT_INTERVAL` or `OTEL_METRIC_EXPORT_TIMEOUT`
+  environment variables, or the `export_interval` or `export_timeout`
+  options, does not fail any more (#79).
+
+* The `create_histogram()` method of meters now has a `boundaries`
+  argument, to set explicit bucket boundaries for the histogram
+  (r-lib/otel#49).
+
+* Length one attribute values that are R arrays, e.g. created with
+  `as.array()`, are now recorded as arrays, instead of scalars
+  (r-lib/otel#48).
+
+* Spans ended automatically, without an error, now keep the `unset` status,
+  instead of being set to `ok` (r-lib/otel#30).
+
+* Spans now have a `set_attributes()` method, to set multiple attributes
+  at once (r-lib/otel#35).
+
+* The span object returned by `otel::get_active_span()` now has the
+  correct span name in `$name` (#80).
+
+* The file tracer, logger and meter providers now write to the standard
+  output or standard error if the `file_pattern` option is `stdout` or
+  `stderr`. otel uses this for the `otlp/stdout` exporter (r-lib/otel#18).
+
 * The `end_steady_time` option of the `end()` method of spans is now
   correctly used for the end time of the span.
 
-* Documentation update for the new Otel 1.61.0 specification.
+* Documentation update for the new Otel 1.62.0 specification.
+
+* otelsdk now bundles opentelemetry-cpp 1.30.0. Notable changes:
+  - The default `schedule_delay` of the batch log processor is now
+    1000 ms, instead of 5000 ms.
+  - New trace IDs now have the W3C `random` trace flag set.
 
 # otelsdk 0.2.4
 
