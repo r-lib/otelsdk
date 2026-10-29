@@ -1000,6 +1000,50 @@ as_named_list <- function(x, arg = caller_arg(x), call = caller_env()) {
   }
 }
 
+# Default alias pattern, derived from the file pattern. The alias must not
+# contain date/time placeholders or the rotation index, otherwise a new
+# alias is created for every new file. So we replace the last group of
+# placeholders in the file name with 'latest', and drop all other
+# placeholders, together with a separator next to them. Directory
+# components that become empty are dropped.
+default_alias_pattern <- function(file_pattern) {
+  if (is.null(file_pattern)) {
+    return(NULL)
+  }
+  ph <- "%[YymjdwHIMSFTRNn]"
+  if (!grepl(ph, gsub("%%", "", file_pattern, fixed = TRUE))) {
+    return(file_pattern)
+  }
+  run <- paste0(ph, "(?:[-_.: ]*", ph, ")*")
+  drop_runs <- function(x) {
+    x <- gsub(paste0("[-_.: ]", run), "", x, perl = TRUE)
+    x <- gsub(paste0("(^|[/\\\\])", run, "[-_: ]?"), "\\1", x, perl = TRUE)
+    gsub(run, "", x, perl = TRUE)
+  }
+
+  # protect literal '%' characters
+  x <- gsub("%%", "\001", file_pattern, fixed = TRUE)
+  dir <- sub("[^/\\\\]*$", "", x)
+  base <- substring(x, nchar(dir) + 1L)
+
+  m <- gregexpr(run, base, perl = TRUE)[[1]]
+  if (m[1] != -1) {
+    last <- length(m)
+    start <- m[last]
+    end <- start + attr(m, "match.length")[last]
+    base <- paste0(substr(base, 1, start - 1L), "\002", substring(base, end))
+  }
+  base <- sub("\002", "latest", drop_runs(base), fixed = TRUE)
+
+  dir2 <- drop_runs(dir)
+  dir2 <- gsub("(?<=[^/\\\\])([/\\\\])[/\\\\]+", "\\1", dir2, perl = TRUE)
+  if (!grepl("^[/\\\\]", dir)) {
+    dir2 <- sub("^[/\\\\]+", "", dir2)
+  }
+
+  gsub("\001", "%%", paste0(dir2, base), fixed = TRUE)
+}
+
 as_file_exporter_options <- function(
   opts,
   evs,
@@ -1022,7 +1066,7 @@ as_file_exporter_options <- function(
     get_env(evs[["alias_pattern"]]) %||%
     get_env(file_exporter_alias_envvar) %||%
     if (!isTRUE(file_pattern %in% c("stdout", "stderr"))) {
-      empty_atomic_as_null(sub("%N", "latest", file_pattern))
+      empty_atomic_as_null(default_alias_pattern(file_pattern))
     }
 
   flush_interval <-

@@ -655,6 +655,34 @@ test_that("as_file_exporter_options", {
   expect_true(TRUE)
 })
 
+test_that("default_alias_pattern", {
+  expect_null(default_alias_pattern(NULL))
+  cases <- c(
+    "foo" = "foo",
+    "foo-%N" = "foo-latest",
+    "trace-%N.jsonl" = "trace-latest.jsonl",
+    "trace-%n.jsonl" = "trace-latest.jsonl",
+    "trace-%T.jsonl" = "trace-latest.jsonl",
+    "trace-%F-%T-%N.jsonl" = "trace-latest.jsonl",
+    "trace-%Y%m%d-%H%M%S.jsonl" = "trace-latest.jsonl",
+    "trace-%H:%M:%S-%N.jsonl" = "trace-latest.jsonl",
+    "trace-%F_%R.jsonl" = "trace-latest.jsonl",
+    "%F.jsonl" = "latest.jsonl",
+    "%F-trace-%N.jsonl" = "trace-latest.jsonl",
+    "app-%F-trace-%N.jsonl" = "app-trace-latest.jsonl",
+    "logs/%F/trace-%N.jsonl" = "logs/trace-latest.jsonl",
+    "logs/%Y/%m/%d/trace-%N.jsonl" = "logs/trace-latest.jsonl",
+    "logs/%F/trace.jsonl" = "logs/trace.jsonl",
+    "%F/trace-%N.jsonl" = "trace-latest.jsonl",
+    "/var/log/%F/trace-%N.jsonl" = "/var/log/trace-latest.jsonl",
+    "C:\\logs\\%F\\trace-%N.jsonl" = "C:\\logs\\trace-latest.jsonl",
+    "100%%-%N.jsonl" = "100%%-latest.jsonl"
+  )
+  for (i in seq_along(cases)) {
+    expect_equal(default_alias_pattern(names(cases)[i]), cases[[i]])
+  }
+})
+
 test_that("check_known_options", {
   opts <- list(a = 1, b = 2)
   expect_equal(check_known_options(opts, c("a", "b", "c")), opts)

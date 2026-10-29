@@ -648,6 +648,12 @@ doc_file_exporter_options <- function(evs, def) {
        - `{file_exporter_alias_envvar} environment variable`, or
        - the default is: `{def[['alias_pattern']]}`.
 
+       If `file_pattern` is set, but `alias_pattern` is not, then the
+       default alias is created from `file_pattern`: the last group of
+       placeholders in the file name is replaced by `latest`, and all
+       other placeholders are removed, e.g. `trace-%F-%T-%N.jsonl` becomes
+       `trace-latest.jsonl`.
+
        May contain placeholders, see below.
 
      * `flush_interval`: Interval to force flush output. A time interval

@@ -1,5 +1,10 @@
 # otelsdk (development version)
 
+* The default alias pattern of the file exporters, used when only the
+  file pattern is set, does not contain date and time placeholders any
+  more. Previously a file pattern like `trace-%F-%T-%N.jsonl` created a
+  new alias file for every output file (#70).
+
 * Setting the metric export interval or timeout, via the
   `OTEL_METRIC_EXPORT_INTERVAL` or `OTEL_METRIC_EXPORT_TIMEOUT`
   environment variables, or the `export_interval` or `export_timeout`

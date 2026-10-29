@@ -66,6 +66,12 @@ Value is set from:
 \item the default is: \code{trace-latest.jsonl}.
 }
 
+If \code{file_pattern} is set, but \code{alias_pattern} is not, then the
+default alias is created from \code{file_pattern}: the last group of
+placeholders in the file name is replaced by \code{latest}, and all
+other placeholders are removed, e.g. \verb{trace-\%F-\%T-\%N.jsonl} becomes
+\code{trace-latest.jsonl}.
+
 May contain placeholders, see below.
 \item \code{flush_interval}: Interval to force flush output. A time interval
 specification, see \link{Time Interval Options}. Value is set from
