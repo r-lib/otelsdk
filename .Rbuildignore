@@ -36,5 +36,6 @@
 ^\.rvenvlib$
 ^\.Renviron$
 ^rproj\.toml$
-^rproj\.lock$^Makefile$
+^rproj\.lock$
+^Makefile$
 ^tools/template$
