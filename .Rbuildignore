@@ -37,3 +37,5 @@
 ^\.Renviron$
 ^rproj\.toml$
 ^rproj\.lock$
+^Makefile$
+^tools/template$
