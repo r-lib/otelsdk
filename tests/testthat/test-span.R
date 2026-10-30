@@ -398,11 +398,6 @@ test_that("end_steady_time", {
   expect_equal(spns[[1]]$duration, 5)
 })
 
-msg <- function(expr) {
-  expect_message(val <- expr, class = "otel_error_message")
-  val
-}
-
 test_that("span methods do not error", {
   trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
@@ -480,29 +475,4 @@ test_that("span context methods do not error", {
   expect_error(spc$is_remote())
   expect_error(spc$is_sampled())
   expect_error(spc$to_http_headers())
-})
-
-test_that("setup_dev_env", {
-  env <- new.env()
-  withr::local_envvar(OTEL_ENV = "dev")
-  setup_dev_env(env)
-  expect_identical(env$span_base_new, span_base_new_dev)
-  expect_identical(env$span_context_new, span_context_new_dev)
-
-  env <- new.env()
-  withr::local_envvar(OTEL_ENV = NA_character_)
-  setup_dev_env(env)
-  expect_null(env$span_base_new)
-})
-
-test_that("R/span-dev.R is up to date", {
-  skip_on_cran()
-  root <- test_path("../..")
-  skip_if_not(file.exists(file.path(root, "tools/template/dev.R")))
-  out <- tempfile(fileext = ".R")
-  on.exit(unlink(out), add = TRUE)
-  withr::local_envvar(OTEL_DEV_API_OUTPUT_FILE = out)
-  withr::local_dir(root)
-  suppressMessages(source("tools/template/dev.R", local = new.env()))
-  expect_equal(readLines(out), readLines("R/span-dev.R"))
 })

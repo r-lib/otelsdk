@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 tracer_provider_stdstream_new <- function(opts = NULL) {
   opts <- as_tracer_provider_stdstream_options(opts)
   self <- new_object(
@@ -9,16 +12,27 @@ tracer_provider_stdstream_new <- function(opts = NULL) {
       attributes = NULL,
       ...
     ) {
-      tracer_new(self, name, version, schema_url, attributes, ...)
+      tryCatch({                                                     # safe
+        tracer_new(self, name, version, schema_url, attributes, ...)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_tracer()                                                # safe
+      })                                                             # safe
     },
     flush = function() {
-      ccall(otel_tracer_provider_flush, self$xptr)
+      tryCatch({                                                     # safe
+        ccall(otel_tracer_provider_flush, self$xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invisible(NULL)                                              # safe
+      })                                                             # safe
     }
   )
   attributes <- as_otel_attributes(the$default_resource_attributes)
   self$xptr <- ccall(otel_create_tracer_provider_stdstream, opts, attributes)
   self
 }
+# safe end
 
 tracer_provider_stdstream_options <- function() {
   as_tracer_provider_stdstream_options(NULL)

@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 meter_provider_http_new <- function(opts = NULL) {
   opts <- as_meter_provider_http_options(opts)
 
@@ -10,13 +13,27 @@ meter_provider_http_new <- function(opts = NULL) {
       attributes = NULL,
       ...
     ) {
-      meter_new(self, name, version, schema_url, attributes, ...)
+      tryCatch({                                                     # safe
+        meter_new(self, name, version, schema_url, attributes, ...)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_meter()                                                 # safe
+      })                                                             # safe
     },
     flush = function() {
-      invisible(ccall(otel_meter_provider_flush, self$xptr, NULL))
+      tryCatch({                                                     # safe
+        invisible(ccall(otel_meter_provider_flush, self$xptr, NULL))
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invisible(NULL)                                              # safe
+      })                                                             # safe
     },
     shutdown = function() {
-      ccall(otel_meter_provider_shutdown, self$xptr, NULL)
+      tryCatch({                                                     # safe
+        ccall(otel_meter_provider_shutdown, self$xptr, NULL)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
       invisible(self)
     }
   )
@@ -25,6 +42,7 @@ meter_provider_http_new <- function(opts = NULL) {
   self$xptr <- ccall(otel_create_meter_provider_http, opts, attributes)
   self
 }
+# safe end
 
 meter_provider_http_options <- function() {
   ropts <- as_meter_provider_http_options(NULL)

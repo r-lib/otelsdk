@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 meter_provider_memory_new <- function(opts = NULL) {
   opts <- as_meter_provider_memory_options(opts)
   self <- new_object(
@@ -9,17 +12,36 @@ meter_provider_memory_new <- function(opts = NULL) {
       attributes = NULL,
       ...
     ) {
-      meter_new(self, name, version, schema_url, attributes, ...)
+      tryCatch({                                                     # safe
+        meter_new(self, name, version, schema_url, attributes, ...)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_meter()                                                 # safe
+      })                                                             # safe
     },
     flush = function() {
-      invisible(ccall(otel_meter_provider_flush, self$xptr, NULL))
+      tryCatch({                                                     # safe
+        invisible(ccall(otel_meter_provider_flush, self$xptr, NULL))
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invisible(NULL)                                              # safe
+      })                                                             # safe
     },
     shutdown = function() {
-      ccall(otel_meter_provider_shutdown, self$xptr, NULL)
+      tryCatch({                                                     # safe
+        ccall(otel_meter_provider_shutdown, self$xptr, NULL)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
       invisible(self)
     },
     get_metrics = function() {
-      ccall(otel_meter_provider_memory_get_metrics, self$xptr)
+      tryCatch({                                                     # safe
+        ccall(otel_meter_provider_memory_get_metrics, self$xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        list()                                                       # safe
+      })                                                             # safe
     }
   )
 
@@ -27,6 +49,7 @@ meter_provider_memory_new <- function(opts = NULL) {
   self$xptr <- ccall(otel_create_meter_provider_memory, opts, attributes)
   self
 }
+# safe end
 
 meter_provider_memory_options <- function() {
   as_meter_provider_memory_options(NULL)

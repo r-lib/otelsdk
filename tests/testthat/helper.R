@@ -254,3 +254,8 @@ parse_jsonl_lines <- function(lns) {
   lns <- grep("^[{]", lns, value = TRUE)
   lapply(lns, jsonlite::fromJSON, simplifyVector = FALSE)
 }
+
+msg <- function(expr) {
+  expect_message(val <- expr, class = "otel_error_message")
+  val
+}

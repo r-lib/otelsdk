@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 meter_new <- function(
   provider,
   name = NULL,
@@ -20,14 +23,24 @@ meter_new <- function(
       description = NULL,
       unit = NULL
     ) {
-      counter_new(self, name, description, unit)
+      tryCatch({                                                     # safe
+        counter_new(self, name, description, unit)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_meter()$create_counter(NULL)                            # safe
+      })                                                             # safe
     },
     create_up_down_counter = function(
       name,
       description = NULL,
       unit = NULL
     ) {
-      up_down_counter_new(self, name, description, unit)
+      tryCatch({                                                     # safe
+        up_down_counter_new(self, name, description, unit)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_meter()$create_up_down_counter(NULL)                    # safe
+      })                                                             # safe
     },
     create_histogram = function(
       name,
@@ -35,14 +48,24 @@ meter_new <- function(
       unit = NULL,
       boundaries = NULL
     ) {
-      histogram_new(self, name, description, unit, boundaries)
+      tryCatch({                                                     # safe
+        histogram_new(self, name, description, unit, boundaries)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_meter()$create_histogram(NULL)                          # safe
+      })                                                             # safe
     },
     create_gauge = function(
       name,
       description = NULL,
       unit = NULL
     ) {
-      gauge_new(self, name, description, unit)
+      tryCatch({                                                     # safe
+        gauge_new(self, name, description, unit)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_meter()$create_gauge(NULL)                              # safe
+      })                                                             # safe
     },
     is_enabled = function() {
       TRUE
@@ -63,7 +86,9 @@ meter_new <- function(
   )
   self
 }
+# safe end
 
+# safe start
 counter_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
     "otel_counter",
@@ -72,9 +97,14 @@ counter_new <- function(meter, name, description = NULL, unit = NULL) {
       attributes = NULL,
       span_context = NULL
     ) {
-      # TODO: check args
-      value <- as.double(value)
-      ccall(otel_counter_add, self$xptr, value, attributes, span_context)
+      tryCatch({                                                     # safe
+        # TODO: check args
+        value <- as.double(value)
+        ccall(otel_counter_add, self$xptr, value, attributes, span_context)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
+      invisible(self)
     }
   )
   self$xptr <- ccall(
@@ -86,7 +116,9 @@ counter_new <- function(meter, name, description = NULL, unit = NULL) {
   )
   self
 }
+# safe end
 
+# safe start
 up_down_counter_new <- function(
   meter,
   name,
@@ -100,15 +132,20 @@ up_down_counter_new <- function(
       attributes = NULL,
       span_context = NULL
     ) {
-      # TODO: check args
-      value <- as.double(value)
-      ccall(
-        otel_up_down_counter_add,
-        self$xptr,
-        value,
-        attributes,
-        span_context
-      )
+      tryCatch({                                                     # safe
+        # TODO: check args
+        value <- as.double(value)
+        ccall(
+          otel_up_down_counter_add,
+          self$xptr,
+          value,
+          attributes,
+          span_context
+        )
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
+      invisible(self)
     }
   )
   self$xptr <- ccall(
@@ -120,7 +157,9 @@ up_down_counter_new <- function(
   )
   self
 }
+# safe end
 
+# safe start
 histogram_new <- function(
   meter,
   name,
@@ -136,9 +175,14 @@ histogram_new <- function(
       attributes = NULL,
       span_context = NULL
     ) {
-      # TODO: check args
-      value <- as.double(value)
-      ccall(otel_histogram_record, self$xptr, value, attributes, span_context)
+      tryCatch({                                                     # safe
+        # TODO: check args
+        value <- as.double(value)
+        ccall(otel_histogram_record, self$xptr, value, attributes, span_context)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
+      invisible(self)
     }
   )
   self$xptr <- ccall(
@@ -151,7 +195,9 @@ histogram_new <- function(
   )
   self
 }
+# safe end
 
+# safe start
 gauge_new <- function(meter, name, description = NULL, unit = NULL) {
   self <- new_object(
     "otel_gauge",
@@ -160,9 +206,14 @@ gauge_new <- function(meter, name, description = NULL, unit = NULL) {
       attributes = NULL,
       span_context = NULL
     ) {
-      # TODO: check args
-      value <- as.double(value)
-      ccall(otel_gauge_record, self$xptr, value, attributes, span_context)
+      tryCatch({                                                     # safe
+        # TODO: check args
+        value <- as.double(value)
+        ccall(otel_gauge_record, self$xptr, value, attributes, span_context)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
+      invisible(self)
     }
   )
   self$xptr <- ccall(
@@ -174,3 +225,4 @@ gauge_new <- function(meter, name, description = NULL, unit = NULL) {
   )
   self
 }
+# safe end

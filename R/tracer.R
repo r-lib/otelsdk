@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 tracer_new <- function(
   provider,
   name = NULL,
@@ -21,15 +24,20 @@ tracer_new <- function(
       links = NULL,
       options = NULL
     ) {
-      span_new(
-        self,
-        name = name,
-        attributes = attributes,
-        links = links,
-        options = options,
-        scope = NULL,
-        activation_scope = NULL
-      )
+      tryCatch({                                                     # safe
+        span_new(
+          self,
+          name = name,
+          attributes = attributes,
+          links = links,
+          options = options,
+          scope = NULL,
+          activation_scope = NULL
+        )
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_span()                                                  # safe
+      })                                                             # safe
     },
     start_local_active_span = function(
       name = NULL,
@@ -39,32 +47,57 @@ tracer_new <- function(
       scope = parent.frame(),
       activation_scope = parent.frame()
     ) {
-      span_new(
-        self,
-        name = name,
-        attributes = attributes,
-        links = links,
-        options = options,
-        scope = scope,
-        activation_scope = activation_scope
-      )
+      tryCatch({                                                     # safe
+        span_new(
+          self,
+          name = name,
+          attributes = attributes,
+          links = links,
+          options = options,
+          scope = scope,
+          activation_scope = activation_scope
+        )
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_span()                                                  # safe
+      })                                                             # safe
     },
     is_enabled = function(...) TRUE,
     get_active_span_context = function() {
-      xptr <- ccall(otel_get_active_span_context, self$xptr)
-      span_context_new(xptr)
+      tryCatch({                                                     # safe
+        xptr <- ccall(otel_get_active_span_context, self$xptr)
+        span_context_new(xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invalid_span_context()                                       # safe
+      })                                                             # safe
     },
     get_active_span = function() {
-      xptr <- ccall(otel_get_active_span, self$xptr)
-      span_base_new(self, xptr)
+      tryCatch({                                                     # safe
+        xptr <- ccall(otel_get_active_span, self$xptr)
+        span_base_new(self, xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_span()                                                  # safe
+      })                                                             # safe
     },
     flush = function() {
-      self$provider$flush()
+      tryCatch({                                                     # safe
+        self$provider$flush()
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invisible(NULL)                                              # safe
+      })                                                             # safe
     },
     extract_http_context = function(headers) {
-      headers <- as_http_context_headers(headers)
-      xptr <- ccall(otel_extract_http_context, headers)
-      span_context_new(xptr)
+      tryCatch({                                                     # safe
+        headers <- as_http_context_headers(headers)
+        xptr <- ccall(otel_extract_http_context, headers)
+        span_context_new(xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invalid_span_context()                                       # safe
+      })                                                             # safe
     }
   )
   self$provider <- provider
@@ -82,3 +115,4 @@ tracer_new <- function(
   )
   self
 }
+# safe end

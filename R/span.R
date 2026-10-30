@@ -339,6 +339,22 @@ invalid_span_context <- function() {
   otel::tracer_provider_noop$new()$get_tracer()$get_active_span_context()
 }
 
+noop_tracer <- function(name = NULL) {
+  otel::tracer_provider_noop$new()$get_tracer(name)
+}
+
+noop_span <- function() {
+  noop_tracer()$start_span()
+}
+
+noop_logger <- function(name = NULL) {
+  otel::logger_provider_noop$new()$get_logger(name)
+}
+
+noop_meter <- function(name = NULL) {
+  otel::meter_provider_noop$new()$get_meter(name)
+}
+
 format_exception <- function(error_condition) {
   message <- tryCatch(
     utils::capture.output(error_condition),
