@@ -1,7 +1,8 @@
-output_file <- Sys.getenv("OTEL_DEV_API_OUTPUT_FILE", "R/span-dev.R")
+output_file <- Sys.getenv("OTEL_DEV_API_OUTPUT_FILE", "R/api-dev.R")
 
-r_files <- dir("R")
+r_files <- setdiff(dir("R"), "api-dev.R")
 all_lines <- "# fmt: skip file"
+fn_names <- character()
 for (r_file in r_files) {
   lns <- readLines(file.path("R", r_file), warn = FALSE)
   if (!any(grepl("^# safe start", lns))) {
@@ -19,6 +20,7 @@ for (r_file in r_files) {
 
   for (idx in seq_along(stts)) {
     fnlns <- lns[(stts[idx] + 1):(ends[idx] - 1)]
+    fn_names <- c(fn_names, sub(" <- function.*$", "", fnlns[1]))
     fnlns[1] <- sub(
       " <- function",
       "_dev <- function",
@@ -29,5 +31,13 @@ for (r_file in r_files) {
     all_lines <- c(all_lines, "", fnlns)
   }
 }
+
+all_lines <- c(
+  all_lines,
+  "",
+  "dev_function_names <- c(",
+  paste0("  \"", fn_names, "\"", c(rep(",", length(fn_names) - 1), "")),
+  ")"
+)
 
 writeLines(all_lines, output_file)

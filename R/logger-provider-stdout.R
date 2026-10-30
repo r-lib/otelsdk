@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 logger_provider_stdstream_new <- function(opts = NULL) {
   opts <- as_logger_provider_stdstream_options(opts)
 
@@ -11,18 +14,28 @@ logger_provider_stdstream_new <- function(opts = NULL) {
       attributes = NULL,
       ...
     ) {
-      logger_new(
-        self,
-        name,
-        minimum_severity,
-        version,
-        schema_url,
-        attributes,
-        ...
-      )
+      tryCatch({                                                     # safe
+        logger_new(
+          self,
+          name,
+          minimum_severity,
+          version,
+          schema_url,
+          attributes,
+          ...
+        )
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_logger()                                                # safe
+      })                                                             # safe
     },
     flush = function() {
-      ccall(otel_logger_provider_flush, self$xptr)
+      tryCatch({                                                     # safe
+        ccall(otel_logger_provider_flush, self$xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invisible(NULL)                                              # safe
+      })                                                             # safe
     }
   )
 
@@ -30,6 +43,7 @@ logger_provider_stdstream_new <- function(opts = NULL) {
   self$xptr <- ccall(otel_create_logger_provider_stdstream, opts, attributes)
   self
 }
+# safe end
 
 logger_provider_stdstream_options <- function() {
   as_logger_provider_stdstream_options(NULL)

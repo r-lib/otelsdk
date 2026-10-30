@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 tracer_provider_file_new <- function(opts = NULL) {
   opts <- as_tracer_provider_file_options(opts)
 
@@ -10,10 +13,20 @@ tracer_provider_file_new <- function(opts = NULL) {
       attributes = NULL,
       ...
     ) {
-      tracer_new(self, name, version, schema_url, attributes, ...)
+      tryCatch({                                                     # safe
+        tracer_new(self, name, version, schema_url, attributes, ...)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_tracer()                                                # safe
+      })                                                             # safe
     },
     flush = function() {
-      ccall(otel_tracer_provider_flush, self$xptr)
+      tryCatch({                                                     # safe
+        ccall(otel_tracer_provider_flush, self$xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invisible(NULL)                                              # safe
+      })                                                             # safe
     }
   )
 
@@ -21,6 +34,7 @@ tracer_provider_file_new <- function(opts = NULL) {
   self$xptr <- ccall(otel_create_tracer_provider_file, opts, attributes)
   self
 }
+# safe end
 
 #' Tracer provider to write traces into a JSONL file
 #'

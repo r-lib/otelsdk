@@ -121,9 +121,12 @@ test_that("meter, histogram with invalid boundaries", {
   mp <- meter_provider_memory_new()
   on.exit(mp$shutdown(), add = TRUE)
   mtr <- mp$get_meter()
-  expect_snapshot(error = TRUE, {
-    mtr$create_histogram("hst", boundaries = c(2, 1))
-  })
+  expect_message(
+    hst <- mtr$create_histogram("hst", boundaries = c(2, 1)),
+    "strictly increasing",
+    class = "otel_error_message"
+  )
+  expect_s3_class(hst, "otel_histogram_noop")
 })
 
 test_that("meter, gauge", {

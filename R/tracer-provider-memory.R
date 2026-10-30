@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 tracer_provider_memory_new <- function(opts = NULL) {
   opts <- as_tracer_provider_memory_options(opts)
   self <- new_object(
@@ -9,15 +12,25 @@ tracer_provider_memory_new <- function(opts = NULL) {
       attributes = NULL,
       ...
     ) {
-      tracer_new(self, name, version, schema_url, attributes, ...)
+      tryCatch({                                                     # safe
+        tracer_new(self, name, version, schema_url, attributes, ...)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_tracer()                                                # safe
+      })                                                             # safe
     },
     flush = function() {
       # noop currently
     },
     get_spans = function() {
-      spans <- ccall(otel_tracer_provider_memory_get_spans, self$xptr)
-      names(spans) <- map_chr(spans, function(x) x[["name"]] %||% "")
-      spans
+      tryCatch({                                                     # safe
+        spans <- ccall(otel_tracer_provider_memory_get_spans, self$xptr)
+        names(spans) <- map_chr(spans, function(x) x[["name"]] %||% "")
+        spans
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        list()                                                       # safe
+      })                                                             # safe
     }
   )
 
@@ -25,6 +38,7 @@ tracer_provider_memory_new <- function(opts = NULL) {
   self$xptr <- ccall(otel_create_tracer_provider_memory, opts, attributes)
   self
 }
+# safe end
 
 tracer_provider_memory_options <- function() {
   as_tracer_provider_memory_options(NULL)

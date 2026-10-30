@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 logger_provider_http_new <- function(opts = NULL) {
   opts <- as_logger_provider_http_options(opts)
   self <- new_object(
@@ -10,15 +13,20 @@ logger_provider_http_new <- function(opts = NULL) {
       attributes = NULL,
       ...
     ) {
-      logger_new(
-        self,
-        name,
-        minimum_severity,
-        version,
-        schema_url,
-        attributes,
-        ...
-      )
+      tryCatch({                                                     # safe
+        logger_new(
+          self,
+          name,
+          minimum_severity,
+          version,
+          schema_url,
+          attributes,
+          ...
+        )
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        noop_logger()                                                # safe
+      })                                                             # safe
     },
     flush = function() {
       # noop currenrly
@@ -29,6 +37,7 @@ logger_provider_http_new <- function(opts = NULL) {
   self$xptr <- ccall(otel_create_logger_provider_http, opts, attributes)
   self
 }
+# safe end
 
 logger_provider_http_options <- function() {
   ropts <- as_logger_provider_http_options(NULL)

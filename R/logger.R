@@ -1,3 +1,6 @@
+# fmt: skip file
+
+# safe start
 logger_new <- function(
   provider,
   name = NULL,
@@ -17,7 +20,12 @@ logger_new <- function(
   self <- new_object(
     "otel_logger",
     get_name = function() {
-      ccall(otel_logger_get_name, self$xptr)
+      tryCatch({                                                     # safe
+        ccall(otel_logger_get_name, self$xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        self$name                                                    # safe
+      })                                                             # safe
     },
     # create_log_record = function() {
     #   log_record_new()
@@ -45,17 +53,31 @@ logger_new <- function(
       self$log(msg = msg, severity = "fatal", ...)
     },
     is_enabled = function(severity = "info", event_id = NULL) {
-      severity <- as_log_severity(severity)
-      event_id <- as_event_id(event_id)
-      ccall(otel_logger_is_enabled, self$xptr, severity, event_id)
+      tryCatch({                                                     # safe
+        severity <- as_log_severity(severity)
+        event_id <- as_event_id(event_id)
+        ccall(otel_logger_is_enabled, self$xptr, severity, event_id)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        FALSE                                                        # safe
+      })                                                             # safe
     },
     get_minimum_severity = function() {
-      ms <- ccall(otel_get_minimum_log_severity, self$xptr)
-      otel::log_severity_levels[match(ms, otel::log_severity_levels)]
+      tryCatch({                                                     # safe
+        ms <- ccall(otel_get_minimum_log_severity, self$xptr)
+        otel::log_severity_levels[match(ms, otel::log_severity_levels)]
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        otel::log_severity_levels["info"]                            # safe
+      })                                                             # safe
     },
     set_minimum_severity = function(minimum_severity) {
-      minimum_severity <- as_log_severity(minimum_severity)
-      ccall(otel_set_minimum_log_severity, self$xptr, minimum_severity)
+      tryCatch({                                                     # safe
+        minimum_severity <- as_log_severity(minimum_severity)
+        ccall(otel_set_minimum_log_severity, self$xptr, minimum_severity)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
       invisible(self)
     },
     log = function(
@@ -70,43 +92,52 @@ logger_new <- function(
       observed_timestamp = NULL,
       attributes = NULL
     ) {
-      msg <- as_string(msg, null = FALSE)
-      severity <- as_log_severity(severity)
-      event_id <- as_event_id(event_id)
-      span_context <- as_span_context(span_context)
-      span_id <- as_span_id(span_id)
-      trace_id <- as_trace_id(trace_id)
-      trace_flags <- as_trace_flags(trace_flags)
-      timestamp <- as_timestamp(timestamp)
-      observed_timestamp <- as_timestamp(observed_timestamp)
-      attributes <- as.list(as_otel_attributes(attributes))
+      tryCatch({                                                     # safe
+        msg <- as_string(msg, null = FALSE)
+        severity <- as_log_severity(severity)
+        event_id <- as_event_id(event_id)
+        span_context <- as_span_context(span_context)
+        span_id <- as_span_id(span_id)
+        trace_id <- as_trace_id(trace_id)
+        trace_flags <- as_trace_flags(trace_flags)
+        timestamp <- as_timestamp(timestamp)
+        observed_timestamp <- as_timestamp(observed_timestamp)
+        attributes <- as.list(as_otel_attributes(attributes))
 
-      if (!is_na(span_context)) {
-        span_context <- span_context %||% otel::get_active_span_context()
-        if (span_context$is_valid()) {
-          span_id <- span_id %||% span_context$get_span_id()
-          trace_id <- trace_id %||% span_context$get_trace_id()
-          trace_flags <- trace_flags %||% span_context$get_trace_flags()
+        if (!is_na(span_context)) {
+          span_context <- span_context %||% otel::get_active_span_context()
+          if (span_context$is_valid()) {
+            span_id <- span_id %||% span_context$get_span_id()
+            trace_id <- trace_id %||% span_context$get_trace_id()
+            trace_flags <- trace_flags %||% span_context$get_trace_flags()
+          }
         }
-      }
 
-      ccall(
-        otel_log,
-        self$xptr,
-        msg,
-        severity,
-        event_id,
-        span_id,
-        trace_id,
-        trace_flags,
-        timestamp,
-        observed_timestamp,
-        attributes
-      )
+        ccall(
+          otel_log,
+          self$xptr,
+          msg,
+          severity,
+          event_id,
+          span_id,
+          trace_id,
+          trace_flags,
+          timestamp,
+          observed_timestamp,
+          attributes
+        )
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
       invisible(self)
     },
     flush = function() {
-      self$provider$flush()
+      tryCatch({                                                     # safe
+        self$provider$flush()
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invisible(NULL)                                              # safe
+      })                                                             # safe
     },
     name = NULL
   )
@@ -129,6 +160,7 @@ logger_new <- function(
   )
   self
 }
+# safe end
 
 # log_record_new <- function() {
 #   # TODO
