@@ -2,10 +2,15 @@
 
 ## otelsdk (development version)
 
-- Span and span context methods do not throw errors any more. On failure
-  they emit a message of class `otel_error_message` and return a default
-  value, usually the span itself. Set `OTEL_ENV=dev` to get errors
+- Methods of tracer, logger, meter, context, span instrument (counter,
+  up-down counter, histogram, gauge) and provider objects do not throw
+  errors any more. On failure they emit an `otel_error_message` message
+  and return a default value, e.g. a no-op object instead of a span,
+  tracer, logger, meter or instrument. Set `OTEL_ENV=dev` to get errors
   instead (r-lib/otel#36).
+
+- The `add()` and `record()` methods of instruments now return the
+  instrument invisibly.
 
 - The default alias pattern of the file exporters, used when only the
   file pattern is set, does not contain date and time placeholders any

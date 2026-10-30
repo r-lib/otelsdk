@@ -39,7 +39,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="otelsdk-development-version">otelsdk (development version)<a class="anchor" aria-label="anchor" href="#otelsdk-development-version"></a></h2>
-<ul><li><p>Span and span context methods do not throw errors any more. On failure they emit a message of class <code>otel_error_message</code> and return a default value, usually the span itself. Set <code>OTEL_ENV=dev</code> to get errors instead (r-lib/otel#36).</p></li>
+<ul><li><p>Methods of tracer, logger, meter, context, span instrument (counter, up-down counter, histogram, gauge) and provider objects do not throw errors any more. On failure they emit an <code>otel_error_message</code> message and return a default value, e.g. a no-op object instead of a span, tracer, logger, meter or instrument. Set <code>OTEL_ENV=dev</code> to get errors instead (r-lib/otel#36).</p></li>
+<li><p>The <code>add()</code> and <code>record()</code> methods of instruments now return the instrument invisibly.</p></li>
 <li><p>The default alias pattern of the file exporters, used when only the file pattern is set, does not contain date and time placeholders any more. Previously a file pattern like <code>trace-%F-%T-%N.jsonl</code> created a new alias file for every output file (<a href="https://github.com/r-lib/otelsdk/issues/70" class="external-link">#70</a>).</p></li>
 <li><p>Setting the metric export interval or timeout, via the <code>OTEL_METRIC_EXPORT_INTERVAL</code> or <code>OTEL_METRIC_EXPORT_TIMEOUT</code> environment variables, or the <code>export_interval</code> or <code>export_timeout</code> options, does not fail any more (<a href="https://github.com/r-lib/otelsdk/issues/79" class="external-link">#79</a>).</p></li>
 <li><p>The <code>create_histogram()</code> method of meters now has a <code>boundaries</code> argument, to set explicit bucket boundaries for the histogram (r-lib/otel#49).</p></li>
