@@ -17,6 +17,23 @@ test_that("writing to a file", {
   expect_true(any(grepl("name\\s*:\\s*testspan", lns)))
 })
 
+test_that("shutdown", {
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+  tp <- tracer_provider_stdstream_new(list(output = tmp))
+  trc <- tp$get_tracer()
+  sp1 <- trc$start_span("testspan")
+  sp1$end()
+  expect_identical(tp$shutdown(), tp)
+
+  lns <- readLines(tmp)
+  expect_true(any(grepl("name\\s*:\\s*testspan", lns)))
+
+  # no error after shutdown
+  expect_silent(tp$flush())
+  expect_silent(tp$shutdown())
+})
+
 test_that("tracer_provider_stdstream_options", {
   expect_snapshot({
     tracer_provider_stdstream_options()

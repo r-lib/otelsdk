@@ -203,11 +203,23 @@ int otel_tracer_provider_memory_get_spans_(
 int otel_tracer_provider_flush_(void *tracer_provider_) {
   struct otel_tracer_provider *tps =
     (struct otel_tracer_provider *) tracer_provider_;
+  trace_sdk::TracerProvider &tracer_provider = *(tps->ptr);
+  int res = tracer_provider.ForceFlush();
   if (tps->stream.is_open()) {
     tps->stream.flush();
   }
+  return res;
+}
+
+int otel_tracer_provider_shutdown_(void *tracer_provider_) {
+  struct otel_tracer_provider *tps =
+    (struct otel_tracer_provider *) tracer_provider_;
   trace_sdk::TracerProvider &tracer_provider = *(tps->ptr);
-  return tracer_provider.ForceFlush();
+  int res = tracer_provider.Shutdown();
+  if (tps->stream.is_open()) {
+    tps->stream.flush();
+  }
+  return res;
 }
 
 void *otel_get_tracer_(

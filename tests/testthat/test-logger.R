@@ -159,6 +159,14 @@ test_that("otel_logger_provider_flush", {
   })
 })
 
+test_that("otel_logger_provider_shutdown", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_logger_provider_shutdown, 1L)
+    ccall(otel_logger_provider_shutdown, x)
+  })
+})
+
 test_that("otel_get_logger", {
   x <- ccall(create_empty_xptr)
   expect_snapshot(error = TRUE, {

@@ -20,7 +20,20 @@ tracer_provider_memory_new <- function(opts = NULL) {
       })                                                             # safe
     },
     flush = function() {
-      # noop currently
+      tryCatch({                                                     # safe
+        ccall(otel_tracer_provider_flush, self$xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+        invisible(NULL)                                              # safe
+      })                                                             # safe
+    },
+    shutdown = function() {
+      tryCatch({                                                     # safe
+        ccall(otel_tracer_provider_shutdown, self$xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
+      invisible(self)
     },
     get_spans = function() {
       tryCatch({                                                     # safe

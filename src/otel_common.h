@@ -577,6 +577,7 @@ void otel_tracer_provider_file_options_defaults_(
 int otel_tracer_provider_memory_get_spans_(
   void *tracer_provider, struct otel_span_data *cdata);
 int otel_tracer_provider_flush_(void *tracer_provider);
+int otel_tracer_provider_shutdown_(void *tracer_provider);
 void *otel_get_tracer_(
     void *tracer_provider_, const char *name, const char *version,
     const char *schema_url, struct otel_attributes *attributes);
@@ -649,7 +650,8 @@ void *otel_create_logger_provider_file_(
   struct otel_file_exporter_options *options);
 void otel_logger_provider_file_options_defaults_(
   struct otel_file_exporter_options *options);
-void otel_logger_provider_flush_(void *tracer_provider);
+int otel_logger_provider_flush_(void *logger_provider);
+int otel_logger_provider_shutdown_(void *logger_provider);
 int otel_get_minimum_log_severity_(void *logger);
 void otel_set_minimum_log_severity_(void *logger, int minimum_severity);
 void *otel_get_logger_(

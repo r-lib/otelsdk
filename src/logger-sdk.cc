@@ -64,14 +64,26 @@ void otel_logger_provider_file_options_defaults_(
   cc2c_file_exporter_options(backend_opts, *options);
 }
 
-void otel_logger_provider_flush_(void *logger_provider_) {
+int otel_logger_provider_flush_(void *logger_provider_) {
   struct otel_logger_provider *lps =
     (struct otel_logger_provider *) logger_provider_;
+  logs_sdk::LoggerProvider &logger_provider = *(lps->ptr);
+  int res = logger_provider.ForceFlush();
   if (lps->stream.is_open()) {
     lps->stream.flush();
   }
+  return res;
+}
+
+int otel_logger_provider_shutdown_(void *logger_provider_) {
+  struct otel_logger_provider *lps =
+    (struct otel_logger_provider *) logger_provider_;
   logs_sdk::LoggerProvider &logger_provider = *(lps->ptr);
-  logger_provider.ForceFlush();
+  int res = logger_provider.Shutdown();
+  if (lps->stream.is_open()) {
+    lps->stream.flush();
+  }
+  return res;
 }
 
 int otel_get_minimum_log_severity_(void *logger_) {

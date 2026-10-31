@@ -137,6 +137,24 @@ SEXP otel_tracer_provider_flush(SEXP provider) {
   return Rf_ScalarLogical(res);
 }
 
+SEXP otel_tracer_provider_shutdown(SEXP provider) {
+  if (TYPEOF(provider) != EXTPTRSXP) {
+    Rf_warningcall(
+      R_NilValue,
+      "OpenTelemetry: invalid tracer provider pointer."
+    );
+    return R_NilValue;
+  }
+  void *tracer_provider_ = R_ExternalPtrAddr(provider);
+  if (!tracer_provider_) {
+    Rf_error(
+      "Opentelemetry tracer provider cleaned up already, internal error."
+    );
+  }
+  int res = otel_tracer_provider_shutdown_(tracer_provider_);
+  return Rf_ScalarLogical(res);
+}
+
 SEXP otel_get_tracer(
     SEXP provider, SEXP name, SEXP version, SEXP schema_url,
     SEXP attributes) {
