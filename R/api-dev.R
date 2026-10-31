@@ -25,6 +25,10 @@ logger_provider_file_new_dev <- function(opts = NULL) {
     },
     flush = function() {
         ccall(otel_logger_provider_flush, self$xptr)
+    },
+    shutdown = function() {
+        ccall(otel_logger_provider_shutdown, self$xptr)
+      invisible(self)
     }
   )
 
@@ -55,7 +59,11 @@ logger_provider_http_new_dev <- function(opts = NULL) {
         )
     },
     flush = function() {
-      # noop currenrly
+        ccall(otel_logger_provider_flush, self$xptr)
+    },
+    shutdown = function() {
+        ccall(otel_logger_provider_shutdown, self$xptr)
+      invisible(self)
     }
   )
 
@@ -89,6 +97,10 @@ logger_provider_stdstream_new_dev <- function(opts = NULL) {
     },
     flush = function() {
         ccall(otel_logger_provider_flush, self$xptr)
+    },
+    shutdown = function() {
+        ccall(otel_logger_provider_shutdown, self$xptr)
+      invisible(self)
     }
   )
 
@@ -740,6 +752,10 @@ tracer_provider_file_new_dev <- function(opts = NULL) {
     },
     flush = function() {
         ccall(otel_tracer_provider_flush, self$xptr)
+    },
+    shutdown = function() {
+        ccall(otel_tracer_provider_shutdown, self$xptr)
+      invisible(self)
     }
   )
 
@@ -763,6 +779,10 @@ tracer_provider_http_new_dev <- function(opts = NULL) {
     },
     flush = function() {
         ccall(otel_tracer_provider_flush, self$xptr)
+    },
+    shutdown = function() {
+        ccall(otel_tracer_provider_shutdown, self$xptr)
+      invisible(self)
     }
   )
 
@@ -785,7 +805,11 @@ tracer_provider_memory_new_dev <- function(opts = NULL) {
         tracer_new(self, name, version, schema_url, attributes, ...)
     },
     flush = function() {
-      # noop currently
+        ccall(otel_tracer_provider_flush, self$xptr)
+    },
+    shutdown = function() {
+        ccall(otel_tracer_provider_shutdown, self$xptr)
+      invisible(self)
     },
     get_spans = function() {
         spans <- ccall(otel_tracer_provider_memory_get_spans, self$xptr)
@@ -814,6 +838,10 @@ tracer_provider_stdstream_new_dev <- function(opts = NULL) {
     },
     flush = function() {
         ccall(otel_tracer_provider_flush, self$xptr)
+    },
+    shutdown = function() {
+        ccall(otel_tracer_provider_shutdown, self$xptr)
+      invisible(self)
     }
   )
   attributes <- as_otel_attributes(the$default_resource_attributes)

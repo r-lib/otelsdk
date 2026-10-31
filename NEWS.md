@@ -1,5 +1,10 @@
 # otelsdk (development version)
 
+* All tracer and logger providers now have a `shutdown()` method, like
+  meter providers already had. `flush()` now works for
+  `tracer_provider_memory` and `logger_provider_http`; previously it did
+  nothing (#32).
+
 * Methods of tracer, logger, meter, context, span instrument (counter,
   up-down counter, histogram, gauge) and provider objects do not throw
   errors any more. On failure they emit an `otel_error_message` message and

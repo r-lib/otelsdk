@@ -102,3 +102,19 @@ test_that("tracer_new when tracing is disabled", {
   lgr <- tracer_new("name")
   expect_s3_class(lgr, "otel_tracer_noop")
 })
+
+test_that("otel_tracer_provider_flush", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_tracer_provider_flush, 1L)
+    ccall(otel_tracer_provider_flush, x)
+  })
+})
+
+test_that("otel_tracer_provider_shutdown", {
+  x <- ccall(create_empty_xptr)
+  expect_snapshot(error = TRUE, {
+    ccall(otel_tracer_provider_shutdown, 1L)
+    ccall(otel_tracer_provider_shutdown, x)
+  })
+})

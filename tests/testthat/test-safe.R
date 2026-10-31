@@ -195,13 +195,8 @@ test_that("provider methods do not error", {
       if (!is.null(prv$get_meter)) {
         expect_s3_class(msg(prv$get_meter("m")), "otel_meter_noop")
       }
-      # some flush() methods do nothing
-      if (!grepl("_(memory|http)$", nm) || nm == "meter_provider_http") {
-        expect_null(msg(prv$flush()))
-      }
-      if (!is.null(prv$shutdown)) {
-        expect_identical(msg(prv$shutdown()), prv)
-      }
+      expect_null(msg(prv$flush()))
+      expect_identical(msg(prv$shutdown()), prv)
       if (!is.null(prv$get_spans)) {
         expect_equal(msg(prv$get_spans()), list())
       }
@@ -227,9 +222,8 @@ test_that("provider methods error in dev mode", {
       if (!is.null(prv$get_meter)) {
         expect_error(prv$get_meter("m"))
       }
-      if (!is.null(prv$shutdown)) {
-        expect_error(prv$shutdown())
-      }
+      expect_error(prv$flush())
+      expect_error(prv$shutdown())
       if (!is.null(prv$get_spans)) {
         expect_error(prv$get_spans())
       }

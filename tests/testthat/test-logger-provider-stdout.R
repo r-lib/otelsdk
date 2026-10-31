@@ -58,6 +58,22 @@ test_that("log to file", {
   )
 })
 
+test_that("shutdown", {
+  tmp <- tempfile()
+  on.exit(unlink(tmp), add = TRUE)
+  lp <- logger_provider_stdstream_new(list(output = tmp))
+  lgr <- lp$get_logger("mylogger")
+  lgr$log("This is a simple log message")
+  expect_identical(lp$shutdown(), lp)
+
+  spns <- parse_spans(tmp)
+  expect_equal(spns[[1]]$body, "This is a simple log message")
+
+  # no error after shutdown
+  expect_silent(lp$flush())
+  expect_silent(lp$shutdown())
+})
+
 test_that("logger_provider_stdstream_options", {
   expect_snapshot(logger_provider_stdstream_options())
 })

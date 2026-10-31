@@ -26,6 +26,14 @@ tracer_provider_stdstream_new <- function(opts = NULL) {
         errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
         invisible(NULL)                                              # safe
       })                                                             # safe
+    },
+    shutdown = function() {
+      tryCatch({                                                     # safe
+        ccall(otel_tracer_provider_shutdown, self$xptr)
+      }, error = function(err) {                                     # safe
+        errmsg("OpenTelemetry error: ", conditionMessage(err))       # safe
+      })                                                             # safe
+      invisible(self)
     }
   )
   attributes <- as_otel_attributes(the$default_resource_attributes)

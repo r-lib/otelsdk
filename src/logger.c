@@ -122,6 +122,24 @@ SEXP otel_logger_provider_flush(SEXP provider) {
   return R_NilValue;
 }
 
+SEXP otel_logger_provider_shutdown(SEXP provider) {
+  if (TYPEOF(provider) != EXTPTRSXP) {
+    Rf_warningcall(
+      R_NilValue,
+      "OpenTelemetry: invalid logger provider pointer."
+    );
+    return R_NilValue;
+  }
+  void *logger_provider_ = R_ExternalPtrAddr(provider);
+  if (!logger_provider_) {
+    Rf_error(
+      "Opentelemetry logger provider cleaned up already, internal error."
+    );
+  }
+  int res = otel_logger_provider_shutdown_(logger_provider_);
+  return Rf_ScalarLogical(res);
+}
+
 SEXP otel_get_logger(
     SEXP provider, SEXP name, SEXP minimum_severity, SEXP version,
     SEXP schema_url, SEXP attributes) {

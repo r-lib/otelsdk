@@ -47,6 +47,21 @@
       Error:
       ! Opentelemetry logger provider cleaned up already, internal error.
 
+# otel_logger_provider_shutdown
+
+    Code
+      ccall(otel_logger_provider_shutdown, 1L)
+    Condition
+      Warning:
+      OpenTelemetry: invalid logger provider pointer.
+    Output
+      NULL
+    Code
+      ccall(otel_logger_provider_shutdown, x)
+    Condition
+      Error:
+      ! Opentelemetry logger provider cleaned up already, internal error.
+
 # otel_get_logger
 
     Code
