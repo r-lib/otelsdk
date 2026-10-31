@@ -50,5 +50,8 @@ cp -r ${CPP}/api cpp/
 find cpp -name test -type d | xargs rm -rf
 find cpp -name docs -type d | xargs rm -rf
 
+# Patch at update time, so we don't need `patch` at install time
+patch -p0 < ../../tools/scripts/opentelemetry-cpp.patch
+
 echo 'Check cpp and then run'
 echo 'tar czf opentelemetry-cpp.tgz --options gzip:compression-level=9 --no-xattrs cpp'
