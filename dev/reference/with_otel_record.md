@@ -73,16 +73,16 @@ spns
 #> $traces
 #> $traces$my
 #> <otel_span_data>
-#> trace_id              : a89dbdfa8335620300a8d3de406a58d8
-#> span_id               : 1b04c5e27afaf7a2
+#> trace_id              : 0123189ca18cd75b0c899e673f5de476
+#> span_id               : 4908add2e5b6d6cb
 #> name                  : my
 #> flags                 : +sampled +random
-#> parent                : ce5d51f05a2291f7
+#> parent                : 63a256b6114dca8d
 #> description           : 
 #> resource_attributes   : 
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8910
+#>     process.pid                 : 8865
 #>     process.runtime.description : R version 4.6.2 (2026-10-29)
 #>     process.runtime.name        : R
 #>     process.runtime.version     : 4.6.2
@@ -99,16 +99,16 @@ spns
 #>     attributes : 
 #> kind                  : internal
 #> status                : unset
-#> start_time            : 2026-10-30 10:31:59
-#> duration              : 0.000175508
+#> start_time            : 2026-10-31 15:22:03
+#> duration              : 0.000165641
 #> attributes            : 
 #> events                : 
 #> links                 : 
 #> 
 #> $traces$`<NA>`
 #> <otel_span_data>
-#> trace_id              : a89dbdfa8335620300a8d3de406a58d8
-#> span_id               : ce5d51f05a2291f7
+#> trace_id              : 0123189ca18cd75b0c899e673f5de476
+#> span_id               : 63a256b6114dca8d
 #> name                  : <NA>
 #> flags                 : +sampled +random
 #> parent                : 0000000000000000
@@ -116,7 +116,7 @@ spns
 #> resource_attributes   : 
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8910
+#>     process.pid                 : 8865
 #>     process.runtime.description : R version 4.6.2 (2026-10-29)
 #>     process.runtime.name        : R
 #>     process.runtime.version     : 4.6.2
@@ -133,8 +133,8 @@ spns
 #>     attributes : 
 #> kind                  : internal
 #> status                : unset
-#> start_time            : 2026-10-30 10:31:59
-#> duration              : 0.000898296
+#> start_time            : 2026-10-31 15:22:03
+#> duration              : 0.000832841
 #> attributes            : 
 #> events                : 
 #> links                 : 
@@ -146,7 +146,7 @@ spns
 #> attributes:
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8910
+#>     process.pid                 : 8865
 #>     process.runtime.description : R version 4.6.2 (2026-10-29)
 #>     process.runtime.name        : R
 #>     process.runtime.version     : 4.6.2
