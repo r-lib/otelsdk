@@ -9,6 +9,17 @@
   now records logs as well, and has a new `logger_opts` argument
   ([\#21](https://github.com/r-lib/otelsdk/issues/21)).
 
+- New
+  [`add_span_processor()`](https://otelsdk.r-lib.org/dev/reference/add_span_processor.md)
+  and
+  [`remove_span_processor()`](https://otelsdk.r-lib.org/dev/reference/add_span_processor.md)
+  functions to register callbacks that run when a span starts. Use them
+  to add attributes to spans created by other packages, e.g. the current
+  user to every span created by Shiny. You can also set up span
+  processors with the `OTEL_R_SPAN_PROCESSORS` environment variable. See
+  an example Shiny app in `examples/shiny-span-processor`
+  ([\#77](https://github.com/r-lib/otelsdk/issues/77)).
+
 - All tracer and logger providers now have a `shutdown()` method, like
   meter providers already had.
   [`flush()`](https://rdrr.io/r/base/connections.html) now works for

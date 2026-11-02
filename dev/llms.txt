@@ -134,6 +134,9 @@ documentation:
 - [`tracer_provider_stdstream`](https://otelsdk.r-lib.org/dev/reference/tracer_provider_stdstream.md)
   : Tracer provider to write to the standard output or standard error or
   to a file
+- [`add_span_processor()`](https://otelsdk.r-lib.org/dev/reference/add_span_processor.md)
+  [`remove_span_processor()`](https://otelsdk.r-lib.org/dev/reference/add_span_processor.md)
+  : Add or remove a span processor
 
 ## Logs
 

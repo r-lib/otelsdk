@@ -503,6 +503,15 @@ one.
   Buffer size, this is the maximum number of spans, metrics measurements
   or log records that the provider can record.
 
+## Span Processors
+
+- `OTEL_R_SPAN_PROCESSORS`
+
+  Comma separated list of span processors to add, in the `pkg::name`
+  form. Each entry must refer to a named list of callbacks. See
+  [`add_span_processor()`](https://otelsdk.r-lib.org/dev/reference/add_span_processor.md)
+  for details.
+
 ## Support Matrix of all OpenTelemetry Environment Variables for R
 
 |                                                            |             |
