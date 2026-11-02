@@ -8,9 +8,10 @@ generated for your package or application.
 ``` r
 with_otel_record(
   expr,
-  what = c("traces", "metrics"),
+  what = c("traces", "metrics", "logs"),
   tracer_opts = list(),
-  meter_opts = list()
+  meter_opts = list(),
+  logger_opts = list()
 )
 ```
 
@@ -32,6 +33,10 @@ with_otel_record(
 
   Named list of options to pass to the meter provider.
 
+- logger_opts:
+
+  Named list of options to pass to the logger provider.
+
 ## Value
 
 A list with the output for each output type. Entries:
@@ -42,17 +47,18 @@ A list with the output for each output type. Entries:
 
 - `metrics`: the recorded metrics measurements, if requested in `what`.
 
+- `logs`: the recorded log records, if requested in `what`.
+
 ## Details
 
 It evaluates the supplied expression, collects OpenTelemetry output from
 it and returns it.
 
-Note: `with_otel_record()` cannot record logs yet.
-
 `with_otel_record()` uses
-[tracer_provider_memory](https://otelsdk.r-lib.org/dev/reference/tracer_provider_memory.md)
-and
+[tracer_provider_memory](https://otelsdk.r-lib.org/dev/reference/tracer_provider_memory.md),
 [meter_provider_memory](https://otelsdk.r-lib.org/dev/reference/meter_provider_memory.md)
+and
+[logger_provider_memory](https://otelsdk.r-lib.org/dev/reference/logger_provider_memory.md)
 internally.
 
 ## Examples
@@ -73,16 +79,16 @@ spns
 #> $traces
 #> $traces$my
 #> <otel_span_data>
-#> trace_id              : 9e7fb30915847033fe7bed813b2e2b7b
-#> span_id               : a6e266298c743f53
+#> trace_id              : bfb4ce1c8340af617f1bb4277c500011
+#> span_id               : 3f73e5f4bf8dbfef
 #> name                  : my
 #> flags                 : +sampled +random
-#> parent                : 19da5d6e2527ed4a
+#> parent                : b9143f392c68b126
 #> description           : 
 #> resource_attributes   : 
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8747
+#>     process.pid                 : 8891
 #>     process.runtime.description : R version 4.6.2 (2026-10-29)
 #>     process.runtime.name        : R
 #>     process.runtime.version     : 4.6.2
@@ -99,16 +105,16 @@ spns
 #>     attributes : 
 #> kind                  : internal
 #> status                : unset
-#> start_time            : 2026-10-31 15:50:12
-#> duration              : 0.000100554
+#> start_time            : 2026-11-02 09:50:45
+#> duration              : 0.000155971
 #> attributes            : 
 #> events                : 
 #> links                 : 
 #> 
 #> $traces$`<NA>`
 #> <otel_span_data>
-#> trace_id              : 9e7fb30915847033fe7bed813b2e2b7b
-#> span_id               : 19da5d6e2527ed4a
+#> trace_id              : bfb4ce1c8340af617f1bb4277c500011
+#> span_id               : b9143f392c68b126
 #> name                  : <NA>
 #> flags                 : +sampled +random
 #> parent                : 0000000000000000
@@ -116,7 +122,7 @@ spns
 #> resource_attributes   : 
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8747
+#>     process.pid                 : 8891
 #>     process.runtime.description : R version 4.6.2 (2026-10-29)
 #>     process.runtime.name        : R
 #>     process.runtime.version     : 4.6.2
@@ -133,8 +139,8 @@ spns
 #>     attributes : 
 #> kind                  : internal
 #> status                : unset
-#> start_time            : 2026-10-31 15:50:12
-#> duration              : 0.000542552
+#> start_time            : 2026-11-02 09:50:45
+#> duration              : 0.000811954
 #> attributes            : 
 #> events                : 
 #> links                 : 
@@ -146,7 +152,7 @@ spns
 #> attributes:
 #>     os.type                     : linux
 #>     process.owner               : runner
-#>     process.pid                 : 8747
+#>     process.pid                 : 8891
 #>     process.runtime.description : R version 4.6.2 (2026-10-29)
 #>     process.runtime.name        : R
 #>     process.runtime.version     : 4.6.2
@@ -156,5 +162,8 @@ spns
 #>     telemetry.sdk.version       : 0.2.4.9005
 #> scope_metric_data [0]:
 #>     
+#> 
+#> $logs
+#> list()
 #> 
 ```

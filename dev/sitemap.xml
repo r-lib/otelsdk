@@ -10,6 +10,7 @@
 <url><loc>https://otelsdk.r-lib.org/dev/reference/index.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/dev/reference/logger_provider_file.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/dev/reference/logger_provider_http.html</loc></url>
+<url><loc>https://otelsdk.r-lib.org/dev/reference/logger_provider_memory.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/dev/reference/logger_provider_stdstream.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/dev/reference/meter_provider_file.html</loc></url>
 <url><loc>https://otelsdk.r-lib.org/dev/reference/meter_provider_http.html</loc></url>

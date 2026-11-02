@@ -2,6 +2,13 @@
 
 ## otelsdk (development version)
 
+- New `logger_provider_memory` collects log records in memory, for
+  testing, like `tracer_provider_memory` and `meter_provider_memory` do
+  for spans and metrics.
+  [`with_otel_record()`](https://otelsdk.r-lib.org/dev/reference/with_otel_record.md)
+  now records logs as well, and has a new `logger_opts` argument
+  ([\#21](https://github.com/r-lib/otelsdk/issues/21)).
+
 - All tracer and logger providers now have a `shutdown()` method, like
   meter providers already had.
   [`flush()`](https://rdrr.io/r/base/connections.html) now works for

@@ -379,15 +379,16 @@ named <code>stdout</code> or <code>"stderr</code>, use a <code>./</code> prefix.
 </ul></div>
     <div class="section level2">
     <h2 id="in-memory-exporters">In-Memory Exporters<a class="anchor" aria-label="anchor" href="#in-memory-exporters"></a></h2>
-    <p>These environment variables are used by <a href="tracer_provider_memory.html">tracer_provider_memory</a> and
-<a href="meter_provider_memory.html">meter_provider_memory</a>.</p>
+    <p>These environment variables are used by <a href="tracer_provider_memory.html">tracer_provider_memory</a>,
+<a href="meter_provider_memory.html">meter_provider_memory</a> and <a href="logger_provider_memory.html">logger_provider_memory</a>.</p>
 <p>The signal specific environment variables have priority over the generic
 one.</p><ul><li><p><code>OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE</code> |
 <code>OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE</code> |
 <code>OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE</code> |
+<code>OTEL_R_EXPORTER_MEMORY_LOGS_BUFFER_SIZE</code> |
 <code>OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE</code></p>
-<p>Buffer size, this is the maximum number of spans or metrics
-measurements that the provider can record.</p></li>
+<p>Buffer size, this is the maximum number of spans, metrics
+measurements or log records that the provider can record.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="support-matrix-of-all-opentelemetry-environment-variables-for-r">Support Matrix of all OpenTelemetry Environment Variables for R<a class="anchor" aria-label="anchor" href="#support-matrix-of-all-opentelemetry-environment-variables-for-r"></a></h2>

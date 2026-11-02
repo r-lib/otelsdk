@@ -486,9 +486,10 @@ one.
 ## In-Memory Exporters
 
 These environment variables are used by
-[tracer_provider_memory](https://otelsdk.r-lib.org/dev/reference/tracer_provider_memory.md)
+[tracer_provider_memory](https://otelsdk.r-lib.org/dev/reference/tracer_provider_memory.md),
+[meter_provider_memory](https://otelsdk.r-lib.org/dev/reference/meter_provider_memory.md)
 and
-[meter_provider_memory](https://otelsdk.r-lib.org/dev/reference/meter_provider_memory.md).
+[logger_provider_memory](https://otelsdk.r-lib.org/dev/reference/logger_provider_memory.md).
 
 The signal specific environment variables have priority over the generic
 one.
@@ -496,10 +497,11 @@ one.
 - `OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE` \|
   `OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE` \|
   `OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE` \|
+  `OTEL_R_EXPORTER_MEMORY_LOGS_BUFFER_SIZE` \|
   `OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE`
 
-  Buffer size, this is the maximum number of spans or metrics
-  measurements that the provider can record.
+  Buffer size, this is the maximum number of spans, metrics measurements
+  or log records that the provider can record.
 
 ## Support Matrix of all OpenTelemetry Environment Variables for R
 
