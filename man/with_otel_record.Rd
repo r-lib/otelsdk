@@ -6,9 +6,10 @@
 \usage{
 with_otel_record(
   expr,
-  what = c("traces", "metrics"),
+  what = c("traces", "metrics", "logs"),
   tracer_opts = list(),
-  meter_opts = list()
+  meter_opts = list(),
+  logger_opts = list()
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ with_otel_record(
 \item{tracer_opts}{Named list of options to pass to the tracer provider.}
 
 \item{meter_opts}{Named list of options to pass to the meter provider.}
+
+\item{logger_opts}{Named list of options to pass to the logger provider.}
 }
 \value{
 A list with the output for each output type. Entries:
@@ -26,6 +29,7 @@ A list with the output for each output type. Entries:
 \item \code{value}: value of \code{expr}.
 \item \code{traces}: the recorded spans, if requested in \code{what}.
 \item \code{metrics}: the recorded metrics measurements, if requested in \code{what}.
+\item \code{logs}: the recorded log records, if requested in \code{what}.
 }
 }
 \description{
@@ -36,10 +40,8 @@ correctly generated for your package or application.
 It evaluates the supplied expression, collects OpenTelemetry output
 from it and returns it.
 
-Note: \code{with_otel_record()} cannot record logs yet.
-
-\code{with_otel_record()} uses \link{tracer_provider_memory} and
-\link{meter_provider_memory} internally.
+\code{with_otel_record()} uses \link{tracer_provider_memory},
+\link{meter_provider_memory} and \link{logger_provider_memory} internally.
 }
 \examples{
 spns <- with_otel_record({

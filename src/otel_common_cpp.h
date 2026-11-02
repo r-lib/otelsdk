@@ -17,6 +17,8 @@
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 
+#include "in-memory-log-exporter.h"
+
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
 namespace logs_api       = opentelemetry::logs;
@@ -45,6 +47,7 @@ struct otel_tracer {
 struct otel_logger_provider {
   std::unique_ptr<logs_sdk::LoggerProvider> ptr;
   std::fstream stream;
+  std::shared_ptr<InMemoryLogData> logdata;
 };
 
 struct otel_logger {

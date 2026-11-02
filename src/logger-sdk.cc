@@ -22,6 +22,7 @@ namespace logs_sdk       = opentelemetry::sdk::logs;
 namespace logs_exporter  = opentelemetry::exporter::logs;
 namespace otlp           = opentelemetry::exporter::otlp;
 namespace common         = opentelemetry::common;
+namespace resource       = opentelemetry::sdk::resource;
 
 #include "otel_common.h"
 #include "otel_common_cpp.h"
@@ -52,6 +53,93 @@ void *otel_create_logger_provider_file_(
   lps->ptr = logs_sdk::LoggerProviderFactory::Create(std::move(processor));
 
   return (void*) lps;
+}
+
+void *otel_create_logger_provider_memory_(
+    int buffer_size, struct otel_attributes *resource_attributes) {
+  RKeyValueIterable attributes_(*resource_attributes);
+  struct otel_logger_provider *lps = new otel_logger_provider();
+  lps->logdata.reset(new InMemoryLogData(buffer_size));
+  auto exporter  = std::unique_ptr<logs_sdk::LogRecordExporter>(
+    new InMemoryLogRecordExporter(lps->logdata));
+  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(
+    std::move(exporter));
+  lps->ptr = logs_sdk::LoggerProviderFactory::Create(
+    std::move(processor), resource::Resource::Create(&attributes_));
+
+  return (void*) lps;
+}
+
+#define BAIL() throw std::runtime_error("");
+
+static double timestamp_to_double(const common::SystemTimestamp &ts) {
+  std::chrono::nanoseconds ns = ts.time_since_epoch();
+  return ns.count() / 1000.0 / 1000.0 / 1000.0;
+}
+
+int otel_logger_provider_memory_get_logs_(
+    void *logger_provider_, struct otel_log_data *cdata) {
+  try {
+    struct otel_logger_provider *lps =
+      (struct otel_logger_provider *) logger_provider_;
+    InMemoryLogData &logdata = *lps->logdata;
+    std::vector<std::unique_ptr<logs_sdk::ReadWriteLogRecord>> data =
+      logdata.Get();
+    cdata->a = (struct otel_log_data1*)
+      calloc(data.size() ? data.size() : 1, sizeof(struct otel_log_data1));
+    if (!cdata->a) BAIL();
+    cdata->count = data.size();
+    for (size_t i = 0; i < data.size(); i++) {
+      struct otel_log_data1 &out = cdata->a[i];
+      const logs_sdk::ReadWriteLogRecord &rec = *data[i];
+
+      // all zero ids mean that there is no trace or span
+      const trace_api::TraceId &trace_id = rec.GetTraceId();
+      if (trace_id.IsValid()) {
+        if (cc2c_otel_string(trace_id, out.trace_id)) BAIL();
+      }
+      const trace_api::SpanId &span_id = rec.GetSpanId();
+      if (span_id.IsValid()) {
+        if (cc2c_otel_string(span_id, out.span_id)) BAIL();
+      }
+      const trace_api::TraceFlags &tf = rec.GetTraceFlags();
+      if (cc2c_otel_trace_flags(tf, out.flags)) BAIL();
+
+      const common_sdk::OwnedAttributeValue &body = rec.GetBody();
+      if (nostd::holds_alternative<std::string>(body)) {
+        if (cc2c_otel_string(nostd::get<std::string>(body), out.body)) BAIL();
+      }
+
+      out.severity = static_cast<int>(rec.GetSeverity());
+      nostd::string_view sevtxt = rec.GetSeverityText();
+      if (cc2c_otel_string(sevtxt, out.severity_text)) BAIL();
+      nostd::string_view evname = rec.GetEventName();
+      if (cc2c_otel_string(evname, out.event_name)) BAIL();
+      out.timestamp = timestamp_to_double(rec.GetTimestamp());
+      out.observed_timestamp = timestamp_to_double(rec.GetObservedTimestamp());
+
+      const resource::Resource &res = rec.GetResource();
+      const std::string &schema_url = res.GetSchemaURL();
+      if (cc2c_otel_string(schema_url, out.schema_url)) BAIL();
+      const std::unordered_map<std::string, common_sdk::OwnedAttributeValue>
+        &rattr = res.GetAttributes();
+      if (cc2c_otel_attributes(rattr, out.resource_attributes)) BAIL();
+
+      // copy, the conversion function needs a non-const reference
+      trace_sdk::InstrumentationScope is =rec.GetInstrumentationScope();
+      if (cc2c_otel_instrumentation_scope(is, out.instrumentation_scope)) {
+        BAIL();
+      }
+
+      const std::unordered_map<std::string, common_sdk::OwnedAttributeValue>
+        &attr = rec.GetAttributes();
+      if (cc2c_otel_attributes(attr, out.attributes)) BAIL();
+    }
+    return 0;
+  } catch(...) {
+    otel_log_data_free(cdata);
+    return 1;
+  }
 }
 
 void otel_logger_provider_file_options_defaults_(

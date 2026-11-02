@@ -2046,6 +2046,24 @@ as_tracer_provider_memory_options <- function(
   opts1
 }
 
+logger_provider_memory_options_evs <- function() {
+  list(
+    buffer_size = memory_logs_buffer_size_envvar
+  )
+}
+
+as_logger_provider_memory_options <- function(
+  opts,
+  arg = caller_arg(opts),
+  call = caller_env()
+) {
+  evs <- logger_provider_memory_options_evs()
+  opts1 <- as_memory_exporter_options(opts, evs, arg = arg, call = call)
+  check_known_options(opts, names(opts1), arg = arg, call = call)
+
+  opts1
+}
+
 meter_provider_memory_options_evs <- function() {
   list(
     buffer_size = memory_metrics_buffer_size_envvar

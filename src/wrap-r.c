@@ -154,6 +154,28 @@ void otel_span_data_free(struct otel_span_data *cdata) {
   }
 }
 
+void otel_log_data_free(struct otel_log_data *cdata) {
+  if (cdata) {
+    if (cdata->a) {
+      for (size_t i = 0; i < cdata->count; i++) {
+        struct otel_log_data1 *xi = &cdata->a[i];
+        otel_string_free(&xi->trace_id);
+        otel_string_free(&xi->span_id);
+        otel_string_free(&xi->body);
+        otel_string_free(&xi->severity_text);
+        otel_string_free(&xi->event_name);
+        otel_string_free(&xi->schema_url);
+        otel_attributes_free(&xi->resource_attributes);
+        otel_instrumentation_scope_free(&xi->instrumentation_scope);
+        otel_attributes_free(&xi->attributes);
+      }
+      free(cdata->a);
+      cdata->a = NULL;
+      cdata->count = 0;
+    }
+  }
+}
+
 SEXP c2r_otel_trace_flags(const struct otel_trace_flags *flags) {
   const char *nms[] = { "sampled", "random", "" };
   SEXP res = Rf_mkNamed(LGLSXP, nms);

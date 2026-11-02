@@ -133,6 +133,7 @@
 \alias{OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE}
 \alias{OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE}
 \alias{OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE}
+\alias{OTEL_R_EXPORTER_MEMORY_LOGS_BUFFER_SIZE}
 \title{Environment variables to configure otelsdk}
 \value{
 Not applicable.
@@ -564,8 +565,8 @@ named \code{stdout} or \verb{"stderr}, use a \verb{./} prefix.)
 }
 
 \section{In-Memory Exporters}{
-These environment variables are used by \link{tracer_provider_memory} and
-\link{meter_provider_memory}.
+These environment variables are used by \link{tracer_provider_memory},
+\link{meter_provider_memory} and \link{logger_provider_memory}.
 
 The signal specific environment variables have priority over the generic
 one.
@@ -573,10 +574,11 @@ one.
 \item \code{OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE} |
 \code{OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE} |
 \code{OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE} |
+\code{OTEL_R_EXPORTER_MEMORY_LOGS_BUFFER_SIZE} |
 \code{OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE}
 
-Buffer size, this is the maximum number of spans or metrics
-measurements that the provider can record.
+Buffer size, this is the maximum number of spans, metrics
+measurements or log records that the provider can record.
 }
 }
 
