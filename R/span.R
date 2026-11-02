@@ -251,6 +251,16 @@ span_new <- function(
 
   self <- span_base_new(tracer, xptr)
 
+  run_span_processors(
+    self,
+    list(
+      name = name,
+      tracer_name = tracer$name,
+      kind = unname(the$span_kinds[options[["kind"]] + 1L]),
+      parent = options[["parent"]]
+    )
+  )
+
   if (!is.null(scope)) {
     defer(self$end(status_code = "auto"), envir = scope)
   }

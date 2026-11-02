@@ -5,6 +5,13 @@
   and metrics. `with_otel_record()` now records logs as well, and has a
   new `logger_opts` argument (#21).
 
+* New `add_span_processor()` and `remove_span_processor()` functions to
+  register callbacks that run when a span starts. Use them to add
+  attributes to spans created by other packages, e.g. the current user
+  to every span created by Shiny. You can also set up span processors
+  with the `OTEL_R_SPAN_PROCESSORS` environment variable. See an example
+  Shiny app in `examples/shiny-span-processor` (#77).
+
 * All tracer and logger providers now have a `shutdown()` method, like
   meter providers already had. `flush()` now works for
   `tracer_provider_memory` and `logger_provider_http`; previously it did

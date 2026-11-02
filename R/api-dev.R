@@ -587,6 +587,47 @@ gauge_new_dev <- function(meter, name, description = NULL, unit = NULL) {
   self
 }
 
+run_span_processors_dev <- function(span, info) {
+  if (!isTRUE(the$span_processors_env_loaded)) {
+    the$span_processors_env_loaded <- TRUE
+    load_span_processors_env()
+  }
+  procs <- the$span_processors
+  if (length(procs) == 0 || isTRUE(the$in_span_processor)) {
+    return(invisible())
+  }
+  if (!span$is_recording()) {
+    return(invisible())
+  }
+  the$in_span_processor <- TRUE
+  on.exit(the$in_span_processor <- FALSE, add = TRUE)
+  for (id in names(procs)) {
+    on_start <- procs[[id]][["on_start"]]
+    if (is.null(on_start)) {
+      next
+    }
+      on_start(span, info)
+  }
+  invisible()
+}
+
+load_span_processors_env_dev <- function() {
+  ev <- trimws(Sys.getenv("OTEL_R_SPAN_PROCESSORS"))
+  if (ev == "") {
+    return(invisible())
+  }
+  entries <- trimws(strsplit(ev, ",", fixed = TRUE)[[1]])
+  entries <- entries[entries != ""]
+  for (entry in entries) {
+      proc <- get_span_processor_from_env(entry)
+      add_span_processor(
+        on_start = proc[["on_start"]],
+        id = paste0("env:", entry)
+      )
+  }
+  invisible()
+}
+
 span_base_new_dev <- function(
   tracer,
   xptr
@@ -997,6 +1038,8 @@ dev_function_names <- c(
   "up_down_counter_new",
   "histogram_new",
   "gauge_new",
+  "run_span_processors",
+  "load_span_processors_env",
   "span_base_new",
   "span_context_new",
   "tracer_provider_file_new",

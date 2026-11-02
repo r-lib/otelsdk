@@ -45,6 +45,8 @@ reference:
 - title: Traces
 - contents:
   - starts_with("tracer_provider_")
+  - add_span_processor
+  - remove_span_processor
 
 - title: Logs
 - contents:

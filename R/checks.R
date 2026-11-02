@@ -202,6 +202,26 @@ as_string <- function(
   ))
 }
 
+as_function <- function(
+  x,
+  null = TRUE,
+  arg = caller_arg(x),
+  call = caller_env()
+) {
+  if (null && is.null(x)) {
+    return(x)
+  }
+  if (is.function(x)) {
+    return(x)
+  }
+
+  stop(cnd(
+    call = call,
+    "Invalid argument: `{arg}` must be a function but it is \\
+     {typename(x)}."
+  ))
+}
+
 as_flag <- function(x, null = FALSE, arg = caller_arg(x), call = caller_env()) {
   if (null && is.null(x)) {
     return(x)
