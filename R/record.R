@@ -14,19 +14,19 @@ otel_restore_cache <- function(copy) {
 #' It evaluates the supplied expression, collects OpenTelemetry output
 #' from it and returns it.
 #'
-#' Note: `with_otel_record()` cannot record logs yet.
-#'
-#' `with_otel_record()` uses [tracer_provider_memory] and
-#' [meter_provider_memory] internally.
+#' `with_otel_record()` uses [tracer_provider_memory],
+#' [meter_provider_memory] and [logger_provider_memory] internally.
 #'
 #' @param expr Expression to evaluate.
 #' @param what Character vector, type(s) of OpenTelemetry output to collect.
 #' @param tracer_opts Named list of options to pass to the tracer provider.
 #' @param meter_opts Named list of options to pass to the meter provider.
+#' @param logger_opts Named list of options to pass to the logger provider.
 #' @return A list with the output for each output type. Entries:
 #'   * `value`: value of `expr`.
 #'   * `traces`: the recorded spans, if requested in `what`.
 #'   * `metrics`: the recorded metrics measurements, if requested in `what`.
+#'   * `logs`: the recorded log records, if requested in `what`.
 #'
 #' @export
 #' @examples
@@ -42,9 +42,10 @@ otel_restore_cache <- function(copy) {
 
 with_otel_record <- function(
   expr,
-  what = c("traces", "metrics"),
+  what = c("traces", "metrics", "logs"),
   tracer_opts = list(),
-  meter_opts = list()
+  meter_opts = list(),
+  logger_opts = list()
 ) {
   # save current otel cache, restore on exit
   copy <- otel_save_cache()
@@ -58,6 +59,9 @@ with_otel_record <- function(
   if ("metrics" %in% what) {
     tmp[["meter_provider"]] <- meter_provider_memory_new(meter_opts)
     on.exit(tmp[["meter_provider"]]$shutdown(), add = TRUE)
+  }
+  if ("logs" %in% what) {
+    tmp[["logger_provider"]] <- logger_provider_memory_new(logger_opts)
   }
   otel_restore_cache(tmp)
 
@@ -74,6 +78,9 @@ with_otel_record <- function(
     },
     metrics = if ("metrics" %in% what) {
       tmp[["meter_provider"]]$get_metrics()
+    },
+    logs = if ("logs" %in% what) {
+      tmp[["logger_provider"]]$get_logs()
     }
   )
 }

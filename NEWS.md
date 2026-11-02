@@ -2,7 +2,8 @@
 
 * New `logger_provider_memory` collects log records in memory, for testing,
   like `tracer_provider_memory` and `meter_provider_memory` do for spans
-  and metrics (#21).
+  and metrics. `with_otel_record()` now records logs as well, and has a
+  new `logger_opts` argument (#21).
 
 * All tracer and logger providers now have a `shutdown()` method, like
   meter providers already had. `flush()` now works for

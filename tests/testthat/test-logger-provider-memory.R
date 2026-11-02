@@ -68,6 +68,31 @@ test_that("flush, shutdown", {
   expect_equal(vapply(lp$get_logs(), "[[", "", "body"), "before")
 })
 
+test_that("with_otel_record records logs", {
+  rec <- with_otel_record({
+    otel::log_info("first")
+    otel::log_warn("second")
+    "done"
+  })
+  expect_equal(rec$value, "done")
+  expect_equal(vapply(rec$logs, "[[", "", "body"), c("first", "second"))
+  expect_equal(rec$logs[[2]]$severity, c(warn = 13L))
+
+  rec2 <- with_otel_record(otel::log_info("not recorded"), what = "traces")
+  expect_null(rec2$logs)
+})
+
+test_that("with_otel_record, logs with span ids", {
+  rec <- with_otel_record({
+    spn <- otel::start_local_active_span("myspan")
+    otel::log_info("in span")
+    spn$end()
+  })
+  expect_equal(names(rec$traces), "myspan")
+  expect_equal(rec$logs[[1]]$span_id, rec$traces[[1]]$span_id)
+  expect_equal(rec$logs[[1]]$trace_id, rec$traces[[1]]$trace_id)
+})
+
 test_that("logger_provider_memory_options", {
   expect_snapshot({
     logger_provider_memory_options()
