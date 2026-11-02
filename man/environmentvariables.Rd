@@ -582,6 +582,16 @@ measurements or log records that the provider can record.
 }
 }
 
+\section{Span Processors}{
+\itemize{
+\item \code{OTEL_R_SPAN_PROCESSORS}
+
+Comma separated list of span processors to add, in the \code{pkg::name}
+form. Each entry must refer to a named list of callbacks. See
+\code{\link[=add_span_processor]{add_span_processor()}} for details.
+}
+}
+
 \section{Support Matrix of all OpenTelemetry Environment Variables for R}{
 \tabular{ll}{
    \emph{Name} \tab \emph{Supported} \cr
