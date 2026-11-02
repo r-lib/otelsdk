@@ -18,12 +18,18 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }}${{ matrix.config.otel == 'dev' && ', dev otel' || '' }})
 
     strategy:
       fail-fast: false
       matrix:
         config:
+          # These use the dev version of otel, from GitHub, the rest use
+          # otel from CRAN
+          - {os: macos-latest,   r: 'release', otel: 'dev'}
+          - {os: windows-latest, r: 'release', otel: 'dev'}
+          - {os: ubuntu-latest,  r: 'release', otel: 'dev'}
+
           - {os: macos-latest,   r: 'release'  }
           - {os: macos-15-intel, r: 'release'  }
 
@@ -62,8 +68,12 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, gaborcsardi/testthatlabs
+          extra-packages: any::rcmdcheck, gaborcsardi/testthatlabs${{ matrix.config.otel == 'dev' && ', r-lib/otel' || '' }}
           needs: check
+
+      - name: Show otel version
+        run: print(packageDescription("otel")[c("Version", "RemoteType", "Repository")])
+        shell: Rscript {0}
 
       - uses: r-hub/actions/debug-shell@main
 

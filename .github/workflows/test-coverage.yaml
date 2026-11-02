@@ -25,7 +25,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: gaborcsardi/uncovr
+          # dev otel, so tests that need it run, and count for coverage
+          extra-packages: gaborcsardi/uncovr, r-lib/otel
           needs: coverage
 
       - name: Test coverage
