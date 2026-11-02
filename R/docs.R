@@ -180,6 +180,7 @@ doc_evs <- function() {
     memory_buffer_size_envvar,
     memory_traces_buffer_size_envvar,
     memory_metrics_buffer_size_envvar,
+    memory_logs_buffer_size_envvar,
     memory_buffer_size_envvar
   )
 }
@@ -546,8 +547,8 @@ doc_evs <- function() {
 #'
 #' # In-Memory Exporters
 #'
-#' These environment variables are used by [tracer_provider_memory] and
-#' [meter_provider_memory].
+#' These environment variables are used by [tracer_provider_memory],
+#' [meter_provider_memory] and [logger_provider_memory].
 #'
 #' The signal specific environment variables have priority over the generic
 #' one.
@@ -555,10 +556,11 @@ doc_evs <- function() {
 #' * ``r memory_buffer_size_envvar`` |
 #'   ``r memory_traces_buffer_size_envvar`` |
 #'   ``r memory_metrics_buffer_size_envvar`` |
+#'   ``r memory_logs_buffer_size_envvar`` |
 #'   ``r memory_buffer_size_envvar``
 #'
-#'   Buffer size, this is the maximum number of spans or metrics
-#'   measurements that the provider can record.
+#'   Buffer size, this is the maximum number of spans, metrics
+#'   measurements or log records that the provider can record.
 #'
 #' # Support Matrix of all OpenTelemetry Environment Variables for R
 #'

@@ -73,6 +73,8 @@ SEXP otel_create_logger_provider_stdstream(SEXP options, SEXP attributes);
 SEXP otel_create_logger_provider_http(SEXP options, SEXP attributes);
 SEXP otel_logger_provider_http_options(void);
 SEXP otel_create_logger_provider_file(SEXP options);
+SEXP otel_create_logger_provider_memory(SEXP options, SEXP attributes);
+SEXP otel_logger_provider_memory_get_logs(SEXP provider);
 SEXP otel_logger_provider_file_options_defaults(void);
 SEXP otel_get_logger(
   SEXP provider, SEXP name, SEXP minimum_severity, SEXP version,
@@ -190,6 +192,8 @@ static const R_CallMethodDef callMethods[]  = {
   CALLDEF(otel_create_logger_provider_http, 2),
   CALLDEF(otel_logger_provider_http_options, 0),
   CALLDEF(otel_create_logger_provider_file, 1),
+  CALLDEF(otel_create_logger_provider_memory, 2),
+  CALLDEF(otel_logger_provider_memory_get_logs, 1),
   CALLDEF(otel_logger_provider_file_options_defaults, 0),
   CALLDEF(otel_get_minimum_log_severity, 1),
   CALLDEF(otel_set_minimum_log_severity, 2),

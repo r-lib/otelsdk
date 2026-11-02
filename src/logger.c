@@ -104,6 +104,77 @@ SEXP otel_logger_provider_file_options_defaults(void) {
   return res;
 }
 
+SEXP otel_create_logger_provider_memory(SEXP options, SEXP attributes) {
+  SEXP buffer_size = rf_get_list_element(options, "buffer_size");
+  int cbuffer_size = INTEGER(buffer_size)[0];
+  struct otel_attributes attributes_;
+  r2c_attributes(attributes, &attributes_);
+  void *logger_provider_ = otel_create_logger_provider_memory_(
+    cbuffer_size, &attributes_);
+  SEXP xptr = R_MakeExternalPtr(logger_provider_, R_NilValue, R_NilValue);
+  R_RegisterCFinalizerEx(xptr, otel_logger_provider_finally, (Rboolean) 1);
+  // TODO: cleancall
+  otel_attributes_free(&attributes_);
+  return xptr;
+}
+
+SEXP otel_logger_provider_memory_get_logs(SEXP provider) {
+  if (TYPEOF(provider) != EXTPTRSXP) {
+    Rf_warningcall(
+      R_NilValue,
+      "OpenTelemetry: invalid logger provider pointer."
+    );
+    return R_NilValue;
+  }
+  void *logger_provider_ = R_ExternalPtrAddr(provider);
+  if (!logger_provider_) {
+    Rf_error(
+      "Opentelemetry logger provider cleaned up already, internal error."
+    );
+  }
+
+  struct otel_log_data data = { 0 };
+  if (otel_logger_provider_memory_get_logs_(logger_provider_, &data)) {
+    R_THROW_MAYBE_SYSTEM_ERROR("Cannot get logs from memory logger provider");
+  }
+
+  SEXP res = PROTECT(Rf_allocVector(VECSXP, data.count));
+  const char *nms[] = {
+    "trace_id", "span_id", "flags", "body", "severity", "severity_text",
+    "event_name", "timestamp", "observed_timestamp",
+    "resource_attributes", "schema_url", "instrumentation_scope",
+    "attributes", ""
+  };
+  SEXP posix_class = PROTECT(Rf_allocVector(STRSXP, 2));
+  SET_STRING_ELT(posix_class, 0, Rf_mkChar("POSIXct"));
+  SET_STRING_ELT(posix_class, 1, Rf_mkChar("POSIXt"));
+  for (size_t i = 0; i < data.count; i++) {
+    struct otel_log_data1 *di = &data.a[i];
+    SET_VECTOR_ELT(res, i, Rf_mkNamed(VECSXP, nms));
+    SEXP xi = VECTOR_ELT(res, i);
+    SET_VECTOR_ELT(xi, 0, c2r_otel_string(&di->trace_id));
+    SET_VECTOR_ELT(xi, 1, c2r_otel_string(&di->span_id));
+    SET_VECTOR_ELT(xi, 2, c2r_otel_trace_flags(&di->flags));
+    SET_VECTOR_ELT(xi, 3, c2r_otel_string(&di->body));
+    SET_VECTOR_ELT(xi, 4, Rf_ScalarInteger(di->severity));
+    SET_VECTOR_ELT(xi, 5, c2r_otel_string(&di->severity_text));
+    SET_VECTOR_ELT(xi, 6, c2r_otel_string(&di->event_name));
+    SET_VECTOR_ELT(xi, 7, Rf_ScalarReal(di->timestamp));
+    Rf_setAttrib(VECTOR_ELT(xi, 7), R_ClassSymbol, posix_class);
+    SET_VECTOR_ELT(xi, 8, Rf_ScalarReal(di->observed_timestamp));
+    Rf_setAttrib(VECTOR_ELT(xi, 8), R_ClassSymbol, posix_class);
+    SET_VECTOR_ELT(xi, 9, c2r_otel_attributes(&di->resource_attributes));
+    SET_VECTOR_ELT(xi, 10, c2r_otel_string(&di->schema_url));
+    SET_VECTOR_ELT(xi, 11, c2r_otel_instrumentation_scope(
+      &di->instrumentation_scope));
+    SET_VECTOR_ELT(xi, 12, c2r_otel_attributes(&di->attributes));
+    Rf_setAttrib(xi, R_ClassSymbol, Rf_mkString("otel_log_data"));
+  }
+  otel_log_data_free(&data);
+  UNPROTECT(2);
+  return res;
+}
+
 SEXP otel_logger_provider_flush(SEXP provider) {
   if (TYPEOF(provider) != EXTPTRSXP) {
     Rf_warningcall(

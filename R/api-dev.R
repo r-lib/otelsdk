@@ -72,6 +72,54 @@ logger_provider_http_new_dev <- function(opts = NULL) {
   self
 }
 
+logger_provider_memory_new_dev <- function(opts = NULL) {
+  opts <- as_logger_provider_memory_options(opts)
+
+  self <- new_object(
+    c("otel_logger_provider_memory", "otel_logger_provider"),
+    get_logger = function(
+      name = NULL,
+      minimum_severity = NULL,
+      version = NULL,
+      schema_url = NULL,
+      attributes = NULL,
+      ...
+    ) {
+        logger_new(
+          self,
+          name,
+          minimum_severity,
+          version,
+          schema_url,
+          attributes,
+          ...
+        )
+    },
+    flush = function() {
+        ccall(otel_logger_provider_flush, self$xptr)
+    },
+    shutdown = function() {
+        ccall(otel_logger_provider_shutdown, self$xptr)
+      invisible(self)
+    },
+    get_logs = function() {
+        logs <- ccall(otel_logger_provider_memory_get_logs, self$xptr)
+        lapply(logs, function(x) {
+          x[["severity"]] <-
+            otel::log_severity_levels[match(
+              x[["severity"]],
+              otel::log_severity_levels
+            )]
+          x
+        })
+    }
+  )
+
+  attributes <- as_otel_attributes(the$default_resource_attributes)
+  self$xptr <- ccall(otel_create_logger_provider_memory, opts, attributes)
+  self
+}
+
 logger_provider_stdstream_new_dev <- function(opts = NULL) {
   opts <- as_logger_provider_stdstream_options(opts)
 
@@ -937,6 +985,7 @@ tracer_new_dev <- function(
 dev_function_names <- c(
   "logger_provider_file_new",
   "logger_provider_http_new",
+  "logger_provider_memory_new",
   "logger_provider_stdstream_new",
   "logger_new",
   "meter_provider_file_new",

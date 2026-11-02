@@ -234,6 +234,29 @@ struct otel_span_data {
 
 void otel_span_data_free(struct otel_span_data *cdata);
 
+struct otel_log_data1 {
+  struct otel_string trace_id;
+  struct otel_string span_id;
+  struct otel_trace_flags flags;
+  struct otel_string body;
+  int severity;
+  struct otel_string severity_text;
+  struct otel_string event_name;
+  double timestamp;
+  double observed_timestamp;
+  struct otel_string schema_url;
+  struct otel_attributes resource_attributes;
+  struct otel_instrumentation_scope instrumentation_scope;
+  struct otel_attributes attributes;
+};
+
+struct otel_log_data {
+  struct otel_log_data1 *a;
+  size_t count;
+};
+
+void otel_log_data_free(struct otel_log_data *cdata);
+
 enum otel_value_type {
   k_value_int64,
   k_value_double
@@ -650,6 +673,10 @@ void *otel_create_logger_provider_file_(
   struct otel_file_exporter_options *options);
 void otel_logger_provider_file_options_defaults_(
   struct otel_file_exporter_options *options);
+void *otel_create_logger_provider_memory_(
+  int buffer_size, struct otel_attributes *resource_attributes);
+int otel_logger_provider_memory_get_logs_(
+  void *logger_provider, struct otel_log_data *cdata);
 int otel_logger_provider_flush_(void *logger_provider);
 int otel_logger_provider_shutdown_(void *logger_provider);
 int otel_get_minimum_log_severity_(void *logger);

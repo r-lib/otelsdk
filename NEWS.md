@@ -1,5 +1,9 @@
 # otelsdk (development version)
 
+* New `logger_provider_memory` collects log records in memory, for testing,
+  like `tracer_provider_memory` and `meter_provider_memory` do for spans
+  and metrics (#21).
+
 * All tracer and logger providers now have a `shutdown()` method, like
   meter providers already had. `flush()` now works for
   `tracer_provider_memory` and `logger_provider_http`; previously it did

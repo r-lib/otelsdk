@@ -164,6 +164,7 @@ provider_constructors <- function() {
       list(file_pattern = tmp)
     ),
     logger_provider_http = list(logger_provider_http_new, NULL),
+    logger_provider_memory = list(logger_provider_memory_new, NULL),
     logger_provider_stdstream = list(
       logger_provider_stdstream_new,
       list(output = tmp)
@@ -200,6 +201,9 @@ test_that("provider methods do not error", {
       if (!is.null(prv$get_spans)) {
         expect_equal(msg(prv$get_spans()), list())
       }
+      if (!is.null(prv$get_logs)) {
+        expect_equal(msg(prv$get_logs()), list())
+      }
       if (!is.null(prv$get_metrics)) {
         expect_equal(msg(prv$get_metrics()), list())
       }
@@ -226,6 +230,9 @@ test_that("provider methods error in dev mode", {
       expect_error(prv$shutdown())
       if (!is.null(prv$get_spans)) {
         expect_error(prv$get_spans())
+      }
+      if (!is.null(prv$get_logs)) {
+        expect_error(prv$get_logs())
       }
       if (!is.null(prv$get_metrics)) {
         expect_error(prv$get_metrics())
