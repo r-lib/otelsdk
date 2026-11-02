@@ -398,6 +398,46 @@ test_that("end_steady_time", {
   expect_equal(spns[[1]]$duration, 5)
 })
 
+test_that("links at span start", {
+  tp <- tracer_provider_memory_new()
+  trc <- tp$get_tracer("mytracer")
+  spn1 <- trc$start_span("s1")
+  spn2 <- trc$start_span(
+    "s2",
+    links = list(spn1, list(spn1, a = "x", b = 1:2))
+  )
+  spn2$end()
+  spn1$end()
+  spns <- tp$get_spans()
+  links <- spns[["s2"]]$links
+  expect_length(links, 2)
+  ctx <- spn1$get_context()
+  for (l in links) {
+    expect_equal(l$trace_id, ctx$get_trace_id())
+    expect_equal(l$span_id, ctx$get_span_id())
+  }
+  expect_equal(length(links[[1]]$attributes), 0)
+  expect_equal(
+    sort_named_list(links[[2]]$attributes),
+    list(a = "x", b = c(1, 2))
+  )
+  expect_equal(spns[["s1"]]$links, list())
+})
+
+test_that("add_link", {
+  tp <- tracer_provider_memory_new()
+  trc <- tp$get_tracer("mytracer")
+  spn1 <- trc$start_span("s1")
+  spn2 <- trc$start_span("s2")
+  expect_identical(spn2$add_link(spn1, list(c = TRUE)), spn2)
+  spn2$end()
+  spn1$end()
+  links <- tp$get_spans()[["s2"]]$links
+  expect_length(links, 1)
+  expect_equal(links[[1]]$span_id, spn1$get_context()$get_span_id())
+  expect_equal(unclass(links[[1]]$attributes), list(c = TRUE))
+})
+
 test_that("span methods do not error", {
   trc_prv <- tracer_provider_memory_new()
   trc <- trc_prv$get_tracer("mytracer")
@@ -409,6 +449,7 @@ test_that("span methods do not error", {
   expect_false(msg(spn$is_valid()))
   expect_false(msg(spn$is_recording()))
   expect_identical(msg(spn$set_attribute("a", "b")), spn)
+  expect_identical(msg(spn$set_attributes(list(a = "b"))), spn)
   expect_identical(msg(spn$add_event("e")), spn)
   expect_identical(msg(spn$add_link(spn)), spn)
   expect_identical(msg(spn$set_status("ok")), spn)

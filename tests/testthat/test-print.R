@@ -169,3 +169,33 @@ test_that("format.otel_metrics_data", {
     transform = transform_metric_data
   )
 })
+
+test_that("format.otel_histogram_point_data, synthetic data", {
+  x <- structure(
+    list(
+      value_type = "double",
+      record_min_max = TRUE,
+      sum = 55,
+      min = 1,
+      max = 10,
+      count = 10,
+      counts = c(0, 5, 5, 0),
+      boundaries = c(0, 5, 10)
+    ),
+    class = "otel_histogram_point_data"
+  )
+  expect_snapshot(x)
+})
+
+test_that("format.otel_last_value_point_data, synthetic data", {
+  x <- structure(
+    list(
+      value_type = "double",
+      value = 10,
+      is_lastvalue_valid = TRUE,
+      sample_ts = 1700000000
+    ),
+    class = "otel_last_value_point_data"
+  )
+  expect_snapshot(x)
+})

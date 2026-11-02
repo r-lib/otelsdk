@@ -147,6 +147,34 @@ test_that("meter, gauge", {
   expect_equal(md[["point_data_attr"]][[1]][["value"]][["value"]], 10)
 })
 
+test_that("meter, gauge, last value", {
+  mp <- meter_provider_memory_new()
+  on.exit(mp$shutdown(), add = TRUE)
+  mtr <- mp$get_meter()
+  gge <- mtr$create_gauge("gge")
+  gge$record(1)
+  gge$record(10)
+  mp$flush()
+  mp$shutdown()
+  # The number of reports depends on timing, look at all of them
+  mds <- unlist(
+    lapply(mp$get_metrics(), function(r) {
+      lapply(r[["scope_metric_data"]], "[[", "metric_data")
+    }),
+    recursive = FALSE
+  )
+  mds <- unlist(mds, recursive = FALSE)
+  expect_true(length(mds) > 0)
+  md <- mds[[length(mds)]]
+  expect_equal(md[["instrument_name"]], "gge")
+  expect_equal(md[["instrument_type"]], "gauge")
+  pd <- md[["point_data_attr"]][[1]]
+  expect_equal(pd[["point_type"]], "last_value_point_data")
+  expect_s3_class(pd[["value"]], "otel_last_value_point_data")
+  expect_equal(pd[["value"]][["value"]], 10)
+  expect_true(pd[["value"]][["is_lastvalue_valid"]])
+})
+
 test_that("meter_new when metrics are disabled", {
   fake(meter_new, "find_instrumentation_scope", list(on = FALSE, name = "nm"))
   mtr <- meter_new("name")

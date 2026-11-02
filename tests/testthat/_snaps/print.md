@@ -324,3 +324,31 @@
                       value       : 5
                       is_monotonic: TRUE
 
+# format.otel_histogram_point_data, synthetic data
+
+    Code
+      x
+    Output
+      <otel_histogram_point_data>
+      value_type    : double
+      record_min_max: TRUE
+      sum           : 55
+      min           : 1
+      max           : 10
+      count         : 10
+      counts [4]:
+          [1] 0 5 5 0
+      boundaries [3]:
+          [1]  0  5 10
+
+# format.otel_last_value_point_data, synthetic data
+
+    Code
+      x
+    Output
+      <otel_last_value_point_data>
+      value_type        : double
+      value             : 10
+      is_lastvalue_valid: TRUE
+      sample_ts         : 1.7e+09
+

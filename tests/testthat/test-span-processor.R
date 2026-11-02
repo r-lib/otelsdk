@@ -204,3 +204,11 @@ test_that("OTEL_R_SPAN_PROCESSORS unknown callbacks are ignored", {
   expect_true(spns[["s"]]$attributes$from.env)
   expect_equal(names(the$span_processors), "env:pkg::newer")
 })
+
+test_that("get_exported_object", {
+  expect_identical(
+    get_exported_object("otelsdk", "with_otel_record"),
+    with_otel_record
+  )
+  expect_error(get_exported_object("otelsdk", "this_does_not_exist"))
+})

@@ -97,6 +97,43 @@ test_that("extract_http_context", {
   expect_equal(spns[["spn1"]][["span_id"]], spns2[["spn2"]][["parent"]])
 })
 
+test_that("extract_http_context, invalid headers", {
+  tp <- tracer_provider_memory_new()
+  trc <- tp$get_tracer("mytracer")
+  trid <- "4bf92f3577b34da6a3ce929d0e0e4736"
+  spid <- "00f067aa0ba902b7"
+  bad <- c(
+    "foo",
+    "00-abc-def-01",
+    paste0("0x-", trid, "-", spid, "-01"),
+    paste0("ff-", trid, "-", spid, "-01"),
+    paste0("01-", trid, "-", spid, "-0"),
+    paste0("00-", trid, "-", spid, "-01-extra"),
+    paste0("00-", strrep("0", 32), "-", spid, "-01")
+  )
+  for (hdr in bad) {
+    ctx <- trc$extract_http_context(c(traceparent = hdr))
+    expect_false(ctx$is_valid(), info = hdr)
+  }
+
+  # future version may have extra fields
+  ctx <- trc$extract_http_context(
+    c(traceparent = paste0("01-", trid, "-", spid, "-01-extra"))
+  )
+  expect_true(ctx$is_valid())
+  expect_equal(ctx$get_trace_id(), trid)
+  expect_equal(ctx$get_span_id(), spid)
+  expect_true(ctx$is_remote())
+
+  # tracestate is kept
+  ctx <- trc$extract_http_context(c(
+    traceparent = paste0("00-", trid, "-", spid, "-01"),
+    tracestate = "foo=bar"
+  ))
+  expect_true(ctx$is_valid())
+  expect_equal(ctx$to_http_headers()[["tracestate"]], "foo=bar")
+})
+
 test_that("tracer_new when tracing is disabled", {
   fake(tracer_new, "find_instrumentation_scope", list(on = FALSE, name = "nm"))
   lgr <- tracer_new("name")
