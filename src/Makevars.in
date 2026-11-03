@@ -119,7 +119,13 @@ otelcpplib: vendor/opentelemetry-cpp.tgz
 		/usr/bin/find . -name CMakeCCompilerId.c | xargs sed -i.bak -e 's/^M$$//'; \
 		/usr/bin/find . -name CMakeCXXCompilerId.cpp | xargs sed -i.bak -e 's/^M$$//'; \
 	fi
-	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ "$(CMAKE)" --build build 2>&1) | @FILTER@
+	@rm -f cpp/build.status
+	(cd cpp; @CMAKE_BUILD_PARALLEL_LEVEL@ "$(CMAKE)" --build build 2>&1; \
+		echo $$? > build.status) | @FILTER@
+	@status=`cat cpp/build.status`; rm -f cpp/build.status; \
+		if [ "$$status" != "0" ]; then \
+			echo "opentelemetry-cpp build failed"; exit 1; \
+		fi
 	(cd cpp; "$(CMAKE)" --install build)
 	@find . -type f  -name "*.pb.h" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
 	@find cpp/third_party/nlohmann-json -type f -name "*.hpp" -exec sed -i.bak "s/#pragma/# pragma/g" {} \;
