@@ -1,4 +1,4 @@
-# otelsdk (development version)
+# otelsdk 0.3.0
 
 * New `logger_provider_memory` collects log records in memory, for testing,
   like `tracer_provider_memory` and `meter_provider_memory` do for spans
