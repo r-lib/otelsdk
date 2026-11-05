@@ -1,7 +1,8 @@
 # Environment variables to configure otelsdk
 
-See also the Environment Variables in the otel package, which is charge
-of selecting the exporters to use.
+See also the [Environment
+Variables](https://otel.r-lib.org/reference/environmentvariables.html)
+in the otel package, which is charge of selecting the exporters to use.
 
 ## Value
 
@@ -11,7 +12,7 @@ Not applicable.
 
 Most of these environment variables are based on the [OpenTelemetry
 Specification](https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/),
-version 1.55.0.
+version 1.62.0.
 
 The environment variables with an '`OTEL_R_`' prefix are not (yet) in
 the standard, and are specific for the otel and otelsdk R packages.
@@ -118,7 +119,7 @@ i.e. if neither of these are set, all packages emit telemetry data.
   excludes packages with an instrumentation scope that starts with
   `org.r-lib.` and also dplyr.
 
-## Zero Code Instrumentation
+## [Zero Code Instrumentation](https://otel.r-lib.org/reference/zci.html)
 
 otel can instrument R packages for OpenTelemetry data collection without
 changing their source code. This relies on changing the code of the R
@@ -484,9 +485,10 @@ one.
 ## In-Memory Exporters
 
 These environment variables are used by
-[tracer_provider_memory](https://otelsdk.r-lib.org/reference/tracer_provider_memory.md)
+[tracer_provider_memory](https://otelsdk.r-lib.org/reference/tracer_provider_memory.md),
+[meter_provider_memory](https://otelsdk.r-lib.org/reference/meter_provider_memory.md)
 and
-[meter_provider_memory](https://otelsdk.r-lib.org/reference/meter_provider_memory.md).
+[logger_provider_memory](https://otelsdk.r-lib.org/reference/logger_provider_memory.md).
 
 The signal specific environment variables have priority over the generic
 one.
@@ -494,10 +496,20 @@ one.
 - `OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE` \|
   `OTEL_R_EXPORTER_MEMORY_TRACES_BUFFER_SIZE` \|
   `OTEL_R_EXPORTER_MEMORY_METRICS_BUFFER_SIZE` \|
+  `OTEL_R_EXPORTER_MEMORY_LOGS_BUFFER_SIZE` \|
   `OTEL_R_EXPORTER_MEMORY_BUFFER_SIZE`
 
-  Buffer size, this is the maximum number of spans or metrics
-  measurements that the provider can record.
+  Buffer size, this is the maximum number of spans, metrics measurements
+  or log records that the provider can record.
+
+## Span Processors
+
+- `OTEL_R_SPAN_PROCESSORS`
+
+  Comma separated list of span processors to add, in the `pkg::name`
+  form. Each entry must refer to a named list of callbacks. See
+  [`add_span_processor()`](https://otelsdk.r-lib.org/reference/add_span_processor.md)
+  for details.
 
 ## Support Matrix of all OpenTelemetry Environment Variables for R
 
@@ -505,7 +517,6 @@ one.
 |------------------------------------------------------------|-------------|
 | *Name*                                                     | *Supported* |
 | `OTEL_SDK_DISABLED`                                        | \+          |
-| `OTEL_ENTITIES`                                            | \-          |
 | `OTEL_RESOURCE_ATTRIBUTES`                                 | \+          |
 | `OTEL_SERVICE_NAME`                                        | \+          |
 | `OTEL_LOG_LEVEL`                                           | \+          |

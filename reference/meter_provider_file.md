@@ -8,6 +8,10 @@ file extension is `jsonl`.
 
 Select this tracer provider with `OTEL_METRICS_EXPORTER=otlp/file`.
 
+Select `OTEL_METRICS_EXPORTER=otlp/stdout` to write to the standard
+output instead of a file. This is the same as setting the `file_pattern`
+option to `stdout`.
+
 ## Value
 
 `meter_provider_file$new()` returns an
@@ -48,6 +52,10 @@ From R:
 
   May contain placeholders, see below.
 
+  If it is `stdout` or `stderr`, then the output is written to the
+  standard output or standard error, instead of a file. In this case the
+  other options are ignored.
+
 - `alias_pattern`: The file which always point to the latest file. Value
   is set from:
 
@@ -58,6 +66,11 @@ From R:
   - `OTEL_EXPORTER_OTLP_FILE_ALIAS environment variable`, or
 
   - the default is: `metrics-latest.jsonl`.
+
+  If `file_pattern` is set, but `alias_pattern` is not, then the default
+  alias is created from `file_pattern`: the last group of placeholders
+  in the file name is replaced by `latest`, and all other placeholders
+  are removed, e.g. `trace-%F-%T-%N.jsonl` becomes `trace-latest.jsonl`.
 
   May contain placeholders, see below.
 

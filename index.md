@@ -55,13 +55,13 @@ with the otel package.
 The current status of the major functional components for OpenTelemetry
 R is as follows:
 
-| *Traces*                                                                                      | *Metrics*                                                                                     | *Logs*                                                                                        |
-|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| *Traces* | *Metrics* | *Logs* |
+|----|----|----|
 | [Development](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#development) | [Development](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#development) | [Development](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#development) |
 
 ## Version support
 
-otel and otelsdk support R 3.6.0 and higher on Unix and R 4.2.0 or
+otel and otelsdk support R 3.6.0 and higher on Unix and R 4.3.0 or
 higher on Windows.
 
 ## Installation
@@ -69,6 +69,7 @@ higher on Windows.
 You can install the otel from CRAN:
 
 ``` r
+
 install.packages("otelsdk")
 ```
 

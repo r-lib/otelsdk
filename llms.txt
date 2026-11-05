@@ -55,13 +55,13 @@ with the otel package.
 The current status of the major functional components for OpenTelemetry
 R is as follows:
 
-| *Traces*                                                                                      | *Metrics*                                                                                     | *Logs*                                                                                        |
-|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| *Traces* | *Metrics* | *Logs* |
+|----|----|----|
 | [Development](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#development) | [Development](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#development) | [Development](https://opentelemetry.io/docs/specs/otel/versioning-and-stability/#development) |
 
 ## Version support
 
-otel and otelsdk support R 3.6.0 and higher on Unix and R 4.2.0 or
+otel and otelsdk support R 3.6.0 and higher on Unix and R 4.3.0 or
 higher on Windows.
 
 ## Installation
@@ -69,6 +69,7 @@ higher on Windows.
 You can install the otel from CRAN:
 
 ``` r
+
 install.packages("otelsdk")
 ```
 
@@ -133,6 +134,9 @@ documentation:
 - [`tracer_provider_stdstream`](https://otelsdk.r-lib.org/reference/tracer_provider_stdstream.md)
   : Tracer provider to write to the standard output or standard error or
   to a file
+- [`add_span_processor()`](https://otelsdk.r-lib.org/reference/add_span_processor.md)
+  [`remove_span_processor()`](https://otelsdk.r-lib.org/reference/add_span_processor.md)
+  : Add or remove a span processor
 
 ## Logs
 
@@ -140,6 +144,8 @@ documentation:
   : Logger provider to write log messages into a JSONL file.
 - [`logger_provider_http`](https://otelsdk.r-lib.org/reference/logger_provider_http.md)
   : Logger provider to log over HTTP
+- [`logger_provider_memory`](https://otelsdk.r-lib.org/reference/logger_provider_memory.md)
+  : In-memory logger provider for testing
 - [`logger_provider_stdstream`](https://otelsdk.r-lib.org/reference/logger_provider_stdstream.md)
   : Logger provider to write to the standard output or standard error or
   to a file

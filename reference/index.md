@@ -32,6 +32,9 @@ documentation:
 - [`tracer_provider_stdstream`](https://otelsdk.r-lib.org/reference/tracer_provider_stdstream.md)
   : Tracer provider to write to the standard output or standard error or
   to a file
+- [`add_span_processor()`](https://otelsdk.r-lib.org/reference/add_span_processor.md)
+  [`remove_span_processor()`](https://otelsdk.r-lib.org/reference/add_span_processor.md)
+  : Add or remove a span processor
 
 ## Logs
 
@@ -39,6 +42,8 @@ documentation:
   : Logger provider to write log messages into a JSONL file.
 - [`logger_provider_http`](https://otelsdk.r-lib.org/reference/logger_provider_http.md)
   : Logger provider to log over HTTP
+- [`logger_provider_memory`](https://otelsdk.r-lib.org/reference/logger_provider_memory.md)
+  : In-memory logger provider for testing
 - [`logger_provider_stdstream`](https://otelsdk.r-lib.org/reference/logger_provider_stdstream.md)
   : Logger provider to write to the standard output or standard error or
   to a file

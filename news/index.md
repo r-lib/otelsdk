@@ -1,5 +1,89 @@
 # Changelog
 
+## otelsdk 0.3.0
+
+- New `logger_provider_memory` collects log records in memory, for
+  testing, like `tracer_provider_memory` and `meter_provider_memory` do
+  for spans and metrics.
+  [`with_otel_record()`](https://otelsdk.r-lib.org/reference/with_otel_record.md)
+  now records logs as well, and has a new `logger_opts` argument
+  ([\#21](https://github.com/r-lib/otelsdk/issues/21)).
+
+- New
+  [`add_span_processor()`](https://otelsdk.r-lib.org/reference/add_span_processor.md)
+  and
+  [`remove_span_processor()`](https://otelsdk.r-lib.org/reference/add_span_processor.md)
+  functions to register callbacks that run when a span starts. Use them
+  to add attributes to spans created by other packages, e.g. the current
+  user to every span created by Shiny. You can also set up span
+  processors with the `OTEL_R_SPAN_PROCESSORS` environment variable. See
+  an example Shiny app in `examples/shiny-span-processor`
+  ([\#77](https://github.com/r-lib/otelsdk/issues/77)).
+
+- All tracer and logger providers now have a `shutdown()` method, like
+  meter providers already had.
+  [`flush()`](https://rdrr.io/r/base/connections.html) now works for
+  `tracer_provider_memory` and `logger_provider_http`; previously it did
+  nothing ([\#32](https://github.com/r-lib/otelsdk/issues/32)).
+
+- Methods of tracer, logger, meter, context, span instrument (counter,
+  up-down counter, histogram, gauge) and provider objects do not throw
+  errors any more. On failure they emit an `otel_error_message` message
+  and return a default value, e.g. a no-op object instead of a span,
+  tracer, logger, meter or instrument. Set `OTEL_ENV=dev` to get errors
+  instead (r-lib/otel#36).
+
+- The `add()` and `record()` methods of instruments now return the
+  instrument invisibly.
+
+- The default alias pattern of the file exporters, used when only the
+  file pattern is set, does not contain date and time placeholders any
+  more. Previously a file pattern like `trace-%F-%T-%N.jsonl` created a
+  new alias file for every output file
+  ([\#70](https://github.com/r-lib/otelsdk/issues/70)).
+
+- Setting the metric export interval or timeout, via the
+  `OTEL_METRIC_EXPORT_INTERVAL` or `OTEL_METRIC_EXPORT_TIMEOUT`
+  environment variables, or the `export_interval` or `export_timeout`
+  options, does not fail any more
+  ([\#79](https://github.com/r-lib/otelsdk/issues/79)).
+
+- The `create_histogram()` method of meters now has a `boundaries`
+  argument, to set explicit bucket boundaries for the histogram
+  (r-lib/otel#49).
+
+- Length one attribute values that are R arrays, e.g. created with
+  [`as.array()`](https://rdrr.io/r/base/array.html), are now recorded as
+  arrays, instead of scalars (r-lib/otel#48).
+
+- Spans ended automatically, without an error, now keep the `unset`
+  status, instead of being set to `ok` (r-lib/otel#30).
+
+- Spans now have a `set_attributes()` method, to set multiple attributes
+  at once (r-lib/otel#35).
+
+- The span object returned by
+  [`otel::get_active_span()`](https://otel.r-lib.org/reference/get_active_span.html)
+  now has the correct span name in `$name`
+  ([\#80](https://github.com/r-lib/otelsdk/issues/80)).
+
+- The file tracer, logger and meter providers now write to the standard
+  output or standard error if the `file_pattern` option is `stdout` or
+  `stderr`. otel uses this for the `otlp/stdout` exporter
+  (r-lib/otel#18).
+
+- The `end_steady_time` option of the
+  [`end()`](https://rdrr.io/r/stats/start.html) method of spans is now
+  correctly used for the end time of the span.
+
+- Documentation update for the new Otel 1.62.0 specification.
+
+- otelsdk now bundles opentelemetry-cpp 1.30.0. Notable changes:
+
+  - The default `schedule_delay` of the batch log processor is now 1000
+    ms, instead of 5000 ms.
+  - New trace IDs now have the W3C `random` trace flag set.
+
 ## otelsdk 0.2.4
 
 CRAN release: 2026-04-08
